@@ -1,10 +1,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>OpenVerify Courses – 示例项目</title>
+    <title>开放验证平台学习资源 – 示例项目</title>
     <link>https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/</link>
-    <description>Recent content in 示例项目 on OpenVerify Courses</description>
+    <description>Recent content in 示例项目 on 开放验证平台学习资源</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <lastBuildDate>Thu, 05 Jan 2017 00:00:00 +0000</lastBuildDate>
     
 	  <atom:link href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/index.xml" rel="self" type="application/rss+xml" />
     
@@ -56,308 +57,37 @@
 
 &lt;/div&gt;
 
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+&lt;h3 id=&#34;芯片验证&#34;&gt;芯片验证&lt;/h3&gt;
+&lt;p&gt;芯片验证是确保芯片设计正确性和可靠性的重要环节，主要包括功能验证、形式验证和物理验证等形式，本学习材料仅仅包含对功能验证的介绍，且侧重于基于仿真器的芯片功能验证。芯片功能验证的流程和方法与软件测试有比较大的共同点，例如都有单元测试、系统测试、黑盒测试、白盒测试等。在验证指标上也有共同特点，例如功能覆盖率、代码覆盖率等等。从某种形式上说，除了使用的工具和编程语言不一样外，他们的目标和流程几乎相同。&lt;strong&gt;因此，在不考虑工具和编程语言的情况下，会软件测试的工程师应当就会芯片验证。&lt;/strong&gt; 但在实际工作中，软件测试和芯片验证属于两个完全不相交的行业，其主要原因是验证工具和验证语言的不同，导致软件测试工程师很难实现跨界。在芯片验证领域，通常使用硬件描述语言进行验证（例如 Verilog 或者 System Verilog），使用专业商业工具进行电路仿真。硬件描述语言不同于C++/Python等高级软件编程语言，具有独特的“时钟”特性，对于软件领域的工程师不友好，学习成本高。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;为了打通芯片验证与传统软件测试之间的壁垒，让更多的人参与到芯片验证，本项目提供如下内容：&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;
+多语言验证工具（Picker），让用户可以使用自己擅长的编程语言进行芯片验证
+&lt;p&gt;验证框架（MLVP），如何在不关心时钟的情况下进行功能验证&lt;/p&gt;
+&lt;p&gt;介绍基本电路、验证知识，方便软件背景爱好者更能容易的理解电路特征&lt;/p&gt;
+&lt;p&gt;提供基本学习材料，学习基本验证知识&lt;/p&gt;
+&lt;p&gt;提供真实高性能芯片验证案例，让爱好者可以远程参与验证工作&lt;/p&gt;
+&lt;/blockquote&gt;&lt;/p&gt;
+&lt;h3 id=&#34;基本术语&#34;&gt;基本术语&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;DUT：&lt;/strong&gt; DUT（Design Under Test）指待测试设计，通常指设计好的RTL代码。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RM：&lt;/strong&gt; Reference Model （RM）指代待测试单元对应的参考模型，参考模型通常被认为是标准的，没有错误的。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RTL：&lt;/strong&gt; 指寄存器传输级（Register Transfer Level），通常指代芯片设计对应的 verilog 或者 vhdl 代码。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;覆盖率：&lt;/strong&gt; 测试覆盖率是指测试范围与整个需求范围的百分比。在芯片验证领域，通常有代码行覆盖率、函数覆盖率、功能覆盖率等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;DV：&lt;/strong&gt; DV中的D通常指设计（Desgin），V指验证（Verification）。何在一起指设计与验证协同工作。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;差分测试（difftest）：&lt;/strong&gt; 选取两个（或以上）功能相同的被测对象，选取符合被测对象要求的同一测试用例分别提交被测对象进行执行，以观测执行结果是否存在差异的过程。&lt;/p&gt;
+&lt;h3 id=&#34;工具介绍&#34;&gt;工具介绍&lt;/h3&gt;
+&lt;p&gt;本学习材料用到的核心工具为 picker （url：），它的作用是将RTL编写的设计模块转换成高级软件编程语言（Python/C++/Java/Golang）第三方库的工具。基于该工具，软件开发（测试）背景的验证人员可以不用去学习 Verilog/VHDL 等硬件描述语言。&lt;/p&gt;
+&lt;h3 id=&#34;系统需求&#34;&gt;系统需求&lt;/h3&gt;
+&lt;p&gt;操作系统建议： Linux 系统&lt;/p&gt;
 
       </description>
     </item>
     
     <item>
-      <title>Docs: TileLink 协议</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <title>Docs: 验证加法器</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-adder/</link>
+      <pubDate>Thu, 05 Jan 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 基础知识</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 异步编程</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/async/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/async/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 创建DUT</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 高级教程</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 消息驱动</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/message/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/message/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: DUT编译</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 高级案例</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 验证IP</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/ovip/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/ovip/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: DUT验证</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 验证框架</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/test_framework/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/test_framework/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: VCS 支持</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/vcs/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/vcs/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 验证报告</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/report/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/report/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: UVM对接</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/uvm/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/uvm/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 加法器验证</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/adder/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/adder/</guid>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-adder/</guid>
       <description>
         
         
@@ -554,11 +284,110 @@ REF: sum=0xfcad9866c3d98d72, cout=0x0
     </item>
     
     <item>
-      <title>Docs: 随机数生成器验证</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/rmg/</link>
+      <title>Docs: TileLink 协议</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/rmg/</guid>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 基础知识</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/</guid>
+      <description>
+        
+        
+        
+
+&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
+
+&lt;/div&gt;
+
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 异步编程</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/async/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/async/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 创建DUT</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</guid>
+      <description>
+        
+        
+        
+
+&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
+&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
+
+&lt;/div&gt;
+
+&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
+&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
+&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
+&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
+&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
+&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
+&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
+&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 高级教程</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 消息驱动</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/message/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/message/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 验证随机数</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/</guid>
       <description>
         
         
@@ -695,48 +524,11 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
     </item>
     
     <item>
-      <title>Docs: 验证示例</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/</link>
+      <title>Docs: DUT编译</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;备注：
-Verilog的Top文件可以理解为主程序，Top Module可以理解为主函数。Top Module即是该设计的入口。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 多语言</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 高级用法</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/</guid>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</guid>
       <description>
         
         
@@ -756,6 +548,236 @@ Verilog的Top文件可以理解为主程序，Top Module可以理解为主函数
 &lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
 &lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
 
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 高级案例</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 验证IP</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/ovip/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/ovip/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: DUT验证</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</guid>
+      <description>
+        
+        
+        
+
+&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
+&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
+
+&lt;/div&gt;
+
+&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
+&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
+&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
+&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
+&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
+&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
+&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
+&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 验证框架</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/test_framework/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/test_framework/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: VCS 支持</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/vcs/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/vcs/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 验证报告</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/report/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/report/</guid>
+      <description>
+        
+        
+        
+
+&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
+&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
+
+&lt;/div&gt;
+
+&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
+&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
+&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
+&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
+&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
+&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
+&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
+&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: UVM对接</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/uvm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/uvm/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 高级特征</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 生成DUT波形</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/wave/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/wave/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 多文件输入</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/multifile/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/multifile/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 输出覆盖率</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/coverage-/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/coverage-/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 软件测试框架</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: PyTest</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/pytest/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/pytest/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Hypothesis</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/hypothesis/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/hypothesis/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 其他编程语言</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/</guid>
+      <description>
+        
+        
+        
       </description>
     </item>
     

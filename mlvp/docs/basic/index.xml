@@ -1,8 +1,8 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>OpenVerify Courses – 基础知识</title>
+    <title>开放验证平台学习资源 – 基础知识</title>
     <link>https://xs-mlvp.github.io/mlvp/docs/basic/</link>
-    <description>Recent content in 基础知识 on OpenVerify Courses</description>
+    <description>Recent content in 基础知识 on 开放验证平台学习资源</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     
@@ -43,7 +43,7 @@
 &lt;/p&gt;&lt;/blockquote&gt;
 &lt;h2 id=&#34;芯片验证流程&#34;&gt;芯片验证流程&lt;/h2&gt;
 &lt;hr&gt;
-&lt;p&gt;&lt;img src=&#34;ic-verify.drawio.svg&#34; alt=&#34;验证在芯片设计中的位置&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;验证在芯片设计中的位置&#34; src=&#34;ic-verify.drawio.svg&#34;&gt;&lt;/p&gt;
 &lt;p&gt;芯片设计和验证的耦合关系如上图所示，设计和验证有同样的输入，即规范文档（specification）。参考规范，设计与验证人员双方按照各自的理解，以及各自的需求进行独立编码实现。设计方需要满足的前提是编码的RTL代码“可综合”，需要考虑电路特性，而验证方一般只要考虑功能是否满足要求，编码限制少。双方完成模块开发后，需要进行健全性对比测试（Sanity Test），判定功能是否表现一致，若不一致需要进行协同排查，确定问题所在并进行修复，再进行对比测试，直到所有功能点都满足预期。由于芯片设计和芯片验证耦合度很高，因此有些企业在研发队伍上也进行了直接耦合，为每个子模块的设计团队都配置了对应的验证团队（DV）。上图中的设计与验证的耦合流程为粗粒度的关系，具体到具体芯片（例如Soc、DDR）、具体企业等都有其适合自身的合作模式。&lt;/p&gt;
 &lt;p&gt;在上述对比测试中，设计方的产出的模块通常称为DUT（Design Under Test），验证方开发的模型通常称为RM（Reference Model）。针对图中的验证工作，按照流程可以有：编写验证计划、创建验证平台、整理功能点、构建测试用例、运行调试、收集Bug/覆盖率、回归测试、编写测试报告等多个阶段。&lt;/p&gt;
 &lt;blockquote&gt;&lt;p&gt;
@@ -103,7 +103,7 @@
 &lt;h2 id=&#34;芯片验证众包&#34;&gt;芯片验证众包&lt;/h2&gt;
 &lt;hr&gt;
 &lt;p&gt;相比与硬件，软件领域为了减少软件测试成本，测试外包（分包）已经成为常态，该领域的分包业务非常成熟，市场规模已经是千亿人民币级别，并朝万亿级别规模进发。从工作内容上看，软件测试和硬件验证，有非常大的共同特征（系统的目的不同的对象），如果以软件的方式对硬件验证进行分包是否可行？&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;maket_of_soft_test.png&#34; alt=&#34;软件外包市场&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;软件外包市场&#34; src=&#34;maket_of_soft_test.png&#34;&gt;&lt;/p&gt;
 &lt;blockquote&gt;&lt;p&gt;
 把芯片验证工作进行外包（分包）面临诸多挑战，例如：
 &lt;p&gt;&lt;strong&gt;从业人员基数少：&lt;/strong&gt; 相比软件领域，硬件开发者数量少了几个数量级。例如在github的统计上（https://madnight.github.io/githut/#/pull_requests/2023/2），传统软件编程语言占（Python、Java、C++，Go）比接近 50%， 而硬件描述语言，verilog占比仅 0.076%，这能从侧面反应出各自领域的开发者数量。&lt;/p&gt;

@@ -1,8 +1,8 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>OpenVerify Courses – docs</title>
+    <title>开放验证平台学习资源 – Docs</title>
     <link>https://xs-mlvp.github.io/mlvp/tags/docs/</link>
-    <description>Recent content in docs on OpenVerify Courses</description>
+    <description>Recent content in Docs on 开放验证平台学习资源</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <lastBuildDate>Thu, 05 Jan 2017 00:00:00 +0000</lastBuildDate>
@@ -16,7 +16,7 @@
     
     
     <item>
-      <title>Docs: 安装教程</title>
+      <title>Docs: 搭建验证环境</title>
       <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/installer/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -39,6 +39,10 @@
 &lt;/blockquote&gt;
 &lt;h3 id=&#34;下载源码&#34;&gt;下载源码&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://gitee.com/yaozhicheng/picker.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://gitee.com/XS-MLVP/xcomm.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker/dependence
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rmdir xcomm/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ln -s ../../xcomm xcomm
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;构建并安装&#34;&gt;构建并安装&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;BUILD_XSPCOMM_SWIG&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;python &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 仅在需要python支持时使用&lt;/span&gt;
@@ -191,381 +195,37 @@
 
 &lt;/div&gt;
 
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+&lt;h3 id=&#34;芯片验证&#34;&gt;芯片验证&lt;/h3&gt;
+&lt;p&gt;芯片验证是确保芯片设计正确性和可靠性的重要环节，主要包括功能验证、形式验证和物理验证等形式，本学习材料仅仅包含对功能验证的介绍，且侧重于基于仿真器的芯片功能验证。芯片功能验证的流程和方法与软件测试有比较大的共同点，例如都有单元测试、系统测试、黑盒测试、白盒测试等。在验证指标上也有共同特点，例如功能覆盖率、代码覆盖率等等。从某种形式上说，除了使用的工具和编程语言不一样外，他们的目标和流程几乎相同。&lt;strong&gt;因此，在不考虑工具和编程语言的情况下，会软件测试的工程师应当就会芯片验证。&lt;/strong&gt; 但在实际工作中，软件测试和芯片验证属于两个完全不相交的行业，其主要原因是验证工具和验证语言的不同，导致软件测试工程师很难实现跨界。在芯片验证领域，通常使用硬件描述语言进行验证（例如 Verilog 或者 System Verilog），使用专业商业工具进行电路仿真。硬件描述语言不同于C++/Python等高级软件编程语言，具有独特的“时钟”特性，对于软件领域的工程师不友好，学习成本高。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;为了打通芯片验证与传统软件测试之间的壁垒，让更多的人参与到芯片验证，本项目提供如下内容：&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;
+多语言验证工具（Picker），让用户可以使用自己擅长的编程语言进行芯片验证
+&lt;p&gt;验证框架（MLVP），如何在不关心时钟的情况下进行功能验证&lt;/p&gt;
+&lt;p&gt;介绍基本电路、验证知识，方便软件背景爱好者更能容易的理解电路特征&lt;/p&gt;
+&lt;p&gt;提供基本学习材料，学习基本验证知识&lt;/p&gt;
+&lt;p&gt;提供真实高性能芯片验证案例，让爱好者可以远程参与验证工作&lt;/p&gt;
+&lt;/blockquote&gt;&lt;/p&gt;
+&lt;h3 id=&#34;基本术语&#34;&gt;基本术语&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;DUT：&lt;/strong&gt; DUT（Design Under Test）指待测试设计，通常指设计好的RTL代码。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RM：&lt;/strong&gt; Reference Model （RM）指代待测试单元对应的参考模型，参考模型通常被认为是标准的，没有错误的。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RTL：&lt;/strong&gt; 指寄存器传输级（Register Transfer Level），通常指代芯片设计对应的 verilog 或者 vhdl 代码。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;覆盖率：&lt;/strong&gt; 测试覆盖率是指测试范围与整个需求范围的百分比。在芯片验证领域，通常有代码行覆盖率、函数覆盖率、功能覆盖率等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;DV：&lt;/strong&gt; DV中的D通常指设计（Desgin），V指验证（Verification）。何在一起指设计与验证协同工作。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;差分测试（difftest）：&lt;/strong&gt; 选取两个（或以上）功能相同的被测对象，选取符合被测对象要求的同一测试用例分别提交被测对象进行执行，以观测执行结果是否存在差异的过程。&lt;/p&gt;
+&lt;h3 id=&#34;工具介绍&#34;&gt;工具介绍&lt;/h3&gt;
+&lt;p&gt;本学习材料用到的核心工具为 picker （url：），它的作用是将RTL编写的设计模块转换成高级软件编程语言（Python/C++/Java/Golang）第三方库的工具。基于该工具，软件开发（测试）背景的验证人员可以不用去学习 Verilog/VHDL 等硬件描述语言。&lt;/p&gt;
+&lt;h3 id=&#34;系统需求&#34;&gt;系统需求&lt;/h3&gt;
+&lt;p&gt;操作系统建议： Linux 系统&lt;/p&gt;
 
       </description>
     </item>
     
     <item>
-      <title>Docs: TileLink 协议</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <title>Docs: 验证加法器</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-adder/</link>
+      <pubDate>Thu, 05 Jan 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 基础知识</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 异步编程</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/async/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/async/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 创建DUT</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 高级教程</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 消息驱动</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/message/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/message/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: DUT编译</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 高级案例</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 验证IP</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/ovip/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/ovip/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: DUT验证</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 验证框架</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/test_framework/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/test_framework/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: VCS 支持</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/vcs/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/vcs/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 验证报告</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/report/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/report/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: UVM对接</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/uvm/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/uvm/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: C&#43;&#43;</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/cpp/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/cpp/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;流程介绍&#34;&gt;流程介绍&lt;/h2&gt;
-&lt;h3 id=&#34;基础库&#34;&gt;基础库&lt;/h3&gt;
-&lt;p&gt;在本章节中，我们将介绍如何使用Picker将RTL代码编译为C++ Class，并编译为动态库。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;首先，Picker工具会解析RTL代码，根据指定的 Top Module ，创建一个新的 Module 封装该模块的&lt;strong&gt;输入输出端口&lt;/strong&gt;，并导出&lt;code&gt;DPI/API&lt;/code&gt;以操作输入端口、读取输出端口。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;em&gt;工具通过指定Top Module所在的文件和 Module Name来确定需要封装的模块。此时可以将 Top 理解为软件编程中的main。&lt;/em&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;2&#34;&gt;
-&lt;li&gt;其次，Picker工具会使用指定的 &lt;strong&gt;仿真器&lt;/strong&gt; 编译RTL代码，并生成一个&lt;strong&gt;DPI库文件&lt;/strong&gt;。该库文件内包含模拟运行RTL代码所需要的逻辑（即为&lt;strong&gt;硬件模拟器&lt;/strong&gt;）。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;em&gt;对于VCS，该库文件为.so（动态库）文件，对于Verilator，该库文件为.a（静态库）文件。&lt;/em&gt;&lt;br&gt;
-&lt;em&gt;DPI的含义是 &lt;a href=&#34;https://www.chipverify.com/systemverilog/systemverilog-dpi&#34;&gt;Direct Programming Interface&lt;/a&gt;，可以理解为一种API规范。&lt;/em&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;3&#34;&gt;
-&lt;li&gt;接下来，Picker工具会根据配置参数，渲染源代码中定义的基类，生成用于对接仿真器并&lt;strong&gt;隐藏仿真器细节&lt;/strong&gt;的基类（wrapper）。然后链接基类与DPI库文件，生成一个 &lt;strong&gt;UT动态库文件&lt;/strong&gt;。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;此时，该&lt;strong&gt;UT库文件&lt;/strong&gt;使用了Picker工具模板中提供的统一API，相比于&lt;strong&gt;DPI库文件&lt;/strong&gt;中与仿真器强相关的API，UT库文件为仿真器生成的硬件模拟器，提供了&lt;strong&gt;统一的API接口&lt;/strong&gt;。&lt;/em&gt;&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;截至这一步生成&lt;strong&gt;UT库文件&lt;/strong&gt;在不同语言中是&lt;strong&gt;通用&lt;/strong&gt;的！如果没有另行说明，其他高级语言均会通过&lt;strong&gt;调用UT动态库&lt;/strong&gt;以实现对硬件模拟器的操作。&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;4&#34;&gt;
-&lt;li&gt;最后，Picker工具会根据配置参数和解析的RTL代码，生成一段 &lt;strong&gt;C++ Class&lt;/strong&gt; 的源码。这段源码即是 RTL 硬件模块在软件中的&lt;strong&gt;定义 (.hpp)&lt;/strong&gt; 及&lt;strong&gt;实现 (.cpp)&lt;/strong&gt; 。实例化该类即相当于创建了一个硬件模块。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;em&gt;该类继承自&lt;strong&gt;基类&lt;/strong&gt;，并实现了基类中的纯虚函数，以用软件方式实例化硬件。&lt;/em&gt;&lt;br&gt;
-&lt;em&gt;不将&lt;strong&gt;类的实现&lt;/strong&gt;这一步也封装进动态库的原因有两点：&lt;/em&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;em&gt;由于&lt;strong&gt;UT库文件&lt;/strong&gt;需要在不同语言中&lt;strong&gt;通用&lt;/strong&gt;，而不同语言实现类的方式不同。为了通用性，不将&lt;code&gt;类的实现&lt;/code&gt;封装进动态库。&lt;/em&gt;&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;为了&lt;strong&gt;便于调试&lt;/strong&gt;，提升代码可读性，方便用户进行二次封装和修改。&lt;/em&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/blockquote&gt;
-&lt;h3 id=&#34;生成可执行文件&#34;&gt;生成可执行文件&lt;/h3&gt;
-&lt;p&gt;在本章节中，我们将介绍如何基于上一章节生成的基础库（包含动态库，类的声明及定义），编写测试用例，生成可执行文件。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;首先，用户需要编写测试用例，即实例化上一章节生成的类，并调用类中的方法，以实现对硬件模块的操作。&lt;br&gt;
-详情可以参考&lt;a href=&#34;docs/quick-start/examples/rmg/#%E9%85%8D%E7%BD%AE%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81&#34;&gt;随机数生成器验证-配置测试代码&lt;/a&gt;中实例化及初始化的过程。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;其次，用户需要根据基础库所应用的&lt;strong&gt;不同仿真器&lt;/strong&gt;，应用不同的链接参数以生成可执行文件。对应的参数在&lt;code&gt;template/cpp/cmake/*.cmake&lt;/code&gt;中有定义。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;最终根据配置的链接参数，编译器会链接基础库，生成可执行文件。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;以 &lt;a href=&#34;docs/quick-start/examples/adder/#%E5%B0%86rtl%E6%9E%84%E5%BB%BA%E4%B8%BAc-class&#34;&gt;加法器验证&lt;/a&gt; 为例，&lt;code&gt;picker_out_adder/cpp/cmake/*.cmake&lt;/code&gt;即是上述表项2所述模板的拷贝。&lt;br&gt;
-&lt;code&gt;vcs.cmake&lt;/code&gt;定义了使用VCS仿真器生成的基础库的链接参数，&lt;code&gt;verilator.cmake&lt;/code&gt;定义了使用Verilator仿真器生成的基础库的链接参数。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h2 id=&#34;使用方案&#34;&gt;使用方案&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;参数 &lt;code&gt;--language cpp&lt;/code&gt; 或 &lt;code&gt;-l cpp&lt;/code&gt; 用于指定生成C++基础库。&lt;/li&gt;
-&lt;li&gt;参数 &lt;code&gt;-e&lt;/code&gt; 用于生成包含示例项目的可执行文件。&lt;/li&gt;
-&lt;li&gt;参数 &lt;code&gt;-v&lt;/code&gt; 用于保留生成项目时的中间文件。&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 加法器验证</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/adder/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/adder/</guid>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-adder/</guid>
       <description>
         
         
@@ -762,11 +422,11 @@ REF: sum=0xfcad9866c3d98d72, cout=0x0
     </item>
     
     <item>
-      <title>Docs: Python</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/python/</link>
+      <title>Docs: TileLink 协议</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/python/</guid>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</guid>
       <description>
         
         
@@ -775,11 +435,97 @@ REF: sum=0xfcad9866c3d98d72, cout=0x0
     </item>
     
     <item>
-      <title>Docs: 随机数生成器验证</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/rmg/</link>
+      <title>Docs: 基础知识</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/rmg/</guid>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/</guid>
+      <description>
+        
+        
+        
+
+&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
+
+&lt;/div&gt;
+
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 异步编程</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/async/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/async/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 创建DUT</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</guid>
+      <description>
+        
+        
+        
+
+&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
+&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
+
+&lt;/div&gt;
+
+&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
+&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
+&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
+&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
+&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
+&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
+&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
+&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 高级教程</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 消息驱动</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/message/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/message/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 验证随机数</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/</guid>
       <description>
         
         
@@ -916,48 +662,11 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
     </item>
     
     <item>
-      <title>Docs: 验证示例</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/</link>
+      <title>Docs: DUT编译</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/examples/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;备注：
-Verilog的Top文件可以理解为主程序，Top Module可以理解为主函数。Top Module即是该设计的入口。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 多语言</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/</guid>
-      <description>
-        
-        
-        
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: 高级用法</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/</guid>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</guid>
       <description>
         
         
@@ -981,315 +690,318 @@ Verilog的Top文件可以理解为主程序，Top Module可以理解为主函数
     </item>
     
     <item>
-      <title>Docs: Example Page</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/example-page/</link>
-      <pubDate>Thu, 05 Jan 2017 00:00:00 +0000</pubDate>
+      <title>Docs: 高级案例</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/example-page/</guid>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 验证IP</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/ovip/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/ovip/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: DUT验证</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</guid>
       <description>
         
         
         
 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;This is a placeholder page. Replace it with your own content.&lt;/p&gt;
+&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;Text can be &lt;strong&gt;bold&lt;/strong&gt;, &lt;em&gt;italic&lt;/em&gt;, or &lt;del&gt;strikethrough&lt;/del&gt;. &lt;a href=&#34;https://gohugo.io&#34;&gt;Links&lt;/a&gt; should be blue with no underlines (unless hovered over).&lt;/p&gt;
-&lt;p&gt;There should be whitespace between paragraphs. Vape migas chillwave sriracha poutine try-hard distillery. Tattooed shabby chic small batch, pabst art party heirloom letterpress air plant pop-up. Sustainable chia skateboard art party banjo cardigan normcore affogato vexillologist quinoa meggings man bun master cleanse shoreditch readymade. Yuccie prism four dollar toast tbh cardigan iPhone, tumblr listicle live-edge VHS. Pug lyft normcore hot chicken biodiesel, actually keffiyeh thundercats photo booth pour-over twee fam food truck microdosing banh mi. Vice activated charcoal raclette unicorn live-edge post-ironic. Heirloom vexillologist coloring book, beard deep v letterpress echo park humblebrag tilde.&lt;/p&gt;
-&lt;p&gt;90&amp;rsquo;s four loko seitan photo booth gochujang freegan tumeric listicle fam ugh humblebrag. Bespoke leggings gastropub, biodiesel brunch pug fashion axe meh swag art party neutra deep v chia. Enamel pin fanny pack knausgaard tofu, artisan cronut hammock meditation occupy master cleanse chartreuse lumbersexual. Kombucha kogi viral truffaut synth distillery single-origin coffee ugh slow-carb marfa selfies. Pitchfork schlitz semiotics fanny pack, ugh artisan vegan vaporware hexagon. Polaroid fixie post-ironic venmo wolf ramps &lt;strong&gt;kale chips&lt;/strong&gt;.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;There should be no margin above this first sentence.&lt;/p&gt;
-&lt;p&gt;Blockquotes should be a lighter gray with a border along the left side in the secondary color.&lt;/p&gt;
-&lt;p&gt;There should be no margin below this final sentence.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h2 id=&#34;first-header-2&#34;&gt;First Header 2&lt;/h2&gt;
-&lt;p&gt;This is a normal paragraph following a header. Knausgaard kale chips snackwave microdosing cronut copper mug swag synth bitters letterpress glossier &lt;strong&gt;craft beer&lt;/strong&gt;. Mumblecore bushwick authentic gochujang vegan chambray meditation jean shorts irony. Viral farm-to-table kale chips, pork belly palo santo distillery activated charcoal aesthetic jianbing air plant woke lomo VHS organic. Tattooed locavore succulents heirloom, small batch sriracha echo park DIY af. Shaman you probably haven&amp;rsquo;t heard of them copper mug, crucifix green juice vape &lt;em&gt;single-origin coffee&lt;/em&gt; brunch actually. Mustache etsy vexillologist raclette authentic fam. Tousled beard humblebrag asymmetrical. I love turkey, I love my job, I love my friends, I love Chardonnay!&lt;/p&gt;
-&lt;p&gt;Deae legum paulatimque terra, non vos mutata tacet: dic. Vocant docuique me plumas fila quin afuerunt copia haec o neque.&lt;/p&gt;
-&lt;p&gt;On big screens, paragraphs and headings should not take up the full container width, but we want tables, code blocks and similar to take the full width.&lt;/p&gt;
-&lt;p&gt;Scenester tumeric pickled, authentic crucifix post-ironic fam freegan VHS pork belly 8-bit yuccie PBR&amp;amp;B. &lt;strong&gt;I love this life we live in&lt;/strong&gt;.&lt;/p&gt;
-&lt;h2 id=&#34;second-header-2&#34;&gt;Second Header 2&lt;/h2&gt;
-&lt;blockquote&gt;
-&lt;p&gt;This is a blockquote following a header. Bacon ipsum dolor sit amet t-bone doner shank drumstick, pork belly porchetta chuck sausage brisket ham hock rump pig. Chuck kielbasa leberkas, pork bresaola ham hock filet mignon cow shoulder short ribs biltong.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h3 id=&#34;header-3&#34;&gt;Header 3&lt;/h3&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;This is a code block following a header.
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next level leggings before they sold out, PBR&amp;amp;B church-key shaman echo park. Kale chips occupy godard whatever pop-up freegan pork belly selfies. Gastropub Belinda subway tile woke post-ironic seitan. Shabby chic man bun semiotics vape, chia messenger bag plaid cardigan.&lt;/p&gt;
-&lt;h4 id=&#34;header-4&#34;&gt;Header 4&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;This is an unordered list following a header.&lt;/li&gt;
-&lt;li&gt;This is an unordered list following a header.&lt;/li&gt;
-&lt;li&gt;This is an unordered list following a header.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h5 id=&#34;header-5&#34;&gt;Header 5&lt;/h5&gt;
+&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
+&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
+&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
+&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
+&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
+&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
+&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
+&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 验证框架</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/test_framework/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/test_framework/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: VCS 支持</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/vcs/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/vcs/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 验证报告</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/report/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/report/</guid>
+      <description>
+        
+        
+        
+
+&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
+&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
+
+&lt;/div&gt;
+
+&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
+&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
+&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
+&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
+&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
+&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
+&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
+&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: UVM对接</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_func/uvm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_func/uvm/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 高级特征</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 生成DUT波形</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/wave/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/wave/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 多文件输入</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/multifile/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/multifile/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 输出覆盖率</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/coverage-/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/coverage-/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 软件测试框架</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: PyTest</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/pytest/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/pytest/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Hypothesis</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/hypothesis/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/frameworks/hypothesis/</guid>
+      <description>
+        
+        
+        &lt;p&gt;XXXX&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 其他编程语言</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: C&#43;&#43;</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/cpp/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/cpp/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;流程介绍&#34;&gt;流程介绍&lt;/h2&gt;
+&lt;h3 id=&#34;基础库&#34;&gt;基础库&lt;/h3&gt;
+&lt;p&gt;在本章节中，我们将介绍如何使用Picker将RTL代码编译为C++ Class，并编译为动态库。&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;This is an ordered list following a header.&lt;/li&gt;
-&lt;li&gt;This is an ordered list following a header.&lt;/li&gt;
-&lt;li&gt;This is an ordered list following a header.&lt;/li&gt;
+&lt;li&gt;首先，Picker工具会解析RTL代码，根据指定的 Top Module ，创建一个新的 Module 封装该模块的&lt;strong&gt;输入输出端口&lt;/strong&gt;，并导出&lt;code&gt;DPI/API&lt;/code&gt;以操作输入端口、读取输出端口。&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h6 id=&#34;header-6&#34;&gt;Header 6&lt;/h6&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;What&lt;/th&gt;
-&lt;th&gt;Follows&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;A table&lt;/td&gt;
-&lt;td&gt;A header&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;A table&lt;/td&gt;
-&lt;td&gt;A header&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;A table&lt;/td&gt;
-&lt;td&gt;A header&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;p&gt;There&amp;rsquo;s a horizontal rule above and below this.&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;Here is an unordered list:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;工具通过指定Top Module所在的文件和 Module Name来确定需要封装的模块。此时可以将 Top 理解为软件编程中的main。&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;其次，Picker工具会使用指定的 &lt;strong&gt;仿真器&lt;/strong&gt; 编译RTL代码，并生成一个&lt;strong&gt;DPI库文件&lt;/strong&gt;。该库文件内包含模拟运行RTL代码所需要的逻辑（即为&lt;strong&gt;硬件模拟器&lt;/strong&gt;）。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;对于VCS，该库文件为.so（动态库）文件，对于Verilator，该库文件为.a（静态库）文件。&lt;/em&gt;&lt;br&gt;
+&lt;em&gt;DPI的含义是 &lt;a href=&#34;https://www.chipverify.com/systemverilog/systemverilog-dpi&#34;&gt;Direct Programming Interface&lt;/a&gt;，可以理解为一种API规范。&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;接下来，Picker工具会根据配置参数，渲染源代码中定义的基类，生成用于对接仿真器并&lt;strong&gt;隐藏仿真器细节&lt;/strong&gt;的基类（wrapper）。然后链接基类与DPI库文件，生成一个 &lt;strong&gt;UT动态库文件&lt;/strong&gt;。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
 &lt;ul&gt;
-&lt;li&gt;Liverpool F.C.&lt;/li&gt;
-&lt;li&gt;Chelsea F.C.&lt;/li&gt;
-&lt;li&gt;Manchester United F.C.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;此时，该&lt;strong&gt;UT库文件&lt;/strong&gt;使用了Picker工具模板中提供的统一API，相比于&lt;strong&gt;DPI库文件&lt;/strong&gt;中与仿真器强相关的API，UT库文件为仿真器生成的硬件模拟器，提供了&lt;strong&gt;统一的API接口&lt;/strong&gt;。&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;截至这一步生成&lt;strong&gt;UT库文件&lt;/strong&gt;在不同语言中是&lt;strong&gt;通用&lt;/strong&gt;的！如果没有另行说明，其他高级语言均会通过&lt;strong&gt;调用UT动态库&lt;/strong&gt;以实现对硬件模拟器的操作。&lt;/em&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;And an ordered list:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;最后，Picker工具会根据配置参数和解析的RTL代码，生成一段 &lt;strong&gt;C++ Class&lt;/strong&gt; 的源码。这段源码即是 RTL 硬件模块在软件中的&lt;strong&gt;定义 (.hpp)&lt;/strong&gt; 及&lt;strong&gt;实现 (.cpp)&lt;/strong&gt; 。实例化该类即相当于创建了一个硬件模块。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;该类继承自&lt;strong&gt;基类&lt;/strong&gt;，并实现了基类中的纯虚函数，以用软件方式实例化硬件。&lt;/em&gt;&lt;br&gt;
+&lt;em&gt;不将&lt;strong&gt;类的实现&lt;/strong&gt;这一步也封装进动态库的原因有两点：&lt;/em&gt;&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;Michael Brecker&lt;/li&gt;
-&lt;li&gt;Seamus Blake&lt;/li&gt;
-&lt;li&gt;Branford Marsalis&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;由于&lt;strong&gt;UT库文件&lt;/strong&gt;需要在不同语言中&lt;strong&gt;通用&lt;/strong&gt;，而不同语言实现类的方式不同。为了通用性，不将&lt;code&gt;类的实现&lt;/code&gt;封装进动态库。&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;为了&lt;strong&gt;便于调试&lt;/strong&gt;，提升代码可读性，方便用户进行二次封装和修改。&lt;/em&gt;&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;And an unordered task list:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;input checked=&#34;&#34; disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Create a Hugo theme&lt;/li&gt;
-&lt;li&gt;&lt;input checked=&#34;&#34; disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Add task lists to it&lt;/li&gt;
-&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Take a vacation&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;And a &amp;ldquo;mixed&amp;rdquo; task list:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Pack bags&lt;/li&gt;
-&lt;li&gt;?&lt;/li&gt;
-&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Travel!&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;And a nested list:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Jackson 5
-&lt;ul&gt;
-&lt;li&gt;Michael&lt;/li&gt;
-&lt;li&gt;Tito&lt;/li&gt;
-&lt;li&gt;Jackie&lt;/li&gt;
-&lt;li&gt;Marlon&lt;/li&gt;
-&lt;li&gt;Jermaine&lt;/li&gt;
-&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;生成可执行文件&#34;&gt;生成可执行文件&lt;/h3&gt;
+&lt;p&gt;在本章节中，我们将介绍如何基于上一章节生成的基础库（包含动态库，类的声明及定义），编写测试用例，生成可执行文件。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;首先，用户需要编写测试用例，即实例化上一章节生成的类，并调用类中的方法，以实现对硬件模块的操作。&lt;br&gt;
+详情可以参考&lt;a href=&#34;docs/quick-start/examples/rmg/#%E9%85%8D%E7%BD%AE%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81&#34;&gt;随机数生成器验证-配置测试代码&lt;/a&gt;中实例化及初始化的过程。&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;TMNT
-&lt;ul&gt;
-&lt;li&gt;Leonardo&lt;/li&gt;
-&lt;li&gt;Michelangelo&lt;/li&gt;
-&lt;li&gt;Donatello&lt;/li&gt;
-&lt;li&gt;Raphael&lt;/li&gt;
-&lt;/ul&gt;
+&lt;li&gt;
+&lt;p&gt;其次，用户需要根据基础库所应用的&lt;strong&gt;不同仿真器&lt;/strong&gt;，应用不同的链接参数以生成可执行文件。对应的参数在&lt;code&gt;template/cpp/cmake/*.cmake&lt;/code&gt;中有定义。&lt;/p&gt;
 &lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;最终根据配置的链接参数，编译器会链接基础库，生成可执行文件。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;以 &lt;a href=&#34;docs/quick-start/examples/adder/#%E5%B0%86rtl%E6%9E%84%E5%BB%BA%E4%B8%BAc-class&#34;&gt;加法器验证&lt;/a&gt; 为例，&lt;code&gt;picker_out_adder/cpp/cmake/*.cmake&lt;/code&gt;即是上述表项2所述模板的拷贝。&lt;br&gt;
+&lt;code&gt;vcs.cmake&lt;/code&gt;定义了使用VCS仿真器生成的基础库的链接参数，&lt;code&gt;verilator.cmake&lt;/code&gt;定义了使用Verilator仿真器生成的基础库的链接参数。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;使用方案&#34;&gt;使用方案&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;参数 &lt;code&gt;--language cpp&lt;/code&gt; 或 &lt;code&gt;-l cpp&lt;/code&gt; 用于指定生成C++基础库。&lt;/li&gt;
+&lt;li&gt;参数 &lt;code&gt;-e&lt;/code&gt; 用于生成包含示例项目的可执行文件。&lt;/li&gt;
+&lt;li&gt;参数 &lt;code&gt;-v&lt;/code&gt; 用于保留生成项目时的中间文件。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Definition lists can be used with Markdown syntax. Definition headers are bold.&lt;/p&gt;
-&lt;dl&gt;
-&lt;dt&gt;Name&lt;/dt&gt;
-&lt;dd&gt;Godzilla&lt;/dd&gt;
-&lt;dt&gt;Born&lt;/dt&gt;
-&lt;dd&gt;1952&lt;/dd&gt;
-&lt;dt&gt;Birthplace&lt;/dt&gt;
-&lt;dd&gt;Japan&lt;/dd&gt;
-&lt;dt&gt;Color&lt;/dt&gt;
-&lt;dd&gt;Green&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;hr&gt;
-&lt;p&gt;Tables should have bold headings and alternating shaded rows.&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Artist&lt;/th&gt;
-&lt;th&gt;Album&lt;/th&gt;
-&lt;th&gt;Year&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;Michael Jackson&lt;/td&gt;
-&lt;td&gt;Thriller&lt;/td&gt;
-&lt;td&gt;1982&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Prince&lt;/td&gt;
-&lt;td&gt;Purple Rain&lt;/td&gt;
-&lt;td&gt;1984&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Beastie Boys&lt;/td&gt;
-&lt;td&gt;License to Ill&lt;/td&gt;
-&lt;td&gt;1986&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;If a table is too wide, it should scroll horizontally.&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Artist&lt;/th&gt;
-&lt;th&gt;Album&lt;/th&gt;
-&lt;th&gt;Year&lt;/th&gt;
-&lt;th&gt;Label&lt;/th&gt;
-&lt;th&gt;Awards&lt;/th&gt;
-&lt;th&gt;Songs&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;Michael Jackson&lt;/td&gt;
-&lt;td&gt;Thriller&lt;/td&gt;
-&lt;td&gt;1982&lt;/td&gt;
-&lt;td&gt;Epic Records&lt;/td&gt;
-&lt;td&gt;Grammy Award for Album of the Year, American Music Award for Favorite Pop/Rock Album, American Music Award for Favorite Soul/R&amp;amp;B Album, Brit Award for Best Selling Album, Grammy Award for Best Engineered Album, Non-Classical&lt;/td&gt;
-&lt;td&gt;Wanna Be Startin&amp;rsquo; Somethin&amp;rsquo;, Baby Be Mine, The Girl Is Mine, Thriller, Beat It, Billie Jean, Human Nature, P.Y.T. (Pretty Young Thing), The Lady in My Life&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Prince&lt;/td&gt;
-&lt;td&gt;Purple Rain&lt;/td&gt;
-&lt;td&gt;1984&lt;/td&gt;
-&lt;td&gt;Warner Brothers Records&lt;/td&gt;
-&lt;td&gt;Grammy Award for Best Score Soundtrack for Visual Media, American Music Award for Favorite Pop/Rock Album, American Music Award for Favorite Soul/R&amp;amp;B Album, Brit Award for Best Soundtrack/Cast Recording, Grammy Award for Best Rock Performance by a Duo or Group with Vocal&lt;/td&gt;
-&lt;td&gt;Let&amp;rsquo;s Go Crazy, Take Me With U, The Beautiful Ones, Computer Blue, Darling Nikki, When Doves Cry, I Would Die 4 U, Baby I&amp;rsquo;m a Star, Purple Rain&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Beastie Boys&lt;/td&gt;
-&lt;td&gt;License to Ill&lt;/td&gt;
-&lt;td&gt;1986&lt;/td&gt;
-&lt;td&gt;Mercury Records&lt;/td&gt;
-&lt;td&gt;noawardsbutthistablecelliswide&lt;/td&gt;
-&lt;td&gt;Rhymin &amp;amp; Stealin, The New Style, She&amp;rsquo;s Crafty, Posse in Effect, Slow Ride, Girls, (You Gotta) Fight for Your Right, No Sleep Till Brooklyn, Paul Revere, Hold It Now, Hit It, Brass Monkey, Slow and Low, Time to Get Ill&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;p&gt;Code snippets like &lt;code&gt;var foo = &amp;quot;bar&amp;quot;;&lt;/code&gt; can be shown inline.&lt;/p&gt;
-&lt;p&gt;Also, &lt;code&gt;this should vertically align&lt;/code&gt; &lt;del&gt;&lt;code&gt;with this&lt;/code&gt;&lt;/del&gt; &lt;del&gt;and this&lt;/del&gt;.&lt;/p&gt;
-&lt;p&gt;Code can also be shown in a block element.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;foo := &amp;#34;bar&amp;#34;;
-bar := &amp;#34;foo&amp;#34;;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Code can also use syntax highlighting.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;`var foo = &amp;#34;bar&amp;#34;;`&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;lexer&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;lexers&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Get&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;javascript&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;iterator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;_&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;lexer&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Tokenise&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;nil&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;input&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;style&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;styles&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Get&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;github&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;formatter&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;html&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;New&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;html&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithLineNumbers&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;())&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;buff&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;bytes&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Buffer&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;formatter&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;buff&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;style&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;iterator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;fmt&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Println&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;buff&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;())&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Inline code inside table cells should still be distinguishable.&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Language&lt;/th&gt;
-&lt;th&gt;Code&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;Javascript&lt;/td&gt;
-&lt;td&gt;&lt;code&gt;var foo = &amp;quot;bar&amp;quot;;&lt;/code&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Ruby&lt;/td&gt;
-&lt;td&gt;&lt;code&gt;foo = &amp;quot;bar&amp;quot;{&lt;/code&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;p&gt;Small images should be shown at their actual size.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Picea_abies_shoot_with_buds%2C_Sogndal%2C_Norway.jpg/240px-Picea_abies_shoot_with_buds%2C_Sogndal%2C_Norway.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Large images should always scale down and fit in the content container.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Picea_abies_shoot_with_buds%2C_Sogndal%2C_Norway.jpg/1024px-Picea_abies_shoot_with_buds%2C_Sogndal%2C_Norway.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;The photo above of the Spruce Picea abies shoot with foliage buds: Bjørn Erik Pedersen, CC-BY-SA.&lt;/em&gt;&lt;/p&gt;
-&lt;h2 id=&#34;components&#34;&gt;Components&lt;/h2&gt;
-&lt;h3 id=&#34;alerts&#34;&gt;Alerts&lt;/h3&gt;
-&lt;p&gt;
 
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;
-
-
-    This is an alert.
-
-&lt;/div&gt;
-
-
-
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;
-&lt;h4 class=&#34;alert-heading&#34;&gt;Note&lt;/h4&gt;
-
-    This is an alert with a title.
-
-&lt;/div&gt;
-
-
-
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;
-&lt;h4 class=&#34;alert-heading&#34;&gt;Note&lt;/h4&gt;
-
-    This is an alert with a title and &lt;strong&gt;Markdown&lt;/strong&gt;.
-
-&lt;/div&gt;
-
-
-
-&lt;div class=&#34;alert alert-success&#34; role=&#34;alert&#34;&gt;
-
-
-    This is a successful alert.
-
-&lt;/div&gt;
-
-
-
-&lt;div class=&#34;alert alert-warning&#34; role=&#34;alert&#34;&gt;
-
-
-    This is a warning.
-
-&lt;/div&gt;
-
-
-
-&lt;div class=&#34;alert alert-warning&#34; role=&#34;alert&#34;&gt;
-&lt;h4 class=&#34;alert-heading&#34;&gt;Warning&lt;/h4&gt;
-
-    This is a warning with a title.
-
-&lt;/div&gt;
-&lt;/p&gt;
-&lt;h2 id=&#34;another-heading&#34;&gt;Another Heading&lt;/h2&gt;
-&lt;p&gt;Add some sections here to see how the ToC looks like. Bacon ipsum dolor sit amet t-bone doner shank drumstick, pork belly porchetta chuck sausage brisket ham hock rump pig. Chuck kielbasa leberkas, pork bresaola ham hock filet mignon cow shoulder short ribs biltong.&lt;/p&gt;
-&lt;h3 id=&#34;this-document&#34;&gt;This Document&lt;/h3&gt;
-&lt;p&gt;Inguina genus: Anaphen post: lingua violente voce suae meus aetate diversi. Orbis unam nec flammaeque status deam Silenum erat et a ferrea. Excitus rigidum ait: vestro et Herculis convicia: nitidae deseruit coniuge Proteaque adiciam &lt;em&gt;eripitur&lt;/em&gt;? Sitim noceat signa &lt;em&gt;probat quidem&lt;/em&gt;. Sua longis &lt;em&gt;fugatis&lt;/em&gt; quidem genae.&lt;/p&gt;
-&lt;h3 id=&#34;pixel-count&#34;&gt;Pixel Count&lt;/h3&gt;
-&lt;p&gt;Tilde photo booth wayfarers cliche lomo intelligentsia man braid kombucha vaporware farm-to-table mixtape portland. PBR&amp;amp;B pickled cornhole ugh try-hard ethical subway tile. Fixie paleo intelligentsia pabst. Ennui waistcoat vinyl gochujang. Poutine salvia authentic affogato, chambray lumbersexual shabby chic.&lt;/p&gt;
-&lt;h3 id=&#34;contact-info&#34;&gt;Contact Info&lt;/h3&gt;
-&lt;p&gt;Plaid hell of cred microdosing, succulents tilde pour-over. Offal shabby chic 3 wolf moon blue bottle raw denim normcore poutine pork belly.&lt;/p&gt;
-&lt;h3 id=&#34;external-links&#34;&gt;External Links&lt;/h3&gt;
-&lt;p&gt;Stumptown PBR&amp;amp;B keytar plaid street art, forage XOXO pitchfork selvage affogato green juice listicle pickled everyday carry hashtag. Organic sustainable letterpress sartorial scenester intelligentsia swag bushwick. Put a bird on it stumptown neutra locavore. IPhone typewriter messenger bag narwhal. Ennui cold-pressed seitan flannel keytar, single-origin coffee adaptogen occupy yuccie williamsburg chillwave shoreditch forage waistcoat.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;This is the final element on the page and there should be no margin below this.
-&lt;/code&gt;&lt;/pre&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Java</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/java/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/java/</guid>
+      <description>
+        
+        
+        
       </description>
     </item>
     
