@@ -44,6 +44,17 @@
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
 
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
   </head>
   <body class="td-section">
     <header>
@@ -64,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.04e12fee0c2501fb3f3da2c402f842f0.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.11ae8c9f8e3a777826a59840e960d6f8.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -269,7 +280,96 @@
     
 	<h1 id="pg-9686c7f43948e8fd2321d4480b1d679f">1 - 回调与Eventloop</h1>
     <div class="lead">XXXX。</div>
-	
+	<h2 id="1-回调">1. 回调</h2>
+<h3 id="11-概述">1.1. 概述</h3>
+<blockquote>
+<p>回调是一种常见的编程模式，用于异步或事件驱动编程。回调函数是一种特殊的函数，它可以在异步操作完成后<strong>调用一个预定义的函数来处理结果</strong>。回调函数通常用于处理事件、执行异步操作或响应用户输入等场景。</p>
+</blockquote>
+<p>回调函数是一个函数或过程，不过它是一个由调用方自己实现，供被调用方使用的特殊函数，一般使用方法如下</p>
+<ul>
+<li><strong>在a()方法中调用了b()方法</strong></li>
+<li><strong>在b方法执行完毕主动调用提供的callback()方法</strong></li>
+</ul>
+<p>这个下面的例子中，实现了一个简单的callback 示例，我们定一个了一个打印结果的方法 print_result，一个两数相加的方法add (), 当完成add 后，调用 print_result（）方法将结果打印出来</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>def add<span style="color:#ce5c00;font-weight:bold">(</span>x, y, callback<span style="color:#ce5c00;font-weight:bold">)</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> x + y
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 在执行时，这里的callback相当于print_result()</span>
+</span></span><span style="display:flex;"><span>    callback<span style="color:#ce5c00;font-weight:bold">(</span>result<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>def print_result<span style="color:#ce5c00;font-weight:bold">(</span>result<span style="color:#ce5c00;font-weight:bold">)</span>:
+</span></span><span style="display:flex;"><span>    print<span style="color:#ce5c00;font-weight:bold">(</span>result<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 在调用add 时，将 print_result 作为参传递给add 里的callback</span>
+</span></span><span style="display:flex;"><span>add<span style="color:#ce5c00;font-weight:bold">(</span>2, 3, <span style="color:#000">callback</span><span style="color:#ce5c00;font-weight:bold">=</span>print_result<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span></code></pre></div><h3 id="12-回调函数的使用场景包括">1.2. 回调函数的使用场景包括</h3>
+<ol>
+<li><strong>事件处理</strong>：回调函数可以用于处理各种事件，例如鼠标点击、键盘输入、网络请求等。</li>
+<li><strong>异步操作</strong>：回调函数可以用于异步操作，例如读取文件、发送邮件、下载文件等。</li>
+<li><strong>数据处理</strong>：回调函数可以用于处理数据，例如对数组进行排序、过滤、映射等。</li>
+<li><strong>插件开发</strong>：回调函数可以用于开发插件，例如 WordPress 插件、jQuery 插件等。</li>
+</ol>
+<h3 id="13-回调函数的优缺点">1.3. 回调函数的优缺点</h3>
+<p>优点</p>
+<ol>
+<li>回调函数的作用是将代码逻辑分离出来，使得代码更加模块化和可维护。使用回调函数可以避免阻塞程序的运行，提高程序的性能和效率。另外，回调函数还可以实现代码的复用，因为它们可以被多个地方调用。</li>
+<li>提高代码的复用性和灵活性：回调函数可以将一个函数作为参数传递给另一个函数，从而实现模块化编程，提高代码的复用性和灵活性。</li>
+<li>解耦合：回调函数可以将不同模块之间的关系解耦，使得代码更易于维护和扩展。</li>
+<li>可以异步执行：回调函数可以在异步操作完成后被执行，这样避免了阻塞线程，提高应用程序的效率。
+缺点：</li>
+<li>回调函数嵌套过多会导致代码难以维护：如果回调函数嵌套层数过多，代码会变得非常复杂，难以维护。</li>
+<li>回调函数容易造成竞态条件：如果回调函数中有共享资源访问，容易出现竞态条件，导致程序出错。</li>
+<li>代码可读性差：回调函数的使用可能会破坏代码的结构和可读性，尤其是在处理大量数据时</li>
+</ol>
+<h2 id="2-eventloop">2. Eventloop</h2>
+<h3 id="21-概述">2.1. 概述</h3>
+<blockquote>
+<p>**Event Loop：事件循环机制是一种计算机编程模型，其目的是使程序能够在一种非阻塞方式下等待事件(如<code>输入、计时器、定时器、网络</code>等)的发生，并在发生事件时被通知及时处理事件，用于等待和分配消息和事件，单线程运行时不会阻塞的一种机制，也就是实现异步的原理。作为一种单线程语言</p>
+</blockquote>
+<p>事件循环机制的核心是<strong>事件循环</strong>，即<strong>程序会轮询事件队列中是否有待处理事件</strong>，如果有，就执行相应的回调函数来处理该事件。然后继续等待下一个事件。事件可以是来自外部资源（如网络套接字、文件、定时器等）的输入、用户输入、系统通知等。由此，程序就可以实现<strong>异步、非阻塞</strong>的编程方式，提高程序的响应速度和运行效率.</p>
+<h3 id="22-基本原理">2.2. 基本原理</h3>
+<p>事件循环的工作流程通常如下：</p>
+<ol>
+<li>启动程序，执行同步代码直到遇到异步代码，</li>
+<li>将异步代码的回调函数放入事件队列中，以便在事件发生时执行。</li>
+<li>当所有同步代码执行完毕，开始事件循环，不断检查是否有事件发生。</li>
+<li>如果有事件队列不为空，则执行与之关联的回调函数。</li>
+<li>回到步骤 4，继续循环处理事件。</li>
+</ol>
+<h3 id="23-宏任务与微任务">2.3. 宏任务与微任务</h3>
+<blockquote>
+<p>事件队列是事件循环机制的核心部分之一，它是一个<strong>保存事件以及对应的回调函数的队列</strong>，在事件队列中的内容可以分为宏任务和微任务两种类型</p>
+</blockquote>
+<p><strong>宏任务包括：</strong></p>
+<blockquote>
+<p>宏任务是指在事件循环中排队等待执行的较大的任务单元。
+宏任务的执行顺序是按照它们被添加到队列中的顺序来执行的，每个宏任务在执行完成后，事件循环会检查微任务队列是否有任务需要执行，如果有则立即执行微任务，然后再继续下一个宏任务。</p>
+</blockquote>
+<ul>
+<li>定时器任务（setTimeout、setInterval等）</li>
+<li>UI 渲染任务</li>
+<li>网络请求任务</li>
+<li>文件 I/O 任务</li>
+<li>setImmediate（Node 环境）等</li>
+</ul>
+<p><strong>微任务包括：</strong></p>
+<blockquote>
+<p>微任务是指在事件循环中排队等待执行的较小的任务单元
+微任务会在宏任务执行完毕后立即执行，因此它们的执行优先级要高于宏任务。当一个宏任务执行完毕后，事件循环会立即执行微任务队列中的所有任务，直到微任务队列为空</p>
+</blockquote>
+<ul>
+<li>Promise 中的回调函数（then、catch等）</li>
+<li>async/await 中的异步操作等</li>
+</ul>
+<h3 id="24-eventloop-的优点">2.4. Eventloop 的优点</h3>
+<blockquote>
+<p>总之，事件循环机制的基本原理就是不断循环遍历事件队列，每次取出队列中最先进入队列的事件并执行对应的回调函数，直到事件队列为空。</p>
+</blockquote>
+<ol>
+<li>能够有效地<strong>处理大量的并发事件</strong>，而不会阻塞程序的执行。这种非阻塞的特性使得它特别适用于构建高性能、响应式的应用程序，如 Web 服务器、桌面应用程序、游戏等。</li>
+<li>事件循环的实现<strong>可以是单线程的，也可以是多线程的</strong>。在单线程的情况下，事件循环会依次处理每个事件，而在多线程的情况下，不同的线程可以并行处理不同的事件，从而提高处理效率。</li>
+<li>一些流行的编程语言和框架，如JavaScript 中的 Node.js、Python 中的 asyncio、C# 中的 .NET 等，都提供了事件循环机制，使得开发者可以<strong>更轻松地构建异步、非阻塞</strong>的应用程序。</li>
+</ol>
+
 </div>
 
 
@@ -298,7 +398,54 @@
     
 	<h1 id="pg-3babf53e5850c3328db51782776d2d77">2 - 异步编程</h1>
     <div class="lead">XXXX。</div>
-	
+	<h1 id="异步编程">异步编程</h1>
+<h3 id="11-概述">1.1. 概述</h3>
+<blockquote>
+<p>异步编程通过将某些任务异步执行，程序可以在等待结果时继续执行其他任务，从而减少了阻塞和等待的时间。
+传统的同步编程方式中，代码会按照顺序依次执行，直到前一个任务完成后才能执行下一个任务，异步编程通过将任务分解为更小的子任务，并且不需要等待前一个任务完成，从而实现并行执行多个任务的效果。</p>
+</blockquote>
+<h3 id="12-实现原理">1.2. 实现原理</h3>
+<blockquote>
+<p>异步编程的实现基于以下两个核心概念，我们会在下一小节进行更详细的介绍</p>
+</blockquote>
+<ol>
+<li>回调函数（Callback）
+回调函数是异步编程的基础。当一个任务完成时，系统会调用预先注册的回调函数来处理任务的结果。通过回调函数的方式，程序可以在等待任务完成的同时继续执行其他任务，提高了程序的并发性。</li>
+<li>事件循环（Event Loop）
+事件循环是异步编程的核心机制之一。它负责监听各种事件（如用户输入、I/O 操作等），当事件发生时，触发相应的回调函数进行处理。事件循环通过不断地轮询事件队列，实现了非阻塞式的任务处理。</li>
+</ol>
+<h3 id="13-常见的异步编程框架和工具">1.3. 常见的异步编程框架和工具</h3>
+<blockquote>
+<p>为了方便开发者进行异步编程，有许多优秀的框架和工具可供选择。以下是一些常见的异步编程框架和工具：</p>
+</blockquote>
+<ol>
+<li>Asyncio
+Asyncio 是 Python 的一个强大的异步编程框架，提供了高效的协程（Coroutine）支持。它可以用于编写并发性能优秀的网络应用、爬虫程序等。</li>
+<li>Node. Js
+Node. Js 是基于 Chrome V 8 引擎构建的 JavaScript 运行时环境，天生支持非阻塞 I/O 操作。它在 Web 开发领域广泛应用，尤其擅长处理高并发的实时应用。</li>
+<li>RxJava
+RxJava 是一个基于观察者模式和迭代器模式的异步编程库。它为 Java 开发者提供了丰富的操作符和组合方式，简化了异步编程的复杂性。</li>
+</ol>
+<h3 id="14-异步编程的优势">1.4. 异步编程的优势</h3>
+<p>异步编程具有以下几个显著的优势：</p>
+<ol>
+<li>提高响应速度
+通过异步编程，程序能够在等待某个任务完成时继续执行其他任务，避免了任务阻塞带来的延迟。这样能够大幅度提高程序的响应速度，提升用户体验。</li>
+<li>提升并发性能
+异步编程允许程序同时处理多个任务，充分利用计算资源，提升了系统的并发能力。特别是在处理大量 I/O 密集型任务时，异步编程能够更好地发挥优势，降低资源消耗。</li>
+<li>简化编程逻辑
+异步编程可以避免编写复杂的多线程代码，降低了程序的复杂性和出错的概率。通过简化编程逻辑，开发者能够更专注于业务逻辑的实现。</li>
+</ol>
+<p>因此异步编程广泛应用于以下几个领域：</p>
+<ol>
+<li>Web 开发
+在 Web 开发中，异步编程常用于处理网络请求、数据库操作等耗时任务。通过异步方式处理这些任务，可以避免阻塞主线程，保证 Web 服务器的并发性能。</li>
+<li>并行计算
+异步编程可以帮助实现并行计算，将一个大任务拆分成多个小任务并发执行，提高计算效率。这在科学计算、数据处理等领域非常常见。</li>
+<li>消息队列
+消息队列是异步编程的经典应用之一。异步消息队列可以实现不同系统之间的解耦和异步通信，提高系统的可扩展性和稳定性。</li>
+</ol>
+
 </div>
 
 
@@ -356,7 +503,42 @@
     
 	<h1 id="pg-cd9f1938b4673c2b5afc91dc934a09d9">4 - 验证IP</h1>
     <div class="lead">XXXX。</div>
-	
+	<h2 id="1-概述">1. 概述</h2>
+<blockquote>
+<p><strong>验证环境并不是全部由verifier编写的，可以用到很多已经编写好的，复用程度高的验证模板，例如某些agent，而这些模板就是VIP。</strong>
+VIP（Verfication IP）代码确认与验证技术，是预先验证过的内建验证结构，提供了完整的、灵活的应用机制，可以方便地插入到基于仿真的确认测试中，可以大大提高验证可重用性和验证效率。</p>
+</blockquote>
+<p>VIP 提供一套全面测试环境，帮助设计者和验证者确认其设计功能的正确性，可用于各个层次的仿真验证。通常，VIP 是基于标准协议的，如：AMBA、PCIE、USB、Ethernet 等。VIP 中包括很多验证部件 IP，这些 IP 都严格遵循这些标准协议、已经被验证过，通常包括：产生 testbench 所必须的基础部件、根据协议等的驱动driver和sequence，以及相应的覆盖率模型、dut软件模型、说明文档。</p>
+<p>大型项目中，涉及到众多协议和标准，所以会涉及到很多VIP，还涉及C++等跨平台联合仿真</p>
+<h3 id="11-使用场景">1.1. 使用场景</h3>
+<p><strong>● 验证设计IP</strong>
+就是IC设计者会通过购买稳定VIP来对自己的设计进行验证。
+当然也可以自己开发VIP</p>
+<p><strong>● 集成设计IP</strong>
+设计IP的参数众多，不同的参数配置会产生不同的性能、不同的功能。
+所以需要集成人员，将多个设计IP进行连接、配置、调度，那么对应的VIP也要进行继承</p>
+<p><strong>● 子系统、SoC系统开发者</strong>
+设计的IP向上层集成时，也涉及到VIP的使用和集成，例如使用什么样的sequence进行定向测试</p>
+<h3 id="12-vip--的优势和特点">1.2. VIP  的优势和特点</h3>
+<p><strong>● 不断更新的标准</strong>
+什么PCIe、DDR、USB、AMBA等各种协议呀，经常不断更新。
+为了使硬件之间能够相互兼容，设计IP就要不断修正、完善使自己的IP兼容新的标准，相应地验证IP也要不断迭代更新。
+而有了VIP之后，集成人员和验证人员就不需要花费力气去兼容协议，而将重点放在功能上去即可。</p>
+<p><strong>● 虚拟dut</strong>
+就是说，如果用硬件模型仿真，可能会耗时巨大。VIP提供的一些用SystemC、Systemverilog等软件模拟的硬件，可加快仿真速度</p>
+<p><strong>● 内置开发的协议冲突检查器</strong>
+在设计和VIP之间的接口上集成了VIP监视器。它可以用来监视总线上的trans，也可以用来自动验证协议规则。无论何时从DUT发送或接收任何trans，都有可能违反VIP中开发的内置协议检查器中的协议规则，从而引发违反协议的错误</p>
+<p>*<em>● 提供各种详细的错误报告</em></p>
+<h3 id="13-vip-的集成">1.3. VIP 的集成</h3>
+<p><strong>● 模块级</strong>
+module级别的验证其实就是之前一直讲的验证框架，只不过将验证框架的内容替换成VIP</p>
+<p><strong>● 子系统级</strong>
+对于多个module集成之后的子系统而言，可将VIP嵌入系统中，替换子系统中的某些控制module或响应module，进行含有driver、sequencer的UVM_ACTIVE测试。</p>
+<p>如果驱动测试没问题，就可以接上真正的硬件模块了，然后<strong>将VIP中相应的agent设定为UVM_PASSIVE</strong>，只保留monitor监测就好。</p>
+<p><strong>● 芯片级</strong>
+系统级别，集成程度更高，就会涉及到系统级别的VIP，系统中某些Process、Memory等硬件，并不是真的硬件而是VIP提供的
+这是一种虚拟的处理器，可通过SystemC、SystemVerilog实现这样的核，这是为了加快仿真速度</p>
+
 </div>
 
 

@@ -44,6 +44,17 @@
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
 
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
   </head>
   <body class="td-section">
     <header>
@@ -64,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.04e12fee0c2501fb3f3da2c402f842f0.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.11ae8c9f8e3a777826a59840e960d6f8.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -315,11 +326,9 @@
 <p>请注意，请确保<code>verible-verilog-format</code>等工具的路径已经添加到环境变量<code>$PATH</code>中，可以直接命令行调用。</p>
 </blockquote>
 <h3 id="下载源码">下载源码</h3>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://gitee.com/yaozhicheng/picker.git
-</span></span><span style="display:flex;"><span>git clone https://gitee.com/XS-MLVP/xcomm.git
-</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker/dependence
-</span></span><span style="display:flex;"><span>rmdir xcomm/
-</span></span><span style="display:flex;"><span>ln -s ../../xcomm xcomm
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/picker.git
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker
+</span></span><span style="display:flex;"><span>make init
 </span></span></code></pre></div><h3 id="构建并安装">构建并安装</h3>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker
 </span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">BUILD_XSPCOMM_SWIG</span><span style="color:#ce5c00;font-weight:bold">=</span>python <span style="color:#8f5902;font-style:italic"># 仅在需要python支持时使用</span>
@@ -901,8 +910,108 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
     
 	<h1 id="pg-38047ee84ecd685f56b0602b64893e6f">5.1 - PyTest</h1>
     <div class="lead">XXX。</div>
-	<p>XXXX</p>
-
+	<h2 id="1-软件测试">1. 软件测试</h2>
+<p>在正式开始pytest 之间我们先了解一下软件的测试，软件测试一般分为如下四个方面</p>
+<ul>
+<li>单元测试：称模块测试，针对软件设计中的最小单位——程序模块，进行正确性检查的测试工作</li>
+<li>集成测试：称组装测试，通常在单元测试的基础上，将所有程序模块进行有序的、递增测试，重点测试不同模块的接口部分</li>
+<li>系统测试：将整个软件系统看成一个整体进行测试，包括对功能、性能以及软件所运行的软硬件环境进行测试</li>
+<li>验收测试：指按照项目任务书或合同、供需双方约定的验收依据文档进行的对整个系统的测试与评审，决定是否接收或拒收系统</li>
+</ul>
+<blockquote>
+<p>pytest最初是作为一个单元测试框架而设计的，但它也提供了许多功能，使其能够进行更广泛的测试，包括集成测试，系统测试，他是一个非常成熟的全功能的python 测试框架。
+它通过收集测试函数和模块，并提供丰富的断言库来简化测试的编写和运行</p>
+</blockquote>
+<ol>
+<li><strong>收集测试用例</strong>：pytest 会搜索当前目录及其子目录中的 Python 文件，找到符合命名约定的测试文件和测试函数。</li>
+<li><strong>运行测试</strong>：它可以通过命令行运行所有测试用例，也可以运行特定的测试文件、模块或者单个测试函数</li>
+<li><strong>断言</strong> ：提供了丰富的断言库，用于验证测试结果是否符合预期。这些断言包括等值比较、异常抛出、容器包含等等</li>
+<li><strong>Fixture</strong>：pytest 使用 fixture 机制来管理测试用例的环境设置和清理工作</li>
+<li></li>
+</ol>
+<ul>
+<li>简单灵活，容易上手</li>
+<li>支持参数化</li>
+<li>测试用例的skip和xfail，自动失败重试等处理</li>
+</ul>
+<h2 id="2-安装">2. 安装</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 安装pytest：</span>
+</span></span><span style="display:flex;"><span>pip install pytest
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 升级pytest</span>
+</span></span><span style="display:flex;"><span>pip install -U pytest
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 查看pytest版本</span>
+</span></span><span style="display:flex;"><span>pytest --version
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 查看已安装包列表</span>
+</span></span><span style="display:flex;"><span>pip list
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 查看pytest帮助文档</span>
+</span></span><span style="display:flex;"><span>pytest -h
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 安装第三方插件</span>
+</span></span><span style="display:flex;"><span> pip install pytest-sugar
+</span></span><span style="display:flex;"><span> pip install pytest-rerunfailures
+</span></span><span style="display:flex;"><span> pip install pytest-xdist
+</span></span><span style="display:flex;"><span> pip install pytest-assume
+</span></span><span style="display:flex;"><span> pip install pytest-html
+</span></span></code></pre></div><h2 id="3-使用">3. 使用</h2>
+<h3 id="31-命名规则">3.1. 命名规则</h3>
+<ul>
+<li>首先在使用pytest 时我们的模块名通常是以test 开头或者test 结尾</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#test_*.py 或 *_test.py</span>
+</span></span><span style="display:flex;"><span>test_demo1
+</span></span><span style="display:flex;"><span>demo2_test
+</span></span></code></pre></div><ul>
+<li>模块中的类名要以Test 开始且不能有init 方法</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>class TestDemo1:
+</span></span><span style="display:flex;"><span>class TestLogin:
+</span></span></code></pre></div><ul>
+<li>类中定义的测试方法名要以test_开头</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>test_demo1<span style="color:#ce5c00;font-weight:bold">(</span>self<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>test_demo2<span style="color:#ce5c00;font-weight:bold">(</span>self<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span></code></pre></div><ul>
+<li>测试用例的例子</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>class test_one:
+</span></span><span style="display:flex;"><span>    def test_demo1<span style="color:#ce5c00;font-weight:bold">(</span>self<span style="color:#ce5c00;font-weight:bold">)</span>:
+</span></span><span style="display:flex;"><span>        print<span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;测试用例1&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    def test_demo2<span style="color:#ce5c00;font-weight:bold">(</span>self<span style="color:#ce5c00;font-weight:bold">)</span>:
+</span></span><span style="display:flex;"><span>        print<span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;测试用例2&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span></code></pre></div><h3 id="32-参数解析">3.2. 参数解析</h3>
+<ul>
+<li>打印详细运行日志信息：pytest -v (最高级别信息-verbose)</li>
+<li>S 是带控制台输出结果，也是输出详细，可以打印测试用例中 print 的输出：pytest -v -s 文件名</li>
+<li>执行单独一个 pytest 模块：pytest 文件名. Py</li>
+<li>运行某个模块里面某个类：pytest 文件名. Py:: 类名</li>
+<li>运行某个模块里面某个类里面的方法：pytest 文件名. Py:: 类名:: 方法名</li>
+<li>-k：运行测试用例名称中包含某个字符串的测试用例：pytest -k &ldquo;类名 and not 方法名&rdquo;，如 pytest -k &ldquo;TestDemo and not test_one&rdquo;</li>
+<li>-m ：也叫冒烟用例运行带有某标记的测试用例 (pytest. mark. 标记名)</li>
+<li>-x：出现一个失败用例就立即停止</li>
+<li>&ndash;maxfail = num：当错误达到 num 的时候就停止运行：</li>
+<li>&ndash;html 路径：生成html 报告</li>
+</ul>
+<blockquote>
+<p>冒烟用例：</p>
+</blockquote>
+<h3 id="33-使用">3.3. 使用</h3>
+<p>可以在main 方法或者终端中使用pytest</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 不带参数使用</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">__name__</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#4e9a06">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>	pytest.main<span style="color:#ce5c00;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 带参数使用</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">__name__</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#4e9a06">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>	pytest.main<span style="color:#ce5c00;font-weight:bold">([</span><span style="color:#4e9a06">&#34;‐vs&#34;</span><span style="color:#ce5c00;font-weight:bold">])</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 命令行使用</span>
+</span></span><span style="display:flex;"><span> ./testcase/test_one.py --html<span style="color:#ce5c00;font-weight:bold">=</span>./report/report.html
+</span></span></code></pre></div>
 </div>
 
 
@@ -919,8 +1028,62 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
     
 	<h1 id="pg-c007ae0b9ac57d0811d7767dc3566608">5.2 - Hypothesis</h1>
     <div class="lead">XXX。</div>
-	<p>XXXX</p>
-
+	<h1 id="hypothesis">Hypothesis</h1>
+<blockquote>
+<p>在传统的软件测试中，我们通常需要手动编写测试用例，并为每个用例指定输入和预期输出。这种方式存在一些问题，例如测试用例覆盖不全面、边界条件容易被忽略等。Hypothesis 库通过属性基测试的思想，可以自动生成测试数据，并使用这些数据进行自动化测试。它的目标是发现潜在的错误和边界情况，从而提高代码的质量和可靠性</p>
+</blockquote>
+<p>Hypothesis 的核心思想是使用假设（hypothesis）来推断代码的行为，并根据这些假设来生成测试数据</p>
+<h2 id="1-基本概念">1. 基本概念</h2>
+<ol>
+<li>测试函数：即待测试的函数或方法，我们需要对其进行测试。</li>
+<li>属性：定义了测试函数应该满足的条件。属性是以装饰器的形式应用于<strong>测试函数</strong>上的。</li>
+<li>策略：用于生成测试数据的生成器。Hypothesis 提供了一系列内置的策略，如整数、字符串、列表等。我们也可以自定义策略。</li>
+<li>测试生成器：基于策略生成测试数据的函数。Hypothesis 会自动为我们生成测试数据，并将其作为参数传递给测试函数。</li>
+</ol>
+<h2 id="2-安装">2. 安装</h2>
+<p>可以使用pip 命令安装 Hypothesis，然后在python 中导入就可以使用</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>　pip install hypothesis
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>　import hypothesis
+</span></span></code></pre></div><h2 id="3-使用">3. 使用</h2>
+<h3 id="31-属性和策略">3.1. 属性和策略</h3>
+<blockquote>
+<p>Hypothesis 使用属性装饰器来定义测试函数的属性。最常用的装饰器是 @given，它指定了测试函数应该满足的属性。</p>
+</blockquote>
+<p>我们可以通过@given 装饰器定义了一个测试函数 test_addition。并给x 添加对应的属性，测试生成器会自动为测试函数生成测试数据，并将其作为参数传递给函数，例如</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>def addition<span style="color:#ce5c00;font-weight:bold">(</span>number: int<span style="color:#ce5c00;font-weight:bold">)</span> -&gt; int:
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> number + <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>@given<span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">=</span>integers<span style="color:#ce5c00;font-weight:bold">()</span>, <span style="color:#000">y</span><span style="color:#ce5c00;font-weight:bold">=</span>integers<span style="color:#ce5c00;font-weight:bold">())</span>　　
+</span></span><span style="display:flex;"><span>def test_addition<span style="color:#ce5c00;font-weight:bold">(</span>x, y<span style="color:#ce5c00;font-weight:bold">)</span>:　　   
+</span></span><span style="display:flex;"><span>	assert x + <span style="color:#000">1</span> <span style="color:#ce5c00;font-weight:bold">==</span> addition（1）
+</span></span></code></pre></div><p>其中Integers () 是一个内置的策略，用于生成整数类型的测试数据。Hypothesis 提供了丰富的内置策略，用于生成各种类型的测试数据。除了 Integers ()之外，还有字符串、布尔值、列表、字典等策略。例如使用 text () 策略生成字符串类型的测试数据，使用 lists (text ()) 策略生成字符串列表类型的测试数据</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>@given<span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">s</span><span style="color:#ce5c00;font-weight:bold">=</span>text<span style="color:#ce5c00;font-weight:bold">()</span>, <span style="color:#000">l</span><span style="color:#ce5c00;font-weight:bold">=</span>lists<span style="color:#ce5c00;font-weight:bold">(</span>text<span style="color:#ce5c00;font-weight:bold">()))</span>
+</span></span><span style="display:flex;"><span>def test_string_concatenation<span style="color:#ce5c00;font-weight:bold">(</span>s, l<span style="color:#ce5c00;font-weight:bold">)</span>:　　   
+</span></span><span style="display:flex;"><span>	<span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> s + <span style="color:#4e9a06">&#34;&#34;</span>.join<span style="color:#ce5c00;font-weight:bold">(</span>l<span style="color:#ce5c00;font-weight:bold">)</span>　　   
+</span></span><span style="display:flex;"><span>	assert len<span style="color:#ce5c00;font-weight:bold">(</span>result<span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">==</span> len<span style="color:#ce5c00;font-weight:bold">(</span>s<span style="color:#ce5c00;font-weight:bold">)</span> + sum<span style="color:#ce5c00;font-weight:bold">(</span>len<span style="color:#ce5c00;font-weight:bold">(</span>x<span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">for</span> x in l<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span></code></pre></div><p>除了可以使用内置的策略以外，还可以使用自定义策略来生成特定类型的测试数据，例如我们可以生产一个非负整形的策略</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>def non_negative_integers<span style="color:#ce5c00;font-weight:bold">()</span>:
+</span></span><span style="display:flex;"><span>　　<span style="color:#204a87;font-weight:bold">return</span> integers<span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">min_value</span><span style="color:#ce5c00;font-weight:bold">=</span>0<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>@given<span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">=</span>non_negative_integers<span style="color:#ce5c00;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>　　def test_positive_addition<span style="color:#ce5c00;font-weight:bold">(</span>x<span style="color:#ce5c00;font-weight:bold">)</span>:
+</span></span><span style="display:flex;"><span>　　assert x + <span style="color:#0000cf;font-weight:bold">1</span> &gt; x
+</span></span></code></pre></div><h3 id="32-期望">3.2. 期望</h3>
+<p>我们可以通过expect 来指明需要的函数期待得到的结果</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>@given<span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">=</span>integers<span style="color:#ce5c00;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>def test_addition<span style="color:#ce5c00;font-weight:bold">(</span>x<span style="color:#ce5c00;font-weight:bold">)</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#000">expected</span> <span style="color:#ce5c00;font-weight:bold">=</span> x + <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">actual</span> <span style="color:#ce5c00;font-weight:bold">=</span> addition<span style="color:#ce5c00;font-weight:bold">(</span>x<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>   
+</span></span><span style="display:flex;"><span>    
+</span></span></code></pre></div><h3 id="33-假设和断言">3.3. 假设和断言</h3>
+<p>在使用 Hypothesis 进行测试时，我们可以使用标准的 Python 断言来验证测试函数的属性。Hypothesis 会自动为我们生成测试数据，并根据属性装饰器中定义的属性来运行测试函数。如果断言失败，Hypothesis 会尝试缩小测试数据的范围，以找出导致失败的最小样例。</p>
+<p>假如我们有一个字符串反转函数，我们可以通过assert 来判断翻转两次后他是不是等于自身</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>def test_reverse_string<span style="color:#ce5c00;font-weight:bold">(</span>s<span style="color:#ce5c00;font-weight:bold">)</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#000">expected</span> <span style="color:#ce5c00;font-weight:bold">=</span> x + <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">actual</span> <span style="color:#ce5c00;font-weight:bold">=</span> addition<span style="color:#ce5c00;font-weight:bold">(</span>x<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	assert <span style="color:#000">actual</span> <span style="color:#ce5c00;font-weight:bold">==</span> expected
+</span></span></code></pre></div>
 </div>
 
 

@@ -20,14 +20,14 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
 <title>DUT编译 | 开放验证平台学习资源</title>
-<meta name="description" content="开放验证平台工具链需要的编译相关知识。">
+<meta name="description" content="开放验证平台DUT的编译相关知识。">
 <meta property="og:title" content="DUT编译" />
-<meta property="og:description" content="开放验证平台工具链需要的编译相关知识。" />
+<meta property="og:description" content="开放验证平台DUT的编译相关知识。" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/basic/compile/" />
 <meta itemprop="name" content="DUT编译">
-<meta itemprop="description" content="开放验证平台工具链需要的编译相关知识。"><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="DUT编译"/>
-<meta name="twitter:description" content="开放验证平台工具链需要的编译相关知识。"/>
+<meta itemprop="description" content="开放验证平台DUT的编译相关知识。"><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="DUT编译"/>
+<meta name="twitter:description" content="开放验证平台DUT的编译相关知识。"/>
 
 
 
@@ -43,6 +43,17 @@
   src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
 
   </head>
   <body class="td-section">
@@ -64,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.04e12fee0c2501fb3f3da2c402f842f0.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.11ae8c9f8e3a777826a59840e960d6f8.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -88,7 +99,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.04e12fee0c2501fb3f3da2c402f842f0.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.11ae8c9f8e3a777826a59840e960d6f8.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -206,17 +217,7 @@
 
 </div>
 
-            <div class="td-toc">
-        <nav id="TableOfContents">
-  <ul>
-    <li><a href="#硬件验证">硬件验证</a></li>
-    <li><a href="#design-under-test">Design Under Test</a></li>
-    <li><a href="#reference-model">Reference Model</a></li>
-    <li><a href="#开始实验">开始实验</a></li>
-  </ul>
-</nav>
-      </div>
-    
+            
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Tag Cloud</h5>
       <ul class="taxonomy-terms">
@@ -252,7 +253,7 @@
             
 <div class="td-content">
 	<h1>DUT编译</h1>
-  <div class="lead">开放验证平台工具链需要的编译相关知识。</div>
+  <div class="lead">开放验证平台DUT的编译相关知识。</div>
 	<header class="article-meta">
 		<div class="taxonomy taxonomy-terms-article taxo-tags">
   <h5 class="taxonomy-title">Tags:</h5>
@@ -273,18 +274,15 @@
 	
 
 <div class="pageinfo pageinfo-primary">
-<p>在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。</p>
+<p>本节主要介绍如何基于Picker编译DUT。</p>
 
 </div>
 
-<h2 id="硬件验证">硬件验证</h2>
-<p>Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?</p>
-<h2 id="design-under-test">Design Under Test</h2>
-<p>Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?</p>
-<h2 id="reference-model">Reference Model</h2>
-<p>Is there any initial setup users need to do after installation to try your project?</p>
-<h2 id="开始实验">开始实验</h2>
-<p>Can your users test their installation, for example by running a command or deploying a Hello World example?</p>
+<p>编译DUT是指将被测设计（Design Under Test，即DUT）的硬件描述语言（HDL）代码转换为可供仿真和验证使用的逻辑网表的过程。这个过程通常包括综合、优化、映射和布线等步骤，其主要目的是将抽象的HDL代码转换为实际的电路网表，以便进行后续的仿真和验证工作。</p>
+<p>以<a href="%22/content/zh-cn/docs/quick-start/%22">加法器DUT的编译：</a>为例进行解释：</p>
+<p>在 Adder 文件夹中，执行以下命令将 Verilog 文件编译为 C++ Class：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#000">picker</span> <span style="color:#000">Adder</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">v</span> <span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#000">w</span> <span style="color:#000">Adder</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">fst</span> <span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#000">S</span> <span style="color:#000">Adder</span> <span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#000">t</span> <span style="color:#000">picker_out_adder</span> <span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#000">l</span> <span style="color:#000">cpp</span> <span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#000">e</span> <span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#000">v</span> <span style="color:#ce5c00;font-weight:bold">--</span><span style="color:#000">sim</span> <span style="color:#000">verilator</span>
+</span></span></code></pre></div><p>这个命令会将 Adder.v 文件作为 Top 文件，并将其编译为 C++ Class，使用 verilator 仿真器。编译过程会生成一系列中间文件，其中包括 Verilog 文件、C++ 源代码等。</p>
 
   <div class="section-index">
     
@@ -298,7 +296,7 @@
     
 </div>
 <div class="text-muted mt-5 pt-3 border-top">
-  最后修改 January 18, 2024: <a href="https://github.com/XS-MLVP/course/commit/a022181cf64dcdcdaef78d39596d84f3df8bf721">refine struct &amp; add verify intro (a022181)</a>
+  最后修改 March 26, 2024: <a href="https://github.com/XS-MLVP/course/commit/bb33a48b92cfb2b52dd2fb1852b3327dde53b9ec">fix url (bb33a48)</a>
 </div>
 </div>
 

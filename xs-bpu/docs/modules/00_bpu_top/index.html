@@ -1,0 +1,585 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-cn" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/xs-bpu/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/xs-bpu/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-192x192.png" sizes="192x192">
+
+<title>BPU 顶层模块 | 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
+<meta name="description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
+生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。
+BPU 顶层中所有的生成器共有 6 个：
+npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全局历史写入数据 foledGhGen 维护折叠历史 lastBrNumOHGen 维护上周期最后一个生效的分支指令位置 aheadFhObGen 维护分支历史最老位 其中，除了 npcGen 以外，其余生成器都会在本文档中进行介绍。本节中我们着重探讨一下生成器的产生下一次预测的方法。
+在代码中你可以看到生成器用类似下面这种方式进行定义：
+val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
+npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
+s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。">
+<meta property="og:title" content="BPU 顶层模块" />
+<meta property="og:description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
+生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。
+BPU 顶层中所有的生成器共有 6 个：
+npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全局历史写入数据 foledGhGen 维护折叠历史 lastBrNumOHGen 维护上周期最后一个生效的分支指令位置 aheadFhObGen 维护分支历史最老位 其中，除了 npcGen 以外，其余生成器都会在本文档中进行介绍。本节中我们着重探讨一下生成器的产生下一次预测的方法。
+在代码中你可以看到生成器用类似下面这种方式进行定义：
+val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
+npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
+s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/00_bpu_top/" /><meta property="article:section" content="docs" />
+
+<meta property="article:modified_time" content="2024-03-27T15:25:22+08:00" />
+<meta itemprop="name" content="BPU 顶层模块">
+<meta itemprop="description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
+生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。
+BPU 顶层中所有的生成器共有 6 个：
+npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全局历史写入数据 foledGhGen 维护折叠历史 lastBrNumOHGen 维护上周期最后一个生效的分支指令位置 aheadFhObGen 维护分支历史最老位 其中，除了 npcGen 以外，其余生成器都会在本文档中进行介绍。本节中我们着重探讨一下生成器的产生下一次预测的方法。
+在代码中你可以看到生成器用类似下面这种方式进行定义：
+val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
+npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
+s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。">
+<meta itemprop="dateModified" content="2024-03-27T15:25:22+08:00" />
+<meta itemprop="wordCount" content="633">
+<meta itemprop="keywords" content="香山,BPU 顶层,全局分支历史,分支折叠历史,流水线控制," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="BPU 顶层模块"/>
+<meta name="twitter:description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
+生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。
+BPU 顶层中所有的生成器共有 6 个：
+npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全局历史写入数据 foledGhGen 维护折叠历史 lastBrNumOHGen 维护上周期最后一个生效的分支指令位置 aheadFhObGen 维护分支历史最老位 其中，除了 npcGen 以外，其余生成器都会在本文档中进行介绍。本节中我们着重探讨一下生成器的产生下一次预测的方法。
+在代码中你可以看到生成器用类似下面这种方式进行定义：
+val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
+npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
+s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。"/>
+
+
+
+
+<link rel="preload" href="/xs-bpu/scss/main.min.a4b91db5523db31ece8b4cafe3c363c918ca66dd6af0b9ed7b4181b018981f38.css" as="style">
+<link href="/xs-bpu/scss/main.min.a4b91db5523db31ece8b4cafe3c363c918ca66dd6af0b9ed7b4181b018981f38.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/xs-bpu/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.65834df3efb52d2a07004106e88c9bbd.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.65834df3efb52d2a07004106e88c9bbd.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-xs-bpudocs-li">
+  <a href="/xs-bpu/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-xs-bpudocs"><span class="">分支预测器与昆明湖微架构实现</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-xs-bpudocsbasic-li">
+  <a href="/xs-bpu/docs/basic/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-xs-bpudocsbasic"><span class="">香山分支预测单元（BPU）基础设计</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsbasic00_bp-li">
+  <a href="/xs-bpu/docs/basic/00_bp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsbasic00_bp"><span class="">何为分支预测</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsbasic01_xsbpu_basic-li">
+  <a href="/xs-bpu/docs/basic/01_xsbpu_basic/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsbasic01_xsbpu_basic"><span class="">香山分支预测单元基础</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsbasic02_xsbpu_structure-li">
+  <a href="/xs-bpu/docs/basic/02_xsbpu_structure/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsbasic02_xsbpu_structure"><span class="">香山分支预测单元结构介绍</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsbasic03_xsbpu_timing-li">
+  <a href="/xs-bpu/docs/basic/03_xsbpu_timing/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsbasic03_xsbpu_timing"><span class="">香山分支预测单元时序介绍</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-xs-bpudocsports-li">
+  <a href="/xs-bpu/docs/ports/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-xs-bpudocsports"><span class="">重要结构及接口文档</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsports00_ftb-li">
+  <a href="/xs-bpu/docs/ports/00_ftb/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsports00_ftb"><span class="">FTB项与完整预测结果接口</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsports01_redirect_and_update-li">
+  <a href="/xs-bpu/docs/ports/01_redirect_and_update/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsports01_redirect_and_update"><span class="">重定向与更新接口</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsports02_global_ports-li">
+  <a href="/xs-bpu/docs/ports/02_global_ports/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsports02_global_ports"><span class="">BPU 全局接口</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsports03_subpredictor-li">
+  <a href="/xs-bpu/docs/ports/03_subpredictor/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsports03_subpredictor"><span class="">子预测器基类与子预测器接口</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-xs-bpudocsmodules-li">
+  <a href="/xs-bpu/docs/modules/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-xs-bpudocsmodules"><span class="">子模块文档</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-xs-bpudocsmodules00_bpu_top-li">
+  <a href="/xs-bpu/docs/modules/00_bpu_top/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules00_bpu_top"><span class="td-sidebar-nav-active-item">BPU 顶层模块</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules01_uftb-li">
+  <a href="/xs-bpu/docs/modules/01_uftb/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules01_uftb"><span class="">uFTB 分支预测器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules02_tage_sc-li">
+  <a href="/xs-bpu/docs/modules/02_tage_sc/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules02_tage_sc"><span class="">TAGE-SC 分支预测器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules03_ftb-li">
+  <a href="/xs-bpu/docs/modules/03_ftb/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules03_ftb"><span class="">FTB 分支预测器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules04_ittage-li">
+  <a href="/xs-bpu/docs/modules/04_ittage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules04_ittage"><span class="">ITTAGE 分支预测器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules05_ras-li">
+  <a href="/xs-bpu/docs/modules/05_ras/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules05_ras"><span class="">RAS 分支预测器</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-xs-bpudocsfeature-li">
+  <a href="/xs-bpu/docs/feature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-xs-bpudocsfeature"><span class="">功能列表</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature00_bpufeature-li">
+  <a href="/xs-bpu/docs/feature/00_bpufeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature00_bpufeature"><span class="">BPU Top 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature01_uftbfeature-li">
+  <a href="/xs-bpu/docs/feature/01_uftbfeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature01_uftbfeature"><span class="">uFTB 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature02_ftbfeature-li">
+  <a href="/xs-bpu/docs/feature/02_ftbfeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature02_ftbfeature"><span class="">FTB 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature03_tagescfeature-li">
+  <a href="/xs-bpu/docs/feature/03_tagescfeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature03_tagescfeature"><span class="">TAGE-SC 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature04_ittagefeature-li">
+  <a href="/xs-bpu/docs/feature/04_ittagefeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature04_ittagefeature"><span class="">ITTAGE 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature05_rasfeature-li">
+  <a href="/xs-bpu/docs/feature/05_rasfeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature05_rasfeature"><span class="">RAS 功能列表</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            
+<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/modules/00_bpu_top.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/modules/00_bpu_top.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/modules?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=BPU%20%e9%a1%b6%e5%b1%82%e6%a8%a1%e5%9d%97" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
+  <a id="print" href="/xs-bpu/docs/modules/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#生成器维护方法">生成器维护方法</a></li>
+    <li><a href="#全局分支历史">全局分支历史</a>
+      <ul>
+        <li><a href="#通过-ghist_ptr-计算当前全局分支历史">通过 ghist_ptr 计算当前全局分支历史</a></li>
+        <li><a href="#全局分支历史的更新">全局分支历史的更新</a></li>
+      </ul>
+    </li>
+    <li><a href="#分支折叠历史">分支折叠历史</a>
+      <ul>
+        <li><a href="#分支折叠历史-1">分支折叠历史</a></li>
+        <li><a href="#分支折叠历史更新方法">分支折叠历史更新方法</a></li>
+        <li><a href="#更新方法实现">更新方法实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#流水线控制方法">流水线控制方法</a>
+      <ul>
+        <li><a href="#valid-ready-与-fire">valid, ready 与 fire</a></li>
+        <li><a href="#加入-flush-和-redirect">加入 flush 和 redirect</a></li>
+      </ul>
+    </li>
+    <li><a href="#重定向恢复逻辑">重定向恢复逻辑</a></li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tag Cloud</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/bpu/" data-taxonomy-term="bpu"><span class="taxonomy-label">BPU</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/bpu-%E9%A1%B6%E5%B1%82/" data-taxonomy-term="bpu-%E9%A1%B6%E5%B1%82"><span class="taxonomy-label">BPU 顶层</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/feature-list/" data-taxonomy-term="feature-list"><span class="taxonomy-label">Feature List</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/ftb/" data-taxonomy-term="ftb"><span class="taxonomy-label">FTB</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/ftb-%E9%A1%B9/" data-taxonomy-term="ftb-%E9%A1%B9"><span class="taxonomy-label">FTB 项</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/ittage/" data-taxonomy-term="ittage"><span class="taxonomy-label">ITTAGE</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/ras/" data-taxonomy-term="ras"><span class="taxonomy-label">RAS</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/tage-sc/" data-taxonomy-term="tage-sc"><span class="taxonomy-label">TAGE-SC</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/uftb/" data-taxonomy-term="uftb"><span class="taxonomy-label">UFTB</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%85%A8%E5%B1%80%E5%88%86%E6%94%AF%E5%8E%86%E5%8F%B2/" data-taxonomy-term="%E5%85%A8%E5%B1%80%E5%88%86%E6%94%AF%E5%8E%86%E5%8F%B2"><span class="taxonomy-label">全局分支历史</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2/" data-taxonomy-term="%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2"><span class="taxonomy-label">分支折叠历史</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B"><span class="taxonomy-label">分支预测</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%9D%97/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%9D%97"><span class="taxonomy-label">分支预测块</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%8F%96%E5%80%BC%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq/" data-taxonomy-term="%E5%8F%96%E5%80%BC%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq"><span class="taxonomy-label">取值目标队列（FTQ）</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8/" data-taxonomy-term="%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8"><span class="taxonomy-label">子预测器</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82/" data-taxonomy-term="%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82"><span class="taxonomy-label">更新请求</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6/" data-taxonomy-term="%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6"><span class="taxonomy-label">流水线控制</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82/" data-taxonomy-term="%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82"><span class="taxonomy-label">重定向请求</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%87%8D%E5%AE%9A%E5%90%91/" data-taxonomy-term="%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%87%8D%E5%AE%9A%E5%90%91"><span class="taxonomy-label">预测结果重定向</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%A6%99%E5%B1%B1/" data-taxonomy-term="%E9%A6%99%E5%B1%B1"><span class="taxonomy-label">香山</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%A6%99%E5%B1%B1-bpu-%E6%97%B6%E5%BA%8F/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E6%97%B6%E5%BA%8F"><span class="taxonomy-label">香山 BPU 时序</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%A6%99%E5%B1%B1-bpu-%E7%BB%93%E6%9E%84/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E7%BB%93%E6%9E%84"><span class="taxonomy-label">香山 BPU 结构</span><span class="taxonomy-count">1</span></a></li>
+        </ul>
+    </div>
+  <div class="taxonomy taxonomy-terms-cloud taxo-categories">
+      <h5 class="taxonomy-title">Categories</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/feature-list/" data-taxonomy-term="feature-list"><span class="taxonomy-label">Feature List</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%8D%95%E5%85%83bpu/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%8D%95%E5%85%83bpu"><span class="taxonomy-label">分支预测单元（BPU）</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E7%A4%BA%E4%BE%8B/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B"><span class="taxonomy-label">示例</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E9%A6%99%E5%B1%B1-bpu-%E5%9F%BA%E7%A1%80%E8%AE%BE%E8%AE%A1/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E5%9F%BA%E7%A1%80%E8%AE%BE%E8%AE%A1"><span class="taxonomy-label">香山 BPU 基础设计</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E9%A6%99%E5%B1%B1-bpu-%E5%AD%90%E6%A8%A1%E5%9D%97/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E5%AD%90%E6%A8%A1%E5%9D%97"><span class="taxonomy-label">香山 BPU 子模块</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E9%A6%99%E5%B1%B1-bpu-%E6%8E%A5%E5%8F%A3/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E6%8E%A5%E5%8F%A3"><span class="taxonomy-label">香山 BPU 接口</span><span class="taxonomy-count">5</span></a></li>
+        </ul>
+    </div>
+  
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/xs-bpu/docs/">分支预测器与昆明湖微架构实现</a></li>
+  <li class="breadcrumb-item">
+    <a href="/xs-bpu/docs/modules/">子模块文档</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    BPU 顶层模块</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>BPU 顶层模块</h1>
+	
+	<header class="article-meta">
+		<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%A6%99%E5%B1%B1/" data-taxonomy-term="%E9%A6%99%E5%B1%B1"><span class="taxonomy-label">香山</span></a></li>
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/bpu-%E9%A1%B6%E5%B1%82/" data-taxonomy-term="bpu-%E9%A1%B6%E5%B1%82"><span class="taxonomy-label">BPU 顶层</span></a></li>
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%85%A8%E5%B1%80%E5%88%86%E6%94%AF%E5%8E%86%E5%8F%B2/" data-taxonomy-term="%E5%85%A8%E5%B1%80%E5%88%86%E6%94%AF%E5%8E%86%E5%8F%B2"><span class="taxonomy-label">全局分支历史</span></a></li>
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2/" data-taxonomy-term="%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2"><span class="taxonomy-label">分支折叠历史</span></a></li>
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6/" data-taxonomy-term="%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6"><span class="taxonomy-label">流水线控制</span></a></li>
+    </ul>
+</div>
+<div class="taxonomy taxonomy-terms-article taxo-categories">
+  <h5 class="taxonomy-title">Categories:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E9%A6%99%E5%B1%B1-bpu-%E5%AD%90%E6%A8%A1%E5%9D%97/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E5%AD%90%E6%A8%A1%E5%9D%97"><span class="taxonomy-label">香山 BPU 子模块</span></a></li>
+    </ul>
+</div>
+
+  </header>
+	<p>BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。</p>
+<h2 id="生成器维护方法">生成器维护方法</h2>
+<p>通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。</p>
+<p>BPU 顶层中所有的生成器共有 6 个：</p>
+<ul>
+<li><strong>npcGen</strong> 维护 pc</li>
+<li><strong>ghistPtrGen</strong> 维护全局历史指针</li>
+<li><strong>ghvBitWriteGens</strong> 维护全局历史写入数据</li>
+<li><strong>foledGhGen</strong> 维护折叠历史</li>
+<li><strong>lastBrNumOHGen</strong> 维护上周期最后一个生效的分支指令位置</li>
+<li><strong>aheadFhObGen</strong> 维护分支历史最老位</li>
+</ul>
+<p>其中，除了 <code>npcGen</code> 以外，其余生成器都会在本文档中进行介绍。本节中我们着重探讨一下生成器的产生下一次预测的方法。</p>
+<p>在代码中你可以看到生成器用类似下面这种方式进行定义：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Scala" data-lang="Scala"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">npcGen</span> <span style="color:#204a87;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">PhyPriorityMuxGenerator</span><span style="color:#ce5c00;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">UInt</span><span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span></code></pre></div><p>接下来，代码通过多条语句对生成器的数据来源进行注册：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Scala" data-lang="Scala"><span style="display:flex;"><span><span style="color:#000">npcGen</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">register</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">B</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">reg</span><span style="color:#a40000">，</span> <span style="color:#ce5c00;font-weight:bold">...)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">npcGen</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">register</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">s1_valid</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">s1_target</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">...)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">npcGen</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">register</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">s2_redirect</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">s2_target</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">...)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">npcGen</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">register</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">s3_redirect</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">s3_target</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">...)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">npcGen</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">register</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">do_redirect</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">valid</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">do_redirect</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bits</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cfiUpdate</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">target</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">...)</span>
+</span></span></code></pre></div><p>每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：</p>
+<ul>
+<li>s0 阻塞的数据</li>
+<li>根据 s1 预测结果更新后的数据</li>
+<li>根据 s2 预测结果更新后的数据</li>
+<li>根据 s3 预测结果更新后的数据</li>
+<li>BPU 外部重定向中的数据</li>
+</ul>
+<p>这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。</p>
+<p>我们可以得出所有生成器产生 s0 信号的方法：<strong>在所有数据有效信号中，如果只有一个有效的，则选取它对应的数据，如果有多个数据有效信号生效，则选取优先级最高的数据。</strong></p>
+<h2 id="全局分支历史">全局分支历史</h2>
+<p>我们知道，全局分支历史在 BPU 顶层进行维护，维护的策略与 PC 的维护策略一致。即在每个阶段流水级预测结果产生之后，会根据相应信号对全局分支历史进行更新。</p>
+<p>顶层为了维护全局分支历史定义了两组信号</p>
+<ul>
+<li><strong>ghv</strong> 存储了全局分支历史（最大长度 256）</li>
+<li><strong>ghist_ptr</strong> 全局分支历史指针，指向全局分支历史当前的位置</li>
+</ul>
+<p>与 <code>s0_pc</code>, <code>s1_pc</code>, <code>s2_pc</code> 一样，BPU 顶层为全局历史指针也维护了每一阶段的信号 <code>s0_ghist_ptr</code>, <code>s1_ghist_ptr</code>, <code>s2_ghist_ptr</code> ，但 <strong><code>ghv</code></strong> <strong>中的内容是位置固定的，我们仅通过</strong> <strong><code>ghist_ptr</code></strong> <strong>来定位当前的全局分支历史从哪里开始。</strong></p>
+<h3 id="通过-ghist_ptr-计算当前全局分支历史">通过 ghist_ptr 计算当前全局分支历史</h3>
+<p><code>ghist_ptr</code> 的使用仅在 BPU 顶层可见，而我们向子预测器传入的，是全局历史寄存器中的数据根据 <code>ghist_ptr</code> 所移位之后的全局分支历史。<strong>在子预测器拿到的全局分支历史中，最低位对应全局分支历史的最新位，最高位对应全局分支历史的最老位。</strong></p>
+<p>那么是怎样进行移位的呢，我们首先来看一下全局历史是怎样在 <code>ghv</code> 中进行存储的。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plain" data-lang="Plain"><span style="display:flex;"><span>|===== ghist =====&gt;| =======&gt;|
+</span></span><span style="display:flex;"><span>n                  ^         0
+</span></span><span style="display:flex;"><span>                   ghist_ptr
+</span></span></code></pre></div><p>如上图所示，序列表示整个 <code>ghv</code> 寄存器，<code>ghist_ptr</code> 指向 <code>ghv</code> 中的某个位置，这个位置代表了全局分支历史的最新位。当需要添加一位新的全局历史记录时，首先将 <code>ghist_ptr</code> 减 1，然后将该位写在其所指向的位置。当 <code>ghist_ptr</code> 减到 0 后，又会循环回来指向最高位，因此会覆盖之前写入的全局分支历史。</p>
+<p>但不管怎样，从 <code>ghist_ptr</code> 所指向的位置开始，指针越增加，历史越老。因此，当<strong>我们需要计算当前全局分支历史时，只需要将</strong> <strong><code>ghv</code></strong> <strong>寄存器循环右移</strong> <strong><code>ghist_ptr</code></strong> <strong>位即可。</strong></p>
+<h3 id="全局分支历史的更新">全局分支历史的更新</h3>
+<p>全局分支历史的更新策略与 <code>pc</code> 更新的策略一致，在每一个流水级都需要根据当前流水级的预测结果生成一个 <strong>当前流水级的指针及</strong> <strong><code>ghv</code></strong> <strong>的更新说明</strong>，最终都送给相关生成器来处理。</p>
+<p><code>ghv</code> 的更新说明即 用于指导 <code>ghv</code> 寄存器的更新的某些信息。香山 BPU 中维护了两个信息来完成这一职责：</p>
+<ul>
+<li><code>ghv_wdata</code> 需要向 ghv 中写入的数据</li>
+<li><code>ghv_wens</code> 写入位掩码</li>
+</ul>
+<p>最终更新时，只需要将 <code>ghv_wens</code> 所标识的位写入 <code>ghv_wdata</code> 的对应位即可。</p>
+<p><strong>因此每个流水级需要负责产生三组信息：</strong><code>ghist_ptr</code>,<code>ghv_wdata</code>, <code>ghv_wens</code>。</p>
+<p>具体地，预测结果中最多含有两条分支指令，我们只需将实际情况来设置这几个信息即可，举几种情况的例子：</p>
+<ul>
+<li>只有第一个槽有效，并且其中条件分支指令被预测为不跳转。则将 <code>ghv_wens</code> 的下一个位置置 0 ，<code>ghv_wens</code> 的对应位置置 1, 同时 <code>ghist_ptr</code> 减一。</li>
+<li>两个槽都存放了条件分支指令，第一条被预测为不跳转, 第二条被预测为跳转。此时 <code>ghist_ptr</code> 应该减二，并且其他两个信息应该指示向 <code>ghv</code> 中写入 01。</li>
+</ul>
+<p>此处在生成器中只维护了一个 <code>ghv_wdata</code> 信息（通过 <code>ghvBitWriteGens</code> 生成器维护），<code>ghv_wens</code> 并没有通过生成器来维护。这是因为此处使用了一个小技巧，使用了生成器的 <code>ghv_wdata</code> 最终输出的是被选中阶段的结果，而 <code>ghv_wens</code> 将所有阶段的 <code>ghv_wens</code> 进行<strong>按位或</strong>来使用。</p>
+<p>这是基于如下考虑的：</p>
+<ul>
+<li>如果较晚的流水线阶段有效。全局历史指针被恢复到较老的位置，即便被早期流水的 <code>ghv_wens</code> 修改了较新位置的历史也没关系。</li>
+<li>如果较早的流水线阶段有效。全局历史指针继续向较新的位置更新，而后期流水线会因为 redirect 未生效而不把 <code>ghv_wens</code> 置位。</li>
+</ul>
+<h2 id="分支折叠历史">分支折叠历史</h2>
+<p>送入预测器的分支折叠历史也是由顶层 BPU 来维护的，BPU 为了缩短折叠历史的更新延迟，维护了很多变量，来支持分支折叠历史的快速更新，我们将会重点介绍这一策略，并介绍每一个变量的作用。</p>
+<p>在开始之前，我们先来看一下分支折叠历史是怎样定义的，结构又是怎样的。</p>
+<h3 id="分支折叠历史-1">分支折叠历史</h3>
+<p>如果你查看了 BPU 全局接口的文档，你就会知道，子预测器拿到的是一个不同长度位向量的数组，代表了各种长度的折叠历史，而这些<strong>折叠历史都是由全局分支历史压缩而成</strong>。</p>
+<p>对于全局分支历史，我们有一个存放全局分支历史的寄存器，长度为 256。为了方便举例，我们假设全局分支历史的长度为 15 位，并且经过移位之后，我们可以拿到一个这样的分支历史：最低位是最新的历史记录，最高位是最老的历史记录。</p>
+<p>此时如果我们需要用这 15 位，产生一个 6 位的折叠历史，会使用异或的策略进行压缩，具体过程是这样的：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plain" data-lang="Plain"><span style="display:flex;"><span>    h[5]         h[4]       h[3]    h[2]   h[1]   h[0]
+</span></span><span style="display:flex;"><span>    h[11]        h[10]      h[9]    h[8]   h[7]   h[6]
+</span></span><span style="display:flex;"><span>^                                   h[14]  h[13]  h[12]
+</span></span><span style="display:flex;"><span>---------------------------------------------------------------
+</span></span><span style="display:flex;"><span>    h[5]^h[11]   h[4]^h[10]         ...           h[0]^h[6]^h[12]
+</span></span></code></pre></div><p>即将其按照上面的方式排列之后，将每一位上的值进行异或，结果便是求出的长度为 6 的折叠历史。</p>
+<h3 id="分支折叠历史更新方法">分支折叠历史更新方法</h3>
+<p>此时我们想要对这一分支折叠历史进行更新，当我们向全局分支历史插入一位新历史时，是从最低位插入的，也就是说原来的 h[0] 变为了 h[1]，如果我们想求此时的分支折叠历史，只需要再进行一遍异或运算。但这样的效率太低了，因为异或的操作有可能变得特别长，我们可以来探寻一下一次更新对分支折叠历史的影响。</p>
+<p>上述例子中，插入一位新历史之前，6 位折叠历史的生成是按照下面这种排列生成的</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plain" data-lang="Plain"><span style="display:flex;"><span>h[5]   h[4]   h[3]  h[2]  h[1]  h[0]
+</span></span><span style="display:flex;"><span>h[11]  h[10]  h[9]  h[8]  h[7]  h[6]
+</span></span><span style="display:flex;"><span>                    h[14] h[13] h[12]
+</span></span></code></pre></div><p>插入一位新历史之后变成了下面这样</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plain" data-lang="Plain"><span style="display:flex;"><span>h[4]   h[3]   h[2]  h[1]  h[0]  h[new]
+</span></span><span style="display:flex;"><span>h[10]  h[9]   h[8]  h[7]  h[6]  h[5]
+</span></span><span style="display:flex;"><span>           (h[14])  h[13] h[12] h[11]
+</span></span></code></pre></div><p>我们可以发现一些规律</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plain" data-lang="Plain"><span style="display:flex;"><span>插入前：
+</span></span><span style="display:flex;"><span>h[5]   {h[4]   h[3]  h[2]  h[1]  h[0] }
+</span></span><span style="display:flex;"><span>h[11]  {h[10]  h[9]  h[8]  h[7]  h[6] }
+</span></span><span style="display:flex;"><span>       {             h[14] h[13] h[12]}
+</span></span><span style="display:flex;"><span>插入后：
+</span></span><span style="display:flex;"><span>{h[4]   h[3]   h[2]  h[1]  h[0] } h[new]
+</span></span><span style="display:flex;"><span>{h[10]  h[9]   h[8]  h[7]  h[6] } h[5]
+</span></span><span style="display:flex;"><span>{           (h[14])  h[13] h[12]} h[11]
+</span></span></code></pre></div><p>大括号中的内容发生了整体的左移，h[5] 和 h[11]，由最高位变到了最低位。那么表现在压缩后的历史上不就是我们常见的循环左移吗！</p>
+<p>但其中有且仅有两个位的值发生了变化，一个是新加入的 h[new]，一个是被舍弃掉的 h[14]。h[new] 肯定在第一位，被舍弃的位置也是固定的。<strong>因此我们想要完成一次更新，只需要知道 新插入历史的值 和 前一次历史的最老位即可</strong>。循环移位后，将这两个位置根据实际情况进行一次修改便可拿到更新后的折叠历史。</p>
+<h3 id="更新方法实现">更新方法实现</h3>
+<p>BPU 顶层为了实现这种更新，正是通过维护最老位，这通过两个额外的变量来实现：</p>
+<ul>
+<li><strong>ahead_fh_oldest_bits</strong>  全局分支历史的最老位，还额外往前存储了若干位</li>
+<li><strong>last_br_num_oh</strong>  上一次预测最后一个生效的分支指令在第几个槽</li>
+</ul>
+<p>在这里有一处为时序所优化的点，因为当流水级的预测结果出来时，全局历史指针才能通过跳转情况进行更新，等到全局历史指针更新完再来更新最老位会增加时延。因此我们将跳转情况维护起来，等到下一周期用的时候再来用跳转情况更新最老位。</p>
+<p>此时的最老位也需要多往前维护几位，因为在使用时，利用跳转情况更新后，前面较新的几位就会变成最老位了。</p>
+<p>所以与折叠历史相关的生成器共有三个：<code>foldedGhGen</code>, <code>lastBrNumOhGen</code>, <code>aheadFhObGen</code></p>
+<p><strong>每次折叠历史更新时需要的信息分别是</strong>：</p>
+<ul>
+<li>更新前的折叠历史信息</li>
+<li>全局分支历史最老位(ahead_fh_oldest_bits）</li>
+<li>上次预测的跳转情况(last_br_num_oh)</li>
+<li>本次更新是否有指令跳转</li>
+<li>本次更新的跳转情况：最后一个生效的分支指令在第几个槽</li>
+</ul>
+<p>每次折叠历史更新时，都需要根据 <code>last_br_num_oh</code> 和 <code>ahead_fh_oldest_bits</code> 求出真正的最老位，然后通过最老位与本次更新的跳转情况将其中的若干位进行修改，最后进行循环左移，便完成了更新操作。</p>
+<h2 id="流水线控制方法">流水线控制方法</h2>
+<p>流水线控制是 BPU 功能的核心，逻辑也最为复杂，BPU 顶层中所有的流水线控制信号如下：</p>
+<ul>
+<li><strong>s1_valid, s2_valid, s3_valid</strong> 表示对应流水数据生效</li>
+<li><strong>s1_ready, s2_ready, s3_ready</strong> 表示对应流水已准备好继续上一流水级的预测</li>
+<li><strong>s1_component_ready, s2_component_ready, s3_component_ready</strong> 表示对应流水子预测器的 ready 情况</li>
+<li><strong>s0_fire, s1_fire, s2_fire, s3_fire</strong> 握手成功信号，表示该流水数据生效，并成功传递给了下一流水</li>
+<li><strong>s1_flush, s2_flush, s3_flush</strong> 表示当前流水是否需要冲刷</li>
+<li><strong>s2_redirect, s3_redirect</strong> 表示当前流水在 fire 的同时，是否预测结果不同，需要产生预测结果重定向</li>
+</ul>
+<h3 id="valid-ready-与-fire">valid, ready 与 fire</h3>
+<p>我们会逐步来介绍每个信号的作用，首先我们来看 <code>fire</code> 信号，这一信号表示的含义是流水线握手成功，数据成功传给了下一流水。这标志着本周期结束时，本流水级的预测也随之结束，下周期开始时，下一流水级的预测即将开始。</p>
+<p>这需要两个条件：</p>
+<ol>
+<li><code>valid</code> 本流水级的数据是有效的。</li>
+<li><code>ready</code> 与 <code>component_ready</code> 分别指示了 BPU 顶层与预测器的下一流水级是否就绪。</li>
+</ol>
+<p>当这两个信号同时置高时，<code>fire</code> 信号有效，表示握手成功。如果我们单独把一次预测拿出来，那么时序应该是这样的（实际中，大多数时间每个流水线都是一直有效的）：</p>
+
+<figure>
+    <img src="1.png" width="400px"/> 
+</figure>
+
+<p>上文中提到的四组信号，除了 <code>component_ready</code> 是由预测器输出，其余信号皆需 BPU 顶层来维护，而最终暴露给子预测器的，只有 <code>fire</code> 一组信号。</p>
+<p>我们接下来以 s2 为例分别来看每个信号是如何维护的。</p>
+<p><strong>ready</strong> <strong>信号</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Scala" data-lang="Scala"><span style="display:flex;"><span><span style="color:#000">s2_ready</span> <span style="color:#204a87;font-weight:bold">:</span><span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">s2_fire</span> <span style="color:#ce5c00;font-weight:bold">||</span> <span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">s2_valid</span>
+</span></span></code></pre></div><p>该赋值语句是一个组合电路赋值，也就是说，<code>s2_ready</code> 信号是与本周期的 <code>s2_fire</code> 和 <code>s2_valid</code> 直接相关联的，分为以下两种情况：</p>
+<ul>
+<li><code>s2_valid</code> 信号在本周期无效，说明 s2 流水级目前是空的，自然可以接受新的数据，则 <code>s2_ready</code> 有效</li>
+<li><code>s2_valid</code> 信号在本周期有效，说明 s2 流水级目前有数据还未传递给下一级，但如果 <code>s2_fire</code> ，那么本周期就会传递给下一级。此时 <code>s2_ready</code> 有效，刚好指示数据可以在下一拍流入。</li>
+</ul>
+<p><strong>valid 信号</strong></p>
+<p><code>s2_valid</code> 信号目前为止维护是相对简单的，与 <code>s1_fire</code> 信号和 <code>s2_ready</code> 信号相关。其关系为：</p>
+<ul>
+<li>当 <code>s1_fire</code> 有效，说明数据传进来，下一周期 <code>s2_valid</code> 有效。</li>
+<li>当 <code>s2_fire</code> 有效，说明数据流出去，下一周期 <code>s2_valid</code> 无效。</li>
+</ul>
+<p><strong>fire 信号</strong></p>
+<p>fire 信号相对特殊，但对于中间的流水级来说，维护非常简单，例如</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Scala" data-lang="Scala"><span style="display:flex;"><span><span style="color:#000">s2_fire</span> <span style="color:#204a87;font-weight:bold">:</span><span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">s2_valid</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> <span style="color:#000">s3_components_ready</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> <span style="color:#000">s3_ready</span>
+</span></span></code></pre></div><p>只需考虑当前流水级的 <code>valid</code> 和下一流水级的 <code>ready</code> 即可。</p>
+<p>但对 s0_fire 来说，没有 valid 信号，因此其直接等于 <code>s1_components_ready &amp;&amp; s1_ready</code></p>
+<p>对于 s3_fire 来说，没有下一级的 ready 信号，因此其直接等于 <code>s3_valid</code></p>
+<h3 id="加入-flush-和-redirect">加入 flush 和 redirect</h3>
+<p>我们知道，当流水线出现预测结果不同时，需要产生预测结果重定向信号，并且将之前的流水线清空。<code>flush</code> 和 <code>redirect</code> 正是在做这两项工作。<code>redirect</code> 表示当前流水级是否需要重定向，<code>flush</code> 则表示当前流水级是否需要冲刷。</p>
+<p><strong>redirect 信号</strong></p>
+<p><code>s2_redirect</code> 的产生方式如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Scala" data-lang="Scala"><span style="display:flex;"><span><span style="color:#000">s2_redirect</span> <span style="color:#204a87;font-weight:bold">:</span><span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">s2_fire</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> <span style="color:#000">s2_redirect_s1_last_pred</span>
+</span></span></code></pre></div><p>也就是说，当 <code>s2_fire</code> 时，并且 s2 的预测结果与上一周期保存的 s1 预测结果不同时，这个信号便有效。之后该信号将会连接到子预测器的输入，与 BPU 预测结果的输出，分别指导子预测器和  FTQ  的状态恢复。</p>
+<p><strong>flush 信号</strong></p>
+<p>flush 信号是用于指导流水线冲刷的，例如 s3 重定向有效时，说明错误的预测结果已经流入流水线， s1 和 s2 此时全都是基于错误的结果来预测的，因此需要进行流水线冲刷，使之前的流水级都暂停工作，等待新的预测结果流入。</p>
+<p>具体地，他们之间有如下关系：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Scala" data-lang="Scala"><span style="display:flex;"><span> <span style="color:#000">s2_flush</span> <span style="color:#204a87;font-weight:bold">:</span><span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">s3_flush</span> <span style="color:#ce5c00;font-weight:bold">||</span> <span style="color:#000">s3_redirect</span>
+</span></span><span style="display:flex;"><span> <span style="color:#000">s1_flush</span> <span style="color:#204a87;font-weight:bold">:</span><span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">s2_flush</span> <span style="color:#ce5c00;font-weight:bold">||</span> <span style="color:#000">s2_redirect</span>
+</span></span></code></pre></div><p>也就是说，某个流水级 <code>redirect</code> 有效，之前的流水级的 flush 全都会被置为有效。那么 flush 具有什么作用呢？答案是指导 valid 信号，如果本周期 valid 信号有效，但 fire 信号未生效，说明错误的数据没有被下一流水取走，此时 flush 有效后，在下一周期 valid 就会立即变为无效，以这种方式来避免错误数据长期存储在流水线中。</p>
+<p>但 flush 信号对 valid 信号的影响，也根据每一个流水级的不同而有一定差异。例如</p>
+<ul>
+<li>s1 流水级。虽然 flush 有效，但是如果此时 <code>s0_fire</code> 有效，说明新数据流入，那么下周期 valid 依然有效。</li>
+<li>s2 流水级。flush 有效，那么必定下周期不会 valid（因为 s1 也肯定被 flush），此时就可以直接将 valid 置为无效。但还存在一种特殊情况，<code>s2_redirect</code> 发生时，<code>s2_flush</code> 并没有被置为有效，此时如果发生 <code>s1_fire</code>，s1 的错误预测结果也可能流入，此时还需根据 <code>s1_flush</code> 信号来决定 <code>s2_valid</code> 是否有效。</li>
+</ul>
+<p>flush 的使用较复杂，更详细的细节还需参考代码进行理解。</p>
+<h2 id="重定向恢复逻辑">重定向恢复逻辑</h2>
+<p>当 FTQ 发往 BPU 的重定向请求生效时就说明所有流水级的预测结果都是不正确的，此时应该将所有流水级进行冲刷，这可以通过将 <code>s3_flush</code> 置为有效来实现。因此有</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Scala" data-lang="Scala"><span style="display:flex;"><span> <span style="color:#000">s3_flush</span> <span style="color:#204a87;font-weight:bold">:</span><span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">redirect_req</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">valid</span>
+</span></span></code></pre></div><p>在 BPU 中，重定向请求送入后被延迟一周期才正式使用，因此 <code>s1_valid</code> 的信号也需要对 <code>flush</code> 信号的响应做出一些改变。当重定向请求（延迟前）有效时，<code>s1_valid</code> 下周期立即被置为无效，不需要再去参考 <code>s0_fire</code> 信号了。</p>
+<p>此时 <code>npcGen</code> 等生成器也需要直接去采用重定向请求中的数据来生成，这就相当于将 BPU 的状态重定向到出错之前状态的过程。但注意 BPU 默认的重定向等级为 <code>flushAfter</code> ，即重定向请求会对应一条预测错误的指令，而 BPU 会认为这条指令虽然预测错了，但是已经被纠正并且交由后端执行了，因此下一次预测可以直接从下一条指令开始。</p>
+<p>所以在重定向恢复时，不仅需要将重定向接口中的信息恢复，还需要将这条预测错误的指令的执行情况也更新到历史中去。</p>
+
+	<div class="text-muted mt-5 pt-3 border-top">
+  最后修改 March 27, 2024: <a href="https://github.com/XS-MLVP/course/commit/4fdc17467fddafde54625ec48ada413b2d5f1887">Add BPU documents (4fdc174)</a>
+</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
+        <span>&copy; 2024 BOSC 保留所有权利</span>
+        <span class="ms-1"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
+        
+      </div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <script src="/xs-bpu/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
+<script defer src="/xs-bpu/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/xs-bpu/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

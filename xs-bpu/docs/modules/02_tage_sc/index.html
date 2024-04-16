@@ -1,0 +1,1509 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-cn" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/xs-bpu/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/xs-bpu/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-192x192.png" sizes="192x192">
+
+<title>TAGE-SC 分支预测器 | 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
+<meta name="description" content="一、功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
+二、昆明湖Tage分支预测器 1. 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
+基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
+对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
+对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
+如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
+<meta property="og:title" content="TAGE-SC 分支预测器" />
+<meta property="og:description" content="一、功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
+二、昆明湖Tage分支预测器 1. 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
+基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
+对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
+对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
+如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/02_tage_sc/" /><meta property="article:section" content="docs" />
+
+<meta property="article:modified_time" content="2024-04-09T14:32:39+08:00" />
+<meta itemprop="name" content="TAGE-SC 分支预测器">
+<meta itemprop="description" content="一、功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
+二、昆明湖Tage分支预测器 1. 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
+基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
+对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
+对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
+如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
+<meta itemprop="dateModified" content="2024-04-09T14:32:39+08:00" />
+<meta itemprop="wordCount" content="1101">
+<meta itemprop="keywords" content="子预测器,TAGE-SC," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="TAGE-SC 分支预测器"/>
+<meta name="twitter:description" content="一、功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
+二、昆明湖Tage分支预测器 1. 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
+基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
+对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
+对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
+如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。"/>
+
+
+
+
+<link rel="preload" href="/xs-bpu/scss/main.min.a4b91db5523db31ece8b4cafe3c363c918ca66dd6af0b9ed7b4181b018981f38.css" as="style">
+<link href="/xs-bpu/scss/main.min.a4b91db5523db31ece8b4cafe3c363c918ca66dd6af0b9ed7b4181b018981f38.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/xs-bpu/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.65834df3efb52d2a07004106e88c9bbd.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.65834df3efb52d2a07004106e88c9bbd.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-xs-bpudocs-li">
+  <a href="/xs-bpu/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-xs-bpudocs"><span class="">分支预测器与昆明湖微架构实现</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-xs-bpudocsbasic-li">
+  <a href="/xs-bpu/docs/basic/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-xs-bpudocsbasic"><span class="">香山分支预测单元（BPU）基础设计</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsbasic00_bp-li">
+  <a href="/xs-bpu/docs/basic/00_bp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsbasic00_bp"><span class="">何为分支预测</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsbasic01_xsbpu_basic-li">
+  <a href="/xs-bpu/docs/basic/01_xsbpu_basic/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsbasic01_xsbpu_basic"><span class="">香山分支预测单元基础</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsbasic02_xsbpu_structure-li">
+  <a href="/xs-bpu/docs/basic/02_xsbpu_structure/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsbasic02_xsbpu_structure"><span class="">香山分支预测单元结构介绍</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsbasic03_xsbpu_timing-li">
+  <a href="/xs-bpu/docs/basic/03_xsbpu_timing/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsbasic03_xsbpu_timing"><span class="">香山分支预测单元时序介绍</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-xs-bpudocsports-li">
+  <a href="/xs-bpu/docs/ports/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-xs-bpudocsports"><span class="">重要结构及接口文档</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsports00_ftb-li">
+  <a href="/xs-bpu/docs/ports/00_ftb/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsports00_ftb"><span class="">FTB项与完整预测结果接口</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsports01_redirect_and_update-li">
+  <a href="/xs-bpu/docs/ports/01_redirect_and_update/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsports01_redirect_and_update"><span class="">重定向与更新接口</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsports02_global_ports-li">
+  <a href="/xs-bpu/docs/ports/02_global_ports/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsports02_global_ports"><span class="">BPU 全局接口</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsports03_subpredictor-li">
+  <a href="/xs-bpu/docs/ports/03_subpredictor/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsports03_subpredictor"><span class="">子预测器基类与子预测器接口</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-xs-bpudocsmodules-li">
+  <a href="/xs-bpu/docs/modules/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-xs-bpudocsmodules"><span class="">子模块文档</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules00_bpu_top-li">
+  <a href="/xs-bpu/docs/modules/00_bpu_top/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules00_bpu_top"><span class="">BPU 顶层模块</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules01_uftb-li">
+  <a href="/xs-bpu/docs/modules/01_uftb/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules01_uftb"><span class="">uFTB 分支预测器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-xs-bpudocsmodules02_tage_sc-li">
+  <a href="/xs-bpu/docs/modules/02_tage_sc/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules02_tage_sc"><span class="td-sidebar-nav-active-item">TAGE-SC 分支预测器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules03_ftb-li">
+  <a href="/xs-bpu/docs/modules/03_ftb/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules03_ftb"><span class="">FTB 分支预测器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules04_ittage-li">
+  <a href="/xs-bpu/docs/modules/04_ittage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules04_ittage"><span class="">ITTAGE 分支预测器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsmodules05_ras-li">
+  <a href="/xs-bpu/docs/modules/05_ras/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsmodules05_ras"><span class="">RAS 分支预测器</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-xs-bpudocsfeature-li">
+  <a href="/xs-bpu/docs/feature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-xs-bpudocsfeature"><span class="">功能列表</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature00_bpufeature-li">
+  <a href="/xs-bpu/docs/feature/00_bpufeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature00_bpufeature"><span class="">BPU Top 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature01_uftbfeature-li">
+  <a href="/xs-bpu/docs/feature/01_uftbfeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature01_uftbfeature"><span class="">uFTB 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature02_ftbfeature-li">
+  <a href="/xs-bpu/docs/feature/02_ftbfeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature02_ftbfeature"><span class="">FTB 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature03_tagescfeature-li">
+  <a href="/xs-bpu/docs/feature/03_tagescfeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature03_tagescfeature"><span class="">TAGE-SC 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature04_ittagefeature-li">
+  <a href="/xs-bpu/docs/feature/04_ittagefeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature04_ittagefeature"><span class="">ITTAGE 功能列表</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-xs-bpudocsfeature05_rasfeature-li">
+  <a href="/xs-bpu/docs/feature/05_rasfeature/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-xs-bpudocsfeature05_rasfeature"><span class="">RAS 功能列表</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            
+<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/modules/02_tage_sc.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/modules/02_tage_sc.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/modules?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=TAGE-SC%20%e5%88%86%e6%94%af%e9%a2%84%e6%b5%8b%e5%99%a8" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
+  <a id="print" href="/xs-bpu/docs/modules/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#一功能介绍">一、功能介绍</a></li>
+    <li><a href="#二昆明湖tage分支预测器">二、昆明湖Tage分支预测器</a>
+      <ul>
+        <li><a href="#1-基本功能">1. 基本功能</a></li>
+        <li><a href="#2-流水线">2. 流水线</a></li>
+        <li><a href="#3-数据结构">3. 数据结构</a></li>
+        <li><a href="#4-t0tn表的检索方法">4. T0，Tn表的检索方法</a></li>
+        <li><a href="#5-替代预测器">5. 替代预测器</a></li>
+        <li><a href="#6-预测过程">6. 预测过程</a></li>
+        <li><a href="#7-训练过程">7. 训练过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#三昆明湖sc分支预测器">三、昆明湖SC分支预测器</a>
+      <ul>
+        <li><a href="#1-基本功能介绍">1. 基本功能介绍</a></li>
+        <li><a href="#2-预测过程">2. 预测过程</a></li>
+        <li><a href="#3-训练过程">3. 训练过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#四昆明湖tage-sc分支预测器">四、昆明湖TAGE-SC分支预测器</a>
+      <ul>
+        <li><a href="#1-有了tage为何还需要sc">1. 有了TAGE为何还需要SC</a></li>
+        <li><a href="#2-tage-sc功能介绍">2. TAGE-SC功能介绍</a></li>
+        <li><a href="#3-流水线">3. 流水线</a></li>
+        <li><a href="#4-预测过程">4. 预测过程</a></li>
+        <li><a href="#5-训练过程">5. 训练过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#四接口列表">四、接口列表</a>
+      <ul>
+        <li><a href="#tagesc">TageSC</a></li>
+        <li><a href="#io_out_last_stage_meta">io_out_last_stage_meta</a></li>
+        <li><a href="#io_update_bits_meta">io_update_bits_meta</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tag Cloud</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/bpu/" data-taxonomy-term="bpu"><span class="taxonomy-label">BPU</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/bpu-%E9%A1%B6%E5%B1%82/" data-taxonomy-term="bpu-%E9%A1%B6%E5%B1%82"><span class="taxonomy-label">BPU 顶层</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/feature-list/" data-taxonomy-term="feature-list"><span class="taxonomy-label">Feature List</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/ftb/" data-taxonomy-term="ftb"><span class="taxonomy-label">FTB</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/ftb-%E9%A1%B9/" data-taxonomy-term="ftb-%E9%A1%B9"><span class="taxonomy-label">FTB 项</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/ittage/" data-taxonomy-term="ittage"><span class="taxonomy-label">ITTAGE</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/ras/" data-taxonomy-term="ras"><span class="taxonomy-label">RAS</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/tage-sc/" data-taxonomy-term="tage-sc"><span class="taxonomy-label">TAGE-SC</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/uftb/" data-taxonomy-term="uftb"><span class="taxonomy-label">UFTB</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%85%A8%E5%B1%80%E5%88%86%E6%94%AF%E5%8E%86%E5%8F%B2/" data-taxonomy-term="%E5%85%A8%E5%B1%80%E5%88%86%E6%94%AF%E5%8E%86%E5%8F%B2"><span class="taxonomy-label">全局分支历史</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2/" data-taxonomy-term="%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2"><span class="taxonomy-label">分支折叠历史</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B"><span class="taxonomy-label">分支预测</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%9D%97/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%9D%97"><span class="taxonomy-label">分支预测块</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%8F%96%E5%80%BC%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq/" data-taxonomy-term="%E5%8F%96%E5%80%BC%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq"><span class="taxonomy-label">取值目标队列（FTQ）</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8/" data-taxonomy-term="%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8"><span class="taxonomy-label">子预测器</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82/" data-taxonomy-term="%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82"><span class="taxonomy-label">更新请求</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6/" data-taxonomy-term="%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6"><span class="taxonomy-label">流水线控制</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82/" data-taxonomy-term="%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82"><span class="taxonomy-label">重定向请求</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%87%8D%E5%AE%9A%E5%90%91/" data-taxonomy-term="%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%87%8D%E5%AE%9A%E5%90%91"><span class="taxonomy-label">预测结果重定向</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%A6%99%E5%B1%B1/" data-taxonomy-term="%E9%A6%99%E5%B1%B1"><span class="taxonomy-label">香山</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%A6%99%E5%B1%B1-bpu-%E6%97%B6%E5%BA%8F/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E6%97%B6%E5%BA%8F"><span class="taxonomy-label">香山 BPU 时序</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E9%A6%99%E5%B1%B1-bpu-%E7%BB%93%E6%9E%84/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E7%BB%93%E6%9E%84"><span class="taxonomy-label">香山 BPU 结构</span><span class="taxonomy-count">1</span></a></li>
+        </ul>
+    </div>
+  <div class="taxonomy taxonomy-terms-cloud taxo-categories">
+      <h5 class="taxonomy-title">Categories</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/feature-list/" data-taxonomy-term="feature-list"><span class="taxonomy-label">Feature List</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%8D%95%E5%85%83bpu/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%8D%95%E5%85%83bpu"><span class="taxonomy-label">分支预测单元（BPU）</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E7%A4%BA%E4%BE%8B/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B"><span class="taxonomy-label">示例</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E9%A6%99%E5%B1%B1-bpu-%E5%9F%BA%E7%A1%80%E8%AE%BE%E8%AE%A1/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E5%9F%BA%E7%A1%80%E8%AE%BE%E8%AE%A1"><span class="taxonomy-label">香山 BPU 基础设计</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E9%A6%99%E5%B1%B1-bpu-%E5%AD%90%E6%A8%A1%E5%9D%97/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E5%AD%90%E6%A8%A1%E5%9D%97"><span class="taxonomy-label">香山 BPU 子模块</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E9%A6%99%E5%B1%B1-bpu-%E6%8E%A5%E5%8F%A3/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bpu-%E6%8E%A5%E5%8F%A3"><span class="taxonomy-label">香山 BPU 接口</span><span class="taxonomy-count">5</span></a></li>
+        </ul>
+    </div>
+  
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/xs-bpu/docs/">分支预测器与昆明湖微架构实现</a></li>
+  <li class="breadcrumb-item">
+    <a href="/xs-bpu/docs/modules/">子模块文档</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    TAGE-SC 分支预测器</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>TAGE-SC 分支预测器</h1>
+	
+	<header class="article-meta">
+		<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8/" data-taxonomy-term="%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8"><span class="taxonomy-label">子预测器</span></a></li>
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/tage-sc/" data-taxonomy-term="tage-sc"><span class="taxonomy-label">TAGE-SC</span></a></li>
+    </ul>
+</div>
+<div class="taxonomy taxonomy-terms-article taxo-categories">
+  <h5 class="taxonomy-title">Categories:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/categories/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%8D%95%E5%85%83bpu/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%8D%95%E5%85%83bpu"><span class="taxonomy-label">分支预测单元（BPU）</span></a></li>
+    </ul>
+</div>
+
+  </header>
+	<h2 id="一功能介绍">一、功能介绍</h2>
+<p>TAGE-SC 是南湖架构条件分支的<strong>主预测器</strong>，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。</p>
+<ul>
+<li>标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用<strong>历史长度不同的多个预测表</strong>，可以挖掘<strong>极长的分支历史信息</strong>。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。</li>
+<li>SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和<strong>统计偏向的结果</strong>。并根据这两个结果，<strong>矫正</strong>最终的预测结果。</li>
+</ul>
+<p>在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多<strong>同时预测 2 条</strong>条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并<strong>基于相同的全局历史</strong>进行预测。</p>
+<h2 id="二昆明湖tage分支预测器">二、昆明湖Tage分支预测器</h2>
+<h3 id="1-基本功能">1. 基本功能</h3>
+<p><img alt="img" src="https://iz9a87wn37.feishu.cn/space/api/box/stream/download/asynccode/?code=OWYxOWVmNjk5YTdjYWIyYjRkOTc4YzJhMWZlNDg1ZTJfaUowZzh3Q3F1V21uVHdtYkVVNkhVUVA0dnllWjJVQndfVG9rZW46Wk1TaWJjYXNzb2RNVTZ4azRkdWNEbFh4bnNBXzE3MTI2NDM3MzQ6MTcxMjY0NzMzNF9WNA"></p>
+<p>TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 <strong>1+N</strong> 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。</p>
+<p>基于 T0 表的预测器为<strong>基础预测器</strong>。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。</p>
+<p>对于 T0 以外的表，我们用 <strong>Tn</strong> <strong>进行表示</strong>。在查表时除了 PC 外，还需要用到<strong>全局跳转历史信息H</strong>进行查找。<strong>查找命中后</strong>，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。</p>
+<p>对于每一次预测，TAGE 从所有 Tn 命中表项中选择<strong>全局跳转历史最长</strong>的表项。</p>
+<ol>
+<li>如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。</li>
+<li>如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。</li>
+</ol>
+<p>在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行<strong>压缩</strong>，该过程也称为<strong>历史折叠</strong>。</p>
+<p>各预测表的表项包含如下元素：</p>
+<ol>
+<li>T0 表项通过 pc 直接索引
+<ol>
+<li>2 bit pred <strong>无符号</strong>饱和计数器（给出预测方向和信心强度）</li>
+</ol>
+</li>
+<li>Tn 表项通过 异或 pc 与 折叠全局历史 索引
+<ol>
+<li>3 bit pred <strong>无符号</strong>饱和计数器</li>
+<li>8 bit tag （基于Hash校验是否命中，而非巧合）</li>
+<li>1 bit useful 用于控制有效期</li>
+</ol>
+</li>
+</ol>
+<p>对于一个预测块，有可能所有的表都会产生预测结果，此时就需要进行选择。如上图所示，一般情况下，Tn表的编号越大，优先级越高。</p>
+<h3 id="2-流水线">2. 流水线</h3>
+<p>TAGE <strong>内含两个流水级</strong>，第一级计算索引，第二级通过索引读出SRAM表中的结果</p>
+<ol>
+<li>第0拍，s0：第一个流水级的输入，一般是pc和折叠历史。</li>
+</ol>
+<p><strong>第一流水级运行</strong>：计算index。通过寄存器输出到s1</p>
+<ol>
+<li>第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。</li>
+</ol>
+<p><strong>第二流水级运行</strong>：访存SRAM，读取预测结果。通过寄存器输出到s2</p>
+<ol>
+<li>第2拍，s2：实际预测结果。TAGE用了2拍进行预测，在2拍之后的第3拍预测结果就绪可用。</li>
+</ol>
+<h3 id="3-数据结构">3. 数据结构</h3>
+<ol>
+<li>
+<p>在昆明湖的实现中，T0与Tn的表结构如下所示：</p>
+<ol>
+<li>
+<table>
+<thead>
+<tr>
+<th><strong>预测器</strong></th>
+<th><strong>作用</strong></th>
+<th><strong>表项构成</strong></th>
+<th><strong>项数</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基准预测器T0</td>
+<td>用于在其他预测器的预测结果都无效时输出预测结果</td>
+<td>2 bit ctr 饱和计数器最高位决定跳转方向</td>
+<td>2路各2048项，每路对于一条分支指令</td>
+</tr>
+<tr>
+<td>预测表T1-T4</td>
+<td>对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为最后预测结果。历史记录长度由输入的H决定</td>
+<td>3 bit ctr 饱和计数器8 bit tag 校验命中1 bit us 作为usefulness计数器</td>
+<td>4096项、奇数项对应第一条分支指令，偶数项对应第二条分支指令</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ol>
+</li>
+</ol>
+<p>对于每个表Tn，在查询时，其输入“全局分支历史数据H”的长度是不同的。假如总的预测历史长度为S，Tn、Tn+1可能用S的低x，低y位 （<strong>越低的位是越新的历史</strong>）作为查询输入。一般情况下，Tn表的n越大，其用到的历史信息越长，即 x&lt;y 。</p>
+<p>在进行 Tn 表的查询时，由于历史数据H进行了“压缩”，可能导致一个PC1^H1的结果与另一个PC2^H2的结果相同（类似Hash表的Hash冲突），进而导致索引到无效数据（预测PC1索引到预测PC2的数据）。所以TAGE为每个表提供了一个tag标识，昆明湖中采用了8bit tag，来减小冲突发生的概率，tag的计算方法和查询的索引方法不同，<strong>只有当tag计算相同时查询结果才有效</strong>。</p>
+<p>在Tn表项中，除了饱和计数器ctr和tag外，还有1bit的<strong>usefulness计数器</strong>，该计数器为0时，作弱表项，表示可以当作该项可以被重新分配当作他用；不为0时，作强表项，该项不能被分配当作他用。</p>
+<p>为了<strong>尽力避免</strong>所有表项全为1，无法分配新表项的情况发生，TAGE预期使用计数器bankTickCtrs 对所有usefulness进行清零操作。</p>
+<h3 id="4-t0tn表的检索方法">4. T0，Tn表的检索方法</h3>
+<ul>
+<li>对于T0表，在查找时用 PC[11:1] 位进行索引2048表项，因此对于T0来说，不可能存在检索不到的情况。</li>
+<li>对于表Tn，除了 PC[11:1] 外，<strong>还需要</strong>基于全局分支历史进行检索。在昆明湖中，顶层分支预测器维护了一个256bit的全局历史记录GH，可以根据子预测器需要将GH的最近n位历史信息，按目标位数x进行折叠。 即把n，以长度x为基本单元，拆分成ceil(x/n)个长为x的数，然后<strong>按位进行异或</strong>得到。通常用FH（Folded History）表示，具体流程请参考 XXX章节。TAGE预测器查找Tn的表项时，用到了index和tag，他们的计算公式如下表所示：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>计算方法 公式</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>index = FH ^ ((pc&raquo;1)低位)</td>
+</tr>
+<tr>
+<td>tag = FH1 ^ FH2 ^ ((pc&raquo;1)低位)</td>
+</tr>
+</tbody>
+</table>
+<p>其中FH、FH1、FH2表示按一定规范折叠后的全局分支历史。对于Tn而言，其FH、FH1、FH2都有各自的对于折叠位数，不一定相同。在昆明湖实现中，T0和Tn表的配置如下：</p>
+<table>
+<thead>
+<tr>
+<th><strong>表名称</strong></th>
+<th><strong>FH长度</strong></th>
+<th><strong>FH1长度</strong></th>
+<th><strong>FH2长度</strong></th>
+<th><strong>最近历史长度（用到GH中的位数）</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>8比特</td>
+<td>8比特</td>
+<td>7比特</td>
+<td>低8位，即把最新8位历史，折叠成FH、FH1、FH2</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>11比特</td>
+<td>8比特</td>
+<td>7比特</td>
+<td>低13位，即把最新13位历史，折叠成FH、FH1、FH2</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>11比特</td>
+<td>8比特</td>
+<td>7比特</td>
+<td>低32位，即把最新32位历史，折叠成FH、FH1、FH2</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>11比特</td>
+<td>8比特</td>
+<td>7比特</td>
+<td>低119位，即把最新119位历史，折叠成FH、FH1、FH2</td>
+</tr>
+</tbody>
+</table>
+<p>注：pc&raquo;1是因为使用了RISC-C拓展，2Byte对齐，而PC本身已经省略了1B对齐，所以只用1b</p>
+<h3 id="5-替代预测器">5. 替代预测器</h3>
+<p>由于 Tn 表使用饱和计数器进行预测，因此其输出结果可能存在“<strong>信心不足</strong>”的情况。例如在昆明湖中，对3比特饱和计数器，100、011时都是<strong>弱预测</strong>。为了为该状态提供更多的选择参考，TAGE 预测器还提供了一个“替代预测器”机制，他的作用是告诉 TAGE 在 Tn 表预测的结果 “信心不足” 时，是该选择 Tn 的预测结果，还是选择 T0 的预测结果。</p>
+<p>在昆明湖的具体实现中，“替代预测器” 基于 <strong>useAltOnNaCtrs</strong> 的寄存器组实现。它由128 个 <strong>4-bit饱和计数器</strong> 构成，每个计数器都被初始化为 <strong>0b1000</strong>。在TAGE进行预测时，使用 <strong>PC(7,1)</strong> 进行索引得到对应的饱和计数器。如果该计数器的值大于预设值，且Tn预测结果信心不高，则选择T0的结果，否则选择Tn的结果。</p>
+<h3 id="6-预测过程">6. 预测过程</h3>
+<p>综上所述，昆明湖中TAGE预测器的预测步骤如下：</p>
+<ol>
+<li><strong>并行</strong>索引 T0 表以及 Tn 表，<strong>根据命中结果选择</strong>使用哪一个表给出预测结果
+<ol>
+<li>如果有<strong>命中到tag</strong>匹配的Tn表，由<strong>历史记录最长</strong>Tn表的ctr饱和计数器给出潜在预测结果。</li>
+<li>如果<strong>没有命中</strong>Tn表，则由<strong>T0表</strong>的饱和计数器给出最终预测结果。</li>
+</ol>
+</li>
+<li>如果匹配到的<strong>Tn表的潜在预测结果为弱预测</strong>(100,011)，且<strong>替代预测中PC对应4-bit计数器的值</strong>大于阈值，则采用T0表的结果为最终结果，否则采用Tn表的预测结果为最终预测结果。</li>
+</ol>
+<h3 id="7-训练过程">7. 训练过程</h3>
+<p>由于TAGE的预测过程用到了很多计数器和tag，他们需要根据一定的规则进行更新，该过程称为训练。该训练过程发生在BPU的update阶段，该阶段会输入PC，分支历史、以及否预测正确等信息。香山昆明湖的分支预测进行训练的流程根据不同情况，分为如下几个步骤：</p>
+<ol>
+<li><strong>T0</strong>始终更新：发生跳转（即taken）则 pc 索引的 ctr 饱和计数器 +1，否则 -1</li>
+<li>在<strong>只有T0</strong>命中时，进行如下操作
+<ol>
+<li>T0<strong>预测正确</strong>则不额外更新</li>
+<li>T0<strong>预测错误</strong>则尝试随机在Tn中的某个表申请一个新表项 申请新表项时需要对应index位置的原表项useful为0 新表项默认是弱预测，useful为0，并设置其tag为计算出来的新tag</li>
+</ol>
+</li>
+<li>在<strong>T0和Tn同时命中</strong>时，进行如下操作
+<ol>
+<li><strong>Tn</strong> 始终更新：taken 则 pc 索引的 ctr 饱和计数器 +1，否则 -1 需要注意，”命中“ 表示 index 索引到的表项的 tag 要和计算出的 tag <strong>匹配</strong></li>
+<li>若<strong>T0和Tn结果相同</strong>
+<ol>
+<li><strong>预测正确</strong>则不额外更新</li>
+<li><strong>预测错误</strong>则尝试在比Tn对应历史更长的表中随机申请一个新表项 申请新表项时需要对应index位置的原表项useful为0 新表项默认是弱预测，useful为0，tag设置为用新历史信息计算出来的tag</li>
+</ol>
+</li>
+<li>若<strong>T0和Tn结果不同</strong>
+<ol>
+<li>若<strong>Tn正确</strong>则表项 useful +1
+<ol>
+<li>若结果还同时为<strong>弱预测</strong>，则选用T0的替代预测计数器 -1</li>
+</ol>
+</li>
+<li>若<strong>Tn错误</strong>则表项 useful -1，同时如 <strong>3.b.ii</strong> 在更长历史表中申请新表项
+<ol>
+<li>若结果还同时为<strong>弱预测</strong>，则选用T0的替代预测计数器 +1</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>在<strong>每次需要分配表时</strong>，进行动态重置usefulness标志位
+<ol>
+<li>使用 7bit 的 bankTickCtrs 寄存器，并计算
+<ol>
+<li>可分配的表数 <strong>a</strong>（历史长度比当前更长，且对应索引的useful为 0 ）</li>
+<li>不可分配的表数 <strong>b</strong>（历史长度比当前更长，且对应索引的useful 不为 0 ）</li>
+</ol>
+</li>
+<li><strong>更新</strong> bankTickCtrs += Δ（饱和计数）， <strong>Δ = a - b</strong>，</li>
+<li>当 bankTickCtrs当为<strong>最大值</strong>时, <strong>重置所有useful=0</strong></li>
+</ol>
+</li>
+</ol>
+<h2 id="三昆明湖sc分支预测器">三、昆明湖SC分支预测器</h2>
+<h3 id="1-基本功能介绍">1. 基本功能介绍</h3>
+<p>SC（Statistics counter）分支预测器是一种基于历史统计信息的分支预测器。</p>
+<p>与TAGE类似，在SC中通常有多个表Tn，他们对应了不同历史长度的跳转统计。不同点在于，在预测按PC检索时，每个表Tn都会命中，然后SC把每个命中的表项进行求和，计算总的“饱和计数器”跳转信息，最后根<strong>据总的跳转信息判断是否跳转</strong>。一般情况下，SC采用“有符号饱和计数器”，计数器值大于0时表示跳转，小于0时表示不跳转。计数器的绝对值越大，表示其预测置信度越高。</p>
+<p>在SC预测器中，SC也由多个表组成（例如T1，T2，T3，T4），但相对TAGE预测器少了基础预测表T0。SC中Tn表有6 bit的<strong>有符号</strong>饱和计数器。SC表的索引方式如下：</p>
+<table>
+<thead>
+<tr>
+<th><strong>计算方式</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Index = (index FH) ^ ((pc&raquo;1)低位)</td>
+</tr>
+</tbody>
+</table>
+<p>对应每个表，其表项数和用到的折叠历史长度如下：</p>
+<table>
+<thead>
+<tr>
+<th>表名</th>
+<th>表项数</th>
+<th>FH长度</th>
+<th>折叠历史范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>512</td>
+<td>0</td>
+<td>不折叠</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>512</td>
+<td>4</td>
+<td>把历史信息的低4位，折叠成FH</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>512</td>
+<td>8</td>
+<td>把历史信息的低10位，折叠成FH</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>512</td>
+<td>8</td>
+<td>把历史信息的低16位，折叠成FH</td>
+</tr>
+</tbody>
+</table>
+<p>在计算统计预测结果时，总得统计结果计算公式如下：</p>
+<p>$$scCtrSum=\sum_{i=0}^{i&lt;4}( (ctr_{sc} &laquo; 1) +1)$$</p>
+<p>其中ctr_sc表示每个表的有符号饱和计数器。对其进行左移加一是进行<strong>权重调整</strong>。累加后的scCtrSum就是SC的最终预测结果，如果为该值大于零，则预测跳转，小于零则预测不跳转。其绝对值越大，表示预测置信度越高。</p>
+<p>典型数据转换结果如下（在计算时为了不溢出，扩展到了9位）：</p>
+<ol>
+<li>均为 6b100000（强不跳转） ，求得 9b100000100，值为 -252</li>
+<li>均为 6b011111（强跳转），求得 9b011111100，值为 252</li>
+<li>均为 6b000000（弱跳转），求得 9b000000100，值为 4</li>
+<li>均为 6b111111（弱不跳转），求得 9b111111100，值为 -4</li>
+</ol>
+<h3 id="2-预测过程">2. 预测过程</h3>
+<ol>
+<li>通过PC和历史信息结算表Tn的索引 Index</li>
+<li>根据Index查询，得到所有表对应的饱和计数器</li>
+<li>所有所有表查询到的饱和计数器进行求和得到最终预测结果（大于0跳转，小于0不跳转）</li>
+</ol>
+<h3 id="3-训练过程">3. 训练过程</h3>
+<p>在update阶段进行饱和计数器的更新。</p>
+<ol>
+<li>如果PC对应的真实指令跳转，这所有表中对应的饱和计数器+1</li>
+<li>如果PC对应的真实指令不跳转，这所有表中对应的饱和计数器-1</li>
+</ol>
+<h2 id="四昆明湖tage-sc分支预测器">四、昆明湖TAGE-SC分支预测器</h2>
+<h3 id="1-有了tage为何还需要sc">1. 有了TAGE为何还需要SC</h3>
+<p>一些应用上，一些分支行为与分支历史或<strong>路径相关性较弱</strong>，表现出一个<strong>统计上的预测偏向性</strong>。对于这些分支，相比基于历史的分支预测，使用<strong>计数器</strong>捕捉统计偏向的方法更为有效。</p>
+<p>TAGE在预测与历史非常相关的分支时非常有效，但对有统计偏向的分支则支持不佳。例如只对一个方向有小偏差，但与历史路径没有强相关性的分支。为了避免该问题，可以在传统TAGE预测器上增加SC预测器。</p>
+<h3 id="2-tage-sc功能介绍">2. TAGE-SC功能介绍</h3>
+<p>在昆明湖 TAGE-SC 预测器中，会同时得到 TAGE 和 SC 的预测结果 P1 和 P2，然后对他们的结果进行累加 P = P1+P2 ，如果 P 的绝对值大于 8bit 的阈值 sc_bank_thres，则采用预测器结果 P，否则则采用 P1 作为最终预测结果。</p>
+<p>为了进行动态自适应，阈值sc_thres是需要是动态变化的。为此在实现上TAGE-SC使用了一个5bit的sc_bank_ctr计数器对阈值sc_bank_thres进行调整。另外，由于昆明湖支持同时预测2条分支指令，因此阈值寄存器和对应的控制计数器也是两份。</p>
+<h3 id="3-流水线">3. 流水线</h3>
+<p>TAGE-SC 内含 3 个流水级，TAGE的2级流水已经介绍过，SC部分的流水线如下：</p>
+<ol>
+<li>第0拍，s0 读入 pc 和折叠历史</li>
+</ol>
+<p><strong>第一流水级</strong>：通过pc和FH计算出index，并输出到s0_idx寄存器</p>
+<ol>
+<li>第1拍，s1 从s0寄存器读出s0_idx作为s1_idx</li>
+</ol>
+<p><strong>第二流水级</strong>：找到SCTable中s1_idx对应的计数器数据，输出到s1_scResps寄存器</p>
+<ol>
+<li>第2拍，s2 从s1寄存器读出s1_scResps作为s2_scResps</li>
+</ol>
+<p><strong>第三流水级</strong>：根据s2_scResps选择是否需要反转预测结果，输出到s2_disagree寄存器</p>
+<ol>
+<li>第3拍，s3 从s2_disagree中读出结果，作为s3_disagree输出</li>
+</ol>
+<h3 id="4-预测过程">4. 预测过程</h3>
+<p>在TAGE-SC预测时，TAGE的预测结果P1用tage_ctr表示，SC的预测结果P2用<strong>scCtrSum</strong>表示。在预测时，分为如下四步。</p>
+<ol>
+<li>
+<p>执行SC预测器，得到预测结果scCtrSum</p>
+</li>
+<li>
+<p>并行得到TAGE预测器的预测结果 tage_ctr。</p>
+<ol>
+<li>
+<p>由于TAGE的预测结果是无符号饱和计数器，而SC的预测结果是有符号饱和计数器，如果对他们进行相加，需要进行数据转换。</p>
+</li>
+<li>
+<p>昆明湖在实现上，采用了对TAGE的结果进行转换。转换后的结果用</p>
+</li>
+</ol>
+<p>tageCtrCentered</p>
+<p>表示，具体转换过程如下：</p>
+<pre><code> $$tageCtrCentered=((((ctr_{tage} -4)&lt;&lt;1)+1)&lt;&lt;3)$$
+</code></pre>
+<ol start="3">
+<li>
+<p>3比特的无符号饱和计数器转换为8比特的有符号饱和计数器结果举例如下所示：</p>
+</li>
+<li>
+<p>3b100 弱跳转 =&gt; 8b00001000 = 8</p>
+</li>
+<li>
+<p>3b011 弱不跳转 =&gt; 8b11111000 = -8</p>
+</li>
+<li>
+<p>3b111 强跳转 =&gt; 8b00111000 = 56</p>
+</li>
+<li>
+<p>3b000 强不跳转 =&gt; 8b11001000 = -56</p>
+</li>
+</ol>
+</li>
+<li>
+<p>对TAGE和SC的预测结果进行相加得到最终预测结果P，在实现上用totalSum进行表示。 $$totalSum = scCtrSum + tageCtrCentered$$</p>
+</li>
+<li>
+<p>根据 <strong>totalSum 以及 sc_bank_thres</strong> <strong>决定最终预测方向</strong></p>
+<ol>
+<li><strong>totalSum  &gt; 0 且绝对值超过阈值则跳转：</strong> 如果 <strong>scCtrSum &gt;  sc_bank_thres - tageCtrCentered</strong>  也可以理解成 <strong>totalSum &gt; sc_bank_thres</strong>  上面的写法可以降低最大位宽（把保证不溢出需要10bit变成9bit）</li>
+<li><strong>totalSum  &lt; 0 且绝对值超过阈值则不跳转：</strong> 如果 <strong>scCtrSum &lt; -sc_bank_thres - tageCtrCentered</strong>  也可以理解成 |<strong>totalSum</strong>| <strong>&gt; sc_bank_thres</strong></li>
+</ol>
+</li>
+</ol>
+<h3 id="5-训练过程">5. 训练过程</h3>
+<p>在对 TAGE 和 SC 进行组合后，TAGE-SC 添加了 sc_bank_ctr 计数器用来控制阈值sc_bank_thres。因此在训练时，除了 TAGE 和 SC 本身的训练外，还需要对新增加的计数器进行更新。</p>
+<p>在update阶段，其具体更新流程如下：</p>
+<ol>
+<li>TAGE-SC采用了预测结果P（即TAGE+SC后的预测结果），如果 |<strong>totalSum</strong>| 在 [<strong>sc_bank_thres</strong> -4, <strong>sc_bank_thres</strong> -2] 的范围内，则对阈值相关寄存器组进行更新
+<ol>
+<li>更新 <strong>sc_bank_ctr，饱和计数</strong> 若预测正确，则 <strong>sc_bank_ctr +=1</strong> 若预测错误，则 <strong>sc_bank_ctr  -=1</strong></li>
+<li>更新 <strong>sc_bank_thres</strong> <strong>，受限制的饱和运算，</strong> 若 <strong>sc_bank_ctr</strong> 更新后的值已达 0b11111 且 <strong>sc_bank_thres</strong> &lt;= 31，则 <strong>sc_bank_thres +=2</strong> 若 <strong>sc_bank_ctr</strong> 更新后的值为 0 且 <strong>sc_bank_thres</strong> &gt;=6，则 <strong>sc_bank_thres -=2</strong> 其余情况thres不变。</li>
+<li><strong>sc_bank_thres</strong> 更新判断结束后，会对 <strong>sc_bank_ctr</strong> 再做一次判断 若更新后的<strong>sc_bank_ctr</strong>若为0b11111或0，则thres_ctr会被置回初始值0b10000。</li>
+</ol>
+</li>
+<li>TAGE-SC采用了预测结果P1（即TAGE的预测结果）不进行任何操作</li>
+</ol>
+<h2 id="四接口列表">四、接口列表</h2>
+<h3 id="tagesc">TageSC</h3>
+<table>
+<thead>
+<tr>
+<th>信号类型</th>
+<th>信号宽度</th>
+<th>信号名</th>
+<th>信号描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>clock</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>reset</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[35:0]</td>
+<td>io_reset_vector</td>
+<td>用于reset时，reset s1_pc_dup_0 提供的值</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[38:0]</td>
+<td>io_in_bits_s0_pc_0</td>
+<td>复制的s0_pc的dup数组的第1个，给顶层BPU的PC</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[38:0]</td>
+<td>io_in_bits_s0_pc_1</td>
+<td>复制的s0_pc第2个，给Tage的PC</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[38:0]</td>
+<td>io_in_bits_s0_pc_3</td>
+<td>复制的s0_pc的第4个，给SC的PC</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[10:0]</td>
+<td>io_in_bits_folded_hist_1_hist_17_folded_hist</td>
+<td>TageTabe 2 用到的11bits 折叠历史 从多长历史范围折叠到11bit见前文所述的表 注意TageTabe下标+1，此处 T2 是前文 T3</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[10:0]</td>
+<td>io_in_bits_folded_hist_1_hist_16_folded_hist</td>
+<td>TageTabe 3 用到的11bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[6:0]</td>
+<td>io_in_bits_folded_hist_1_hist_15_folded_hist</td>
+<td>TageTabe 1 用到的7bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_in_bits_folded_hist_1_hist_14_folded_hist</td>
+<td>TageTabe 0 用到的8bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[6:0]</td>
+<td>io_in_bits_folded_hist_1_hist_9_folded_hist</td>
+<td>TageTabe 2 用到的7bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_in_bits_folded_hist_1_hist_8_folded_hist</td>
+<td>TageTabe 3 用到的8bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[6:0]</td>
+<td>io_in_bits_folded_hist_1_hist_7_folded_hist</td>
+<td>TageTabe 0 用到的7bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[6:0]</td>
+<td>io_in_bits_folded_hist_1_hist_5_folded_hist</td>
+<td>TageTabe 3 用到的7bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_in_bits_folded_hist_1_hist_4_folded_hist</td>
+<td>TageTabe 1 用到的8bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_in_bits_folded_hist_1_hist_3_folded_hist</td>
+<td>TageTabe 2 用到的8bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[10:0]</td>
+<td>io_in_bits_folded_hist_1_hist_1_folded_hist</td>
+<td>TageTabe 1 用到的11bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[3:0]</td>
+<td>io_in_bits_folded_hist_3_hist_12_folded_hist</td>
+<td>SCTable 1 用到的 4bit 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_in_bits_folded_hist_3_hist_11_folded_hist</td>
+<td>SCTable 2 用到的 8bit 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_in_bits_folded_hist_3_hist_2_folded_hist</td>
+<td>SCTable 3 用到的 8bit 折叠历史</td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s2_full_pred_0_br_taken_mask_0</td>
+<td>io_out_s2_full_pred_{i}<em>br_taken_mask</em>{j} Tage 在 s2流水级输出的，复制4份 预测块中第 j 条分支指令TAGE预测结果  这里不该叫mask吧</td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s2_full_pred_0_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s2_full_pred_1_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s2_full_pred_1_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s2_full_pred_2_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s2_full_pred_2_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s2_full_pred_3_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s2_full_pred_3_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s3_full_pred_0_br_taken_mask_0</td>
+<td>io_out_s3_full_pred_{i}<em>br_taken_mask</em>{j} Tage 在 s3流水级输出的，复制4份 预测块中第 j 条分支指令SC预测结果</td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s3_full_pred_0_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s3_full_pred_1_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s3_full_pred_1_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s3_full_pred_2_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s3_full_pred_2_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s3_full_pred_3_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_out_s3_full_pred_3_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*[218:0]</td>
+<td>io_out_last_stage_meta</td>
+<td>见附表</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_ctrl_tage_enable</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_ctrl_sc_enable</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s0_fire_0</td>
+<td>s0 阶段流水线控制 相同信号复制多份，0给BPU，1给Tage，3给SC</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s0_fire_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s0_fire_3</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s1_fire_0</td>
+<td>s1 阶段流水线控制</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s1_fire_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s1_fire_2</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s1_fire_3</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s2_fire_0</td>
+<td>s2 阶段流水线控制</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s2_fire_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s2_fire_2</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_s2_fire_3</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>*</td>
+<td>io_s1_ready</td>
+<td>tage的所有表，可以执行读取结果的操作</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_valid</td>
+<td>从FTQ发向BPU的后端执行结果（更新信号）是否有效</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[38:0]</td>
+<td>io_update_bits_pc</td>
+<td>（后端执行过的）预测块的PC</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[10:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_17_folded_hist</td>
+<td>TageTabe 2 用到的11bits 折叠历史 预测时使用的分支历史结果，没有更新，转了一圈回来了</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[10:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_16_folded_hist</td>
+<td>TageTabe 3 用到的11bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[6:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_15_folded_hist</td>
+<td>TageTabe 1 用到的7bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_14_folded_hist</td>
+<td>TageTabe 0 用到的8bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[3:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_12_folded_hist</td>
+<td>SCTable 1 用到的 4bit 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_11_folded_hist</td>
+<td>SCTable 2 用到的 8bit 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[6:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_9_folded_hist</td>
+<td>TageTabe 2 用到的7bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_8_folded_hist</td>
+<td>TageTabe 3 用到的8bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[6:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_7_folded_hist</td>
+<td>TageTabe 0 用到的7bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[6:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_5_folded_hist</td>
+<td>TageTabe 3 用到的7bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_4_folded_hist</td>
+<td>TageTabe 1 用到的8bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_3_folded_hist</td>
+<td>TageTabe 2 用到的8bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_2_folded_hist</td>
+<td>SCTable 3 用到的 8bit 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[10:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_1_folded_hist</td>
+<td>TageTabe 1 用到的11bits 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_bits_ftb_entry_brSlots_0_valid</td>
+<td>FTB 表项的第一个slot是否有效（存储了跳转指令）</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_bits_ftb_entry_tailSlot_sharing</td>
+<td>FTB 表项的最后一个slot是否存储了条件分支而非无条件跳转</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_bits_ftb_entry_tailSlot_valid</td>
+<td>FTB 表项的最后一个slot是否有效</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_bits_ftb_entry_always_taken_0</td>
+<td>历史上slot 0 指令总是跳转</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_bits_ftb_entry_always_taken_1</td>
+<td>历史上slot 1 指令总是跳转</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_bits_br_taken_mask_0</td>
+<td>solt 0 是否 taken</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_bits_br_taken_mask_1</td>
+<td>solt 1 是否 taken</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_bits_mispred_mask_0</td>
+<td>solt 0 是否预测正确</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*</td>
+<td>io_update_bits_mispred_mask_1</td>
+<td>solt 1 是否预测正确</td>
+</tr>
+<tr>
+<td>input</td>
+<td>*[218:0]</td>
+<td>io_update_bits_meta</td>
+<td>见附表</td>
+</tr>
+</tbody>
+</table>
+<h3 id="io_out_last_stage_meta">io_out_last_stage_meta</h3>
+<p>需要设计参与优化！</p>
+<table>
+<thead>
+<tr>
+<th>信号类型</th>
+<th>信号位</th>
+<th>信号名</th>
+<th>信号描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>output</td>
+<td>[218:88]</td>
+<td>0</td>
+<td>占位，全为0，传递到composer时会忽略</td>
+</tr>
+<tr>
+<td></td>
+<td>87</td>
+<td>resp_meta_providers_1_valid_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[86:85]</td>
+<td>resp_meta_providers_1_bits_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>84</td>
+<td>resp_meta_providers_0_valid_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[83:82]</td>
+<td>resp_meta_providers_0_bits_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[81:79]</td>
+<td>resp_meta_providerResps_1_r_ctr</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>78</td>
+<td>resp_meta_providerResps_1_r_u</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>77</td>
+<td>resp_meta_providerResps_1_r_unconf</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[76:74]</td>
+<td>resp_meta_providerResps_0_r_ctr</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>73</td>
+<td>resp_meta_providerResps_0_r_u</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>72</td>
+<td>resp_meta_providerResps_0_r_unconf</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>71</td>
+<td>resp_meta_altUsed_1_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>70</td>
+<td>resp_meta_altUsed_0_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>69</td>
+<td>resp_meta_altDiffers_1_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>68</td>
+<td>resp_meta_altDiffers_0_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[67:66]</td>
+<td>resp_meta_basecnts_1_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[65:64]</td>
+<td>resp_meta_basecnts_0_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[63:60]</td>
+<td>resp_meta_allocates_1_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[59:56]</td>
+<td>resp_meta_allocates_0_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>55</td>
+<td>resp_meta_takens_1_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>54</td>
+<td>resp_meta_takens_0_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>53</td>
+<td>resp_meta_scMeta_tageTakens_1_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>52</td>
+<td>resp_meta_scMeta_tageTakens_0_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>51</td>
+<td>resp_meta_scMeta_scUsed_1_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>50</td>
+<td>resp_meta_scMeta_scUsed_0_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>49</td>
+<td>resp_meta_scMeta_scPreds_1_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>48</td>
+<td>resp_meta_scMeta_scPreds_0_r</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[47:42]</td>
+<td>r_1_3</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[41:36]</td>
+<td>r_1_2</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[35:30]</td>
+<td>r_1_1</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[29:24]</td>
+<td>r_1_0</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[23:18]</td>
+<td>r_3</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[17:12]</td>
+<td>r_2</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[11:6]</td>
+<td>r_1</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>[5:0]</td>
+<td>r_0</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="io_update_bits_meta">io_update_bits_meta</h3>
+<table>
+<thead>
+<tr>
+<th>信号类型</th>
+<th>信号位</th>
+<th>信号名</th>
+<th>信号描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>input</td>
+<td>[218:94]</td>
+<td></td>
+<td>FTB, ITAGE, RAS 模块传给 FTQ 的 META 信息，忽略</td>
+</tr>
+<tr>
+<td></td>
+<td>[93:6]</td>
+<td>io_out_last_stage_meta[87:0] 偏移 6bit 后的结果</td>
+<td>TAGE 输出给 FTQ 的 META</td>
+</tr>
+<tr>
+<td></td>
+<td>[5:0]</td>
+<td></td>
+<td>uFTB 输出给 FTQ 的 META</td>
+</tr>
+</tbody>
+</table>
+
+	<div class="text-muted mt-5 pt-3 border-top">
+  最后修改 April 9, 2024: <a href="https://github.com/XS-MLVP/course/commit/184f4be569fab6b26e5c6af7fcd13d6b16a6646a">update tage-sc predictor submodule docs (184f4be)</a>
+</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
+        <span>&copy; 2024 BOSC 保留所有权利</span>
+        <span class="ms-1"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
+        
+      </div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <script src="/xs-bpu/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
+<script defer src="/xs-bpu/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/xs-bpu/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

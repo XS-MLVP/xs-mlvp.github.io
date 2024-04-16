@@ -19,15 +19,15 @@
 <link rel="icon" type="image/png" href="/xs-bpu/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/xs-bpu/favicons/android-192x192.png" sizes="192x192">
 
-<title>基础知识 | 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
-<meta name="description" content="什么是分支预测">
-<meta property="og:title" content="基础知识" />
-<meta property="og:description" content="什么是分支预测" />
+<title>香山分支预测单元（BPU）基础设计 | 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
+<meta name="description" content="本文档介绍了香山分支预测单元的基础设计思想，通过阅读本文档，你不需要得知具体的信号名称和代码细节便可理解香山分支预测单元的大致工作流程。">
+<meta property="og:title" content="香山分支预测单元（BPU）基础设计" />
+<meta property="og:description" content="本文档介绍了香山分支预测单元的基础设计思想，通过阅读本文档，你不需要得知具体的信号名称和代码细节便可理解香山分支预测单元的大致工作流程。" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/basic/" />
-<meta itemprop="name" content="基础知识">
-<meta itemprop="description" content="什么是分支预测"><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="基础知识"/>
-<meta name="twitter:description" content="什么是分支预测"/>
+<meta itemprop="name" content="香山分支预测单元（BPU）基础设计">
+<meta itemprop="description" content="本文档介绍了香山分支预测单元的基础设计思想，通过阅读本文档，你不需要得知具体的信号名称和代码细节便可理解香山分支预测单元的大致工作流程。"><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="香山分支预测单元（BPU）基础设计"/>
+<meta name="twitter:description" content="本文档介绍了香山分支预测单元的基础设计思想，通过阅读本文档，你不需要得知具体的信号名称和代码细节便可理解香山分支预测单元的大致工作流程。"/>
 
 
 
@@ -43,6 +43,17 @@
   src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
 
   </head>
   <body class="td-section">
@@ -64,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.63302633cb036a01cb30c9d23c4c4f82.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.65834df3efb52d2a07004106e88c9bbd.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -94,8 +105,8 @@
 
 
 
-<h1 class="title">基础知识</h1>
-<div class="lead">什么是分支预测</div>
+<h1 class="title">香山分支预测单元（BPU）基础设计</h1>
+<div class="lead">本文档介绍了香山分支预测单元的基础设计思想，通过阅读本文档，你不需要得知具体的信号名称和代码细节便可理解香山分支预测单元的大致工作流程。</div>
 
 
 
@@ -111,7 +122,7 @@
     
     
 	
-<li>1: <a href="#pg-da9883e73667360217b5a02164bb473e">什么是分支预测</a></li>
+<li>1: <a href="#pg-fe21ea780ba57fbb564bd5b9d0edb476">何为分支预测</a></li>
 
 
     
@@ -119,7 +130,7 @@
     
     
 	
-<li>2: <a href="#pg-0b946f9bf5756087c9697ed2f0a5e1d3">两比特分支预测</a></li>
+<li>2: <a href="#pg-d61a51e555575e837489cec4d799e293">香山分支预测单元基础</a></li>
 
 
     
@@ -127,7 +138,7 @@
     
     
 	
-<li>3: <a href="#pg-0db49a206b0078412e8bc3aa44e1c22d">基于历史的分支预测</a></li>
+<li>3: <a href="#pg-5ba037ce5b0684d09c2046d64d401ab7">香山分支预测单元结构介绍</a></li>
 
 
     
@@ -135,7 +146,7 @@
     
     
 	
-<li>4: <a href="#pg-10db6ff921b8c96faf7b819c03776693">分支预测块</a></li>
+<li>4: <a href="#pg-4be070861f535b0326baa1f87f4937e4">香山分支预测单元时序介绍</a></li>
 
 
     
@@ -145,12 +156,23 @@
 
 
 <div class="content">
-      
+      <p>在处理器设计中，一个设计优秀的分支预测器（BPU）是提高处理器性能的关键部件，它负责指导处理器的取值，确定处理器下一步要到哪里取出指令并执行。BPU 是一条指令生命周期最开始的地方，因此想要深入探究一个高性能处理器，从BPU开始是一个很好的选择。</p>
+<p>在香山中亦是如此，香山作为一个乱序六发射的高性能处理器，自然需要一个准确度高、预测效率高的分支预测单元。而一个分支预测单元的设计实际中往往需要考虑很多因素，例如时序、结构的复杂度、占用的硅片面积、预测的准确度、预测错误时恢复的速度等等。香山处理器的分支预测单元在这些因素之间都做到了比较好的权衡，通过许多巧妙的设计使其拥有了很高的分支预测效率与准确度，为后端的指令供给提供了基础的保障。</p>
+<p>在本节中，我们将会介绍香山预测单元的基础设计，通过阅读本节，可以掌握如下知识：</p>
+
 
 <div class="pageinfo pageinfo-primary">
+<ul>
+<li>分支预测的基本概念</li>
+<li>香山分支预测单元的基本预测单位——分支预测块</li>
+<li>香山分支预测单元的对外交互接口</li>
+<li>香山分支预测单元的基本结构</li>
+<li>香山分支预测单元的基础时序</li>
+</ul>
 
 </div>
 
+<p>任何参与BPU众包验证工作的同学，都需要率先阅读本节，以便对香山分支预测单元有基础了解。</p>
 
 </div>
 </div>
@@ -170,25 +192,129 @@
 	
     
 
-<div class="td-content" style="">
+<div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-da9883e73667360217b5a02164bb473e">1 - 什么是分支预测</h1>
-    <div class="lead">什么是分支预测</div>
-	
+	<h1 id="pg-fe21ea780ba57fbb564bd5b9d0edb476">1 - 何为分支预测</h1>
+    <div class="lead">分支预测单元，顾名思义需要完成一件基本的任务——分支预测。在深入探讨分支预测单元之前，必须要了解分支预测是什么。</div>
+	<h2 id="为何需要分支预测">为何需要分支预测？</h2>
+<p>分支预测主要有两方面的原因：一是<strong>程序的执行流中含有分支指令</strong>，二是<strong>高性能处理器使用流水线设计</strong>。</p>
+<h3 id="程序的执行流中含有分支指令">程序的执行流中含有分支指令</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">x</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">10</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">y</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">20</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">x</span> <span style="color:#ce5c00;font-weight:bold">&gt;=</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">x</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">x</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>上述是一段C语言代码，这段代码首先定义了三个变量 x, y 和 result，然后根据 x 和 y 值的大小情况对result进行赋值。可以发现，程序在前三行对变量进行赋值时是顺序往下执行的，而在第 5 行时，由于 if 指令的出现，程序产生了分支，从第 5 行直接跳转到了第 8 行继续运行，这就造成了程序执行的<strong>分支</strong>。</p>
+<p>翻译成 RISC-V 汇编之后的代码如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#000">li</span>  <span style="color:#000">a0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">10</span>               <span style="color:#8f5902;font-style:italic"># x = 10
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">li</span>  <span style="color:#000">a1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">20</span>               <span style="color:#8f5902;font-style:italic"># y = 20
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">li</span>  <span style="color:#000">a2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">0</span>                <span style="color:#8f5902;font-style:italic"># result = 0
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#000">blt</span> <span style="color:#000">a0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">else_branch</span>  <span style="color:#8f5902;font-style:italic"># 如果 x &lt; y，则跳转到 else_branch
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">add</span> <span style="color:#000">a2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a1</span>           <span style="color:#8f5902;font-style:italic"># 否则执行 result = x + y
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">j</span> <span style="color:#000">end</span>                    <span style="color:#8f5902;font-style:italic"># 跳转到 end
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#f57900">else_branch:</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">sub</span> <span style="color:#000">a2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a1</span>           <span style="color:#8f5902;font-style:italic"># result = x - y
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#f57900">end:</span>
+</span></span></code></pre></div><p>可以发现程序依然保持着先前的分支行为，在代码的前三行，指令顺序执行，之后，在程序的第 5 行，出现了一条特殊指令blt ，我们称之为分支指令，它会根据 x 和 y 的大小关系决定指令流顺序往下执行还是跳转到其他地方，该指令的出现导致程序的执行出现了分支。</p>
+<h3 id="高性能处理器使用流水线设计">高性能处理器使用流水线设计</h3>
 
-<div class="pageinfo pageinfo-primary">
-<p>在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。</p>
+<figure>
+    <img src="f4669877-a9f9-4f5d-9fe3-8ba976973513.png" width="400px"/> 
+</figure>
 
-</div>
+<p>因此有了<strong>分支预测</strong>的概念，如果我们可以在执行结果产生之前，精准的预测出下一条指令的地址，便可以使处理器一直高效的运行下去。</p>
+<h2 id="分支预测的可行性">分支预测的可行性</h2>
+<p>为什么可以进行分支预测呢？我们看接下来一个例子</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C" data-lang="C"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">data</span> <span style="color:#ce5c00;font-weight:bold">&gt;=</span> <span style="color:#0000cf;font-weight:bold">128</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">+=</span> <span style="color:#000">data</span><span style="color:#000;font-weight:bold">;</span>
+</span></span></code></pre></div><p>假设该条指令将被重复执行，并且 data 从 0 开始递增，即 data = 0, 1, 2, 3 &hellip; 128, 129&hellip;，接下来我们可以分析每次执行这条指令的行为。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plain" data-lang="Plain"><span style="display:flex;"><span>T = branch taken
+</span></span><span style="display:flex;"><span>N = branch not taken
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data   = 0, 1, 2, 3, s, ... 126, 127, 128, 129, 130, ... 250, 251, 252, ...
+</span></span><span style="display:flex;"><span>branch = N  N  N  N  N  ...   N    N    T    T    T  ...   T    T    T  ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       = NNNNNNNNNNNN ... NNNNNNNTTTTTTTTT ... TTTTTTTTTT  (easy to predict)
+</span></span></code></pre></div><p>可以看出，在前 128 次，该分支都是 Not Taken （条件不成立）的，但在 128 次之后，分支一直都是 Taken （条件成立）的。如果我们用最简单的方法根据上一次是否 Taken，来预测本次是否 Taken，在整个预测过程中，我们只会产生一次预测错误。</p>
+<p>上述现象的产生是源于一个基本事实的——<strong>分支指令是否跳转与该条指令以往的跳转行为有关联</strong>，我们通过总结以往跳转的规律，便可以对本次跳转产生较为精准的预测，这也使得分支预测变得可能。</p>
+<p>事实上，分支指令的跳转还会与其他分支指令的跳转情况等因素相关，充分发掘有效信息，产生精准预测结果，是分支预测的主要任务之一。</p>
+<h2 id="分支预测的基本类型">分支预测的基本类型</h2>
+<p>在RISC-V 中，分支指令包含两种类型：</p>
+<ol>
+<li><strong>条件分支指令</strong> <strong>(beq, bne, blt, bge, bltu, bgeu)</strong>    对于这类指令，是否跳转时候其中的条件决定，跳转目标可以在指令中获取，因此我们需要预测该指令是否跳转</li>
+<li><strong>无条件跳转指令</strong> <strong>(jal, jalr)</strong>    对于这类指令，每当执行到它时是总是跳转，但跳转目标有可能由寄存器执行，因此我们需要预测该指令的跳转地址。</li>
+</ol>
+<p>幸运的是，由于RISC-V架构设计的简洁，我们不需要处理条件跳转指令，每一个需要我们预测的跳转指令都是无条件的，这也给我们的设计提供了便利。</p>
+<p>上述分析中，我们可以总结出分支预测的两大基本类型——<strong>方向预测</strong> 和 <strong>目标地址预测</strong>。</p>
+<h3 id="分支指令的方向预测">分支指令的方向预测</h3>
+<p>分支指令的方向预测对应到 RISC-V 指令就是条件分支指令，我们需要预测它是否需要跳转，也就是分支的方向，因此叫做方向预测。</p>
+<h4 id="两位饱和计数器">两位饱和计数器</h4>
+<p>方向预测有一种非常简单并且十分高效的预测方法，叫做叫做饱和计数器法，它的大致思想可以参考下图。</p>
 
-<h2 id="硬件验证">硬件验证</h2>
-<p>Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?</p>
-<h2 id="design-under-test">Design Under Test</h2>
-<p>Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?</p>
-<h2 id="reference-model">Reference Model</h2>
-<p>Is there any initial setup users need to do after installation to try your project?</p>
-<h2 id="开始实验">开始实验</h2>
-<p>Can your users test their installation, for example by running a command or deploying a Hello World example?</p>
+<figure>
+    <img src="c7e5cf3e-8131-430b-a728-659fb7775f53.png" width="700px"/> 
+</figure>
+
+<p>两位饱和计数器被视作一个状态机，我们为每一个分支指令都维护这样一个状态机器，当一条分支指令发生跳转时，对应上图中的状态向右移动，否则状态向左移动。这样在下次遇到这条分支指令时，我们首先查找到它的两位饱和计数器，如果状态更偏右则预测其跳转，否则预测其不跳转。</p>
+<p>当然，为每一条分支指令都维护一个两位饱和计数器是不现实的，因此在实际中，我们通常会采取PC部分位，或哈希的方法来索引两位饱和计数器，如下图所示。</p>
+
+<figure>
+    <img src="e2cf0e6d-f050-4aff-bee3-c72a2b9004e1.png" width="700px"/> 
+</figure>
+
+<h4 id="分支历史">分支历史</h4>
+<p>分支历史是方向预测中非常常用的数据，也是大多分支预测算法的基础，因为分支历史是指令以往跳转行为最直接的展示。</p>
+<p>分支历史有以下两种基本类型：</p>
+<ul>
+<li><strong>局部分支历史</strong>    为每一条分支指令维护一组寄存器，记录该条指令的历史跳转情况
+<ul>
+<li>例如： 0101000000101   （0代表不跳转，1代表跳转）</li>
+</ul>
+</li>
+<li><strong>全局分支历史</strong>    所有指令共用一组寄存器，记录程序执行过程中的分支跳转情况
+<ul>
+<li>
+<p>例如：</p>
+<pre tabindex="0"><code>    beg a0, a1, label1          不跳转  记录0
+    bne a1, a2, label2          不跳转  记录0
+-&gt;  beq a2, a3, label4          跳转    记录1
+</code></pre><p>​执行完三条不同的分支指令后，全局分支历史变为 001</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="分支指令的目标地址预测">分支指令的目标地址预测</h3>
+<p>RISC-V架构中，分支指令的目标地址预测是指对无条件跳转指令（如jal、jalr）的跳转目标地址进行预测。由于这类指令总是执行跳转操作，我们需要预测其跳转的目标地址。</p>
+<h4 id="分支目标缓存btb">分支目标缓存（BTB）</h4>
+<p>BTB 是目标地址预测的一种常用方法，它的核心思想是使用一个缓存来存储以往无条件跳转指令的跳转目标，之后如果再次执行到这一条无条件跳转指令，就可以查看BTB中是存在该指令的记录，将记录的跳转目标作为本次预测的跳转目标。</p>
+<p>示意图如下</p>
+
+<figure>
+    <img src="540d418a-2760-4724-aad4-502bd0775185.png" width="500px"/> 
+</figure>
+
+<h3 id="预测指令类型">预测指令类型</h3>
+<p>我们已经知道，在分支预测中，对于条件分支指令来说，我们需要预测其方向，对于无条件跳转指令来说，我们需要预测其跳转目标。但是出现了一个问题，拿到一个需要预测的PC之后，我们并不清楚这个PC所对应的指令是什么，也就是说我们根本不知道当前指令到底是一条普通指令还是一条分支指令，也就无法进行预测了。</p>
+<p>如何解决呢？可以采取的一种方法是，在取出指令之后，对这条指令的行为进行预测。但取值需要从 ICache 或 Memory 中去取，有可能会耗费多个周期，这是这种方法的一大弊端。</p>
+<p>更好的一种方法是，直接预测指令的类型，拿到一个PC之后，可以直接预测出这条指令是否是分支指令，并对指令行为进行预测。这样一来，我们就没有必要等待取值完成，并且预测出来的结果还可以指导 CPU 到什么地方去取值。</p>
+<p>类型预测的方法，可以与BTB相似，在缓存中的某个字段中加入指令的类型，以供下一次预测使用。</p>
+<h2 id="分支预测的一般步骤">分支预测的一般步骤</h2>
+<p>通过本节知识的介绍，我们可以总结出分支预测的一般步骤</p>
+<ol>
+<li>获取 PC</li>
+<li>预测是否是分支指令
+<ol>
+<li>如果是条件分支指令，预测其跳转方向和跳转目标</li>
+<li>如果是无条件跳转指令 ，预测其跳转目标</li>
+</ol>
+</li>
+</ol>
+<p>注意，由于在预测中需要预测指令类型，没有获取到指令具体内容，所以对于条件分支指令来说，预测它的跳转目标也变成了我们的工作。</p>
 
 </div>
 
@@ -204,23 +330,115 @@
 
 <div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-0b946f9bf5756087c9697ed2f0a5e1d3">2 - 两比特分支预测</h1>
-    <div class="lead">两比特分支预测</div>
-	
+	<h1 id="pg-d61a51e555575e837489cec4d799e293">2 - 香山分支预测单元基础</h1>
+    <div class="lead">本节介绍了香山分支预测单元（BPU）的基础思想和工作原理，包括采用的分支预测块思想、多预测器、多流水线结构以及取值目标队列（FTQ）的作用，说明了 BPU 对外交互的主要接口。</div>
+	<h2 id="分支预测块思想">分支预测块思想</h2>
+<p>对于一般的分支预测器来说，通常会根据给定的 PC  预测出该 PC 所对应的指令的相关信息，如是否是条件分支指令、是否是跳转指令。对于条件分支指令，会预测出是否会跳转，而对于跳转指令，则会预测出跳转目标。然而，这种一条一条地预测指令的方法效率较低，导致前端指令供给过慢。</p>
+<p>相比之下，香山采用的预测方法是每次预测一个指令块。也就是说，<strong>给定一个 PC，香山会预测出以这个PC开始的一个分支预测块，包括了接下来若干条指令的情况，如是否存在分支指令、分支指令的位置、是否跳转以及跳转目标等信息</strong>。</p>
+<p>这样的预测方法可以一次性地预测出多条指令，并将预测结果送往取值单元（IFU），指导IFU进行取值。此外，由于IFU需要考虑缓存行的性能问题，它可以根据预测块一次性地取出多条指令，从而提高吞吐效率。</p>
+<p>在预测块产生后，<strong>分支预测块还会生成执行完本预测块后跳转到的 PC，接着 BPU 会根据该 PC 继续产生下一个分支预测块</strong>。</p>
+<p>举个简单的例子</p>
 
-<div class="pageinfo pageinfo-primary">
-<p>在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。</p>
+<figure>
+    <img src="1.png" width="700px"/> 
+</figure>
 
-</div>
+<p>如上图所示，当 PC 执行到 0x20000118 时，BPU会经历如下几个步骤：</p>
+<ol>
+<li>BPU得知PC 0x20000118</li>
+<li>BPU产生以 0x20000118 为开始的分支预测块，内容大致如下
+<ol>
+<li>在接下来的若干条指令中</li>
+<li>第三条是一个条件分支指令</li>
+<li>对于这个条件分支指令，预测他将会跳转</li>
+<li>跳转后的地址为 0x20000110</li>
+</ol>
+</li>
+<li>BPU将PC设置为 0x20000110，并继续产生下一个分支预测块</li>
+</ol>
+<p>这便是采用了分支预测块的香山 BPU 的基本预测流程</p>
+<h2 id="多预测器多流水线结构">多预测器、多流水线结构</h2>
 
-<h2 id="硬件验证">硬件验证</h2>
-<p>Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?</p>
-<h2 id="design-under-test">Design Under Test</h2>
-<p>Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?</p>
-<h2 id="reference-model">Reference Model</h2>
-<p>Is there any initial setup users need to do after installation to try your project?</p>
-<h2 id="开始实验">开始实验</h2>
-<p>Can your users test their installation, for example by running a command or deploying a Hello World example?</p>
+<figure>
+    <img src="2.png" width="500px"/> 
+</figure>
+
+<p>上图展示了香山BPU的总体架构，其中我们需要关注两个主要方面：</p>
+<h3 id="多预测器">多预测器</h3>
+<ol>
+<li>为了确保预测的准确性，香山 BPU 采用了多个预测器，并且这些预测器共同产生 BPU 的预测结果。例如，FTB 会生成基础的预测结果供后续预测器使用，而 TAGE 则对条件分支指令产生更精准的预测结果等。</li>
+</ol>
+<h3 id="多流水线">多流水线</h3>
+<ol>
+<li>为了满足高性能的需求，香山 BPU 采用了流水线设计。各个预测器处于不同的流水线级别。其中，uFTB（即图中的uBTB）预测器位于第一流水线级别，能够在一个周期内产生预测结果。而其余预测器则需要2-3个周期才能生成预测结果，尽管预测时间较长，但预测结果相对更精确。</li>
+</ol>
+<p>但在第三个周期才能获取到预测结果，并基于新的结果重新开始预测难免导致性能损失。因为这样一来，需要耗费三个时钟周期才可以完成一次预测。</p>
+<p>为了在第一和第二周期就能够获取到某些预测器的预测结果，我们设置了三个预测结果通道，并将三个流水线级别的预测结果同时输出，如下图所示。</p>
+
+<figure>
+    <img src="3.png" width="600px"/> 
+</figure>
+
+<h2 id="取值目标队列ftq">取值目标队列（FTQ）</h2>
+<h3 id="分支预测结果暂存">分支预测结果暂存</h3>
+<p>尽管 BPU 可以以分支预测块的形式提供预测结果，IFU 也可以一次性取值多条指令，但它们之间仍然存在性能上的差距。通常情况下，BPU产生预测结果的速度更快。</p>
+<p>因此，在 BPU 与 IFU 之间添加了一个取值目标队列（FTQ）作为缓冲。FTQ 本质上是一个队列，用于存储一个个数据项。BPU产生的预测结果会先暂存到FTQ中，然后由 IFU 从 FTQ 中获取预测结果，如下图所示。</p>
+
+<figure>
+    <img src="4.png" width="400px"/> 
+</figure>
+
+<p>每当 BPU 产生一个预测块，该预测块会被放入 FTQ 的队首。当 IFU 处于空闲状态时，它会从 FTQ 队尾获取下一个预测块。下方的示意图展示了这一过程。</p>
+
+<figure>
+    <img src="5.png" width="600px"/> 
+</figure>
+
+<p>在香山中，FTQ 的功能远远不止于此。参考上文图中 FTQ 的对外交互接口，可以看出它还负责向 ICache 发送预取信息，存储 BPU 的各类训练信息，负责分析取值模块、后端执行模块中发来的重定向信息、更新信息，还会向 BPU 发送更新请求，甚至 FTB 预测器中的基本数据结构——FTB项都是由 FTQ 来更新的。</p>
+<h3 id="bpu-预测结果重定向">BPU 预测结果重定向</h3>
+<p>上文中提到，香山分支预测结果共有三个通道，会同时输出 s1, s2, s3 流水级的预测结果，那 FTQ 如何使用三个阶段的预测结果呢？</p>
+<p>我们不妨从探讨流水线的时序出发，如下图所示</p>
+
+<figure>
+    <img src="6.png" width="400px"/> 
+</figure>
+
+<ul>
+<li>在第一个周期，一个新的PC 0x4 被送入，能在一周期内产生预测结果的预测器（叫做 uFTB）在 s1 接口输出了他的预测结果，并且结果指示下一个 PC 为 0xf，其他接口还无输出</li>
+<li>在第二周期，PC 被设置为了 0xf，而 uFTB 也产生了 0xf 的预测结果，并从 s1 通道送出。与此同时，两周期预测器产生了上一轮 0x4 地址的预测结果，并从 s2 通道送出。</li>
+</ul>
+<p>那么在这里产生了一个问题，第二周期 s2 产生的是 0x4 预测结果，而 0x4 的预测结果已经在上一周期被 s1 所输出，并放置在了 FTQ 中的某个项中。也就是说 s2 产生的预测结果，已经在 s1 通道被产生过了。但不同点是 s2 结果是由两周期预测器产生而来，结果会更加准确。</p>
+<p>因此我们需要做的并不是根据 s2 的预测结果，放置一个新的 FTQ 项，而是 <strong>对比 s2 预测结果和上一周期 s1 预测结果是否有差异，如果有差异则覆盖上一阶段 s1 接口放置的 FTQ 项</strong></p>
+<p>于是我们给 s2 和 s3 通道增加两个额外的信号线，我们称之为 redirect 信号，如果该信号有效说明此时该阶段的预测结果与之前的预测结果产生差异，并且需要覆盖之前某个位置的 FTQ 项。结构如下图所示。</p>
+
+<figure>
+    <img src="7.png" width="600px"/> 
+</figure>
+
+<p>结构示意图中的时刻，对应流水线的第二个周期，此时 s1 通道已经往 FTQ 中放入一个地址为 0x4 的分支预测块结果，而此时 s2 预测结果产生，BPU 发现 s2 预测结果与 s1 不同，则本周期 redirect 接口被置为有效。FTQ 会使用 s2 通道的预测结果覆盖之前存放 0x4 预测结果的 FTQ 项。</p>
+<p>此时，s1 通道虽然也产生了以 0xf 为首的分支预测块，但显然，0xf 是 s1 基于第一周期的错误预测结果产生的 PC，因此在这时候，s1 结果可直接弃之不用。</p>
+<p>在第三周期，s1 又使用 s2 所产生的正确预测结果所指示的新PC 0x8 开始了新一轮预测。之后，如果 s2, s3 通道始终未检测到有预测错误发生，则流水线将以满状态持续运行下去。</p>
+<h3 id="bpu-重定向请求">BPU 重定向请求</h3>
+<p>无论再精确的分支预测器也不总是正确的，这种不正确会导致后续流水线中填充错误的指令，因此需要有一种机制来纠正这种错误，这种机制就是重定向。指令在被后端执行模块执行时，这条指令真正的行为才会被确定，因此在这个时候，后端执行模块如果发现分支预测错误，就会发出 <strong>重定向请求</strong> （注意此处重定向请求与上文预测结果重定向是不同的概念），让处理器的状态恢复到执行错误指令之前的状态，对于我们来说，只需要关注BPU和FTQ在重定向时是怎样恢复状态的即可。</p>
+<p>除了后端会产生重定向请求，香山处理器中会在 IFU 取到指令之后对指令进行简单分析，检测出最基本的预测错误。具体的过程是这样的，FTQ 向 IFU 发送取指请求之后，会等待 IFU 返回预译码信息（预译码是IFU对指令的简单解码，例如是否是跳转指令、跳转的目标是什么），FTQ 会将预译码信息写回到对应 FTQ项 中的某个字段，同时会分析预译码信息，如果发现预测错误，便会生成一个 IFU 重定向请求。</p>
+<p>来自后端执行模块的重定向请求不需要 FTQ 生成，是直接由后端发往 FTQ 进行处理。FTQ 会将生成的 IFU 重定向请求与后端重定向请求转发到 BPU 的重定向接口中去，如果二者在同一周期有效，那么FTQ会选择转发后端重定向请求。</p>
+<p>添加了重定向接口的 BPU 如下图所示。</p>
+
+<figure>
+    <img src="8.png" width="700px"/> 
+</figure>
+
+<h3 id="bpu-的更新请求">BPU 的更新请求</h3>
+<p>目前的 BPU 已经有了纠错的能力，但是还有一个问题，BPU 中的数据没有办法得到更新。如果无法获取指令的位置、类型、是否发生跳转以及跳转地址等信息，BPU 将得不到训练，并导致准确度大幅降低。</p>
+<p>为了获得这些信息，我们仍需依赖于取值目标队列（FTQ），因为它不仅能与 IFU 交互获取指令相关的信息，还可以与后端交互，获取执行的相关信息。 因此会有一个更新请求通道由 FTQ 直接连接至 BPU。</p>
+
+<figure>
+    <img src="9.png" width="700px"/> 
+</figure>
+
+<p><strong>当后端执行完 FTQ 中的某一项时，该项会被标识为已提交，接下来 FTQ 将该项的更新信息，通过 Update 通道发往BPU。</strong></p>
+<h2 id="总结">总结</h2>
+<p>通过本节，我们了解到 BPU 对外交互所需的所有主要接口，以及 FTQ 对于 BPU 的作用。拥有了预测结果接口、重定向接口、更新接口的 BPU已经可以支撑 BPU 的所有对外交互了。接下来我们会将目光深入 BPU 内部。</p>
 
 </div>
 
@@ -236,23 +454,72 @@
 
 <div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-0db49a206b0078412e8bc3aa44e1c22d">3 - 基于历史的分支预测</h1>
-    <div class="lead">基于历史的分支预测</div>
-	
+	<h1 id="pg-5ba037ce5b0684d09c2046d64d401ab7">3 - 香山分支预测单元结构介绍</h1>
+    <div class="lead">本节介绍了香山分支预测单元（BPU）的结构，包括多预测器、多流水线方案的整合，以及内部子预测器的组织结构和接口设计，展示了BPU如何与Composer交互，并说明了子预测器之间的连接方式。</div>
+	<h2 id="bpu-是如何整合内部子预测器的">BPU 是如何整合内部子预测器的？</h2>
+<p>我们已经知道香山 BPU 采用的是多预测器，多流水线方案。其中为了适配多流水线，BPU 采用了三通道结果输出接口。但是又是如何适配多预测器的呢？这就要求我们进一步深入 BPU，探究其内部结构。</p>
 
-<div class="pageinfo pageinfo-primary">
-<p>在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。</p>
+<figure>
+    <img src="1.png" width="600px"/> 
+</figure>
 
-</div>
+<p>上图为香山文档中的 BPU 架构图，目前我们只需要关心这样一个信息，内部的所有子预测器都被包在了一个叫做 <code>Composer</code> 的结构中。BPU只需要和 <code>Composer</code> 交互。</p>
+<p><code>Composer</code> 是什么？我们不妨先看一下香山代码中对于他们的定义。</p>
 
-<h2 id="硬件验证">硬件验证</h2>
-<p>Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?</p>
-<h2 id="design-under-test">Design Under Test</h2>
-<p>Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?</p>
-<h2 id="reference-model">Reference Model</h2>
-<p>Is there any initial setup users need to do after installation to try your project?</p>
-<h2 id="开始实验">开始实验</h2>
-<p>Can your users test their installation, for example by running a command or deploying a Hello World example?</p>
+<figure>
+    <img src="2.png" width="700px"/> 
+</figure>
+
+<p>可以发现，<code>Composer</code> 以及五个子预测器有一个共同的特点，他们全部继承于 <code>BasePredictor</code> 基类。并且接口已经在 <code>BasePredictor</code> 类中定义好。换句话说就是，<code>Composer</code><strong>和五个子预测器都拥有相同的接口</strong>！BPU 顶层可以直接把 <code>Composer</code> 也当做一个子预测器，而无需关心内部是怎么连接子预测器的。</p>
+<h2 id="子预测器接口">子预测器接口</h2>
+<p>接下来我们会查看子预测器接口是怎样的。该接口将涉及到 <code>Composer</code> 与 BPU 顶层的交互，还会涉及到各子预测器与 <code>Composer</code> 的交互。</p>
+<p>我们先以 <code>Composer</code> 为例，说明子预测器接口的结构</p>
+
+<figure>
+    <img src="3.png" width="400px"/> 
+</figure>
+
+<p>如上图所示，<code>Composer</code> 的三通道预测结果被直接输出至 BPU 外部，并且还有一组三通道预测结果从BPU内部连接至 <code>Composer</code> ，但由于预测结果是由 <code>Composer</code> 产生，因此 BPU 会将一个空的预测结果传递给 <code>Composer</code> ，这样做的意义是，使子预测器形成了一个“加工”的作用，子预测器会将输入的预测结果进行加工，然后再输出加工过后的预测结果。</p>
+<p>接下来，BPU 顶层会为流水线提供预测所需要的信息。首先是 <strong>PC</strong> 和<strong>分支历史记录</strong>（包括全局历史和全局折叠历史），接下来 BPU 会和 <code>Composer</code> 之间连接一些<strong>流水线控制信号</strong>，最后 BPU 将外部输入的<strong>重定向请求接口</strong>和<strong>更新接口</strong>直接连接至 <code>Composer</code>。</p>
+<p>最终可以简单给出子预测器接口的定义（详细定义请前往接口文档进行查看）：</p>
+<ul>
+<li><strong>in</strong>
+<ul>
+<li><strong>(s1, s2, s3)</strong> 预测信息输入</li>
+<li><strong>s0_pc</strong>         需要预测的PC</li>
+<li><strong>ghist</strong>            全局分支历史</li>
+<li><strong>folded_hist</strong> 全局折叠历史</li>
+</ul>
+</li>
+<li><strong>out  (s1, s2, s3)</strong> 预测信息输出</li>
+<li><strong>流水线控制信号</strong>
+<ul>
+<li><strong>s0_fire, s1_fire, s2_fire, s3_fire</strong> 相应流水级是否工作</li>
+<li><strong>s2_redirect, s3_redirect</strong>              后续流水级发现预测错误时重定向信号</li>
+<li><strong>s1_ready, s2_ready, s3_ready</strong>    子预测器相应流水级是否就绪</li>
+</ul>
+</li>
+<li><strong>update</strong>        更新请求</li>
+<li><strong>redirect</strong>        重定向请求</li>
+</ul>
+<h2 id="子预测器之间的连接">子预测器之间的连接</h2>
+<p>我们已经清楚各个子预测器之间的接口与<code>Composer</code> 的接口是相同的，并且我们也已经知道了 <code>Composer</code>是如何连向顶层 BPU 的，本小节将会说明子预测器是如何在 <code>Composer</code> 内部进行连接的。</p>
+
+<figure>
+    <img src="4.png" width="400px"/> 
+</figure>
+
+<p>上图便是子预测器在 <code>Composer</code> 中连接的结构图。可以看出，三通道预测结果送入<code>Composer</code>后，首先经过 <code>uFTB</code> 的“加工”后输出，再依次由 <code>TAGE-SC</code>、<code>FTB</code>、<code>ITTAGE</code>、<code>RAS</code>进行“加工”，最终连接到 <code>Composer</code> 的预测结果输出，并由<code>Composer</code> 再直接连往 BPU 外部。</p>
+<p>而对于其他信号，因为<code>Composer</code>和各子预测器的接口相同，都被<code>Composer</code>直接连接到了每个预测器的相应接口，而没有做非常多额外处理。</p>
+<h3 id="预测结果接口连接">预测结果接口连接</h3>
+<p>对于子预测器来说，他们的预测结果的连接方式是，预测结果输出是下一个预测器的输入。但需要注意的是，这种连接是组合电路的连接，而没有时序的影响。</p>
+
+<figure>
+    <img src="5.png" width="400px"/> 
+</figure>
+
+<p>如上图所示，以 s1 通道为例，从输入到最后一个预测器输出，中间全都是组合电路在做修改，不受时序影响。寄存器只在 s1, s2 和 s3 通道之间存在。</p>
+<p>因此增加子预测器的数量，并不会导致预测所需的周期数量增多，仅仅会导致每个周期预测所需要的时延增大。</p>
 
 </div>
 
@@ -268,23 +535,66 @@
 
 <div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-10db6ff921b8c96faf7b819c03776693">4 - 分支预测块</h1>
-    <div class="lead">分支预测块</div>
-	
+	<h1 id="pg-4be070861f535b0326baa1f87f4937e4">4 - 香山分支预测单元时序介绍</h1>
+    <div class="lead">三级流水线的时序设计是香山 BPU 的灵魂所在。预测结果重定向信号如何产生，如何根据预测结果生成新的PC，如何处理三个通道的预测结果，都会在本节中进行介绍。</div>
+	<h2 id="一周期无空泡预测">一周期无空泡预测</h2>
 
-<div class="pageinfo pageinfo-primary">
-<p>在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。</p>
+<figure>
+    <img src="1.png" width="500px"/> 
+</figure>
 
-</div>
+<p><code>uFTB</code> 是香山 BPU 中唯一一个可以在一周期便可以产生预测结果的预测器，上图中展示了 <code>uFTB</code> 的预测过程。<code>s0_pc</code> 由 BPU 顶层送入，s1 周期生效时，<code>s1_pc</code> 保存了上一周期 <code>s0_pc</code> 的值，依次类推。也就是说传入的 <code>s0_pc</code> 的值会随流水线向下移动。</p>
+<p>在 s1 周期生效时，<code>uFTB</code> 会接收到本周期传来的 <code>s1_fire</code> 信号，并根据 <code>s1_pc</code> 指示的地址，在本周期生成预测结果，在预测结果中可以获取新的 PC 值。</p>
 
-<h2 id="硬件验证">硬件验证</h2>
-<p>Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?</p>
-<h2 id="design-under-test">Design Under Test</h2>
-<p>Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?</p>
-<h2 id="reference-model">Reference Model</h2>
-<p>Is there any initial setup users need to do after installation to try your project?</p>
-<h2 id="开始实验">开始实验</h2>
-<p>Can your users test their installation, for example by running a command or deploying a Hello World example?</p>
+<figure>
+    <img src="2.png" width="500px"/> 
+</figure>
+
+<p>如图所示，BPU 顶层根据 s1 预测结果通道，分析出下一个 PC 值的位置（即图中的 target），并将其送往 <code>npc_Gen</code> （即新PC生成器）中，用于产生下一个周期的 s0_pc。</p>
+<p>于是下一周期，<code>uFTB</code> 获取到了新的 PC 值，并开始了新 PC 值预测块的产生。由此可见，仅凭借 s1 周期，便可以以一周期一个预测块的速度来产生预测结果。</p>
+<h2 id="预测结果重定向">预测结果重定向</h2>
+<p>但除了 <code>uFTB</code> 以外，其他预测器都需要 2-3 个周期才可以产生预测结果，如何利用起他们的预测结果？又如何生成预测结果重定向信号呢？</p>
+
+<figure>
+    <img src="3.png" width="500px"/> 
+</figure>
+
+<p>如图中所示，一个两周期产生预测结果的 <code>Predirector 2</code> ，可以在 s2 周期，向 s2 预测结果通道内输出它的预测结果。BPU 顶层拿到预测结果后，分析出预测块的跳转目标地址 <code>target</code> 并连向 <code>npc_Gen</code>。</p>
+<p>此时连向 <code>npc_Gen</code> 的信号中，既有 s2 产生的旧 PC 的预测结果，又有 s1 产生的新 PC 的预测结果，该如何抉择新 PC 用哪一个呢？</p>
+<p>通过之前的介绍，我们已经知道，BPU 会将 s2 的预测结果与上周期 s1 的预测结果进行比较，如果预测结果不同，那么说明 s1 预测错了，自然 s1 基于上周期错误预测结果产生的本周期预测结果也是错误的，因此在本周期如果预测结果产生错误，<code>npc_Gen</code> 将使用 s2 所提供的 <code>target</code> 作为新的 <code>s0_pc</code>。</p>
+<p>这个过程画在流水线结构图中是这样的：</p>
+
+<figure>
+    <img src="4.png" width="500px"/> 
+</figure>
+
+<p>Diff 比较器通过获取 s1 周期的预测结果，与 s1 周期的预测结果进行对比产生 diff 信号，指导 <code>npc_Gen</code> 进行下一条 pc 的生成。与此同时，diff 信号指示了 s1 阶段的预测结果发生错误，可直接用于 BPU 发往 FTQ 的预测结果中 s2 通道的预测结果重定向通道，指导 FTQ 覆盖之前的预测结果。</p>
+<p>Diff 信号还会通过 s2_redirect 接口送往每个子预测器，指导子预测器进行状态的更新。</p>
+<p>除此之外，当 s2 预测结果重定向发生时，说明 s1 通道预测结果已经发生错误，s2 阶段不能继续进行预测，需及时将子预测器流水线控制信号 <code>s2_fire</code> 置为无效，并等待纠正后的预测结果流入。</p>
+<p>s3 预测结果的重定向与此类似，其流水线结构图如下所示。具体的处理过程留给大家来分析。</p>
+
+<figure>
+    <img src="5.png" width="500px"/> 
+</figure>
+
+<h2 id="重定向请求与其他信息生成">重定向请求与其他信息生成</h2>
+
+<figure>
+    <img src="6.png" width="500px"/> 
+</figure>
+
+<p>只有当三个阶段的预测信息都错误时，才会产生有外部重定向请求发生，此时 <code>npc_Gen</code> 会接收到来自重定向请求中的 pc 地址。由于当重定向请求发生时，我们认为三阶段均预测错误，因此需要将三个阶段的 <code>fire</code> 信号全部置为无效，然后 <code>npc_Gen</code> 采用重定向请求中需要恢复的 PC，重新开始预测。</p>
+<p>其他信息，例如全局历史的生成方式与PC的生成方式一致，都是在顶层通过三阶段预测信息来维护，全局历史会根据每一阶段的预测结果来产生新的分支历史。</p>
+<h2 id="流水线控制信号">流水线控制信号</h2>
+<p>学习了流水线的具体流程，我们应该可以理解子预测器接口中的流水线控制信号了，如下</p>
+<ul>
+<li><strong>s0_fire, s1_fire, s2_fire, s3_fire</strong> 指示每个流水级是否工作</li>
+<li><strong>s2_redirect, s3_redirect</strong>              指示是否有预测结果重定向发生</li>
+<li><strong>s1_ready, s2_ready, s3_ready</strong>    子预测器发给BPU顶层，表示相应流水级是否就绪</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>至此，你应该懂得了香山分支预测单元的基础设计思想、对外交互逻辑、内部结构、时序等内容，并对 BPU 的工作原理有了大致的理解，香山的 BPU 对你来说已经不再神秘。</p>
+<p>接下来你可以阅读<code>重要结构及接口文档</code>，并结合香山 BPU 源代码对 BPU 形成更为细致的理解，当你能清楚的明白 BPU 的工作原理和信号细节时，便可以开始你的验证工作了！</p>
 
 </div>
 

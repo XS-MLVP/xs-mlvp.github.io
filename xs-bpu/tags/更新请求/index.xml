@@ -1,0 +1,359 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>香山微架构开放验证第一期：昆明湖BPU模块UT验证实战 – 更新请求</title>
+    <link>https://xs-mlvp.github.io/xs-bpu/tags/%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82/</link>
+    <description>Recent content in 更新请求 on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    
+	  <atom:link href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: 香山分支预测单元基础</title>
+      <link>https://xs-mlvp.github.io/xs-bpu/docs/basic/01_xsbpu_basic/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/xs-bpu/docs/basic/01_xsbpu_basic/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;分支预测块思想&#34;&gt;分支预测块思想&lt;/h2&gt;
+&lt;p&gt;对于一般的分支预测器来说，通常会根据给定的 PC  预测出该 PC 所对应的指令的相关信息，如是否是条件分支指令、是否是跳转指令。对于条件分支指令，会预测出是否会跳转，而对于跳转指令，则会预测出跳转目标。然而，这种一条一条地预测指令的方法效率较低，导致前端指令供给过慢。&lt;/p&gt;
+&lt;p&gt;相比之下，香山采用的预测方法是每次预测一个指令块。也就是说，&lt;strong&gt;给定一个 PC，香山会预测出以这个PC开始的一个分支预测块，包括了接下来若干条指令的情况，如是否存在分支指令、分支指令的位置、是否跳转以及跳转目标等信息&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;这样的预测方法可以一次性地预测出多条指令，并将预测结果送往取值单元（IFU），指导IFU进行取值。此外，由于IFU需要考虑缓存行的性能问题，它可以根据预测块一次性地取出多条指令，从而提高吞吐效率。&lt;/p&gt;
+&lt;p&gt;在预测块产生后，&lt;strong&gt;分支预测块还会生成执行完本预测块后跳转到的 PC，接着 BPU 会根据该 PC 继续产生下一个分支预测块&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;举个简单的例子&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;1.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;如上图所示，当 PC 执行到 0x20000118 时，BPU会经历如下几个步骤：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;BPU得知PC 0x20000118&lt;/li&gt;
+&lt;li&gt;BPU产生以 0x20000118 为开始的分支预测块，内容大致如下
+&lt;ol&gt;
+&lt;li&gt;在接下来的若干条指令中&lt;/li&gt;
+&lt;li&gt;第三条是一个条件分支指令&lt;/li&gt;
+&lt;li&gt;对于这个条件分支指令，预测他将会跳转&lt;/li&gt;
+&lt;li&gt;跳转后的地址为 0x20000110&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;BPU将PC设置为 0x20000110，并继续产生下一个分支预测块&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这便是采用了分支预测块的香山 BPU 的基本预测流程&lt;/p&gt;
+&lt;h2 id=&#34;多预测器多流水线结构&#34;&gt;多预测器、多流水线结构&lt;/h2&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;2.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;上图展示了香山BPU的总体架构，其中我们需要关注两个主要方面：&lt;/p&gt;
+&lt;h3 id=&#34;多预测器&#34;&gt;多预测器&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;为了确保预测的准确性，香山 BPU 采用了多个预测器，并且这些预测器共同产生 BPU 的预测结果。例如，FTB 会生成基础的预测结果供后续预测器使用，而 TAGE 则对条件分支指令产生更精准的预测结果等。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;多流水线&#34;&gt;多流水线&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;为了满足高性能的需求，香山 BPU 采用了流水线设计。各个预测器处于不同的流水线级别。其中，uFTB（即图中的uBTB）预测器位于第一流水线级别，能够在一个周期内产生预测结果。而其余预测器则需要2-3个周期才能生成预测结果，尽管预测时间较长，但预测结果相对更精确。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;但在第三个周期才能获取到预测结果，并基于新的结果重新开始预测难免导致性能损失。因为这样一来，需要耗费三个时钟周期才可以完成一次预测。&lt;/p&gt;
+&lt;p&gt;为了在第一和第二周期就能够获取到某些预测器的预测结果，我们设置了三个预测结果通道，并将三个流水线级别的预测结果同时输出，如下图所示。&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;3.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h2 id=&#34;取值目标队列ftq&#34;&gt;取值目标队列（FTQ）&lt;/h2&gt;
+&lt;h3 id=&#34;分支预测结果暂存&#34;&gt;分支预测结果暂存&lt;/h3&gt;
+&lt;p&gt;尽管 BPU 可以以分支预测块的形式提供预测结果，IFU 也可以一次性取值多条指令，但它们之间仍然存在性能上的差距。通常情况下，BPU产生预测结果的速度更快。&lt;/p&gt;
+&lt;p&gt;因此，在 BPU 与 IFU 之间添加了一个取值目标队列（FTQ）作为缓冲。FTQ 本质上是一个队列，用于存储一个个数据项。BPU产生的预测结果会先暂存到FTQ中，然后由 IFU 从 FTQ 中获取预测结果，如下图所示。&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;4.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;每当 BPU 产生一个预测块，该预测块会被放入 FTQ 的队首。当 IFU 处于空闲状态时，它会从 FTQ 队尾获取下一个预测块。下方的示意图展示了这一过程。&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;5.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;在香山中，FTQ 的功能远远不止于此。参考上文图中 FTQ 的对外交互接口，可以看出它还负责向 ICache 发送预取信息，存储 BPU 的各类训练信息，负责分析取值模块、后端执行模块中发来的重定向信息、更新信息，还会向 BPU 发送更新请求，甚至 FTB 预测器中的基本数据结构——FTB项都是由 FTQ 来更新的。&lt;/p&gt;
+&lt;h3 id=&#34;bpu-预测结果重定向&#34;&gt;BPU 预测结果重定向&lt;/h3&gt;
+&lt;p&gt;上文中提到，香山分支预测结果共有三个通道，会同时输出 s1, s2, s3 流水级的预测结果，那 FTQ 如何使用三个阶段的预测结果呢？&lt;/p&gt;
+&lt;p&gt;我们不妨从探讨流水线的时序出发，如下图所示&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;6.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;ul&gt;
+&lt;li&gt;在第一个周期，一个新的PC 0x4 被送入，能在一周期内产生预测结果的预测器（叫做 uFTB）在 s1 接口输出了他的预测结果，并且结果指示下一个 PC 为 0xf，其他接口还无输出&lt;/li&gt;
+&lt;li&gt;在第二周期，PC 被设置为了 0xf，而 uFTB 也产生了 0xf 的预测结果，并从 s1 通道送出。与此同时，两周期预测器产生了上一轮 0x4 地址的预测结果，并从 s2 通道送出。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;那么在这里产生了一个问题，第二周期 s2 产生的是 0x4 预测结果，而 0x4 的预测结果已经在上一周期被 s1 所输出，并放置在了 FTQ 中的某个项中。也就是说 s2 产生的预测结果，已经在 s1 通道被产生过了。但不同点是 s2 结果是由两周期预测器产生而来，结果会更加准确。&lt;/p&gt;
+&lt;p&gt;因此我们需要做的并不是根据 s2 的预测结果，放置一个新的 FTQ 项，而是 &lt;strong&gt;对比 s2 预测结果和上一周期 s1 预测结果是否有差异，如果有差异则覆盖上一阶段 s1 接口放置的 FTQ 项&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;于是我们给 s2 和 s3 通道增加两个额外的信号线，我们称之为 redirect 信号，如果该信号有效说明此时该阶段的预测结果与之前的预测结果产生差异，并且需要覆盖之前某个位置的 FTQ 项。结构如下图所示。&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;7.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;结构示意图中的时刻，对应流水线的第二个周期，此时 s1 通道已经往 FTQ 中放入一个地址为 0x4 的分支预测块结果，而此时 s2 预测结果产生，BPU 发现 s2 预测结果与 s1 不同，则本周期 redirect 接口被置为有效。FTQ 会使用 s2 通道的预测结果覆盖之前存放 0x4 预测结果的 FTQ 项。&lt;/p&gt;
+&lt;p&gt;此时，s1 通道虽然也产生了以 0xf 为首的分支预测块，但显然，0xf 是 s1 基于第一周期的错误预测结果产生的 PC，因此在这时候，s1 结果可直接弃之不用。&lt;/p&gt;
+&lt;p&gt;在第三周期，s1 又使用 s2 所产生的正确预测结果所指示的新PC 0x8 开始了新一轮预测。之后，如果 s2, s3 通道始终未检测到有预测错误发生，则流水线将以满状态持续运行下去。&lt;/p&gt;
+&lt;h3 id=&#34;bpu-重定向请求&#34;&gt;BPU 重定向请求&lt;/h3&gt;
+&lt;p&gt;无论再精确的分支预测器也不总是正确的，这种不正确会导致后续流水线中填充错误的指令，因此需要有一种机制来纠正这种错误，这种机制就是重定向。指令在被后端执行模块执行时，这条指令真正的行为才会被确定，因此在这个时候，后端执行模块如果发现分支预测错误，就会发出 &lt;strong&gt;重定向请求&lt;/strong&gt; （注意此处重定向请求与上文预测结果重定向是不同的概念），让处理器的状态恢复到执行错误指令之前的状态，对于我们来说，只需要关注BPU和FTQ在重定向时是怎样恢复状态的即可。&lt;/p&gt;
+&lt;p&gt;除了后端会产生重定向请求，香山处理器中会在 IFU 取到指令之后对指令进行简单分析，检测出最基本的预测错误。具体的过程是这样的，FTQ 向 IFU 发送取指请求之后，会等待 IFU 返回预译码信息（预译码是IFU对指令的简单解码，例如是否是跳转指令、跳转的目标是什么），FTQ 会将预译码信息写回到对应 FTQ项 中的某个字段，同时会分析预译码信息，如果发现预测错误，便会生成一个 IFU 重定向请求。&lt;/p&gt;
+&lt;p&gt;来自后端执行模块的重定向请求不需要 FTQ 生成，是直接由后端发往 FTQ 进行处理。FTQ 会将生成的 IFU 重定向请求与后端重定向请求转发到 BPU 的重定向接口中去，如果二者在同一周期有效，那么FTQ会选择转发后端重定向请求。&lt;/p&gt;
+&lt;p&gt;添加了重定向接口的 BPU 如下图所示。&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;8.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;bpu-的更新请求&#34;&gt;BPU 的更新请求&lt;/h3&gt;
+&lt;p&gt;目前的 BPU 已经有了纠错的能力，但是还有一个问题，BPU 中的数据没有办法得到更新。如果无法获取指令的位置、类型、是否发生跳转以及跳转地址等信息，BPU 将得不到训练，并导致准确度大幅降低。&lt;/p&gt;
+&lt;p&gt;为了获得这些信息，我们仍需依赖于取值目标队列（FTQ），因为它不仅能与 IFU 交互获取指令相关的信息，还可以与后端交互，获取执行的相关信息。 因此会有一个更新请求通道由 FTQ 直接连接至 BPU。&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;9.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;当后端执行完 FTQ 中的某一项时，该项会被标识为已提交，接下来 FTQ 将该项的更新信息，通过 Update 通道发往BPU。&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
+&lt;p&gt;通过本节，我们了解到 BPU 对外交互所需的所有主要接口，以及 FTQ 对于 BPU 的作用。拥有了预测结果接口、重定向接口、更新接口的 BPU已经可以支撑 BPU 的所有对外交互了。接下来我们会将目光深入 BPU 内部。&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 重定向与更新接口</title>
+      <link>https://xs-mlvp.github.io/xs-bpu/docs/ports/01_redirect_and_update/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/xs-bpu/docs/ports/01_redirect_and_update/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;分支预测重定向branchpredictionredirect&#34;&gt;&lt;strong&gt;分支预测重定向（BranchPredictionRedirect）&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;接口定义：&lt;/strong&gt;&lt;code&gt;src/main/scala/xiangshan/frontend/FrontendBundle.scala&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;接口类型：&lt;/strong&gt;&lt;code&gt;BranchPredictionRedirect&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;该接口定义了分支预测单元的重定向请求，主要用于重定向分支预测器的状态。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;BranchPredictionRedirct&lt;/code&gt; 接口继承自 &lt;code&gt;Redirct&lt;/code&gt; 接口，所含信号较多，BPU 重定向只会用到其中一部分接口，文档描述的结构中只包含 BPU 用到的接口内容。&lt;/p&gt;
+&lt;p&gt;重定向请求有两种来源，与 IFU 预译码信息对比生成的重定向请求，后端执行过程中的重定向请求。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;在重定向请求中，关键信息是&lt;/strong&gt;&lt;code&gt;cfiUpdate&lt;/code&gt;，&lt;strong&gt;即控制流指令信息。这一信息对应着一条指令，也就是BPU发生预测错误的指令&lt;/strong&gt;。举例来说，如果 BPU 在预测块中指示第三条指令为普通指令不发生跳转，但预译码显示第三条指令是一条无条件跳转指令，必定会跳转。在这种情况下，BPU 发生了预测错误，FTQ 产生了重定向请求。在重定向请求中，&lt;code&gt;cfiUpdate&lt;/code&gt; 将会对应这条无条件跳转指令。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;cfiUpdate&lt;/code&gt; 中的信息可大致分为三种类型的信息：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;对应指令的信息及执行情况&lt;/strong&gt;。其中会说明该指令在预测块中位于那个槽 (shift) 及 pc； 会指示这条指令的类型相关信息 (pd)；还有这条指令的执行情况，例如跳转目标、是否跳转等&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;历史维护相关信息&lt;/strong&gt;。重定向请求中包含了该条指令所处的预测块对应的分支历史信息，以帮助BPU恢复分支历史信息。&lt;code&gt;foleded_hist&lt;/code&gt; 代表全局折叠历史，&lt;code&gt;histPtr&lt;/code&gt; 代表全局历史指针，而其余信息则是维护分支历史的辅助信息。要详细了解这些信息的含义，请参阅 &lt;code&gt;BPU顶层模块&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;RAS维护相关信息&lt;/strong&gt;。详细含义请参阅 RAS 子预测器文档。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;code&gt;level&lt;/code&gt; 信息的含义是，重定向是否包含本条指令，如果不包含，重定向请求的接收方将认为这条指令已经被执行了，下次预测将从下一条指令开始。&lt;code&gt;BPU&lt;/code&gt; 顶层会默认不包含本条指令，收到重定向请求后，会将本条指令的执行情况统计到分支历史当中。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;以下为重定向接口的详细信号列表：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;level&lt;/strong&gt;: 重定向请求是否包括本位置，低表示在本位置后重定向，高表示在本位置重定向。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;UInt(1.W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;cfiUpdate&lt;/strong&gt;: 控制流指令更新信息&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;接口类型: &lt;code&gt;CfiUpdateInfo&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;接口列表&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;pc&lt;/strong&gt;: 重定向请求对应的指令 PC
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;UInt(VaddrBits.W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;pd&lt;/strong&gt;: 重定向指令的预译码信息
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;isRVC&lt;/strong&gt;: 是否是压缩指令
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;Bool&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;isCall&lt;/strong&gt;: 是否是函数调用
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;Bool&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;isRet&lt;/strong&gt;: 是否是函数返回
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;Bool&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;target&lt;/strong&gt;: 重定向请求指令的目标地址。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;UInt(VaddrBits.W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;taken&lt;/strong&gt;: 重定向请求指令是否发生跳转。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;Bool&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;shift&lt;/strong&gt;: 重定向请求指令位于哪个槽，如果是普通指令则为0.
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;UInt((log2Ceil(numBr)+1).W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;addIntoHist&lt;/strong&gt;: 重定向请求指令执行信息是否要加入分支历史。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;Bool&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;folded_hist&lt;/strong&gt;: 重定向请求对应的折叠历史。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;AllFoldedHistories(foldedGHistInfos)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;afhob&lt;/strong&gt;: 重定向请求指令对应的分支历史最老位。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;AllAheadFoldedHistoryOldestBits(foldedGHistInfos)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;lastBrNumOH&lt;/strong&gt;: 重定向请求对应的上次跳转位置。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;UInt((numBr+1).W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;histPtr&lt;/strong&gt;: 重定向请求需要恢复的全局历史指针。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;CGHPtr&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ssp&lt;/strong&gt;: 重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;UInt(log2Up(RasSize).W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;sctr&lt;/strong&gt;: 重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;UInt(log2Up(RasCtrSize).W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TOSW&lt;/strong&gt;: 重定向请求指令对应的 RAS 推测栈（队列）写指针。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;CGHPtr&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TOSR&lt;/strong&gt;: 重定向请求指令对应的 RAS 推测栈（队列）读指针。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;CGHPtr&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;NOS&lt;/strong&gt;: 重定向请求指令的 RAS 栈顶 Counter。
+&lt;ul&gt;
+&lt;li&gt;接口类型: &lt;code&gt;CGHPtr&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;分支预测更新branchpredictionupdate&#34;&gt;&lt;strong&gt;分支预测更新（BranchPredictionUpdate）&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;接口定义: &lt;code&gt;src/main/scala/xiangshan/frontend/FrontendBundle.scala&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;该接口定义了分支预测器的更新请求，主要用于更新分支预测器的状态，文档只列出了在 BPU 中使用的接口。&lt;/p&gt;
+&lt;p&gt;更新请求与每一个分支预测块一一对应，当 FTQ 中的一个分支预测块被执行过以后，FTQ 将会为这个分支预测块产生一个更新请求，来指导预测器进行训练，因此更新请求中的一个重要职责就是向 BPU 反馈指令的真实执行情况。当然在香山分支预测单元中，更新请求还会负责 FTB 项的更新&lt;/p&gt;
+&lt;p&gt;更新请求中的信息可大致分为四类：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;PC&lt;/strong&gt;    表示预测块的起始地址，指示了该更新请求对应哪个分支预测块&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FTB 项更新信息&lt;/strong&gt;    更新通道中会含有一个 FTB 项结构 (ftb_entry)，输出 FTQ 新生成的 FTB 项，并且还会指示是否与旧的 FTB 项相同 (old_entry)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;指令真实执行情况信息&lt;/strong&gt;    更新通道中会指示该分支预测块中分支指令和无条件跳转指令的执行情况，还会给出控制流指令（即发生跳转的指令）的地址以及最终跳转目标。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;与该预测块对应的预测器相关数据&lt;/strong&gt;   包含 spec_info 以及 meta 信息。（具体请参阅BPU全局接口文档）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;更新请求的接口列表如下：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;pc&lt;/strong&gt; 更新请求的pc (预测块起始地址)
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;UInt(VAddrBits.W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ftb_entry&lt;/strong&gt; 更新后的ftb项
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;new FTBEntry()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;接口列表：详见（&lt;code&gt;FTBEntry&lt;/code&gt;）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;old_entry&lt;/strong&gt; 更新后的 FTB 项是否与旧的 FTB 项相同
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;Bool()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;br_taken_mask&lt;/strong&gt; 预测块内每个slot内指令是否跳转
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;Vec(numBr, Bool())&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;mispred_mask&lt;/strong&gt; 预测块内预测错误的掩码。第一、二位分别代表两个条件分支指令是否预测错误，第三位指示无条件跳转指令是否预测错误。
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;Vec(numBr+1, Bool())&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;jmp_taken&lt;/strong&gt; 预测块内无条件跳转指令被触发
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;Bool()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;cfi_idx&lt;/strong&gt; 控制流指令在预测块中的索引
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;ValidUndirectioned(UInt(log2Ceil(PredictWidth).W))&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;full_target&lt;/strong&gt; 预测块的跳转目标（下一个预测块的起始地址）
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;UInt(VAddrBits.W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;spec_info&lt;/strong&gt; 该预测块对应的 last_stage_spec_info
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;new SpeculativeInfo&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;接口列表：（只用到了 &lt;code&gt;foled_hist&lt;/code&gt; 一项）
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;folded_hist&lt;/strong&gt; 全局折叠历史
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;AllFolededHistories(foldedGHistInfos)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;meta&lt;/strong&gt; 该预测块对应的 last_stage_meta 信息
+&lt;ul&gt;
+&lt;li&gt;接口类型：&lt;code&gt;UInt(MaxMetaLength.W)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

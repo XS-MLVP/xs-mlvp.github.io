@@ -38,11 +38,9 @@
 &lt;p&gt;请注意，请确保&lt;code&gt;verible-verilog-format&lt;/code&gt;等工具的路径已经添加到环境变量&lt;code&gt;$PATH&lt;/code&gt;中，可以直接命令行调用。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h3 id=&#34;下载源码&#34;&gt;下载源码&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://gitee.com/yaozhicheng/picker.git
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://gitee.com/XS-MLVP/xcomm.git
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker/dependence
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rmdir xcomm/
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ln -s ../../xcomm xcomm
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/XS-MLVP/picker.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make init
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;构建并安装&#34;&gt;构建并安装&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;BUILD_XSPCOMM_SWIG&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;python &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 仅在需要python支持时使用&lt;/span&gt;
@@ -162,7 +160,9 @@
       <description>
         
         
-        
+        &lt;h2 id=&#34;施工中&#34;&gt;施工中&amp;hellip;&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/yzcccccccccc/XS-MLVP-NutShellCache&#34;&gt;https://github.com/yzcccccccccc/XS-MLVP-NutShellCache&lt;/a&gt;&lt;/p&gt;
+
       </description>
     </item>
     
@@ -175,7 +175,96 @@
       <description>
         
         
-        
+        &lt;h2 id=&#34;1-回调&#34;&gt;1. 回调&lt;/h2&gt;
+&lt;h3 id=&#34;11-概述&#34;&gt;1.1. 概述&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;回调是一种常见的编程模式，用于异步或事件驱动编程。回调函数是一种特殊的函数，它可以在异步操作完成后&lt;strong&gt;调用一个预定义的函数来处理结果&lt;/strong&gt;。回调函数通常用于处理事件、执行异步操作或响应用户输入等场景。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;回调函数是一个函数或过程，不过它是一个由调用方自己实现，供被调用方使用的特殊函数，一般使用方法如下&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;在a()方法中调用了b()方法&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;在b方法执行完毕主动调用提供的callback()方法&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这个下面的例子中，实现了一个简单的callback 示例，我们定一个了一个打印结果的方法 print_result，一个两数相加的方法add (), 当完成add 后，调用 print_result（）方法将结果打印出来&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;def add&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;x, y, callback&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;result&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; x + y
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 在执行时，这里的callback相当于print_result()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    callback&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;result&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;def print_result&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;result&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    print&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;result&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 在调用add 时，将 print_result 作为参传递给add 里的callback&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;add&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;2, 3, &lt;span style=&#34;color:#000&#34;&gt;callback&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;print_result&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;12-回调函数的使用场景包括&#34;&gt;1.2. 回调函数的使用场景包括&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;事件处理&lt;/strong&gt;：回调函数可以用于处理各种事件，例如鼠标点击、键盘输入、网络请求等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;异步操作&lt;/strong&gt;：回调函数可以用于异步操作，例如读取文件、发送邮件、下载文件等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数据处理&lt;/strong&gt;：回调函数可以用于处理数据，例如对数组进行排序、过滤、映射等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;插件开发&lt;/strong&gt;：回调函数可以用于开发插件，例如 WordPress 插件、jQuery 插件等。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;13-回调函数的优缺点&#34;&gt;1.3. 回调函数的优缺点&lt;/h3&gt;
+&lt;p&gt;优点&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;回调函数的作用是将代码逻辑分离出来，使得代码更加模块化和可维护。使用回调函数可以避免阻塞程序的运行，提高程序的性能和效率。另外，回调函数还可以实现代码的复用，因为它们可以被多个地方调用。&lt;/li&gt;
+&lt;li&gt;提高代码的复用性和灵活性：回调函数可以将一个函数作为参数传递给另一个函数，从而实现模块化编程，提高代码的复用性和灵活性。&lt;/li&gt;
+&lt;li&gt;解耦合：回调函数可以将不同模块之间的关系解耦，使得代码更易于维护和扩展。&lt;/li&gt;
+&lt;li&gt;可以异步执行：回调函数可以在异步操作完成后被执行，这样避免了阻塞线程，提高应用程序的效率。
+缺点：&lt;/li&gt;
+&lt;li&gt;回调函数嵌套过多会导致代码难以维护：如果回调函数嵌套层数过多，代码会变得非常复杂，难以维护。&lt;/li&gt;
+&lt;li&gt;回调函数容易造成竞态条件：如果回调函数中有共享资源访问，容易出现竞态条件，导致程序出错。&lt;/li&gt;
+&lt;li&gt;代码可读性差：回调函数的使用可能会破坏代码的结构和可读性，尤其是在处理大量数据时&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;2-eventloop&#34;&gt;2. Eventloop&lt;/h2&gt;
+&lt;h3 id=&#34;21-概述&#34;&gt;2.1. 概述&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;**Event Loop：事件循环机制是一种计算机编程模型，其目的是使程序能够在一种非阻塞方式下等待事件(如&lt;code&gt;输入、计时器、定时器、网络&lt;/code&gt;等)的发生，并在发生事件时被通知及时处理事件，用于等待和分配消息和事件，单线程运行时不会阻塞的一种机制，也就是实现异步的原理。作为一种单线程语言&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;事件循环机制的核心是&lt;strong&gt;事件循环&lt;/strong&gt;，即&lt;strong&gt;程序会轮询事件队列中是否有待处理事件&lt;/strong&gt;，如果有，就执行相应的回调函数来处理该事件。然后继续等待下一个事件。事件可以是来自外部资源（如网络套接字、文件、定时器等）的输入、用户输入、系统通知等。由此，程序就可以实现&lt;strong&gt;异步、非阻塞&lt;/strong&gt;的编程方式，提高程序的响应速度和运行效率.&lt;/p&gt;
+&lt;h3 id=&#34;22-基本原理&#34;&gt;2.2. 基本原理&lt;/h3&gt;
+&lt;p&gt;事件循环的工作流程通常如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;启动程序，执行同步代码直到遇到异步代码，&lt;/li&gt;
+&lt;li&gt;将异步代码的回调函数放入事件队列中，以便在事件发生时执行。&lt;/li&gt;
+&lt;li&gt;当所有同步代码执行完毕，开始事件循环，不断检查是否有事件发生。&lt;/li&gt;
+&lt;li&gt;如果有事件队列不为空，则执行与之关联的回调函数。&lt;/li&gt;
+&lt;li&gt;回到步骤 4，继续循环处理事件。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;23-宏任务与微任务&#34;&gt;2.3. 宏任务与微任务&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;事件队列是事件循环机制的核心部分之一，它是一个&lt;strong&gt;保存事件以及对应的回调函数的队列&lt;/strong&gt;，在事件队列中的内容可以分为宏任务和微任务两种类型&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;宏任务包括：&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;宏任务是指在事件循环中排队等待执行的较大的任务单元。
+宏任务的执行顺序是按照它们被添加到队列中的顺序来执行的，每个宏任务在执行完成后，事件循环会检查微任务队列是否有任务需要执行，如果有则立即执行微任务，然后再继续下一个宏任务。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;定时器任务（setTimeout、setInterval等）&lt;/li&gt;
+&lt;li&gt;UI 渲染任务&lt;/li&gt;
+&lt;li&gt;网络请求任务&lt;/li&gt;
+&lt;li&gt;文件 I/O 任务&lt;/li&gt;
+&lt;li&gt;setImmediate（Node 环境）等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;微任务包括：&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;微任务是指在事件循环中排队等待执行的较小的任务单元
+微任务会在宏任务执行完毕后立即执行，因此它们的执行优先级要高于宏任务。当一个宏任务执行完毕后，事件循环会立即执行微任务队列中的所有任务，直到微任务队列为空&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Promise 中的回调函数（then、catch等）&lt;/li&gt;
+&lt;li&gt;async/await 中的异步操作等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;24-eventloop-的优点&#34;&gt;2.4. Eventloop 的优点&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;总之，事件循环机制的基本原理就是不断循环遍历事件队列，每次取出队列中最先进入队列的事件并执行对应的回调函数，直到事件队列为空。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;能够有效地&lt;strong&gt;处理大量的并发事件&lt;/strong&gt;，而不会阻塞程序的执行。这种非阻塞的特性使得它特别适用于构建高性能、响应式的应用程序，如 Web 服务器、桌面应用程序、游戏等。&lt;/li&gt;
+&lt;li&gt;事件循环的实现&lt;strong&gt;可以是单线程的，也可以是多线程的&lt;/strong&gt;。在单线程的情况下，事件循环会依次处理每个事件，而在多线程的情况下，不同的线程可以并行处理不同的事件，从而提高处理效率。&lt;/li&gt;
+&lt;li&gt;一些流行的编程语言和框架，如JavaScript 中的 Node.js、Python 中的 asyncio、C# 中的 .NET 等，都提供了事件循环机制，使得开发者可以&lt;strong&gt;更轻松地构建异步、非阻塞&lt;/strong&gt;的应用程序。&lt;/li&gt;
+&lt;/ol&gt;
+
       </description>
     </item>
     
@@ -462,7 +551,54 @@ REF: sum=0xfcad9866c3d98d72, cout=0x0
       <description>
         
         
-        
+        &lt;h1 id=&#34;异步编程&#34;&gt;异步编程&lt;/h1&gt;
+&lt;h3 id=&#34;11-概述&#34;&gt;1.1. 概述&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;异步编程通过将某些任务异步执行，程序可以在等待结果时继续执行其他任务，从而减少了阻塞和等待的时间。
+传统的同步编程方式中，代码会按照顺序依次执行，直到前一个任务完成后才能执行下一个任务，异步编程通过将任务分解为更小的子任务，并且不需要等待前一个任务完成，从而实现并行执行多个任务的效果。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;12-实现原理&#34;&gt;1.2. 实现原理&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;异步编程的实现基于以下两个核心概念，我们会在下一小节进行更详细的介绍&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;回调函数（Callback）
+回调函数是异步编程的基础。当一个任务完成时，系统会调用预先注册的回调函数来处理任务的结果。通过回调函数的方式，程序可以在等待任务完成的同时继续执行其他任务，提高了程序的并发性。&lt;/li&gt;
+&lt;li&gt;事件循环（Event Loop）
+事件循环是异步编程的核心机制之一。它负责监听各种事件（如用户输入、I/O 操作等），当事件发生时，触发相应的回调函数进行处理。事件循环通过不断地轮询事件队列，实现了非阻塞式的任务处理。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;13-常见的异步编程框架和工具&#34;&gt;1.3. 常见的异步编程框架和工具&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;为了方便开发者进行异步编程，有许多优秀的框架和工具可供选择。以下是一些常见的异步编程框架和工具：&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;Asyncio
+Asyncio 是 Python 的一个强大的异步编程框架，提供了高效的协程（Coroutine）支持。它可以用于编写并发性能优秀的网络应用、爬虫程序等。&lt;/li&gt;
+&lt;li&gt;Node. Js
+Node. Js 是基于 Chrome V 8 引擎构建的 JavaScript 运行时环境，天生支持非阻塞 I/O 操作。它在 Web 开发领域广泛应用，尤其擅长处理高并发的实时应用。&lt;/li&gt;
+&lt;li&gt;RxJava
+RxJava 是一个基于观察者模式和迭代器模式的异步编程库。它为 Java 开发者提供了丰富的操作符和组合方式，简化了异步编程的复杂性。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;14-异步编程的优势&#34;&gt;1.4. 异步编程的优势&lt;/h3&gt;
+&lt;p&gt;异步编程具有以下几个显著的优势：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;提高响应速度
+通过异步编程，程序能够在等待某个任务完成时继续执行其他任务，避免了任务阻塞带来的延迟。这样能够大幅度提高程序的响应速度，提升用户体验。&lt;/li&gt;
+&lt;li&gt;提升并发性能
+异步编程允许程序同时处理多个任务，充分利用计算资源，提升了系统的并发能力。特别是在处理大量 I/O 密集型任务时，异步编程能够更好地发挥优势，降低资源消耗。&lt;/li&gt;
+&lt;li&gt;简化编程逻辑
+异步编程可以避免编写复杂的多线程代码，降低了程序的复杂性和出错的概率。通过简化编程逻辑，开发者能够更专注于业务逻辑的实现。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;因此异步编程广泛应用于以下几个领域：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Web 开发
+在 Web 开发中，异步编程常用于处理网络请求、数据库操作等耗时任务。通过异步方式处理这些任务，可以避免阻塞主线程，保证 Web 服务器的并发性能。&lt;/li&gt;
+&lt;li&gt;并行计算
+异步编程可以帮助实现并行计算，将一个大任务拆分成多个小任务并发执行，提高计算效率。这在科学计算、数据处理等领域非常常见。&lt;/li&gt;
+&lt;li&gt;消息队列
+消息队列是异步编程的经典应用之一。异步消息队列可以实现不同系统之间的解耦和异步通信，提高系统的可扩展性和稳定性。&lt;/li&gt;
+&lt;/ol&gt;
+
       </description>
     </item>
     
@@ -478,18 +614,38 @@ REF: sum=0xfcad9866c3d98d72, cout=0x0
         
 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
+&lt;p&gt;本节主要介绍如何基于Picker创建DUT。&lt;/p&gt;
 
 &lt;/div&gt;
 
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+&lt;p&gt;创建DUT（Design Under Test）是指在芯片验证过程中，设计并实现被测对象的电路或系统。DUT是验证的主体，是需要验证的电路设计。在创建DUT时，通常需要考虑被测对象的功能、性能要求和验证目标，然后使用硬件描述语言（HDL）如Verilog或VHDL编写相应的电路描述代码，或通过图形化设计工具生成电路设计。创建DUT是验证过程中的第一步，其质量和准确性直接影响着后续的验证工作。&lt;/p&gt;
+&lt;p&gt;以&lt;a href=&#34;%22/zh-cn/docs/quick-start/%22&#34;&gt;加法器DUT的创建：&lt;/a&gt;为例，进行解释：&lt;/p&gt;
+&lt;p&gt;创建一个名为 Adder 的文件夹，并在其中创建一个名为 Adder.v 的文件。这个文件将包含加法器的 Verilog 代码。下面是一个示例的加法器 Verilog 代码：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;module&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Adder&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;#(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;parameter&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;WIDTH&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;64&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WIDTH&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WIDTH&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;cin&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;output&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WIDTH&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;output&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;cout&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;assign&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;cout&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;  &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;cin&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;endmodule&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;UDT解释：&lt;/p&gt;
+&lt;p&gt;module Adder &amp;hellip; endmodule: 定义了一个名为 Adder 的模块，该模块实现了加法器的功能。&lt;/p&gt;
+&lt;p&gt;parameter WIDTH = 64: 使用 parameter 关键字定义了一个名为 WIDTH 的参数，默认值为 64。这个参数可以控制加法器的输入和输出的位宽。&lt;/p&gt;
+&lt;p&gt;input [WIDTH-1:0] a, input [WIDTH-1:0] b: 定义了两个输入端口 a 和 b，它们的宽度为 WIDTH。这里使用了一个向量（vector）来表示输入端口的多个位。&lt;/p&gt;
+&lt;p&gt;input cin: 定义了一个输入端口 cin，表示加法器的进位输入。&lt;/p&gt;
+&lt;p&gt;output [WIDTH-1:0] sum, output cout: 定义了两个输出端口 sum 和 cout，分别表示加法器的和输出和进位输出。&lt;/p&gt;
+&lt;p&gt;assign: 该关键字用于将一个表达式的值赋给一个信号。&lt;/p&gt;
+&lt;p&gt;{cout, sum}: 这是一个连续赋值语句，表示将右边表达式的值分别赋给左边的两个信号 cout 和 sum。&lt;/p&gt;
+&lt;p&gt;a + b + cin: 这是一个表达式，表示将输入端口 a、b 和 cin 的值相加。由于 a、b 和 sum 都是位宽为 WIDTH 的向量，因此这里进行的是位宽为 WIDTH 的加法运算。&lt;/p&gt;
+&lt;p&gt;通过连续赋值语句，将加法器的输出 sum 和 cout 分别赋值为表达式 a + b + cin 的结果的低 WIDTH 位和高 WIDTH 位。&lt;/p&gt;
+&lt;p&gt;endmodule: 表示模块定义结束。&lt;/p&gt;
+&lt;p&gt;这段 Verilog 代码定义了一个参数化的加法器模块，能够根据参数 WIDTH 控制输入输出的位宽。加法器的输入包括两个 WIDTH 位的数 a 和 b，以及一个单独的进位信号 cin。输出包括一个 WIDTH 位的和 sum 和一个单独的进位输出 cout。加法器的实现通过简单的连续赋值语句，将输入的两个数和进位相加，得到输出的和与进位。&lt;/p&gt;
 
       </description>
     </item>
@@ -673,18 +829,15 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
         
 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
+&lt;p&gt;本节主要介绍如何基于Picker编译DUT。&lt;/p&gt;
 
 &lt;/div&gt;
 
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+&lt;p&gt;编译DUT是指将被测设计（Design Under Test，即DUT）的硬件描述语言（HDL）代码转换为可供仿真和验证使用的逻辑网表的过程。这个过程通常包括综合、优化、映射和布线等步骤，其主要目的是将抽象的HDL代码转换为实际的电路网表，以便进行后续的仿真和验证工作。&lt;/p&gt;
+&lt;p&gt;以&lt;a href=&#34;%22/content/zh-cn/docs/quick-start/%22&#34;&gt;加法器DUT的编译：&lt;/a&gt;为例进行解释：&lt;/p&gt;
+&lt;p&gt;在 Adder 文件夹中，执行以下命令将 Verilog 文件编译为 C++ Class：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;picker&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Adder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;w&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Adder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;fst&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;S&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Adder&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;t&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;picker_out_adder&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;l&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;cpp&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;e&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;--&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;sim&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;verilator&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这个命令会将 Adder.v 文件作为 Top 文件，并将其编译为 C++ Class，使用 verilator 仿真器。编译过程会生成一系列中间文件，其中包括 Verilog 文件、C++ 源代码等。&lt;/p&gt;
 
       </description>
     </item>
@@ -711,7 +864,42 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
       <description>
         
         
-        
+        &lt;h2 id=&#34;1-概述&#34;&gt;1. 概述&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;验证环境并不是全部由verifier编写的，可以用到很多已经编写好的，复用程度高的验证模板，例如某些agent，而这些模板就是VIP。&lt;/strong&gt;
+VIP（Verfication IP）代码确认与验证技术，是预先验证过的内建验证结构，提供了完整的、灵活的应用机制，可以方便地插入到基于仿真的确认测试中，可以大大提高验证可重用性和验证效率。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;VIP 提供一套全面测试环境，帮助设计者和验证者确认其设计功能的正确性，可用于各个层次的仿真验证。通常，VIP 是基于标准协议的，如：AMBA、PCIE、USB、Ethernet 等。VIP 中包括很多验证部件 IP，这些 IP 都严格遵循这些标准协议、已经被验证过，通常包括：产生 testbench 所必须的基础部件、根据协议等的驱动driver和sequence，以及相应的覆盖率模型、dut软件模型、说明文档。&lt;/p&gt;
+&lt;p&gt;大型项目中，涉及到众多协议和标准，所以会涉及到很多VIP，还涉及C++等跨平台联合仿真&lt;/p&gt;
+&lt;h3 id=&#34;11-使用场景&#34;&gt;1.1. 使用场景&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;● 验证设计IP&lt;/strong&gt;
+就是IC设计者会通过购买稳定VIP来对自己的设计进行验证。
+当然也可以自己开发VIP&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;● 集成设计IP&lt;/strong&gt;
+设计IP的参数众多，不同的参数配置会产生不同的性能、不同的功能。
+所以需要集成人员，将多个设计IP进行连接、配置、调度，那么对应的VIP也要进行继承&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;● 子系统、SoC系统开发者&lt;/strong&gt;
+设计的IP向上层集成时，也涉及到VIP的使用和集成，例如使用什么样的sequence进行定向测试&lt;/p&gt;
+&lt;h3 id=&#34;12-vip--的优势和特点&#34;&gt;1.2. VIP  的优势和特点&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;● 不断更新的标准&lt;/strong&gt;
+什么PCIe、DDR、USB、AMBA等各种协议呀，经常不断更新。
+为了使硬件之间能够相互兼容，设计IP就要不断修正、完善使自己的IP兼容新的标准，相应地验证IP也要不断迭代更新。
+而有了VIP之后，集成人员和验证人员就不需要花费力气去兼容协议，而将重点放在功能上去即可。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;● 虚拟dut&lt;/strong&gt;
+就是说，如果用硬件模型仿真，可能会耗时巨大。VIP提供的一些用SystemC、Systemverilog等软件模拟的硬件，可加快仿真速度&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;● 内置开发的协议冲突检查器&lt;/strong&gt;
+在设计和VIP之间的接口上集成了VIP监视器。它可以用来监视总线上的trans，也可以用来自动验证协议规则。无论何时从DUT发送或接收任何trans，都有可能违反VIP中开发的内置协议检查器中的协议规则，从而引发违反协议的错误&lt;/p&gt;
+&lt;p&gt;*&lt;em&gt;● 提供各种详细的错误报告&lt;/em&gt;&lt;/p&gt;
+&lt;h3 id=&#34;13-vip-的集成&#34;&gt;1.3. VIP 的集成&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;● 模块级&lt;/strong&gt;
+module级别的验证其实就是之前一直讲的验证框架，只不过将验证框架的内容替换成VIP&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;● 子系统级&lt;/strong&gt;
+对于多个module集成之后的子系统而言，可将VIP嵌入系统中，替换子系统中的某些控制module或响应module，进行含有driver、sequencer的UVM_ACTIVE测试。&lt;/p&gt;
+&lt;p&gt;如果驱动测试没问题，就可以接上真正的硬件模块了，然后&lt;strong&gt;将VIP中相应的agent设定为UVM_PASSIVE&lt;/strong&gt;，只保留monitor监测就好。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;● 芯片级&lt;/strong&gt;
+系统级别，集成程度更高，就会涉及到系统级别的VIP，系统中某些Process、Memory等硬件，并不是真的硬件而是VIP提供的
+这是一种虚拟的处理器，可通过SystemC、SystemVerilog实现这样的核，这是为了加快仿真速度&lt;/p&gt;
+
       </description>
     </item>
     
@@ -727,18 +915,27 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
         
 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
+&lt;p&gt;本节主要介绍如何基于Picker验证DUT。&lt;/p&gt;
 
 &lt;/div&gt;
 
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+&lt;p&gt;DUT测试是芯片验证过程中的关键步骤之一，指的是对被测设计（Design Under Test，即DUT）进行验证和测试的过程。在DUT测试中，验证工程师会通过各种测试方法和技术，对DUT的功能、性能和时序等方面进行全面的评估，以确保DUT能够按照设计要求正常工作，并且满足用户的需求和期望。&lt;/p&gt;
+&lt;p&gt;以&lt;a href=&#34;%22/content/zh-cn/docs/quick-start/%22&#34;&gt;加法器DUT的测试：&lt;/a&gt;为例进行解释：&lt;/p&gt;
+&lt;p&gt;在测试过程中，我们将创建一个示例项目，并编写测试代码来验证加法器的功能。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;#&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;include&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;UT_Adder.hpp&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;UTAdder&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;dut&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;UTAdder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;libDPIAdder.so&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// 进行测试...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;delete&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;dut&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;在这段代码中，我们创建了一个 UTAdder 类的实例，然后进行测试。&lt;/p&gt;
+&lt;p&gt;接着，编译测试代码。在 Adder 文件夹中，执行 make 命令，编译测试代码并生成可执行文件。&lt;/p&gt;
+&lt;p&gt;最后，运行测试。执行生成的可执行文件，即可运行测试，并观察输出结果。&lt;/p&gt;
 
       </description>
     </item>
@@ -781,18 +978,102 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
         
 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;在开始前本页会 简单的介绍什么是验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&lt;/p&gt;
+&lt;p&gt;在我们完成DUT验证后，编写验证报告是至关重要的一环。本节将从整体角度概述验证报告的结构以及报告所需覆盖的内容。&lt;/p&gt;
 
 &lt;/div&gt;
 
-&lt;h2 id=&#34;硬件验证&#34;&gt;硬件验证&lt;/h2&gt;
-&lt;p&gt;Are there any system requirements for using your project? What languages are supported (if any)? Do users need to already have any software or tools installed?&lt;/p&gt;
-&lt;h2 id=&#34;design-under-test&#34;&gt;Design Under Test&lt;/h2&gt;
-&lt;p&gt;Where can your user find your project code? How can they install it (binaries, installable package, build from source)? Are there multiple options/versions they can install and how should they choose the right one for them?&lt;/p&gt;
-&lt;h2 id=&#34;reference-model&#34;&gt;Reference Model&lt;/h2&gt;
-&lt;p&gt;Is there any initial setup users need to do after installation to try your project?&lt;/p&gt;
-&lt;h2 id=&#34;开始实验&#34;&gt;开始实验&lt;/h2&gt;
-&lt;p&gt;Can your users test their installation, for example by running a command or deploying a Hello World example?&lt;/p&gt;
+&lt;h2 id=&#34;1-验证的范围&#34;&gt;1. 验证的范围&lt;/h2&gt;
+&lt;p&gt;1.1 什么是验证范围&lt;/p&gt;
+&lt;p&gt;在芯片验证过程中，验证范围是指需要进行验证的范围或内容的总体描述。它确定了验证活动所需覆盖的功能、性能、边界条件、接口以及其他关键方面。&lt;/p&gt;
+&lt;p&gt;1.2 举例说明&lt;/p&gt;
+&lt;p&gt;以加法器功能验证为例，本块内容应该至少描述清楚以下内容：&lt;/p&gt;
+&lt;p&gt;（1）基本功能验证：&lt;/p&gt;
+&lt;p&gt;确认加法器能够正确执行加法运算，包括对两个输入数进行相加并产生正确的结果。
+测试加法器对不同数据宽度（例如8位、16位、32位）的支持，并验证其在不同数据宽度下的加法功能是否正常工作。
+边界条件验证：&lt;/p&gt;
+&lt;p&gt;验证加法器在最小值、最大值以及边界情况下的加法运算是否正确，例如边界值加法、最大值加法和最小值加法。
+测试加法器对于特殊情况（如进位、溢出）的处理是否符合设计要求。&lt;/p&gt;
+&lt;p&gt;（2）异常输入验证：&lt;/p&gt;
+&lt;p&gt;检查加法器对于不合法输入的处理能力，如无效输入、非数字字符或格式错误输入的情况。
+验证加法器在面对不符合规范的输入时能够产生正确的错误提示或异常处理。&lt;/p&gt;
+&lt;p&gt;（3）多输入/多操作模式验证：&lt;/p&gt;
+&lt;p&gt;确认加法器能够处理多组输入，并正确执行相加操作。
+验证加法器在连续多次相加操作下是否能够保持正确的累加结果。&lt;/p&gt;
+&lt;h2 id=&#34;2-验证环境说明&#34;&gt;2. 验证环境说明&lt;/h2&gt;
+&lt;p&gt;2.1 什么是验证环境&lt;/p&gt;
+&lt;p&gt;验证环境是用于运行芯片顶层功能验证的各个组件（component）的集合。它主要包含以下几个部分：&lt;/p&gt;
+&lt;p&gt;（1）被测设计（DUT）：&lt;/p&gt;
+&lt;p&gt;DUT是待验证的设计单元，即加法器。它是验证的主体，通过验证环境中的测试向量和输入数据进行功能验证。&lt;/p&gt;
+&lt;p&gt;（2）CPU子环境（MPI Agent）：&lt;/p&gt;
+&lt;p&gt;MPI（Message Passing Interface）Agent是与外部处理器（CPU）通信的组件。它负责处理来自CPU的验证指令，并将验证结果返回给CPU。MPI Agent与CPU之间通过消息传递机制进行通信，以启动验证过程并提供验证结果。&lt;/p&gt;
+&lt;p&gt;（3）PTU/PRU子环境（SPT Agent）：&lt;/p&gt;
+&lt;p&gt;SPT（System Port Test）Agent是与外部测试单元（PTU/PRU）通信的组件。它负责与PTU/PRU进行数据交换和配置寄存器访问，以验证加法器的功能和性能。SPT Agent通过与PTU/PRU之间的接口通信，控制测试流程并收集验证数据。&lt;/p&gt;
+&lt;p&gt;（4）参考模块（RM）：&lt;/p&gt;
+&lt;p&gt;参考模块（Reference Model）是验证过程中的参照标准。它包含了预期的加法器功能和性能规格。验证结果将与参考模块的预期结果进行比对，以确认验证的正确性。参考模块通常由设计规格或功能规范定义，并在验证环境中用于验证结果的验证。&lt;/p&gt;
+&lt;p&gt;（5）检查器（Checker）：&lt;/p&gt;
+&lt;p&gt;检查器是验证环境中的组件，用于检查仿真结果与参考模块预期结果之间的一致性。它负责比对仿真输出和参考模块的预期输出，并生成验证报告。检查器确保验证结果与设计规格的一致性，以确认验证的准确性和完整性。&lt;/p&gt;
+&lt;p&gt;（6）脚本（Makefile）：&lt;/p&gt;
+&lt;p&gt;Makefile是验证环境的自动化脚本，用于管理验证流程的各个步骤。它包括编译、运行仿真、分析结果等操作，并提供了一种方便的方式来执行验证任务。通过脚本的自动化处理，可以提高验证效率并减少人工错误的可能性。&lt;/p&gt;
+&lt;p&gt;2.2 举例说明&lt;/p&gt;
+&lt;p&gt;以加法器功能验证为例，本块内容应该至少描述清楚以下内容：&lt;/p&gt;
+&lt;p&gt;（1）DUT版本信息：&lt;/p&gt;
+&lt;p&gt;DUT名称： 加法器
+版本信息： v1.0
+设计语言： Verilog HDL
+设计工具： Synopsys Design Compiler&lt;/p&gt;
+&lt;p&gt;（2）验证平台说明：&lt;/p&gt;
+&lt;p&gt;平台名称： FPGA Verification Platform
+FPGA型号： Xilinx Virtex UltraScale+ VU9P
+仿真工具： Cadence Xcelium Simulator
+编译工具： Xilinx Vivado&lt;/p&gt;
+&lt;p&gt;（2.1）验证环境架构：&lt;/p&gt;
+&lt;p&gt;MPI Agent： 负责与CPU子环境通信，接收和发送验证指令。
+SPT Agent： 与PTU/PRU子环境通信，负责与芯片接口进行数据交换和配置寄存器访问。
+参考模块（RM）： 包含了预期的加法器功能和性能规格，作为验证结果的参照。
+检查器（Checker）： 检查仿真结果与参考模块预期结果之间的一致性，以确认验证的正确性。
+脚本（Makefile）： 包含了验证流程的自动化脚本，用于编译、运行仿真以及结果分析。&lt;/p&gt;
+&lt;p&gt;（2.2）目录结构：&lt;/p&gt;
+&lt;p&gt;列出工作目录下所有文件及文件的概要。&lt;/p&gt;
+&lt;p&gt;（2.3）主要文件说明：&lt;/p&gt;
+&lt;p&gt;对工作目录中重要文件进行补充说明。&lt;/p&gt;
+&lt;h2 id=&#34;3-覆盖率分析&#34;&gt;3. 覆盖率分析&lt;/h2&gt;
+&lt;p&gt;3.1 什么是覆盖率分析&lt;/p&gt;
+&lt;p&gt;覆盖率分析是软件开发和测试过程中的一种质量评估技术，用于衡量测试对软件代码或功能的覆盖程度。它主要分为两个方面：代码覆盖率分析和功能覆盖率分析。&lt;/p&gt;
+&lt;p&gt;（1）代码覆盖率分析：&lt;/p&gt;
+&lt;p&gt;代码覆盖率分析关注的是测试用例对软件代码的覆盖程度。它衡量了测试用例执行过程中究竟有多少代码被执行到，以及这些代码中的哪些部分被执行。代码覆盖率分析通常包括语句覆盖率（Statement Coverage）、分支覆盖率（Branch Coverage）、条件覆盖率（Condition Coverage）和路径覆盖率（Path Coverage）等指标。&lt;/p&gt;
+&lt;p&gt;（2）功能覆盖率分析：&lt;/p&gt;
+&lt;p&gt;功能覆盖率分析关注的是测试用例对软件功能的覆盖程度。它衡量了测试用例是否覆盖了软件规格中定义的各项功能需求。功能覆盖率分析通常包括输入空间覆盖率（Input Space Coverage）、功能操作覆盖率（Functional Operation Coverage）、错误处理覆盖率（Error Handling Coverage）等指标。
+覆盖率分析通过分析测试用例的执行情况，可以帮助评估测试的全面性和有效性。较高的覆盖率通常意味着测试用例对软件的覆盖程度更高，从而提高了软件的质量和可靠性。覆盖率分析结果也可以指导测试用例的设计和调整，以进一步提高测试的效率和完整性。&lt;/p&gt;
+&lt;p&gt;3.2 举例说明&lt;/p&gt;
+&lt;p&gt;以加法器功能验证为例，本块内容应该至少描述清楚以下内容：&lt;/p&gt;
+&lt;p&gt;（1）代码覆盖率分析：&lt;/p&gt;
+&lt;p&gt;代码覆盖率分析用于评估测试是否覆盖了设计代码中的各个部分和逻辑路径。对于加法器的验证，代码覆盖率分析可以通过以下方式进行：&lt;/p&gt;
+&lt;p&gt;语句覆盖率： 确保测试覆盖了加法器设计代码中的所有语句和指令，以验证代码的执行路径。
+分支覆盖率： 确保测试覆盖了加法器设计代码中的所有条件分支和控制流程，以验证不同条件下的执行路径。
+条件覆盖率： 确保测试覆盖了加法器设计代码中的所有条件表达式的各种可能取值，以验证条件判断的正确性。
+路径覆盖率： 确保测试覆盖了加法器设计代码中的所有可能执行路径，以验证代码的完整性和正确性。&lt;/p&gt;
+&lt;p&gt;（2）功能覆盖率分析：&lt;/p&gt;
+&lt;p&gt;功能覆盖率分析旨在评估测试是否涵盖了设计规格中定义的各项功能要求。对于加法器的验证，功能覆盖率可以通过以下方式进行分析和优化：&lt;/p&gt;
+&lt;p&gt;输入空间覆盖率： 确保测试覆盖了所有可能的输入组合，包括边界情况和特殊情况（如进位、溢出）。
+功能操作覆盖率： 确保测试覆盖了加法器所有可能的操作模式和功能特性，如单次加法、多次连续加法、不同数据宽度下的加法等。
+错误处理覆盖率： 确保测试覆盖了加法器对异常情况的处理，如无效输入、非法操作等，以验证其错误处理能力和容错性。&lt;/p&gt;
+&lt;h2 id=&#34;4-未解决bug列表或待改进方案&#34;&gt;4. 未解决Bug列表或待改进方案&lt;/h2&gt;
+&lt;p&gt;4.1 什么是未解决Bug列表或待改进方案&lt;/p&gt;
+&lt;p&gt;在芯片验证过程中，未解决Bug列表或待改进方案是一个关键的文档，用于跟踪和记录在验证过程中发现的问题和改进点。该列表通常由验证团队维护，并在整个验证过程中进行更新和追踪。&lt;/p&gt;
+&lt;p&gt;内容包括但不限于以下方面：&lt;/p&gt;
+&lt;p&gt;（1）Bug描述： 每个Bug或待改进方案应该清晰地描述问题的性质、出现的条件、预期行为和实际行为之间的差异。&lt;/p&gt;
+&lt;p&gt;（2）Bug优先级： 每个Bug应该根据其对验证工作的影响和紧迫程度确定优先级，以帮助团队优先处理关键问题。&lt;/p&gt;
+&lt;p&gt;（3）Bug状态： 每个Bug应该有一个明确定义的状态，如“已确认”、“正在修复”、“待验证”、“已关闭”等，以跟踪Bug的处理进度。&lt;/p&gt;
+&lt;p&gt;（4）Bug责任人： 每个Bug应指定一个责任人负责跟进和解决，确保问题得到及时处理。&lt;/p&gt;
+&lt;p&gt;（5）Bug跟踪编号： 每个Bug应有一个唯一的标识符，便于跟踪和引用，通常使用Bug跟踪系统中提供的编号。&lt;/p&gt;
+&lt;p&gt;4.2 举例说明&lt;/p&gt;
+&lt;p&gt;Bug编号	    Bug描述	                                优先级	    状态	     责任人
+BUG-001	    加法器对于带有进位的加法操作结果错误	     高	      待修复	    小明
+BUG-002	    加法器在32位输入时出现性能下降              中	      正在修复      小红
+BUG-003	    加法器在处理负数输入时产生异常结果	         低	      已确认	    小刚
+BUG-004	    加法器在高速时钟下出现时序问题	             高	      待验证	    小亮&lt;/p&gt;
+&lt;h2 id=&#34;7-验证结论&#34;&gt;7. 验证结论&lt;/h2&gt;
+&lt;p&gt;验证结论是在完成芯片验证过程后得出的最终结论，用于总结验证工作的结果并对验证对象的状态进行评估和描述。此处需要明确覆盖率具体指标等内容。&lt;/p&gt;
 
       </description>
     </item>
@@ -887,8 +1168,108 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
       <description>
         
         
-        &lt;p&gt;XXXX&lt;/p&gt;
-
+        &lt;h2 id=&#34;1-软件测试&#34;&gt;1. 软件测试&lt;/h2&gt;
+&lt;p&gt;在正式开始pytest 之间我们先了解一下软件的测试，软件测试一般分为如下四个方面&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;单元测试：称模块测试，针对软件设计中的最小单位——程序模块，进行正确性检查的测试工作&lt;/li&gt;
+&lt;li&gt;集成测试：称组装测试，通常在单元测试的基础上，将所有程序模块进行有序的、递增测试，重点测试不同模块的接口部分&lt;/li&gt;
+&lt;li&gt;系统测试：将整个软件系统看成一个整体进行测试，包括对功能、性能以及软件所运行的软硬件环境进行测试&lt;/li&gt;
+&lt;li&gt;验收测试：指按照项目任务书或合同、供需双方约定的验收依据文档进行的对整个系统的测试与评审，决定是否接收或拒收系统&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;pytest最初是作为一个单元测试框架而设计的，但它也提供了许多功能，使其能够进行更广泛的测试，包括集成测试，系统测试，他是一个非常成熟的全功能的python 测试框架。
+它通过收集测试函数和模块，并提供丰富的断言库来简化测试的编写和运行&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;收集测试用例&lt;/strong&gt;：pytest 会搜索当前目录及其子目录中的 Python 文件，找到符合命名约定的测试文件和测试函数。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;运行测试&lt;/strong&gt;：它可以通过命令行运行所有测试用例，也可以运行特定的测试文件、模块或者单个测试函数&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;断言&lt;/strong&gt; ：提供了丰富的断言库，用于验证测试结果是否符合预期。这些断言包括等值比较、异常抛出、容器包含等等&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fixture&lt;/strong&gt;：pytest 使用 fixture 机制来管理测试用例的环境设置和清理工作&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;简单灵活，容易上手&lt;/li&gt;
+&lt;li&gt;支持参数化&lt;/li&gt;
+&lt;li&gt;测试用例的skip和xfail，自动失败重试等处理&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2-安装&#34;&gt;2. 安装&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 安装pytest：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pip install pytest
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 升级pytest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pip install -U pytest
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 查看pytest版本&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pytest --version
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 查看已安装包列表&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pip list
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 查看pytest帮助文档&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pytest -h
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 安装第三方插件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; pip install pytest-sugar
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; pip install pytest-rerunfailures
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; pip install pytest-xdist
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; pip install pytest-assume
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; pip install pytest-html
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;3-使用&#34;&gt;3. 使用&lt;/h2&gt;
+&lt;h3 id=&#34;31-命名规则&#34;&gt;3.1. 命名规则&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;首先在使用pytest 时我们的模块名通常是以test 开头或者test 结尾&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;#test_*.py 或 *_test.py&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;test_demo1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;demo2_test
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;模块中的类名要以Test 开始且不能有init 方法&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;class TestDemo1:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;class TestLogin:
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;类中定义的测试方法名要以test_开头&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;test_demo1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;self&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;test_demo2&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;self&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;测试用例的例子&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;class test_one:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    def test_demo1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;self&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        print&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;测试用例1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    def test_demo2&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;self&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        print&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;测试用例2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;32-参数解析&#34;&gt;3.2. 参数解析&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;打印详细运行日志信息：pytest -v (最高级别信息-verbose)&lt;/li&gt;
+&lt;li&gt;S 是带控制台输出结果，也是输出详细，可以打印测试用例中 print 的输出：pytest -v -s 文件名&lt;/li&gt;
+&lt;li&gt;执行单独一个 pytest 模块：pytest 文件名. Py&lt;/li&gt;
+&lt;li&gt;运行某个模块里面某个类：pytest 文件名. Py:: 类名&lt;/li&gt;
+&lt;li&gt;运行某个模块里面某个类里面的方法：pytest 文件名. Py:: 类名:: 方法名&lt;/li&gt;
+&lt;li&gt;-k：运行测试用例名称中包含某个字符串的测试用例：pytest -k &amp;ldquo;类名 and not 方法名&amp;rdquo;，如 pytest -k &amp;ldquo;TestDemo and not test_one&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;-m ：也叫冒烟用例运行带有某标记的测试用例 (pytest. mark. 标记名)&lt;/li&gt;
+&lt;li&gt;-x：出现一个失败用例就立即停止&lt;/li&gt;
+&lt;li&gt;&amp;ndash;maxfail = num：当错误达到 num 的时候就停止运行：&lt;/li&gt;
+&lt;li&gt;&amp;ndash;html 路径：生成html 报告&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;冒烟用例：&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;33-使用&#34;&gt;3.3. 使用&lt;/h3&gt;
+&lt;p&gt;可以在main 方法或者终端中使用pytest&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 不带参数使用&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;__name__&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;__main__&amp;#39;&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	pytest.main&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 带参数使用&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;__name__&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;__main__&amp;#39;&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	pytest.main&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;([&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;‐vs&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 命令行使用&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; ./testcase/test_one.py --html&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;./report/report.html
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
       </description>
     </item>
     
@@ -901,8 +1282,62 @@ LFSR 的更新规则为：将当前的 LFSR 的最高位与次高位异或，然
       <description>
         
         
-        &lt;p&gt;XXXX&lt;/p&gt;
-
+        &lt;h1 id=&#34;hypothesis&#34;&gt;Hypothesis&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在传统的软件测试中，我们通常需要手动编写测试用例，并为每个用例指定输入和预期输出。这种方式存在一些问题，例如测试用例覆盖不全面、边界条件容易被忽略等。Hypothesis 库通过属性基测试的思想，可以自动生成测试数据，并使用这些数据进行自动化测试。它的目标是发现潜在的错误和边界情况，从而提高代码的质量和可靠性&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Hypothesis 的核心思想是使用假设（hypothesis）来推断代码的行为，并根据这些假设来生成测试数据&lt;/p&gt;
+&lt;h2 id=&#34;1-基本概念&#34;&gt;1. 基本概念&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;测试函数：即待测试的函数或方法，我们需要对其进行测试。&lt;/li&gt;
+&lt;li&gt;属性：定义了测试函数应该满足的条件。属性是以装饰器的形式应用于&lt;strong&gt;测试函数&lt;/strong&gt;上的。&lt;/li&gt;
+&lt;li&gt;策略：用于生成测试数据的生成器。Hypothesis 提供了一系列内置的策略，如整数、字符串、列表等。我们也可以自定义策略。&lt;/li&gt;
+&lt;li&gt;测试生成器：基于策略生成测试数据的函数。Hypothesis 会自动为我们生成测试数据，并将其作为参数传递给测试函数。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;2-安装&#34;&gt;2. 安装&lt;/h2&gt;
+&lt;p&gt;可以使用pip 命令安装 Hypothesis，然后在python 中导入就可以使用&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;　pip install hypothesis
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;　import hypothesis
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;3-使用&#34;&gt;3. 使用&lt;/h2&gt;
+&lt;h3 id=&#34;31-属性和策略&#34;&gt;3.1. 属性和策略&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Hypothesis 使用属性装饰器来定义测试函数的属性。最常用的装饰器是 @given，它指定了测试函数应该满足的属性。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;我们可以通过@given 装饰器定义了一个测试函数 test_addition。并给x 添加对应的属性，测试生成器会自动为测试函数生成测试数据，并将其作为参数传递给函数，例如&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;def addition&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;number: int&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; -&amp;gt; int:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; number + &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;@given&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;integers&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt;, &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;integers&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;())&lt;/span&gt;　　
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;def test_addition&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;x, y&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:　　   
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	assert x + &lt;span style=&#34;color:#000&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt; addition（1）
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;其中Integers () 是一个内置的策略，用于生成整数类型的测试数据。Hypothesis 提供了丰富的内置策略，用于生成各种类型的测试数据。除了 Integers ()之外，还有字符串、布尔值、列表、字典等策略。例如使用 text () 策略生成字符串类型的测试数据，使用 lists (text ()) 策略生成字符串列表类型的测试数据&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;@given&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;s&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;text&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt;, &lt;span style=&#34;color:#000&#34;&gt;l&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;lists&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;text&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;def test_string_concatenation&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;s, l&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:　　   
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;result&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; s + &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;.join&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;l&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;　　   
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	assert len&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;result&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt; len&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;s&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; + sum&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;len&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;x&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; x in l&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;除了可以使用内置的策略以外，还可以使用自定义策略来生成特定类型的测试数据，例如我们可以生产一个非负整形的策略&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;def non_negative_integers&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;　　&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; integers&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;min_value&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;@given&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;non_negative_integers&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;　　def test_positive_addition&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;x&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;　　assert x + &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &amp;gt; x
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;32-期望&#34;&gt;3.2. 期望&lt;/h3&gt;
+&lt;p&gt;我们可以通过expect 来指明需要的函数期待得到的结果&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;@given&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;integers&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;def test_addition&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;x&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;expected&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; x + &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;actual&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; addition&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;x&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;33-假设和断言&#34;&gt;3.3. 假设和断言&lt;/h3&gt;
+&lt;p&gt;在使用 Hypothesis 进行测试时，我们可以使用标准的 Python 断言来验证测试函数的属性。Hypothesis 会自动为我们生成测试数据，并根据属性装饰器中定义的属性来运行测试函数。如果断言失败，Hypothesis 会尝试缩小测试数据的范围，以找出导致失败的最小样例。&lt;/p&gt;
+&lt;p&gt;假如我们有一个字符串反转函数，我们可以通过assert 来判断翻转两次后他是不是等于自身&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;def test_reverse_string&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;s&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;expected&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; x + &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;actual&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; addition&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;x&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	assert &lt;span style=&#34;color:#000&#34;&gt;actual&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt; expected
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
       </description>
     </item>
     
