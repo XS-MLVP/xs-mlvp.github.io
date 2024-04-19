@@ -166,16 +166,16 @@
       <description>
         
         
-        &lt;h2 id=&#34;一功能介绍&#34;&gt;一、功能介绍&lt;/h2&gt;
+        &lt;h2 id=&#34;功能介绍&#34;&gt;功能介绍&lt;/h2&gt;
 &lt;p&gt;TAGE-SC 是南湖架构条件分支的&lt;strong&gt;主预测器&lt;/strong&gt;，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用&lt;strong&gt;历史长度不同的多个预测表&lt;/strong&gt;，可以挖掘&lt;strong&gt;极长的分支历史信息&lt;/strong&gt;。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。&lt;/li&gt;
 &lt;li&gt;SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和&lt;strong&gt;统计偏向的结果&lt;/strong&gt;。并根据这两个结果，&lt;strong&gt;矫正&lt;/strong&gt;最终的预测结果。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多&lt;strong&gt;同时预测 2 条&lt;/strong&gt;条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并&lt;strong&gt;基于相同的全局历史&lt;/strong&gt;进行预测。&lt;/p&gt;
-&lt;h2 id=&#34;二昆明湖tage分支预测器&#34;&gt;二、昆明湖Tage分支预测器&lt;/h2&gt;
-&lt;h3 id=&#34;1-基本功能&#34;&gt;1. 基本功能&lt;/h3&gt;
-&lt;p&gt;&lt;img alt=&#34;img&#34; src=&#34;https://iz9a87wn37.feishu.cn/space/api/box/stream/download/asynccode/?code=OWYxOWVmNjk5YTdjYWIyYjRkOTc4YzJhMWZlNDg1ZTJfaUowZzh3Q3F1V21uVHdtYkVVNkhVUVA0dnllWjJVQndfVG9rZW46Wk1TaWJjYXNzb2RNVTZ4azRkdWNEbFh4bnNBXzE3MTI2NDM3MzQ6MTcxMjY0NzMzNF9WNA&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;昆明湖tage分支预测器&#34;&gt;昆明湖Tage分支预测器&lt;/h2&gt;
+&lt;h3 id=&#34;基本功能&#34;&gt;基本功能&lt;/h3&gt;
+&lt;p&gt;&lt;img alt=&#34;img&#34; src=&#34;tage.PNG&#34;&gt;&lt;/p&gt;
 &lt;p&gt;TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 &lt;strong&gt;1+N&lt;/strong&gt; 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。&lt;/p&gt;
 &lt;p&gt;基于 T0 表的预测器为&lt;strong&gt;基础预测器&lt;/strong&gt;。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。&lt;/p&gt;
 &lt;p&gt;对于 T0 以外的表，我们用 &lt;strong&gt;Tn&lt;/strong&gt; &lt;strong&gt;进行表示&lt;/strong&gt;。在查表时除了 PC 外，还需要用到&lt;strong&gt;全局跳转历史信息H&lt;/strong&gt;进行查找。&lt;strong&gt;查找命中后&lt;/strong&gt;，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。&lt;/p&gt;
@@ -201,7 +201,7 @@
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;对于一个预测块，有可能所有的表都会产生预测结果，此时就需要进行选择。如上图所示，一般情况下，Tn表的编号越大，优先级越高。&lt;/p&gt;
-&lt;h3 id=&#34;2-流水线&#34;&gt;2. 流水线&lt;/h3&gt;
+&lt;h3 id=&#34;流水线&#34;&gt;流水线&lt;/h3&gt;
 &lt;p&gt;TAGE &lt;strong&gt;内含两个流水级&lt;/strong&gt;，第一级计算索引，第二级通过索引读出SRAM表中的结果&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;第0拍，s0：第一个流水级的输入，一般是pc和折叠历史。&lt;/li&gt;
@@ -214,7 +214,7 @@
 &lt;ol&gt;
 &lt;li&gt;第2拍，s2：实际预测结果。TAGE用了2拍进行预测，在2拍之后的第3拍预测结果就绪可用。&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h3 id=&#34;3-数据结构&#34;&gt;3. 数据结构&lt;/h3&gt;
+&lt;h3 id=&#34;数据结构&#34;&gt;数据结构&lt;/h3&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;在昆明湖的实现中，T0与Tn的表结构如下所示：&lt;/p&gt;
@@ -252,7 +252,7 @@
 &lt;p&gt;在进行 Tn 表的查询时，由于历史数据H进行了“压缩”，可能导致一个PC1^H1的结果与另一个PC2^H2的结果相同（类似Hash表的Hash冲突），进而导致索引到无效数据（预测PC1索引到预测PC2的数据）。所以TAGE为每个表提供了一个tag标识，昆明湖中采用了8bit tag，来减小冲突发生的概率，tag的计算方法和查询的索引方法不同，&lt;strong&gt;只有当tag计算相同时查询结果才有效&lt;/strong&gt;。&lt;/p&gt;
 &lt;p&gt;在Tn表项中，除了饱和计数器ctr和tag外，还有1bit的&lt;strong&gt;usefulness计数器&lt;/strong&gt;，该计数器为0时，作弱表项，表示可以当作该项可以被重新分配当作他用；不为0时，作强表项，该项不能被分配当作他用。&lt;/p&gt;
 &lt;p&gt;为了&lt;strong&gt;尽力避免&lt;/strong&gt;所有表项全为1，无法分配新表项的情况发生，TAGE预期使用计数器bankTickCtrs 对所有usefulness进行清零操作。&lt;/p&gt;
-&lt;h3 id=&#34;4-t0tn表的检索方法&#34;&gt;4. T0，Tn表的检索方法&lt;/h3&gt;
+&lt;h3 id=&#34;t0tn表的检索方法&#34;&gt;T0，Tn表的检索方法&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;对于T0表，在查找时用 PC[11:1] 位进行索引2048表项，因此对于T0来说，不可能存在检索不到的情况。&lt;/li&gt;
 &lt;li&gt;对于表Tn，除了 PC[11:1] 外，&lt;strong&gt;还需要&lt;/strong&gt;基于全局分支历史进行检索。在昆明湖中，顶层分支预测器维护了一个256bit的全局历史记录GH，可以根据子预测器需要将GH的最近n位历史信息，按目标位数x进行折叠。 即把n，以长度x为基本单元，拆分成ceil(x/n)个长为x的数，然后&lt;strong&gt;按位进行异或&lt;/strong&gt;得到。通常用FH（Folded History）表示，具体流程请参考 XXX章节。TAGE预测器查找Tn的表项时，用到了index和tag，他们的计算公式如下表所示：&lt;/li&gt;
@@ -315,10 +315,10 @@
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;注：pc&amp;raquo;1是因为使用了RISC-C拓展，2Byte对齐，而PC本身已经省略了1B对齐，所以只用1b&lt;/p&gt;
-&lt;h3 id=&#34;5-替代预测器&#34;&gt;5. 替代预测器&lt;/h3&gt;
+&lt;h3 id=&#34;替代预测器&#34;&gt;替代预测器&lt;/h3&gt;
 &lt;p&gt;由于 Tn 表使用饱和计数器进行预测，因此其输出结果可能存在“&lt;strong&gt;信心不足&lt;/strong&gt;”的情况。例如在昆明湖中，对3比特饱和计数器，100、011时都是&lt;strong&gt;弱预测&lt;/strong&gt;。为了为该状态提供更多的选择参考，TAGE 预测器还提供了一个“替代预测器”机制，他的作用是告诉 TAGE 在 Tn 表预测的结果 “信心不足” 时，是该选择 Tn 的预测结果，还是选择 T0 的预测结果。&lt;/p&gt;
 &lt;p&gt;在昆明湖的具体实现中，“替代预测器” 基于 &lt;strong&gt;useAltOnNaCtrs&lt;/strong&gt; 的寄存器组实现。它由128 个 &lt;strong&gt;4-bit饱和计数器&lt;/strong&gt; 构成，每个计数器都被初始化为 &lt;strong&gt;0b1000&lt;/strong&gt;。在TAGE进行预测时，使用 &lt;strong&gt;PC(7,1)&lt;/strong&gt; 进行索引得到对应的饱和计数器。如果该计数器的值大于预设值，且Tn预测结果信心不高，则选择T0的结果，否则选择Tn的结果。&lt;/p&gt;
-&lt;h3 id=&#34;6-预测过程&#34;&gt;6. 预测过程&lt;/h3&gt;
+&lt;h3 id=&#34;预测过程&#34;&gt;预测过程&lt;/h3&gt;
 &lt;p&gt;综上所述，昆明湖中TAGE预测器的预测步骤如下：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;strong&gt;并行&lt;/strong&gt;索引 T0 表以及 Tn 表，&lt;strong&gt;根据命中结果选择&lt;/strong&gt;使用哪一个表给出预测结果
@@ -329,7 +329,7 @@
 &lt;/li&gt;
 &lt;li&gt;如果匹配到的&lt;strong&gt;Tn表的潜在预测结果为弱预测&lt;/strong&gt;(100,011)，且&lt;strong&gt;替代预测中PC对应4-bit计数器的值&lt;/strong&gt;大于阈值，则采用T0表的结果为最终结果，否则采用Tn表的预测结果为最终预测结果。&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h3 id=&#34;7-训练过程&#34;&gt;7. 训练过程&lt;/h3&gt;
+&lt;h3 id=&#34;训练过程&#34;&gt;训练过程&lt;/h3&gt;
 &lt;p&gt;由于TAGE的预测过程用到了很多计数器和tag，他们需要根据一定的规则进行更新，该过程称为训练。该训练过程发生在BPU的update阶段，该阶段会输入PC，分支历史、以及否预测正确等信息。香山昆明湖的分支预测进行训练的流程根据不同情况，分为如下几个步骤：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;strong&gt;T0&lt;/strong&gt;始终更新：发生跳转（即taken）则 pc 索引的 ctr 饱和计数器 +1，否则 -1&lt;/li&gt;
@@ -377,8 +377,8 @@
 &lt;/ol&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2 id=&#34;三昆明湖sc分支预测器&#34;&gt;三、昆明湖SC分支预测器&lt;/h2&gt;
-&lt;h3 id=&#34;1-基本功能介绍&#34;&gt;1. 基本功能介绍&lt;/h3&gt;
+&lt;h2 id=&#34;昆明湖sc分支预测器&#34;&gt;昆明湖SC分支预测器&lt;/h2&gt;
+&lt;h3 id=&#34;基本功能介绍&#34;&gt;基本功能介绍&lt;/h3&gt;
 &lt;p&gt;SC（Statistics counter）分支预测器是一种基于历史统计信息的分支预测器。&lt;/p&gt;
 &lt;p&gt;与TAGE类似，在SC中通常有多个表Tn，他们对应了不同历史长度的跳转统计。不同点在于，在预测按PC检索时，每个表Tn都会命中，然后SC把每个命中的表项进行求和，计算总的“饱和计数器”跳转信息，最后根&lt;strong&gt;据总的跳转信息判断是否跳转&lt;/strong&gt;。一般情况下，SC采用“有符号饱和计数器”，计数器值大于0时表示跳转，小于0时表示不跳转。计数器的绝对值越大，表示其预测置信度越高。&lt;/p&gt;
 &lt;p&gt;在SC预测器中，SC也由多个表组成（例如T1，T2，T3，T4），但相对TAGE预测器少了基础预测表T0。SC中Tn表有6 bit的&lt;strong&gt;有符号&lt;/strong&gt;饱和计数器。SC表的索引方式如下：&lt;/p&gt;
@@ -441,26 +441,26 @@
 &lt;li&gt;均为 6b000000（弱跳转），求得 9b000000100，值为 4&lt;/li&gt;
 &lt;li&gt;均为 6b111111（弱不跳转），求得 9b111111100，值为 -4&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h3 id=&#34;2-预测过程&#34;&gt;2. 预测过程&lt;/h3&gt;
+&lt;h3 id=&#34;预测过程-1&#34;&gt;预测过程&lt;/h3&gt;
 &lt;ol&gt;
 &lt;li&gt;通过PC和历史信息结算表Tn的索引 Index&lt;/li&gt;
 &lt;li&gt;根据Index查询，得到所有表对应的饱和计数器&lt;/li&gt;
 &lt;li&gt;所有所有表查询到的饱和计数器进行求和得到最终预测结果（大于0跳转，小于0不跳转）&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h3 id=&#34;3-训练过程&#34;&gt;3. 训练过程&lt;/h3&gt;
+&lt;h3 id=&#34;训练过程-1&#34;&gt;训练过程&lt;/h3&gt;
 &lt;p&gt;在update阶段进行饱和计数器的更新。&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;如果PC对应的真实指令跳转，这所有表中对应的饱和计数器+1&lt;/li&gt;
 &lt;li&gt;如果PC对应的真实指令不跳转，这所有表中对应的饱和计数器-1&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2 id=&#34;四昆明湖tage-sc分支预测器&#34;&gt;四、昆明湖TAGE-SC分支预测器&lt;/h2&gt;
-&lt;h3 id=&#34;1-有了tage为何还需要sc&#34;&gt;1. 有了TAGE为何还需要SC&lt;/h3&gt;
+&lt;h2 id=&#34;昆明湖tage-sc分支预测器&#34;&gt;昆明湖TAGE-SC分支预测器&lt;/h2&gt;
+&lt;h3 id=&#34;有了tage为何还需要sc&#34;&gt;有了TAGE为何还需要SC&lt;/h3&gt;
 &lt;p&gt;一些应用上，一些分支行为与分支历史或&lt;strong&gt;路径相关性较弱&lt;/strong&gt;，表现出一个&lt;strong&gt;统计上的预测偏向性&lt;/strong&gt;。对于这些分支，相比基于历史的分支预测，使用&lt;strong&gt;计数器&lt;/strong&gt;捕捉统计偏向的方法更为有效。&lt;/p&gt;
 &lt;p&gt;TAGE在预测与历史非常相关的分支时非常有效，但对有统计偏向的分支则支持不佳。例如只对一个方向有小偏差，但与历史路径没有强相关性的分支。为了避免该问题，可以在传统TAGE预测器上增加SC预测器。&lt;/p&gt;
-&lt;h3 id=&#34;2-tage-sc功能介绍&#34;&gt;2. TAGE-SC功能介绍&lt;/h3&gt;
+&lt;h3 id=&#34;tage-sc功能介绍&#34;&gt;TAGE-SC功能介绍&lt;/h3&gt;
 &lt;p&gt;在昆明湖 TAGE-SC 预测器中，会同时得到 TAGE 和 SC 的预测结果 P1 和 P2，然后对他们的结果进行累加 P = P1+P2 ，如果 P 的绝对值大于 8bit 的阈值 sc_bank_thres，则采用预测器结果 P，否则则采用 P1 作为最终预测结果。&lt;/p&gt;
 &lt;p&gt;为了进行动态自适应，阈值sc_thres是需要是动态变化的。为此在实现上TAGE-SC使用了一个5bit的sc_bank_ctr计数器对阈值sc_bank_thres进行调整。另外，由于昆明湖支持同时预测2条分支指令，因此阈值寄存器和对应的控制计数器也是两份。&lt;/p&gt;
-&lt;h3 id=&#34;3-流水线&#34;&gt;3. 流水线&lt;/h3&gt;
+&lt;h3 id=&#34;流水线-1&#34;&gt;流水线&lt;/h3&gt;
 &lt;p&gt;TAGE-SC 内含 3 个流水级，TAGE的2级流水已经介绍过，SC部分的流水线如下：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;第0拍，s0 读入 pc 和折叠历史&lt;/li&gt;
@@ -477,7 +477,7 @@
 &lt;ol&gt;
 &lt;li&gt;第3拍，s3 从s2_disagree中读出结果，作为s3_disagree输出&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h3 id=&#34;4-预测过程&#34;&gt;4. 预测过程&lt;/h3&gt;
+&lt;h3 id=&#34;预测过程-2&#34;&gt;预测过程&lt;/h3&gt;
 &lt;p&gt;在TAGE-SC预测时，TAGE的预测结果P1用tage_ctr表示，SC的预测结果P2用&lt;strong&gt;scCtrSum&lt;/strong&gt;表示。在预测时，分为如下四步。&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
@@ -526,7 +526,7 @@
 &lt;/ol&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h3 id=&#34;5-训练过程&#34;&gt;5. 训练过程&lt;/h3&gt;
+&lt;h3 id=&#34;训练过程-2&#34;&gt;训练过程&lt;/h3&gt;
 &lt;p&gt;在对 TAGE 和 SC 进行组合后，TAGE-SC 添加了 sc_bank_ctr 计数器用来控制阈值sc_bank_thres。因此在训练时，除了 TAGE 和 SC 本身的训练外，还需要对新增加的计数器进行更新。&lt;/p&gt;
 &lt;p&gt;在update阶段，其具体更新流程如下：&lt;/p&gt;
 &lt;ol&gt;
@@ -539,7 +539,7 @@
 &lt;/li&gt;
 &lt;li&gt;TAGE-SC采用了预测结果P1（即TAGE的预测结果）不进行任何操作&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2 id=&#34;四接口列表&#34;&gt;四、接口列表&lt;/h2&gt;
+&lt;h2 id=&#34;接口列表&#34;&gt;接口列表&lt;/h2&gt;
 &lt;h3 id=&#34;tagesc&#34;&gt;TageSC&lt;/h3&gt;
 &lt;table&gt;
 &lt;thead&gt;

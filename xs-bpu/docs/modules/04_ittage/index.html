@@ -18,25 +18,61 @@
 <link rel="icon" type="image/png" href="/xs-bpu/favicons/android-192x192.png" sizes="192x192">
 
 <title>ITTAGE 分支预测器 | 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
-<meta name="description" content="">
+<meta name="description" content="功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。
+ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 TAGE-SC分支预测器。
+昆明湖 ITTAGE 分支预测器 由于在昆明湖的BPU设计中，采用多预测器级联的方式进行预测，因此在子预测器实现上，会与原始预测器有所不同，其中多数表现在默认预测结果上。
+基本功能 ITTAGE基本功能类似 TAGE 分支预测器，但存在以下不同点：
+在表项中增加了 Target 作为跳转的目标地址项，用于预测跳转目标地址。 饱和计数器ctr也不再提供预测方向，而改为决定是否输出结果（只是预测信息）。 由于每个分支预测块中只有一个间接跳转指令，所以ITTAGE也只考虑一条指令。 流水线 ITTAGE 内含三个流水级，第一级计算索引，第二级通过索引读出SRAM表中的结果
+第0拍，s0：第一个流水级的输入，一般是pc和折叠历史。 第一流水级运行：计算index。通过寄存器输出到s1
+第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。 第二流水级运行：访存SRAM，读取预测用信息。通过寄存器输出到s2
+第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。
+第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：
+预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。">
 <meta property="og:title" content="ITTAGE 分支预测器" />
-<meta property="og:description" content="" />
+<meta property="og:description" content="功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。
+ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 TAGE-SC分支预测器。
+昆明湖 ITTAGE 分支预测器 由于在昆明湖的BPU设计中，采用多预测器级联的方式进行预测，因此在子预测器实现上，会与原始预测器有所不同，其中多数表现在默认预测结果上。
+基本功能 ITTAGE基本功能类似 TAGE 分支预测器，但存在以下不同点：
+在表项中增加了 Target 作为跳转的目标地址项，用于预测跳转目标地址。 饱和计数器ctr也不再提供预测方向，而改为决定是否输出结果（只是预测信息）。 由于每个分支预测块中只有一个间接跳转指令，所以ITTAGE也只考虑一条指令。 流水线 ITTAGE 内含三个流水级，第一级计算索引，第二级通过索引读出SRAM表中的结果
+第0拍，s0：第一个流水级的输入，一般是pc和折叠历史。 第一流水级运行：计算index。通过寄存器输出到s1
+第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。 第二流水级运行：访存SRAM，读取预测用信息。通过寄存器输出到s2
+第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。
+第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：
+预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/04_ittage/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-03-27T15:25:22+08:00" />
+<meta property="article:modified_time" content="2024-04-17T19:41:24+08:00" />
 <meta itemprop="name" content="ITTAGE 分支预测器">
-<meta itemprop="description" content="">
-<meta itemprop="dateModified" content="2024-03-27T15:25:22+08:00" />
-<meta itemprop="wordCount" content="0">
+<meta itemprop="description" content="功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。
+ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 TAGE-SC分支预测器。
+昆明湖 ITTAGE 分支预测器 由于在昆明湖的BPU设计中，采用多预测器级联的方式进行预测，因此在子预测器实现上，会与原始预测器有所不同，其中多数表现在默认预测结果上。
+基本功能 ITTAGE基本功能类似 TAGE 分支预测器，但存在以下不同点：
+在表项中增加了 Target 作为跳转的目标地址项，用于预测跳转目标地址。 饱和计数器ctr也不再提供预测方向，而改为决定是否输出结果（只是预测信息）。 由于每个分支预测块中只有一个间接跳转指令，所以ITTAGE也只考虑一条指令。 流水线 ITTAGE 内含三个流水级，第一级计算索引，第二级通过索引读出SRAM表中的结果
+第0拍，s0：第一个流水级的输入，一般是pc和折叠历史。 第一流水级运行：计算index。通过寄存器输出到s1
+第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。 第二流水级运行：访存SRAM，读取预测用信息。通过寄存器输出到s2
+第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。
+第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：
+预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。">
+<meta itemprop="dateModified" content="2024-04-17T19:41:24+08:00" />
+<meta itemprop="wordCount" content="1020">
 <meta itemprop="keywords" content="子预测器,ITTAGE," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="ITTAGE 分支预测器"/>
-<meta name="twitter:description" content=""/>
+<meta name="twitter:description" content="功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。
+ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 TAGE-SC分支预测器。
+昆明湖 ITTAGE 分支预测器 由于在昆明湖的BPU设计中，采用多预测器级联的方式进行预测，因此在子预测器实现上，会与原始预测器有所不同，其中多数表现在默认预测结果上。
+基本功能 ITTAGE基本功能类似 TAGE 分支预测器，但存在以下不同点：
+在表项中增加了 Target 作为跳转的目标地址项，用于预测跳转目标地址。 饱和计数器ctr也不再提供预测方向，而改为决定是否输出结果（只是预测信息）。 由于每个分支预测块中只有一个间接跳转指令，所以ITTAGE也只考虑一条指令。 流水线 ITTAGE 内含三个流水级，第一级计算索引，第二级通过索引读出SRAM表中的结果
+第0拍，s0：第一个流水级的输入，一般是pc和折叠历史。 第一流水级运行：计算index。通过寄存器输出到s1
+第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。 第二流水级运行：访存SRAM，读取预测用信息。通过寄存器输出到s2
+第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。
+第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：
+预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。"/>
 
 
 
 
-<link rel="preload" href="/xs-bpu/scss/main.min.a4b91db5523db31ece8b4cafe3c363c918ca66dd6af0b9ed7b4181b018981f38.css" as="style">
-<link href="/xs-bpu/scss/main.min.a4b91db5523db31ece8b4cafe3c363c918ca66dd6af0b9ed7b4181b018981f38.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" as="style">
+<link href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.6.3.min.js"
@@ -78,7 +114,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.65834df3efb52d2a07004106e88c9bbd.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.c7bf24d50e8829ee3882d7818665b706.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -102,7 +138,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.65834df3efb52d2a07004106e88c9bbd.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.c7bf24d50e8829ee3882d7818665b706.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -184,18 +220,38 @@
 
           </aside>
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
-            
-<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/modules/04_ittage.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/modules/04_ittage.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
-  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/modules?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/course/issues/new?title=ITTAGE%20%e5%88%86%e6%94%af%e9%a2%84%e6%b5%8b%e5%99%a8" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
-  <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/modules/04_ittage.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/modules/04_ittage.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/modules?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=ITTAGE%20%e5%88%86%e6%94%af%e9%a2%84%e6%b5%8b%e5%99%a8" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
   <a id="print" href="/xs-bpu/docs/modules/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
 </div>
 
-            
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#功能介绍">功能介绍</a></li>
+    <li><a href="#昆明湖-ittage-分支预测器">昆明湖 ITTAGE 分支预测器</a>
+      <ul>
+        <li><a href="#基本功能">基本功能</a></li>
+        <li><a href="#流水线">流水线</a></li>
+        <li><a href="#数据结构">数据结构</a></li>
+        <li><a href="#t0tn表的检索方法">T0，Tn表的检索方法</a></li>
+        <li><a href="#替代预测器">替代预测器</a></li>
+        <li><a href="#预测过程">预测过程</a></li>
+        <li><a href="#训练过程">训练过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#接口列表">接口列表</a></li>
+    <li><a href="#其他meta见对应子预测其文档">其他Meta见对应子预测其文档</a></li>
+    <li><a href="#ittage_io_out_last_stage_meta960">ittage_io_out_last_stage_meta[96:0]</a></li>
+  </ul>
+</nav>
+      </div>
+    
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Tag Cloud</h5>
       <ul class="taxonomy-terms">
@@ -274,9 +330,1959 @@
 </div>
 
   </header>
-	
-	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 March 27, 2024: <a href="https://github.com/XS-MLVP/course/commit/4fdc17467fddafde54625ec48ada413b2d5f1887">Add BPU documents (4fdc174)</a>
+	<h2 id="功能介绍">功能介绍</h2>
+<p>对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于<strong>间接跳转</strong>，如call/jump等指令，需要预测跳转<strong>到哪里去</strong>（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。</p>
+<p>ITTAGE 与 TAGE 的<strong>主要区别</strong>在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 <a href="../02_tage_sc/">TAGE-SC分支预测器</a>。</p>
+<h2 id="昆明湖-ittage-分支预测器">昆明湖 ITTAGE 分支预测器</h2>
+<p>由于在昆明湖的BPU设计中，采用多预测器级联的方式进行预测，因此在子预测器实现上，会与原始预测器有所不同，其中多数表现在默认预测结果上。</p>
+<h3 id="基本功能">基本功能</h3>
+<p>ITTAGE基本功能类似 TAGE 分支预测器，但存在以下不同点：</p>
+<ol>
+<li>在表项中增加了 Target 作为跳转的目标地址项，用于预测跳转目标地址。</li>
+<li>饱和计数器ctr也不再提供预测方向，而改为决定是否输出结果（只是预测信息）。</li>
+<li>由于每个分支预测块中只有一个间接跳转指令，所以ITTAGE也只考虑一条指令。</li>
+</ol>
+<h3 id="流水线">流水线</h3>
+<p>ITTAGE <strong>内含三个流水级</strong>，第一级计算索引，第二级通过索引读出SRAM表中的结果</p>
+<ol>
+<li>第0拍，s0：第一个流水级的输入，一般是pc和折叠历史。</li>
+</ol>
+<p><strong>第一流水级运行</strong>：计算index。通过寄存器输出到s1</p>
+<ol>
+<li>第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。</li>
+</ol>
+<p><strong>第二流水级运行</strong>：访存SRAM，读取预测用信息。通过寄存器输出到s2</p>
+<ol>
+<li>第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的<strong>原始预测信息</strong>。</li>
+</ol>
+<p>**第三流水级运行：**处理原始预测信息，决定是否输出预测结果。</p>
+<ol>
+<li>第3拍，s3：预测结果就绪，此时已经可以使用<strong>预测结果</strong>。</li>
+</ol>
+<h3 id="数据结构">数据结构</h3>
+<p>在昆明湖的实现中，T0与Tn的表结构如下所示：</p>
+<table>
+<thead>
+<tr>
+<th><strong>预测器</strong></th>
+<th><strong>作用</strong></th>
+<th><strong>表项构成</strong></th>
+<th><strong>项数</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基准预测器T0</td>
+<td>用于在其他预测器的预测结果都无效时输出预测结果</td>
+<td>虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果</td>
+<td>虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果</td>
+</tr>
+<tr>
+<td>预测表T1-T2</td>
+<td>对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定</td>
+<td>target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器）</td>
+<td>256项</td>
+</tr>
+<tr>
+<td>预测表T3-T5</td>
+<td>512项</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="t0tn表的检索方法">T0，Tn表的检索方法</h3>
+<p>检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。</p>
+<table>
+<thead>
+<tr>
+<th><strong>表名称</strong></th>
+<th><strong>FH长度</strong></th>
+<th><strong>FH1长度</strong></th>
+<th><strong>FH2长度</strong></th>
+<th><strong>最近历史长度（用到GH中的位数）</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>4比特</td>
+<td>4比特</td>
+<td>4比特</td>
+<td>低4位，即把最新4位历史，折叠成FH、FH1、FH2</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>8比特</td>
+<td>8比特</td>
+<td>8比特</td>
+<td>低8位，即把最新8位历史，折叠成FH、FH1、FH2</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>9比特</td>
+<td>9比特</td>
+<td>8比特</td>
+<td>低13位，即把最新13位历史，折叠成FH、FH1、FH2</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>9比特</td>
+<td>9比特</td>
+<td>8比特</td>
+<td>低16位，即把最新16位历史，折叠成FH、FH1、FH2</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>9比特</td>
+<td>9比特</td>
+<td>8比特</td>
+<td>低32位，即把最新32位历史，折叠成FH、FH1、FH2</td>
+</tr>
+</tbody>
+</table>
+<p>其他过程（<strong>计算方式</strong> 及 <strong>计算公式</strong>）类似 <a href="../02_tage_sc/#MZk7dpG3woapSUx3XO9ceJShn0e">TAGE-SC分支预测器</a></p>
+<h3 id="替代预测器">替代预测器</h3>
+<p>当Tn表给出的预测结果，“预测信心”不足时，需要对预测结果进行跳转，成为“替代预测器”。该过程与 TAGE 类似，具体请先阅读TAGE的对应部分。与 TAGE 不同，ITTAGE 的 ctr 并不给出预测方向，只决定是否输出该结果（预测信心）。当 ctr 为 2b00 的时候，即认定为弱信心。选择替代预测结果：</p>
+<ol>
+<li><strong>如果命中多个个表</strong>，输出长度第二长的表中表项的 Target</li>
+<li>否则输出  T0 Target（FTB Target）</li>
+</ol>
+<h3 id="预测过程">预测过程</h3>
+<p>预测过程与 TAGE 类似，但与 TAGE 不同的是ITTAGE 多了一步根据 ctr 决定是否输出预测结果。具体过程如下：</p>
+<ol>
+<li>当 ITTAGE 表项的 ctr 不为 2b00 时，输出 Target</li>
+<li>当 ITTAGE 表项的 ctr 为 2b00 时，输出替代预测结果
+<ol>
+<li>如果有次长的历史（第二个表也命中），则输出 次长的 Target</li>
+<li>否则输出 FTB Target</li>
+</ol>
+</li>
+<li>当 ITTAGE 表项没命中时，输出 T0 Target（FTB Target）</li>
+</ol>
+<h3 id="训练过程">训练过程</h3>
+<p>该过程与 TAGE 类似，具体不同点如下：</p>
+<ol>
+<li>表项更新（原始预测数据）：
+<ol>
+<li>ctr：
+<ol>
+<li>若预测地址与实际一致，则将对应provider（提供原始预测数据的表）表项的ctr计数器自增1</li>
+<li>若预测地址与实际不一致，则将对应provider表项的ctr计数器自减1</li>
+<li>ITTAGE中，会根据ctr判断是否采取这个预测的跳转目标结果。 如果多个表均命中，且历史最长表的ctr为0，则采取替代预测逻辑（历史次长的表 或 T0）。 更新时始终更新历史最长的表，如果采用了替代预测，<strong>也同时更新</strong>替代预测表。</li>
+</ol>
+</li>
+<li>target：
+<ol>
+<li>当待更新表项在进行本次预测时的ctr为0时，直接将实际的最终跳转结果存入target，覆盖</li>
+<li>如果是在申请新表项，直接将实际的最终跳转结果存入target</li>
+<li>否则不修改target</li>
+</ol>
+</li>
+<li>usefulness：
+<ol>
+<li>当provider<strong>预测正确</strong>而<strong>替代预测错误</strong>时provider的usefulness置1</li>
+<li>如果替代预测是弱信心，并且预测正确，则provider的usefulness置1。 如果替代预测是弱信心，并且预测错误，则provider的usefulness置0。</li>
+</ol>
+</li>
+<li>新表项：
+<ol>
+<li>每次由于历史最长表有信心的预测出错时（不是由于使用替代预测出错），会尝试随机在历史更长表中申请一个表项。能申请到的条件是对应项的useful为0</li>
+<li>如果更长的useful均不为0，则分配失败</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>重置useful位：
+<ol>
+<li>每次预测出错时会申请新表项，如果分配失败则tickCtr（用于重置全部useful的8bit饱和计数器） +1，成功则 -1</li>
+<li>当tickCtr为最大值时，设置ITTAGE中的所有useful为0，并设置tickCtr为0。</li>
+</ol>
+</li>
+</ol>
+<h2 id="接口列表">接口列表</h2>
+<table>
+<thead>
+<tr>
+<th>接口类型</th>
+<th>位宽</th>
+<th>信号名</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>input</td>
+<td></td>
+<td>clock</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>reset</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_s0_pc_3</td>
+<td>用于预测的PC</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_in_bits_folded_hist_3_hist_14_folded_hist</td>
+<td>T2 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[8:0]</td>
+<td>io_in_bits_folded_hist_3_hist_13_folded_hist</td>
+<td>T3 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_folded_hist_3_hist_12_folded_hist</td>
+<td>T1 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[8:0]</td>
+<td>io_in_bits_folded_hist_3_hist_10_folded_hist</td>
+<td>T5 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[8:0]</td>
+<td>io_in_bits_folded_hist_3_hist_6_folded_hist</td>
+<td>T4 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_in_bits_folded_hist_3_hist_4_folded_hist</td>
+<td>T3 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_in_bits_folded_hist_3_hist_3_folded_hist</td>
+<td>T5 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_in_bits_folded_hist_3_hist_2_folded_hist</td>
+<td>T4 折叠历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_br_taken_mask_0</td>
+<td>从FTB输入 完全透传到输出 包括jalr_target</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_0_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_1_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_is_jalr</td>
+<td>RAS 模块使用的信息，透传</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_is_call</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_is_ret</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_last_may_be_rvi_call</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_is_br_sharing</td>
+<td>从FTB输入 完全透传到输出 包括jalr_target  fallThroughErr  表示 FTB项 中记录的 pftAddr 有误 生成方式：比较 pftAddr 代表的预测块结束地址是否大于预测块的起始地址，如果小于，则代表出现错误，此信号置为有效。这种情况可能会发生在 pc 索引到错误的 FTB 项的情况。 FTQ使用这个变量，与ITTAGE无关</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_2_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s2_full_pred_3_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_br_taken_mask_0</td>
+<td>除了 jalr_target 可能被修改，其他都是透传</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_br_taken_mask_0</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_br_taken_mask_0</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_is_jalr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_is_call</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_is_ret</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_br_taken_mask_0</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_valid</td>
+<td>透传到output，不做修改 来源是FTB</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_brSlots_0_offset</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[11:0]</td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_brSlots_0_lower</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[1:0]</td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_brSlots_0_tarStat</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_brSlots_0_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_brSlots_0_valid</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_tailSlot_offset</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[19:0]</td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_tailSlot_lower</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[1:0]</td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_tailSlot_tarStat</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_tailSlot_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_tailSlot_valid</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_pftAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_carry</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_isCall</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_isRet</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_isJalr</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_last_may_be_rvi_call</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_always_taken_0</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_in_bits_resp_in_0_last_stage_ftb_entry_always_taken_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_0_br_taken_mask_0</td>
+<td>完全透传传入值 prefix: io_in_bits_resp_in_</td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_0_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_0_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_0_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_0_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_0_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_0_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s2_full_pred_0_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s2_full_pred_0_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_0_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_0_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_0_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_1_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_1_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_1_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_1_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_1_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_1_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_1_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s2_full_pred_1_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s2_full_pred_1_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_1_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_1_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_1_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_2_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_2_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_2_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s2_full_pred_2_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s2_full_pred_2_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_2_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_is_jalr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_is_call</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_is_ret</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_last_may_be_rvi_call</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_2_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_3_br_taken_mask_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_3_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_3_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_3_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_3_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_3_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_3_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s2_full_pred_3_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s2_full_pred_3_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s2_full_pred_3_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_3_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_3_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s2_full_pred_3_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_0_br_taken_mask_0</td>
+<td>见对应prefix的输入</td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_0_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_0_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_0_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_0_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_0_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_0_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_0_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_0_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_0_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_0_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_1_br_taken_mask_0</td>
+<td>见对应prefix的输入</td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_1_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_1_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_1_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_1_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_1_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_1_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_1_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_1_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_1_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_1_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_br_taken_mask_0</td>
+<td>见对应prefix的输入</td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_2_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_2_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_2_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_2_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_is_jalr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_is_call</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_is_ret</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_2_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_3_br_taken_mask_0</td>
+<td>见对应prefix的输入</td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_3_br_taken_mask_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_3_slot_valids_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_3_slot_valids_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_3_targets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_3_targets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_3_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s3_full_pred_3_offsets_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_s3_full_pred_3_offsets_1</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[38:0]</td>
+<td>io_out_s3_full_pred_3_fallThroughAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_3_fallThroughErr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_3_is_br_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_s3_full_pred_3_hit</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[218:0]</td>
+<td>io_out_last_stage_meta</td>
+<td>[96:0] 有效，是ITTAGE的Meta信息</td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_valid</td>
+<td>完全透传传入的值</td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_last_stage_ftb_entry_brSlots_0_offset</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[11:0]</td>
+<td>io_out_last_stage_ftb_entry_brSlots_0_lower</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[1:0]</td>
+<td>io_out_last_stage_ftb_entry_brSlots_0_tarStat</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_brSlots_0_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_brSlots_0_valid</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_last_stage_ftb_entry_tailSlot_offset</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[19:0]</td>
+<td>io_out_last_stage_ftb_entry_tailSlot_lower</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[1:0]</td>
+<td>io_out_last_stage_ftb_entry_tailSlot_tarStat</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_tailSlot_sharing</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_tailSlot_valid</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[3:0]</td>
+<td>io_out_last_stage_ftb_entry_pftAddr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_carry</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_isCall</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_isRet</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_isJalr</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_last_may_be_rvi_call</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_always_taken_0</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td></td>
+<td>io_out_last_stage_ftb_entry_always_taken_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s0_fire_3</td>
+<td>s0阶段使能信号</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s1_fire_3</td>
+<td>s1阶段使能信号</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s2_fire_0</td>
+<td>s2阶段使能信号，相同</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s2_fire_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s2_fire_2</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s2_fire_3</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_valid</td>
+<td>是否进行更新</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_update_bits_pc</td>
+<td>待更新的预测块pc索引</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_14_folded_hist</td>
+<td>T2 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[8:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_13_folded_hist</td>
+<td>T3 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_12_folded_hist</td>
+<td>T1 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[8:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_10_folded_hist</td>
+<td>T5 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[8:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_6_folded_hist</td>
+<td>T4 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_4_folded_hist</td>
+<td>T3 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_3_folded_hist</td>
+<td>T5 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_2_folded_hist</td>
+<td>T4 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_update_bits_ftb_entry_tailSlot_offset</td>
+<td>待更新的FTB项offset</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_ftb_entry_tailSlot_sharing</td>
+<td>待更新的FTB项是否是有条件跳转</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_ftb_entry_tailSlot_valid</td>
+<td>待更新的tailSlot是否启用</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_ftb_entry_isRet</td>
+<td>tailSlot是否是Ret指令</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_ftb_entry_isJalr</td>
+<td>tailSlot是否是Jalr指令</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_cfi_idx_valid</td>
+<td>控制流指令在预测块中的索引.valid信号</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_update_bits_cfi_idx_bits</td>
+<td>控制流指令在预测块中的索引</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_jmp_taken</td>
+<td>预测块内无条件跳转指令被触发</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_mispred_mask_2</td>
+<td>是否预测错误</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[218:0]</td>
+<td>io_update_bits_meta</td>
+<td>预测时传出 meta 信息的[218:25] 即{25h0, _ubtb_io_out_last_stage_meta[5:0] ,_tage_io_out_last_stage_meta[87:0] ,_ftb_io_out_last_stage_meta[2:0], _ittage_io_out_last_stage_meta[96:0]}</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[38:0]</td>
+<td>io_update_bits_full_target</td>
+<td>预测块的跳转目标（下一个预测块的起始地址）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="其他meta见对应子预测其文档">其他Meta见对应子预测其文档</h2>
+<p>_ubtb_io_out_last_stage_meta</p>
+<p>_tage_io_out_last_stage_meta</p>
+<p>_ftb_io_out_last_stage_meta</p>
+<h2 id="ittage_io_out_last_stage_meta960">ittage_io_out_last_stage_meta[96:0]</h2>
+<table>
+<thead>
+<tr>
+<th>位宽</th>
+<th>信号名</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>96</td>
+<td>s3_provided</td>
+<td>是否有结果</td>
+</tr>
+<tr>
+<td>[95:93]</td>
+<td>s3_provider</td>
+<td>提供结果的表项</td>
+</tr>
+<tr>
+<td>92</td>
+<td>s3_altProvided</td>
+<td>是否有替代预测表项</td>
+</tr>
+<tr>
+<td>[91:89]</td>
+<td>s3_altProvider</td>
+<td>提供结果的替代预测表项</td>
+</tr>
+<tr>
+<td>88</td>
+<td>resp_meta_altDiffers</td>
+<td>替代预测是否是弱信心的（FTB不算）</td>
+</tr>
+<tr>
+<td>87</td>
+<td>s3_providerU</td>
+<td>主预测的useful bit</td>
+</tr>
+<tr>
+<td>[86:85]</td>
+<td>s3_providerCtr</td>
+<td>主预测给出的置信度</td>
+</tr>
+<tr>
+<td>[84:83]</td>
+<td>s3_altProviderCtr</td>
+<td>替代预测给出的置信度</td>
+</tr>
+<tr>
+<td>82</td>
+<td>resp_meta_allocate_valid_r</td>
+<td>有空余的表项可供申请</td>
+</tr>
+<tr>
+<td>[81:79]</td>
+<td>resp_meta_allocate_bits_r</td>
+<td>申请哪个表中的表项</td>
+</tr>
+<tr>
+<td>78</td>
+<td>s3_tageTaken_dup_3</td>
+<td>在不使用FTB的情况下始为true，使用FTB也为true</td>
+</tr>
+<tr>
+<td>[77:39]</td>
+<td>s3_providerTarget</td>
+<td>主预测给出的跳转地址</td>
+</tr>
+<tr>
+<td>[38:0]</td>
+<td>s3_altProviderTarget</td>
+<td>替代预测给出的跳转地址</td>
+</tr>
+</tbody>
+</table>
+
+	<div class="td-page-meta__lastmod">
+  最后修改 April 17, 2024: <a href="https://github.com/XS-MLVP/course/commit/f3fa42abc87fa9ff32d85bf89f564918f9100e6c">update ittage part (f3fa42a)</a>
 </div>
 
 </div>
@@ -288,11 +2294,8 @@
       <footer class="td-footer row d-print-none">
   <div class="container-fluid">
     <div class="row mx-md-2">
-      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
-        
-        
-        
-<ul class="td-footer__links-list">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
   
   <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
     <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
@@ -302,14 +2305,8 @@
   
 </ul>
 
-        
-        
-      </div>
-      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
-        
-        
-        
-<ul class="td-footer__links-list">
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
   
   <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
     <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
@@ -319,20 +2316,17 @@
   
 </ul>
 
-        
-        
-      </div>
-      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
-        <span>&copy; 2024 BOSC 保留所有权利</span>
-        <span class="ms-1"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
-        
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2024
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">保留所有权利</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
       </div>
     </div>
   </div>
 </footer>
+
     </div>
-    
-  <script src="/xs-bpu/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
+    <script src="/xs-bpu/js/main.min.fc653db1f3d4f4a8b4eacd389f96d8afe966937ba9dded8b07d3a1b17d967d22.js" integrity="sha256-/GU9sfPU9Ki06s04n5bYr&#43;lmk3up3e2LB9OhsX2WfSI=" crossorigin="anonymous"></script>
 <script defer src="/xs-bpu/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
 <script src='/xs-bpu/js/tabpane-persist.js'></script>
 

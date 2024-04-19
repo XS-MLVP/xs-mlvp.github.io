@@ -18,17 +18,17 @@
 <link rel="icon" type="image/png" href="/xs-bpu/favicons/android-192x192.png" sizes="192x192">
 
 <title>TAGE-SC 分支预测器 | 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
-<meta name="description" content="一、功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+<meta name="description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
-二、昆明湖Tage分支预测器 1. 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
+昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
 基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
 如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
 <meta property="og:title" content="TAGE-SC 分支预测器" />
-<meta property="og:description" content="一、功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+<meta property="og:description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
-二、昆明湖Tage分支预测器 1. 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
+昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
 基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
@@ -36,21 +36,21 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/02_tage_sc/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-04-09T14:32:39+08:00" />
+<meta property="article:modified_time" content="2024-04-17T19:41:24+08:00" />
 <meta itemprop="name" content="TAGE-SC 分支预测器">
-<meta itemprop="description" content="一、功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+<meta itemprop="description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
-二、昆明湖Tage分支预测器 1. 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
+昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
 基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
 如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
-<meta itemprop="dateModified" content="2024-04-09T14:32:39+08:00" />
-<meta itemprop="wordCount" content="1101">
+<meta itemprop="dateModified" content="2024-04-17T19:41:24+08:00" />
+<meta itemprop="wordCount" content="1086">
 <meta itemprop="keywords" content="子预测器,TAGE-SC," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="TAGE-SC 分支预测器"/>
-<meta name="twitter:description" content="一、功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+<meta name="twitter:description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
-二、昆明湖Tage分支预测器 1. 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
+昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
 基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
@@ -59,8 +59,8 @@
 
 
 
-<link rel="preload" href="/xs-bpu/scss/main.min.a4b91db5523db31ece8b4cafe3c363c918ca66dd6af0b9ed7b4181b018981f38.css" as="style">
-<link href="/xs-bpu/scss/main.min.a4b91db5523db31ece8b4cafe3c363c918ca66dd6af0b9ed7b4181b018981f38.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" as="style">
+<link href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.6.3.min.js"
@@ -102,7 +102,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.65834df3efb52d2a07004106e88c9bbd.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.c7bf24d50e8829ee3882d7818665b706.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -126,7 +126,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.65834df3efb52d2a07004106e88c9bbd.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.c7bf24d50e8829ee3882d7818665b706.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -208,13 +208,12 @@
 
           </aside>
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
-            
-<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/modules/02_tage_sc.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/modules/02_tage_sc.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
-  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/modules?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/course/issues/new?title=TAGE-SC%20%e5%88%86%e6%94%af%e9%a2%84%e6%b5%8b%e5%99%a8" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
-  <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/modules/02_tage_sc.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/modules/02_tage_sc.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/modules?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=TAGE-SC%20%e5%88%86%e6%94%af%e9%a2%84%e6%b5%8b%e5%99%a8" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
   <a id="print" href="/xs-bpu/docs/modules/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
 </div>
@@ -222,35 +221,35 @@
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#一功能介绍">一、功能介绍</a></li>
-    <li><a href="#二昆明湖tage分支预测器">二、昆明湖Tage分支预测器</a>
+    <li><a href="#功能介绍">功能介绍</a></li>
+    <li><a href="#昆明湖tage分支预测器">昆明湖Tage分支预测器</a>
       <ul>
-        <li><a href="#1-基本功能">1. 基本功能</a></li>
-        <li><a href="#2-流水线">2. 流水线</a></li>
-        <li><a href="#3-数据结构">3. 数据结构</a></li>
-        <li><a href="#4-t0tn表的检索方法">4. T0，Tn表的检索方法</a></li>
-        <li><a href="#5-替代预测器">5. 替代预测器</a></li>
-        <li><a href="#6-预测过程">6. 预测过程</a></li>
-        <li><a href="#7-训练过程">7. 训练过程</a></li>
+        <li><a href="#基本功能">基本功能</a></li>
+        <li><a href="#流水线">流水线</a></li>
+        <li><a href="#数据结构">数据结构</a></li>
+        <li><a href="#t0tn表的检索方法">T0，Tn表的检索方法</a></li>
+        <li><a href="#替代预测器">替代预测器</a></li>
+        <li><a href="#预测过程">预测过程</a></li>
+        <li><a href="#训练过程">训练过程</a></li>
       </ul>
     </li>
-    <li><a href="#三昆明湖sc分支预测器">三、昆明湖SC分支预测器</a>
+    <li><a href="#昆明湖sc分支预测器">昆明湖SC分支预测器</a>
       <ul>
-        <li><a href="#1-基本功能介绍">1. 基本功能介绍</a></li>
-        <li><a href="#2-预测过程">2. 预测过程</a></li>
-        <li><a href="#3-训练过程">3. 训练过程</a></li>
+        <li><a href="#基本功能介绍">基本功能介绍</a></li>
+        <li><a href="#预测过程-1">预测过程</a></li>
+        <li><a href="#训练过程-1">训练过程</a></li>
       </ul>
     </li>
-    <li><a href="#四昆明湖tage-sc分支预测器">四、昆明湖TAGE-SC分支预测器</a>
+    <li><a href="#昆明湖tage-sc分支预测器">昆明湖TAGE-SC分支预测器</a>
       <ul>
-        <li><a href="#1-有了tage为何还需要sc">1. 有了TAGE为何还需要SC</a></li>
-        <li><a href="#2-tage-sc功能介绍">2. TAGE-SC功能介绍</a></li>
-        <li><a href="#3-流水线">3. 流水线</a></li>
-        <li><a href="#4-预测过程">4. 预测过程</a></li>
-        <li><a href="#5-训练过程">5. 训练过程</a></li>
+        <li><a href="#有了tage为何还需要sc">有了TAGE为何还需要SC</a></li>
+        <li><a href="#tage-sc功能介绍">TAGE-SC功能介绍</a></li>
+        <li><a href="#流水线-1">流水线</a></li>
+        <li><a href="#预测过程-2">预测过程</a></li>
+        <li><a href="#训练过程-2">训练过程</a></li>
       </ul>
     </li>
-    <li><a href="#四接口列表">四、接口列表</a>
+    <li><a href="#接口列表">接口列表</a>
       <ul>
         <li><a href="#tagesc">TageSC</a></li>
         <li><a href="#io_out_last_stage_meta">io_out_last_stage_meta</a></li>
@@ -339,16 +338,16 @@
 </div>
 
   </header>
-	<h2 id="一功能介绍">一、功能介绍</h2>
+	<h2 id="功能介绍">功能介绍</h2>
 <p>TAGE-SC 是南湖架构条件分支的<strong>主预测器</strong>，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。</p>
 <ul>
 <li>标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用<strong>历史长度不同的多个预测表</strong>，可以挖掘<strong>极长的分支历史信息</strong>。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。</li>
 <li>SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和<strong>统计偏向的结果</strong>。并根据这两个结果，<strong>矫正</strong>最终的预测结果。</li>
 </ul>
 <p>在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多<strong>同时预测 2 条</strong>条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并<strong>基于相同的全局历史</strong>进行预测。</p>
-<h2 id="二昆明湖tage分支预测器">二、昆明湖Tage分支预测器</h2>
-<h3 id="1-基本功能">1. 基本功能</h3>
-<p><img alt="img" src="https://iz9a87wn37.feishu.cn/space/api/box/stream/download/asynccode/?code=OWYxOWVmNjk5YTdjYWIyYjRkOTc4YzJhMWZlNDg1ZTJfaUowZzh3Q3F1V21uVHdtYkVVNkhVUVA0dnllWjJVQndfVG9rZW46Wk1TaWJjYXNzb2RNVTZ4azRkdWNEbFh4bnNBXzE3MTI2NDM3MzQ6MTcxMjY0NzMzNF9WNA"></p>
+<h2 id="昆明湖tage分支预测器">昆明湖Tage分支预测器</h2>
+<h3 id="基本功能">基本功能</h3>
+<p><img alt="img" src="tage.PNG"></p>
 <p>TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 <strong>1+N</strong> 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。</p>
 <p>基于 T0 表的预测器为<strong>基础预测器</strong>。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。</p>
 <p>对于 T0 以外的表，我们用 <strong>Tn</strong> <strong>进行表示</strong>。在查表时除了 PC 外，还需要用到<strong>全局跳转历史信息H</strong>进行查找。<strong>查找命中后</strong>，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。</p>
@@ -374,7 +373,7 @@
 </li>
 </ol>
 <p>对于一个预测块，有可能所有的表都会产生预测结果，此时就需要进行选择。如上图所示，一般情况下，Tn表的编号越大，优先级越高。</p>
-<h3 id="2-流水线">2. 流水线</h3>
+<h3 id="流水线">流水线</h3>
 <p>TAGE <strong>内含两个流水级</strong>，第一级计算索引，第二级通过索引读出SRAM表中的结果</p>
 <ol>
 <li>第0拍，s0：第一个流水级的输入，一般是pc和折叠历史。</li>
@@ -387,7 +386,7 @@
 <ol>
 <li>第2拍，s2：实际预测结果。TAGE用了2拍进行预测，在2拍之后的第3拍预测结果就绪可用。</li>
 </ol>
-<h3 id="3-数据结构">3. 数据结构</h3>
+<h3 id="数据结构">数据结构</h3>
 <ol>
 <li>
 <p>在昆明湖的实现中，T0与Tn的表结构如下所示：</p>
@@ -425,7 +424,7 @@
 <p>在进行 Tn 表的查询时，由于历史数据H进行了“压缩”，可能导致一个PC1^H1的结果与另一个PC2^H2的结果相同（类似Hash表的Hash冲突），进而导致索引到无效数据（预测PC1索引到预测PC2的数据）。所以TAGE为每个表提供了一个tag标识，昆明湖中采用了8bit tag，来减小冲突发生的概率，tag的计算方法和查询的索引方法不同，<strong>只有当tag计算相同时查询结果才有效</strong>。</p>
 <p>在Tn表项中，除了饱和计数器ctr和tag外，还有1bit的<strong>usefulness计数器</strong>，该计数器为0时，作弱表项，表示可以当作该项可以被重新分配当作他用；不为0时，作强表项，该项不能被分配当作他用。</p>
 <p>为了<strong>尽力避免</strong>所有表项全为1，无法分配新表项的情况发生，TAGE预期使用计数器bankTickCtrs 对所有usefulness进行清零操作。</p>
-<h3 id="4-t0tn表的检索方法">4. T0，Tn表的检索方法</h3>
+<h3 id="t0tn表的检索方法">T0，Tn表的检索方法</h3>
 <ul>
 <li>对于T0表，在查找时用 PC[11:1] 位进行索引2048表项，因此对于T0来说，不可能存在检索不到的情况。</li>
 <li>对于表Tn，除了 PC[11:1] 外，<strong>还需要</strong>基于全局分支历史进行检索。在昆明湖中，顶层分支预测器维护了一个256bit的全局历史记录GH，可以根据子预测器需要将GH的最近n位历史信息，按目标位数x进行折叠。 即把n，以长度x为基本单元，拆分成ceil(x/n)个长为x的数，然后<strong>按位进行异或</strong>得到。通常用FH（Folded History）表示，具体流程请参考 XXX章节。TAGE预测器查找Tn的表项时，用到了index和tag，他们的计算公式如下表所示：</li>
@@ -488,10 +487,10 @@
 </tbody>
 </table>
 <p>注：pc&raquo;1是因为使用了RISC-C拓展，2Byte对齐，而PC本身已经省略了1B对齐，所以只用1b</p>
-<h3 id="5-替代预测器">5. 替代预测器</h3>
+<h3 id="替代预测器">替代预测器</h3>
 <p>由于 Tn 表使用饱和计数器进行预测，因此其输出结果可能存在“<strong>信心不足</strong>”的情况。例如在昆明湖中，对3比特饱和计数器，100、011时都是<strong>弱预测</strong>。为了为该状态提供更多的选择参考，TAGE 预测器还提供了一个“替代预测器”机制，他的作用是告诉 TAGE 在 Tn 表预测的结果 “信心不足” 时，是该选择 Tn 的预测结果，还是选择 T0 的预测结果。</p>
 <p>在昆明湖的具体实现中，“替代预测器” 基于 <strong>useAltOnNaCtrs</strong> 的寄存器组实现。它由128 个 <strong>4-bit饱和计数器</strong> 构成，每个计数器都被初始化为 <strong>0b1000</strong>。在TAGE进行预测时，使用 <strong>PC(7,1)</strong> 进行索引得到对应的饱和计数器。如果该计数器的值大于预设值，且Tn预测结果信心不高，则选择T0的结果，否则选择Tn的结果。</p>
-<h3 id="6-预测过程">6. 预测过程</h3>
+<h3 id="预测过程">预测过程</h3>
 <p>综上所述，昆明湖中TAGE预测器的预测步骤如下：</p>
 <ol>
 <li><strong>并行</strong>索引 T0 表以及 Tn 表，<strong>根据命中结果选择</strong>使用哪一个表给出预测结果
@@ -502,7 +501,7 @@
 </li>
 <li>如果匹配到的<strong>Tn表的潜在预测结果为弱预测</strong>(100,011)，且<strong>替代预测中PC对应4-bit计数器的值</strong>大于阈值，则采用T0表的结果为最终结果，否则采用Tn表的预测结果为最终预测结果。</li>
 </ol>
-<h3 id="7-训练过程">7. 训练过程</h3>
+<h3 id="训练过程">训练过程</h3>
 <p>由于TAGE的预测过程用到了很多计数器和tag，他们需要根据一定的规则进行更新，该过程称为训练。该训练过程发生在BPU的update阶段，该阶段会输入PC，分支历史、以及否预测正确等信息。香山昆明湖的分支预测进行训练的流程根据不同情况，分为如下几个步骤：</p>
 <ol>
 <li><strong>T0</strong>始终更新：发生跳转（即taken）则 pc 索引的 ctr 饱和计数器 +1，否则 -1</li>
@@ -550,8 +549,8 @@
 </ol>
 </li>
 </ol>
-<h2 id="三昆明湖sc分支预测器">三、昆明湖SC分支预测器</h2>
-<h3 id="1-基本功能介绍">1. 基本功能介绍</h3>
+<h2 id="昆明湖sc分支预测器">昆明湖SC分支预测器</h2>
+<h3 id="基本功能介绍">基本功能介绍</h3>
 <p>SC（Statistics counter）分支预测器是一种基于历史统计信息的分支预测器。</p>
 <p>与TAGE类似，在SC中通常有多个表Tn，他们对应了不同历史长度的跳转统计。不同点在于，在预测按PC检索时，每个表Tn都会命中，然后SC把每个命中的表项进行求和，计算总的“饱和计数器”跳转信息，最后根<strong>据总的跳转信息判断是否跳转</strong>。一般情况下，SC采用“有符号饱和计数器”，计数器值大于0时表示跳转，小于0时表示不跳转。计数器的绝对值越大，表示其预测置信度越高。</p>
 <p>在SC预测器中，SC也由多个表组成（例如T1，T2，T3，T4），但相对TAGE预测器少了基础预测表T0。SC中Tn表有6 bit的<strong>有符号</strong>饱和计数器。SC表的索引方式如下：</p>
@@ -614,26 +613,26 @@
 <li>均为 6b000000（弱跳转），求得 9b000000100，值为 4</li>
 <li>均为 6b111111（弱不跳转），求得 9b111111100，值为 -4</li>
 </ol>
-<h3 id="2-预测过程">2. 预测过程</h3>
+<h3 id="预测过程-1">预测过程</h3>
 <ol>
 <li>通过PC和历史信息结算表Tn的索引 Index</li>
 <li>根据Index查询，得到所有表对应的饱和计数器</li>
 <li>所有所有表查询到的饱和计数器进行求和得到最终预测结果（大于0跳转，小于0不跳转）</li>
 </ol>
-<h3 id="3-训练过程">3. 训练过程</h3>
+<h3 id="训练过程-1">训练过程</h3>
 <p>在update阶段进行饱和计数器的更新。</p>
 <ol>
 <li>如果PC对应的真实指令跳转，这所有表中对应的饱和计数器+1</li>
 <li>如果PC对应的真实指令不跳转，这所有表中对应的饱和计数器-1</li>
 </ol>
-<h2 id="四昆明湖tage-sc分支预测器">四、昆明湖TAGE-SC分支预测器</h2>
-<h3 id="1-有了tage为何还需要sc">1. 有了TAGE为何还需要SC</h3>
+<h2 id="昆明湖tage-sc分支预测器">昆明湖TAGE-SC分支预测器</h2>
+<h3 id="有了tage为何还需要sc">有了TAGE为何还需要SC</h3>
 <p>一些应用上，一些分支行为与分支历史或<strong>路径相关性较弱</strong>，表现出一个<strong>统计上的预测偏向性</strong>。对于这些分支，相比基于历史的分支预测，使用<strong>计数器</strong>捕捉统计偏向的方法更为有效。</p>
 <p>TAGE在预测与历史非常相关的分支时非常有效，但对有统计偏向的分支则支持不佳。例如只对一个方向有小偏差，但与历史路径没有强相关性的分支。为了避免该问题，可以在传统TAGE预测器上增加SC预测器。</p>
-<h3 id="2-tage-sc功能介绍">2. TAGE-SC功能介绍</h3>
+<h3 id="tage-sc功能介绍">TAGE-SC功能介绍</h3>
 <p>在昆明湖 TAGE-SC 预测器中，会同时得到 TAGE 和 SC 的预测结果 P1 和 P2，然后对他们的结果进行累加 P = P1+P2 ，如果 P 的绝对值大于 8bit 的阈值 sc_bank_thres，则采用预测器结果 P，否则则采用 P1 作为最终预测结果。</p>
 <p>为了进行动态自适应，阈值sc_thres是需要是动态变化的。为此在实现上TAGE-SC使用了一个5bit的sc_bank_ctr计数器对阈值sc_bank_thres进行调整。另外，由于昆明湖支持同时预测2条分支指令，因此阈值寄存器和对应的控制计数器也是两份。</p>
-<h3 id="3-流水线">3. 流水线</h3>
+<h3 id="流水线-1">流水线</h3>
 <p>TAGE-SC 内含 3 个流水级，TAGE的2级流水已经介绍过，SC部分的流水线如下：</p>
 <ol>
 <li>第0拍，s0 读入 pc 和折叠历史</li>
@@ -650,7 +649,7 @@
 <ol>
 <li>第3拍，s3 从s2_disagree中读出结果，作为s3_disagree输出</li>
 </ol>
-<h3 id="4-预测过程">4. 预测过程</h3>
+<h3 id="预测过程-2">预测过程</h3>
 <p>在TAGE-SC预测时，TAGE的预测结果P1用tage_ctr表示，SC的预测结果P2用<strong>scCtrSum</strong>表示。在预测时，分为如下四步。</p>
 <ol>
 <li>
@@ -699,7 +698,7 @@
 </ol>
 </li>
 </ol>
-<h3 id="5-训练过程">5. 训练过程</h3>
+<h3 id="训练过程-2">训练过程</h3>
 <p>在对 TAGE 和 SC 进行组合后，TAGE-SC 添加了 sc_bank_ctr 计数器用来控制阈值sc_bank_thres。因此在训练时，除了 TAGE 和 SC 本身的训练外，还需要对新增加的计数器进行更新。</p>
 <p>在update阶段，其具体更新流程如下：</p>
 <ol>
@@ -712,7 +711,7 @@
 </li>
 <li>TAGE-SC采用了预测结果P1（即TAGE的预测结果）不进行任何操作</li>
 </ol>
-<h2 id="四接口列表">四、接口列表</h2>
+<h2 id="接口列表">接口列表</h2>
 <h3 id="tagesc">TageSC</h3>
 <table>
 <thead>
@@ -1444,8 +1443,8 @@
 </tbody>
 </table>
 
-	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 April 9, 2024: <a href="https://github.com/XS-MLVP/course/commit/184f4be569fab6b26e5c6af7fcd13d6b16a6646a">update tage-sc predictor submodule docs (184f4be)</a>
+	<div class="td-page-meta__lastmod">
+  最后修改 April 17, 2024: <a href="https://github.com/XS-MLVP/course/commit/f3fa42abc87fa9ff32d85bf89f564918f9100e6c">update ittage part (f3fa42a)</a>
 </div>
 
 </div>
@@ -1457,11 +1456,8 @@
       <footer class="td-footer row d-print-none">
   <div class="container-fluid">
     <div class="row mx-md-2">
-      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
-        
-        
-        
-<ul class="td-footer__links-list">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
   
   <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
     <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
@@ -1471,14 +1467,8 @@
   
 </ul>
 
-        
-        
-      </div>
-      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
-        
-        
-        
-<ul class="td-footer__links-list">
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
   
   <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
     <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
@@ -1488,20 +1478,17 @@
   
 </ul>
 
-        
-        
-      </div>
-      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
-        <span>&copy; 2024 BOSC 保留所有权利</span>
-        <span class="ms-1"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
-        
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2024
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">保留所有权利</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
       </div>
     </div>
   </div>
 </footer>
+
     </div>
-    
-  <script src="/xs-bpu/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
+    <script src="/xs-bpu/js/main.min.fc653db1f3d4f4a8b4eacd389f96d8afe966937ba9dded8b07d3a1b17d967d22.js" integrity="sha256-/GU9sfPU9Ki06s04n5bYr&#43;lmk3up3e2LB9OhsX2WfSI=" crossorigin="anonymous"></script>
 <script defer src="/xs-bpu/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
 <script src='/xs-bpu/js/tabpane-persist.js'></script>
 

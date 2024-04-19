@@ -75,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.11ae8c9f8e3a777826a59840e960d6f8.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.f84849b5451eee9fafbe55898b908cac.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -122,15 +122,7 @@
     
     
 	
-<li>1: <a href="#pg-534f55f27528e419876359ce45905fc7">C&#43;&#43;</a></li>
-
-
-    
-  
-    
-    
-	
-<li>2: <a href="#pg-2b62907b35f6a605fbcf7e4a9d21e77d">Java</a></li>
+<li>1: <a href="#pg-2b62907b35f6a605fbcf7e4a9d21e77d">Java ...</a></li>
 
 
     
@@ -161,86 +153,10 @@
 
 <div class="td-content" style="">
     
-	<h1 id="pg-534f55f27528e419876359ce45905fc7">1 - C&#43;&#43;</h1>
-    <div class="lead">基于C++封装DUT硬件的运行环境，并编译为动态库。</div>
-	<h2 id="流程介绍">流程介绍</h2>
-<h3 id="基础库">基础库</h3>
-<p>在本章节中，我们将介绍如何使用Picker将RTL代码编译为C++ Class，并编译为动态库。</p>
-<ol>
-<li>首先，Picker工具会解析RTL代码，根据指定的 Top Module ，创建一个新的 Module 封装该模块的<strong>输入输出端口</strong>，并导出<code>DPI/API</code>以操作输入端口、读取输出端口。</li>
-</ol>
-<blockquote>
-<p><em>工具通过指定Top Module所在的文件和 Module Name来确定需要封装的模块。此时可以将 Top 理解为软件编程中的main。</em></p>
-</blockquote>
-<ol start="2">
-<li>其次，Picker工具会使用指定的 <strong>仿真器</strong> 编译RTL代码，并生成一个<strong>DPI库文件</strong>。该库文件内包含模拟运行RTL代码所需要的逻辑（即为<strong>硬件模拟器</strong>）。</li>
-</ol>
-<blockquote>
-<p><em>对于VCS，该库文件为.so（动态库）文件，对于Verilator，该库文件为.a（静态库）文件。</em><br>
-<em>DPI的含义是 <a href="https://www.chipverify.com/systemverilog/systemverilog-dpi">Direct Programming Interface</a>，可以理解为一种API规范。</em></p>
-</blockquote>
-<ol start="3">
-<li>接下来，Picker工具会根据配置参数，渲染源代码中定义的基类，生成用于对接仿真器并<strong>隐藏仿真器细节</strong>的基类（wrapper）。然后链接基类与DPI库文件，生成一个 <strong>UT动态库文件</strong>。</li>
-</ol>
-<blockquote>
-<ul>
-<li><em>此时，该<strong>UT库文件</strong>使用了Picker工具模板中提供的统一API，相比于<strong>DPI库文件</strong>中与仿真器强相关的API，UT库文件为仿真器生成的硬件模拟器，提供了<strong>统一的API接口</strong>。</em></li>
-<li><em>截至这一步生成<strong>UT库文件</strong>在不同语言中是<strong>通用</strong>的！如果没有另行说明，其他高级语言均会通过<strong>调用UT动态库</strong>以实现对硬件模拟器的操作。</em></li>
-</ul>
-</blockquote>
-<ol start="4">
-<li>最后，Picker工具会根据配置参数和解析的RTL代码，生成一段 <strong>C++ Class</strong> 的源码。这段源码即是 RTL 硬件模块在软件中的<strong>定义 (.hpp)</strong> 及<strong>实现 (.cpp)</strong> 。实例化该类即相当于创建了一个硬件模块。</li>
-</ol>
-<blockquote>
-<p><em>该类继承自<strong>基类</strong>，并实现了基类中的纯虚函数，以用软件方式实例化硬件。</em><br>
-<em>不将<strong>类的实现</strong>这一步也封装进动态库的原因有两点：</em></p>
-<ol>
-<li><em>由于<strong>UT库文件</strong>需要在不同语言中<strong>通用</strong>，而不同语言实现类的方式不同。为了通用性，不将<code>类的实现</code>封装进动态库。</em></li>
-<li><em>为了<strong>便于调试</strong>，提升代码可读性，方便用户进行二次封装和修改。</em></li>
-</ol>
-</blockquote>
-<h3 id="生成可执行文件">生成可执行文件</h3>
-<p>在本章节中，我们将介绍如何基于上一章节生成的基础库（包含动态库，类的声明及定义），编写测试用例，生成可执行文件。</p>
-<ol>
-<li>
-<p>首先，用户需要编写测试用例，即实例化上一章节生成的类，并调用类中的方法，以实现对硬件模块的操作。<br>
-详情可以参考<a href="docs/quick-start/examples/rmg/#%E9%85%8D%E7%BD%AE%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81">随机数生成器验证-配置测试代码</a>中实例化及初始化的过程。</p>
-</li>
-<li>
-<p>其次，用户需要根据基础库所应用的<strong>不同仿真器</strong>，应用不同的链接参数以生成可执行文件。对应的参数在<code>template/cpp/cmake/*.cmake</code>中有定义。</p>
-</li>
-<li>
-<p>最终根据配置的链接参数，编译器会链接基础库，生成可执行文件。</p>
-</li>
-</ol>
-<blockquote>
-<p>以 <a href="docs/quick-start/examples/adder/#%E5%B0%86rtl%E6%9E%84%E5%BB%BA%E4%B8%BAc-class">加法器验证</a> 为例，<code>picker_out_adder/cpp/cmake/*.cmake</code>即是上述表项2所述模板的拷贝。<br>
-<code>vcs.cmake</code>定义了使用VCS仿真器生成的基础库的链接参数，<code>verilator.cmake</code>定义了使用Verilator仿真器生成的基础库的链接参数。</p>
-</blockquote>
-<h2 id="使用方案">使用方案</h2>
-<ul>
-<li>参数 <code>--language cpp</code> 或 <code>-l cpp</code> 用于指定生成C++基础库。</li>
-<li>参数 <code>-e</code> 用于生成包含示例项目的可执行文件。</li>
-<li>参数 <code>-v</code> 用于保留生成项目时的中间文件。</li>
-</ul>
+	<h1 id="pg-2b62907b35f6a605fbcf7e4a9d21e77d">1 - Java ...</h1>
+    <div class="lead">基于Java封装DUT硬件的运行环境，并打为jar包</div>
+	<p>目前picker支持C++/Python，其他语言例如 Java、Golang、Javascript，Scala 等在 python 接口稳定后跟进。</p>
 
-</div>
-
-
-
-    
-	
-  
-    
-    
-	
-    
-
-<div class="td-content" style="page-break-before: always">
-    
-	<h1 id="pg-2b62907b35f6a605fbcf7e4a9d21e77d">2 - Java</h1>
-    <div class="lead">基于Python封装DUT硬件的运行环境，并打包为Python module。</div>
-	
 </div>
 
 

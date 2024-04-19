@@ -18,19 +18,19 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
 <title>输出覆盖率 | 开放验证平台学习资源</title>
-<meta name="description" content="XXX。">
+<meta name="description" content="覆盖率工具">
 <meta property="og:title" content="输出覆盖率" />
-<meta property="og:description" content="XXX。" />
+<meta property="og:description" content="覆盖率工具" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/quick-start/advance/coverage-/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-01-29T20:26:48+08:00" />
+<meta property="article:modified_time" content="2024-04-18T14:44:59+08:00" />
 <meta itemprop="name" content="输出覆盖率">
-<meta itemprop="description" content="XXX。">
-<meta itemprop="dateModified" content="2024-01-29T20:26:48+08:00" />
-<meta itemprop="wordCount" content="1">
+<meta itemprop="description" content="覆盖率工具">
+<meta itemprop="dateModified" content="2024-04-18T14:44:59+08:00" />
+<meta itemprop="wordCount" content="79">
 <meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="输出覆盖率"/>
-<meta name="twitter:description" content="XXX。"/>
+<meta name="twitter:description" content="覆盖率工具"/>
 
 
 
@@ -78,7 +78,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.11ae8c9f8e3a777826a59840e960d6f8.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.f84849b5451eee9fafbe55898b908cac.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -102,7 +102,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.11ae8c9f8e3a777826a59840e960d6f8.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.f84849b5451eee9fafbe55898b908cac.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -147,10 +147,8 @@
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsquick-startmulti-lang-li">
   <a href="/mlvp/docs/quick-start/multi-lang/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsquick-startmulti-lang"><span class="">其他编程语言</span></a>
   <ul class="ul-3 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-startmulti-langcpp-li">
-  <a href="/mlvp/docs/quick-start/multi-lang/cpp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startmulti-langcpp"><span class="">C&#43;&#43;</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-startmulti-langjava-li">
-  <a href="/mlvp/docs/quick-start/multi-lang/java/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startmulti-langjava"><span class="">Java</span></a>
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-startmulti-langjava-li">
+  <a href="/mlvp/docs/quick-start/multi-lang/java/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startmulti-langjava"><span class="">Java ...</span></a>
 </li>
   </ul>
 </li>
@@ -195,7 +193,7 @@
   <a href="/mlvp/docs/advance_case/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsadvance_case"><span class="">高级案例</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_casenutshell_cache-li">
-  <a href="/mlvp/docs/advance_case/nutshell_cache/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsadvance_casenutshell_cache"><span class="">果壳 Cache</span></a>
+  <a href="/mlvp/docs/advance_case/nutshell_cache/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsadvance_casenutshell_cache"><span class="">果壳 Python-Cache</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_casetilelink-li">
   <a href="/mlvp/docs/advance_case/tilelink/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsadvance_casetilelink"><span class="">TileLink 协议</span></a>
 </li>
@@ -220,11 +218,25 @@
 
 </div>
 
-            
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#verilator"><strong>Verilator</strong></a>
+      <ul>
+        <li><a href="#verilator_coverage"><strong>verilator_coverage</strong></a></li>
+        <li><a href="#lcovgenhtml"><strong>lcov(genhtml)</strong></a></li>
+        <li><a href="#示例"><strong>示例</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#vcs"><strong>VCS</strong></a></li>
+  </ul>
+</nav>
+      </div>
+    
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Tag Cloud</h5>
       <ul class="taxonomy-terms">
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">30</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">29</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">27</span></a></li>
         </ul>
     </div>
@@ -232,7 +244,7 @@
       <h5 class="taxonomy-title">Categories</h5>
       <ul class="taxonomy-terms">
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99/" data-taxonomy-term="%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99"><span class="taxonomy-label">学习材料</span><span class="taxonomy-count">4</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">26</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">25</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">27</span></a></li>
         </ul>
     </div>
@@ -258,7 +270,7 @@
             
 <div class="td-content">
 	<h1>输出覆盖率</h1>
-	<div class="lead">XXX。</div>
+	<div class="lead">覆盖率工具</div>
 	<header class="article-meta">
 		<div class="taxonomy taxonomy-terms-article taxo-tags">
   <h5 class="taxonomy-title">Tags:</h5>
@@ -276,10 +288,47 @@
 </div>
 
   </header>
-	<p>XXXX</p>
+	<blockquote>
+<p>picker工具支持生成部分的覆盖率报告。</p>
+</blockquote>
+<h2 id="verilator"><strong>Verilator</strong></h2>
+<p>在使用verilator作为仿真器时，可以通过<code>verilator_coverage</code>工具以及<code>lcov</code>工具生成代码覆盖率报告。流程如下：</p>
+<ul>
+<li>使用Picker生成dut时，打开<code>-c</code>选项</li>
+<li>测试完成后生成.dat的覆盖率数据</li>
+<li>使用<code>verilator_coverage</code>的write-info功能将其转换成.info文件</li>
+<li>使用<code>lcov</code>的genhtml功能将.info文件转换成html报告</li>
+</ul>
+<h3 id="verilator_coverage"><strong>verilator_coverage</strong></h3>
+<p><code>verilator_coverage</code>工具可以用来处理verilator生成的.dat的覆盖率数据。以下为一些简单的参数：</p>
+<ul>
+<li><strong>-annotate &lt;output_dir&gt;</strong>：以标注的形式在源文件中呈现覆盖率情况，结果保存到<strong>output_dir</strong>中。形式如下：</li>
+</ul>
+<pre tabindex="0"><code>100000  input logic a;   // Begins with whitespace, because
+                          // number of hits (100000) is above the limit.
+%000000  input logic b;   // Begins with %, because
+                          // number of hits (0) is below the limit.
+</code></pre><ul>
+<li><strong>-annotate-min &lt;count&gt;</strong>：指定上述的limit为count</li>
+<li><strong>-write &lt;merged-datafile&gt; -read &lt;datafiles&gt;</strong>：将若干个.dat(<code>datafiles</code>)文件合并为一个.dat文件</li>
+<li><strong>-write-info &lt;merged-info&gt; -read &lt;datafiles&gt;</strong>：将若干个.dat(<code>datafiles</code>)文件合并为一个.info文件</li>
+</ul>
+<h3 id="lcovgenhtml"><strong>lcov(genhtml)</strong></h3>
+<p><code>genhtml</code>可以由上述的.info文件导出可读性更好的html报告。命令格式为：<code>genhtml [OPTIONS] &lt;infofiles&gt;</code>。
+建议使用<code>-o &lt;outputdir&gt;</code>选项将结果输出到指定目录。</p>
+<h3 id="示例"><strong>示例</strong></h3>
+<p>如果您使用Picker时打开了verbose选项，在生成的目录下的Makefile文件中可以看到如下字段：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-make" data-lang="make"><span style="display:flex;"><span><span style="color:#000">coverage</span><span style="color:#ce5c00;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>    verilator_coverage -write-info coverage.info ./<span style="color:#4e9a06">${</span><span style="color:#000">TARGET</span><span style="color:#4e9a06">}</span>/V<span style="color:#4e9a06">${</span><span style="color:#000">PROJECT</span><span style="color:#4e9a06">}</span>_coverage.dat
+</span></span><span style="display:flex;"><span>    genhtml coverage.info --output-directory coverage
+</span></span><span style="display:flex;"><span>    ...
+</span></span></code></pre></div><p>其会根据生成的.dat文件生成coverage.info，再使用<code>genhtml</code>再coverage目录下生成html报告。</p>
+<h2 id="vcs"><strong>VCS</strong></h2>
+<p>TBD</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 January 29, 2024: <a href="https://github.com/XS-MLVP/course/commit/6e8499b76a9370cd78c8df38ab5b9a4aa4301bdf">update (6e8499b)</a>
+  最后修改 April 18, 2024: <a href="https://github.com/XS-MLVP/course/commit/284c540be97289eb511893068d2a5dd18e2c585e">add coverage part (284c540)</a>
 </div>
 
 </div>

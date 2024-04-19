@@ -75,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.11ae8c9f8e3a777826a59840e960d6f8.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.f84849b5451eee9fafbe55898b908cac.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -170,8 +170,8 @@
 <div class="td-content" style="">
     
 	<h1 id="pg-610ef49d45b16d894a3ef600f8d10ac5">1 - 生成DUT波形</h1>
-    <div class="lead">XXX。</div>
-	<p>XXXX</p>
+    <div class="lead">生成电路波形</div>
+	<p>TBD</p>
 
 </div>
 
@@ -188,8 +188,8 @@
 <div class="td-content" style="page-break-before: always">
     
 	<h1 id="pg-45791ab3d8c319f1f0657513b6b021e2">2 - 多文件输入</h1>
-    <div class="lead">XXX。</div>
-	<p>XXXX</p>
+    <div class="lead">处理多个Verilog源文件</div>
+	<p>TBD</p>
 
 </div>
 
@@ -206,8 +206,45 @@
 <div class="td-content" style="page-break-before: always">
     
 	<h1 id="pg-3fce7a1fa4d95fb11116c0a4a5042c21">3 - 输出覆盖率</h1>
-    <div class="lead">XXX。</div>
-	<p>XXXX</p>
+    <div class="lead">覆盖率工具</div>
+	<blockquote>
+<p>picker工具支持生成部分的覆盖率报告。</p>
+</blockquote>
+<h2 id="verilator"><strong>Verilator</strong></h2>
+<p>在使用verilator作为仿真器时，可以通过<code>verilator_coverage</code>工具以及<code>lcov</code>工具生成代码覆盖率报告。流程如下：</p>
+<ul>
+<li>使用Picker生成dut时，打开<code>-c</code>选项</li>
+<li>测试完成后生成.dat的覆盖率数据</li>
+<li>使用<code>verilator_coverage</code>的write-info功能将其转换成.info文件</li>
+<li>使用<code>lcov</code>的genhtml功能将.info文件转换成html报告</li>
+</ul>
+<h3 id="verilator_coverage"><strong>verilator_coverage</strong></h3>
+<p><code>verilator_coverage</code>工具可以用来处理verilator生成的.dat的覆盖率数据。以下为一些简单的参数：</p>
+<ul>
+<li><strong>-annotate &lt;output_dir&gt;</strong>：以标注的形式在源文件中呈现覆盖率情况，结果保存到<strong>output_dir</strong>中。形式如下：</li>
+</ul>
+<pre tabindex="0"><code>100000  input logic a;   // Begins with whitespace, because
+                          // number of hits (100000) is above the limit.
+%000000  input logic b;   // Begins with %, because
+                          // number of hits (0) is below the limit.
+</code></pre><ul>
+<li><strong>-annotate-min &lt;count&gt;</strong>：指定上述的limit为count</li>
+<li><strong>-write &lt;merged-datafile&gt; -read &lt;datafiles&gt;</strong>：将若干个.dat(<code>datafiles</code>)文件合并为一个.dat文件</li>
+<li><strong>-write-info &lt;merged-info&gt; -read &lt;datafiles&gt;</strong>：将若干个.dat(<code>datafiles</code>)文件合并为一个.info文件</li>
+</ul>
+<h3 id="lcovgenhtml"><strong>lcov(genhtml)</strong></h3>
+<p><code>genhtml</code>可以由上述的.info文件导出可读性更好的html报告。命令格式为：<code>genhtml [OPTIONS] &lt;infofiles&gt;</code>。
+建议使用<code>-o &lt;outputdir&gt;</code>选项将结果输出到指定目录。</p>
+<h3 id="示例"><strong>示例</strong></h3>
+<p>如果您使用Picker时打开了verbose选项，在生成的目录下的Makefile文件中可以看到如下字段：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-make" data-lang="make"><span style="display:flex;"><span><span style="color:#000">coverage</span><span style="color:#ce5c00;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>    verilator_coverage -write-info coverage.info ./<span style="color:#4e9a06">${</span><span style="color:#000">TARGET</span><span style="color:#4e9a06">}</span>/V<span style="color:#4e9a06">${</span><span style="color:#000">PROJECT</span><span style="color:#4e9a06">}</span>_coverage.dat
+</span></span><span style="display:flex;"><span>    genhtml coverage.info --output-directory coverage
+</span></span><span style="display:flex;"><span>    ...
+</span></span></code></pre></div><p>其会根据生成的.dat文件生成coverage.info，再使用<code>genhtml</code>再coverage目录下生成html报告。</p>
+<h2 id="vcs"><strong>VCS</strong></h2>
+<p>TBD</p>
 
 </div>
 

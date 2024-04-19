@@ -152,7 +152,7 @@
     </item>
     
     <item>
-      <title>Docs: 果壳 Cache</title>
+      <title>Docs: 果壳 Python-Cache</title>
       <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/nutshell_cache/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -891,7 +891,7 @@ module级别的验证其实就是之前一直讲的验证框架，只不过将�
       <description>
         
         
-        &lt;p&gt;XXXX&lt;/p&gt;
+        &lt;p&gt;TBD&lt;/p&gt;
 
       </description>
     </item>
@@ -905,7 +905,7 @@ module级别的验证其实就是之前一直讲的验证框架，只不过将�
       <description>
         
         
-        &lt;p&gt;XXXX&lt;/p&gt;
+        &lt;p&gt;TBD&lt;/p&gt;
 
       </description>
     </item>
@@ -919,7 +919,44 @@ module级别的验证其实就是之前一直讲的验证框架，只不过将�
       <description>
         
         
-        &lt;p&gt;XXXX&lt;/p&gt;
+        &lt;blockquote&gt;
+&lt;p&gt;picker工具支持生成部分的覆盖率报告。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;verilator&#34;&gt;&lt;strong&gt;Verilator&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;在使用verilator作为仿真器时，可以通过&lt;code&gt;verilator_coverage&lt;/code&gt;工具以及&lt;code&gt;lcov&lt;/code&gt;工具生成代码覆盖率报告。流程如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用Picker生成dut时，打开&lt;code&gt;-c&lt;/code&gt;选项&lt;/li&gt;
+&lt;li&gt;测试完成后生成.dat的覆盖率数据&lt;/li&gt;
+&lt;li&gt;使用&lt;code&gt;verilator_coverage&lt;/code&gt;的write-info功能将其转换成.info文件&lt;/li&gt;
+&lt;li&gt;使用&lt;code&gt;lcov&lt;/code&gt;的genhtml功能将.info文件转换成html报告&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;verilator_coverage&#34;&gt;&lt;strong&gt;verilator_coverage&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;verilator_coverage&lt;/code&gt;工具可以用来处理verilator生成的.dat的覆盖率数据。以下为一些简单的参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;-annotate &amp;lt;output_dir&amp;gt;&lt;/strong&gt;：以标注的形式在源文件中呈现覆盖率情况，结果保存到&lt;strong&gt;output_dir&lt;/strong&gt;中。形式如下：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;100000  input logic a;   // Begins with whitespace, because
+                          // number of hits (100000) is above the limit.
+%000000  input logic b;   // Begins with %, because
+                          // number of hits (0) is below the limit.
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;-annotate-min &amp;lt;count&amp;gt;&lt;/strong&gt;：指定上述的limit为count&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;-write &amp;lt;merged-datafile&amp;gt; -read &amp;lt;datafiles&amp;gt;&lt;/strong&gt;：将若干个.dat(&lt;code&gt;datafiles&lt;/code&gt;)文件合并为一个.dat文件&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;-write-info &amp;lt;merged-info&amp;gt; -read &amp;lt;datafiles&amp;gt;&lt;/strong&gt;：将若干个.dat(&lt;code&gt;datafiles&lt;/code&gt;)文件合并为一个.info文件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;lcovgenhtml&#34;&gt;&lt;strong&gt;lcov(genhtml)&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;genhtml&lt;/code&gt;可以由上述的.info文件导出可读性更好的html报告。命令格式为：&lt;code&gt;genhtml [OPTIONS] &amp;lt;infofiles&amp;gt;&lt;/code&gt;。
+建议使用&lt;code&gt;-o &amp;lt;outputdir&amp;gt;&lt;/code&gt;选项将结果输出到指定目录。&lt;/p&gt;
+&lt;h3 id=&#34;示例&#34;&gt;&lt;strong&gt;示例&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;如果您使用Picker时打开了verbose选项，在生成的目录下的Makefile文件中可以看到如下字段：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-make&#34; data-lang=&#34;make&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;coverage&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    verilator_coverage -write-info coverage.info ./&lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;TARGET&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;/V&lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;PROJECT&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;_coverage.dat
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    genhtml coverage.info --output-directory coverage
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;其会根据生成的.dat文件生成coverage.info，再使用&lt;code&gt;genhtml&lt;/code&gt;再coverage目录下生成html报告。&lt;/p&gt;
+&lt;h2 id=&#34;vcs&#34;&gt;&lt;strong&gt;VCS&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;TBD&lt;/p&gt;
 
       </description>
     </item>
@@ -1133,80 +1170,7 @@ module级别的验证其实就是之前一直讲的验证框架，只不过将�
     </item>
     
     <item>
-      <title>Docs: C&#43;&#43;</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/cpp/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/cpp/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;流程介绍&#34;&gt;流程介绍&lt;/h2&gt;
-&lt;h3 id=&#34;基础库&#34;&gt;基础库&lt;/h3&gt;
-&lt;p&gt;在本章节中，我们将介绍如何使用Picker将RTL代码编译为C++ Class，并编译为动态库。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;首先，Picker工具会解析RTL代码，根据指定的 Top Module ，创建一个新的 Module 封装该模块的&lt;strong&gt;输入输出端口&lt;/strong&gt;，并导出&lt;code&gt;DPI/API&lt;/code&gt;以操作输入端口、读取输出端口。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;em&gt;工具通过指定Top Module所在的文件和 Module Name来确定需要封装的模块。此时可以将 Top 理解为软件编程中的main。&lt;/em&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;2&#34;&gt;
-&lt;li&gt;其次，Picker工具会使用指定的 &lt;strong&gt;仿真器&lt;/strong&gt; 编译RTL代码，并生成一个&lt;strong&gt;DPI库文件&lt;/strong&gt;。该库文件内包含模拟运行RTL代码所需要的逻辑（即为&lt;strong&gt;硬件模拟器&lt;/strong&gt;）。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;em&gt;对于VCS，该库文件为.so（动态库）文件，对于Verilator，该库文件为.a（静态库）文件。&lt;/em&gt;&lt;br&gt;
-&lt;em&gt;DPI的含义是 &lt;a href=&#34;https://www.chipverify.com/systemverilog/systemverilog-dpi&#34;&gt;Direct Programming Interface&lt;/a&gt;，可以理解为一种API规范。&lt;/em&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;3&#34;&gt;
-&lt;li&gt;接下来，Picker工具会根据配置参数，渲染源代码中定义的基类，生成用于对接仿真器并&lt;strong&gt;隐藏仿真器细节&lt;/strong&gt;的基类（wrapper）。然后链接基类与DPI库文件，生成一个 &lt;strong&gt;UT动态库文件&lt;/strong&gt;。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;此时，该&lt;strong&gt;UT库文件&lt;/strong&gt;使用了Picker工具模板中提供的统一API，相比于&lt;strong&gt;DPI库文件&lt;/strong&gt;中与仿真器强相关的API，UT库文件为仿真器生成的硬件模拟器，提供了&lt;strong&gt;统一的API接口&lt;/strong&gt;。&lt;/em&gt;&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;截至这一步生成&lt;strong&gt;UT库文件&lt;/strong&gt;在不同语言中是&lt;strong&gt;通用&lt;/strong&gt;的！如果没有另行说明，其他高级语言均会通过&lt;strong&gt;调用UT动态库&lt;/strong&gt;以实现对硬件模拟器的操作。&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;4&#34;&gt;
-&lt;li&gt;最后，Picker工具会根据配置参数和解析的RTL代码，生成一段 &lt;strong&gt;C++ Class&lt;/strong&gt; 的源码。这段源码即是 RTL 硬件模块在软件中的&lt;strong&gt;定义 (.hpp)&lt;/strong&gt; 及&lt;strong&gt;实现 (.cpp)&lt;/strong&gt; 。实例化该类即相当于创建了一个硬件模块。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;em&gt;该类继承自&lt;strong&gt;基类&lt;/strong&gt;，并实现了基类中的纯虚函数，以用软件方式实例化硬件。&lt;/em&gt;&lt;br&gt;
-&lt;em&gt;不将&lt;strong&gt;类的实现&lt;/strong&gt;这一步也封装进动态库的原因有两点：&lt;/em&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;em&gt;由于&lt;strong&gt;UT库文件&lt;/strong&gt;需要在不同语言中&lt;strong&gt;通用&lt;/strong&gt;，而不同语言实现类的方式不同。为了通用性，不将&lt;code&gt;类的实现&lt;/code&gt;封装进动态库。&lt;/em&gt;&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;为了&lt;strong&gt;便于调试&lt;/strong&gt;，提升代码可读性，方便用户进行二次封装和修改。&lt;/em&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/blockquote&gt;
-&lt;h3 id=&#34;生成可执行文件&#34;&gt;生成可执行文件&lt;/h3&gt;
-&lt;p&gt;在本章节中，我们将介绍如何基于上一章节生成的基础库（包含动态库，类的声明及定义），编写测试用例，生成可执行文件。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;首先，用户需要编写测试用例，即实例化上一章节生成的类，并调用类中的方法，以实现对硬件模块的操作。&lt;br&gt;
-详情可以参考&lt;a href=&#34;docs/quick-start/examples/rmg/#%E9%85%8D%E7%BD%AE%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81&#34;&gt;随机数生成器验证-配置测试代码&lt;/a&gt;中实例化及初始化的过程。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;其次，用户需要根据基础库所应用的&lt;strong&gt;不同仿真器&lt;/strong&gt;，应用不同的链接参数以生成可执行文件。对应的参数在&lt;code&gt;template/cpp/cmake/*.cmake&lt;/code&gt;中有定义。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;最终根据配置的链接参数，编译器会链接基础库，生成可执行文件。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;以 &lt;a href=&#34;docs/quick-start/examples/adder/#%E5%B0%86rtl%E6%9E%84%E5%BB%BA%E4%B8%BAc-class&#34;&gt;加法器验证&lt;/a&gt; 为例，&lt;code&gt;picker_out_adder/cpp/cmake/*.cmake&lt;/code&gt;即是上述表项2所述模板的拷贝。&lt;br&gt;
-&lt;code&gt;vcs.cmake&lt;/code&gt;定义了使用VCS仿真器生成的基础库的链接参数，&lt;code&gt;verilator.cmake&lt;/code&gt;定义了使用Verilator仿真器生成的基础库的链接参数。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h2 id=&#34;使用方案&#34;&gt;使用方案&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;参数 &lt;code&gt;--language cpp&lt;/code&gt; 或 &lt;code&gt;-l cpp&lt;/code&gt; 用于指定生成C++基础库。&lt;/li&gt;
-&lt;li&gt;参数 &lt;code&gt;-e&lt;/code&gt; 用于生成包含示例项目的可执行文件。&lt;/li&gt;
-&lt;li&gt;参数 &lt;code&gt;-v&lt;/code&gt; 用于保留生成项目时的中间文件。&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: Java</title>
+      <title>Docs: Java ...</title>
       <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/multi-lang/java/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -1214,7 +1178,8 @@ module级别的验证其实就是之前一直讲的验证框架，只不过将�
       <description>
         
         
-        
+        &lt;p&gt;目前picker支持C++/Python，其他语言例如 Java、Golang、Javascript，Scala 等在 python 接口稳定后跟进。&lt;/p&gt;
+
       </description>
     </item>
     
