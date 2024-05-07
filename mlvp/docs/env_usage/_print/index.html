@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link rel="canonical" type="text/html" href="https://xs-mlvp.github.io/mlvp/docs/env_usage/">
-<link rel="alternate" type="application/rss&#43;xml" href="https://xs-mlvp.github.io/mlvp/docs/env_usage/index.xml">
+<link rel="canonical" type="text/html" href="http://127.0.0.1:1313/mlvp/docs/env_usage/">
+<link rel="alternate" type="application/rss&#43;xml" href="http://127.0.0.1:1313/mlvp/docs/env_usage/index.xml">
 <meta name="robots" content="noindex, nofollow">
 
 
@@ -24,7 +24,7 @@
 <meta property="og:title" content="环境使用" />
 <meta property="og:description" content="开放验证平台的环境的详细使用方法。" />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/env_usage/" />
+<meta property="og:url" content="http://127.0.0.1:1313/mlvp/docs/env_usage/" />
 <meta itemprop="name" content="环境使用">
 <meta itemprop="description" content="开放验证平台的环境的详细使用方法。"><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="环境使用"/>
 <meta name="twitter:description" content="开放验证平台的环境的详细使用方法。"/>
@@ -75,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.8a9aae2211667317fe32feca103e6fc3.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.e7e7293c3d8397ded34301370dd143ad.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -283,7 +283,39 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libUTAdder.so
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- libUT_Adder.py
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">`</span>-- example.py              <span style="color:#8f5902;font-style:italic"># 用户需要编写的代码</span>
-</span></span></code></pre></div><p>用户使用 Python 编写测试用例，即导入上述生成的 Python Module，并调用其中的方法，以实现对硬件模块的操作。</p>
+</span></span></code></pre></div><ul>
+<li>用户使用 Python 编写测试用例，即导入上述生成的 Python Module，并调用其中的方法，以实现对硬件模块的操作。下面我们简单的介绍一下DUT的方法和属性。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 初始化DUT,DUT()有两个参数:</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># DUT(waveform_filename=&#34;report/uftb_with_ftq.fst&#34;, coverage_filename=&#34;report/uftb_with_ftq_coverage.dat&#34;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 缺省的时候为使用Picker生成Python类的时候指定的名称，如果命令里面没有指定则参数则不会生成测试报告和波形</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUT</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 访问信号，假如引脚的名称为a</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>                 <span style="color:#8f5902;font-style:italic"># 等价于dut.xdata.a.value</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 绑定clk到模拟器的时钟</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">init_clock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;clk&#34;</span><span style="color:#000;font-weight:bold">)</span>           <span style="color:#8f5902;font-style:italic"># 等价于self.xclock.Add(“clk”)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 时钟推进</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">n</span><span style="color:#000;font-weight:bold">)</span>                     <span style="color:#8f5902;font-style:italic"># 等价于dut.xclock.Step(n)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 添加上升沿回调，参数为回调函数     # 等价于dut.xclock.StepRis(...)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">StepRis</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;lambda ris: &#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 添加下降沿回调，参数为回调函数     # 等价于dut.xclock.StepFal(...)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">StepFal</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;lambda fal: &#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 异步方法，对时钟事件的等待，当时钟事件被触发时，程序才会继续向下执行。</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">astep</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">n</span><span style="color:#000;font-weight:bold">)</span>                    <span style="color:#8f5902;font-style:italic"># 等价于 await self.xclock.AStep(n)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 异步方法，每次时钟事件触发时检查条件是否满足，如果满足才继续向下执行。</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">acondition</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">lambda</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">signal_1</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 等价于 await dut.xclock.ACondition(lambda: dut.signal_1.value == 1)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 异步方法，时钟事件，每驱动一次时钟，都会对时钟事件进行一次触发，其他协程可以通过监听时钟事件来得知时钟被驱动了。</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">runstep</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">n</span><span style="color:#000;font-weight:bold">)</span>                  <span style="color:#8f5902;font-style:italic"># 等价于 dut..xclock.RunStep(n)</span>
+</span></span></code></pre></div><ul>
+<li>DUT类是电路封装完成后创建的一个可直接使用的类。要使用DUT类，首先需要初始化。对于时序电路，还需要把时钟信号与模拟时钟相连。这让我们可以通过调用Step方法来控制电路，而信号的访问则可以通过信号.value来实现，下面我们将以前一章验证过的加法器为例，来详细说明如何使用生成的DUT类。</li>
+</ul>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>          <span style="color:#8f5902;font-style:italic"># 从python软件包里导入模块</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
 </span></span><span style="display:flex;"><span>
@@ -304,7 +336,7 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 清空对象，并完成覆盖率和波形文件的输出工作（写入到文件）</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">finalize</span><span style="color:#000;font-weight:bold">()</span>              
 </span></span></code></pre></div><ul>
-<li>DUT类是电路封装完成后创建的一个可直接使用的类。要使用DUT类，首先需要初始化。对于时序电路，还需要把时钟信号与模拟时钟相连。这让我们可以通过调用Step方法来控制电路，而信号的访问则可以通过信号.value来实现。DUT类内部封装了三种主要的数据类型：XData、XPort和XClock，它们分别对应电路中的不同信号类型。利用这些数据类型，我们可以接触和操作电路中的多种信号，从而进行仿真测试。在接下来的内容中，我们会详细介绍这些数据类型的定义、来源以及它们在实际中的应用方法。</li>
+<li>我们可以直接通过DUT访问某些方法，但大多数方法被封装在DUT类的三个主要数据类型：XData、XPort和XClock中。这些类型分别代表电路中的不同类型的信号。通过这些数据类型，我们能够接触和操纵电路中的各种信号，以便进行仿真测试。在后续的内容中，我们将深入探讨这些数据类型的定义、来源，以及它们在实际仿真中的使用方式。</li>
 </ul>
 <h3 id="xdata">XDATA</h3>
 <ul>
@@ -485,7 +517,7 @@
 <p>如果你需要在异步的使用过程中，需要实例化若干 <code>Event</code> 或 <code>Queue</code> 来实现相应的功能，你需要使用 <code>xspcomm</code> 库中提供的 <code>Event</code> 和 <code>Queue</code> 的实现，而不是使用 Python 标准库中的 <code>asyncio.Event</code> 和 <code>asyncio.Queue</code>，这会使自定义事件和时钟触发的先后顺序得不到保证。</p>
 <p>使用 <code>xspcomm</code> 库中的实现可以保证在当前周期所有可被触发的自定义事件都会在下一个周期到来之前被触发。</p>
 <p><strong>更方便的异步使用</strong></p>
-<p>picker 提供的 dut 当中仅提供了最基础的异步功能，如果你需要更加方便的使用异步，可以参考 <code>mlvp</code> 库的文档，该库提供了更加丰富的异步接口。</p>
+<p>picker 提供的 dut 当中仅提供了最基础的异步功能，如果你需要更加方便的使用异步，可以参考<code>mlvp</code>库的<a href="https://github.com/XS-MLVP/mlvp">文档</a>，该库提供了更加丰富的异步接口。</p>
 
 </div>
 
@@ -716,7 +748,7 @@ CacheMeta.sv
 
 <div class="pageinfo pageinfo-primary">
 <p>在芯片验证的传统实践中，UVM等框架被广泛采用。尽管它们提供了一整套验证方法，但通常只适用于特定的硬件描述语言和仿真环境。本工具突破了这些限制，能够将仿真代码转换成C++或Python，使得我们可以利用软件验证工具来进行更全面的测试。<br>
-因为Python具有强大的生态系统，所以本项目主要以Python作为示例，Pytest和Hypothesis是两个出色的测试工具。<strong>Pytest以其简洁的语法和丰富的功能，轻松应对各种测试需求</strong>。而<strong>Hypothesis则通过生成测试用例，揭示出意料之外的边缘情况，提高了测试的全面性和深度</strong>。<br>
+因为Python具有强大的生态系统，所以本项目主要以Python作为示例，简单介绍Pytest和Hypothesis两个经典软件测试框架。<strong>Pytest以其简洁的语法和丰富的功能，轻松应对各种测试需求</strong>。而<strong>Hypothesis则通过生成测试用例，揭示出意料之外的边缘情况，提高了测试的全面性和深度</strong>。<br>
 我们的项目从一开始就设计为与多种现代软件测试框架兼容。我们鼓励您探索这些工具的潜力，并将其应用于您的测试流程中。通过亲身实践，您将更深刻地理解这些工具如何提升代码的质量和可靠性。让我们一起努力，提高芯片开发的质量。</p>
 
 </div>
