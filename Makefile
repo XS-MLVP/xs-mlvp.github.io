@@ -6,3 +6,4 @@ sync:
 	@cp -r ../mlvp-portal/public/* ./
 	@git add .
 	@git commit -m build`date +%Y%m%d%H%M%S`
+	@git push
