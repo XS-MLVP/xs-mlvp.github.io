@@ -24,11 +24,11 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/ports/00_ftb/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-03-27T15:25:22+08:00" />
+<meta property="article:modified_time" content="2024-04-24T16:14:29+08:00" />
 <meta itemprop="name" content="FTB项与完整预测结果接口">
 <meta itemprop="description" content="BPU 的基本预测单位是分支预测块，然而分支预测块的结构是怎样的呢？为什么一个分支预测块可以指导接下来如此多条指令的执行呢？这一部分将讲述生成分支预测块的核心数据结构——FTB项，以及由 FTB 项生成的完整预测结果结构。">
-<meta itemprop="dateModified" content="2024-03-27T15:25:22+08:00" />
-<meta itemprop="wordCount" content="290">
+<meta itemprop="dateModified" content="2024-04-24T16:14:29+08:00" />
+<meta itemprop="wordCount" content="302">
 <meta itemprop="keywords" content="FTB 项," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTB项与完整预测结果接口"/>
 <meta name="twitter:description" content="BPU 的基本预测单位是分支预测块，然而分支预测块的结构是怎样的呢？为什么一个分支预测块可以指导接下来如此多条指令的执行呢？这一部分将讲述生成分支预测块的核心数据结构——FTB项，以及由 FTB 项生成的完整预测结果结构。"/>
 
@@ -78,7 +78,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.c7bf24d50e8829ee3882d7818665b706.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7b789e39221f500bf445ef126659a179.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -102,7 +102,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.c7bf24d50e8829ee3882d7818665b706.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7b789e39221f500bf445ef126659a179.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -389,7 +389,7 @@
 <li><strong>tarStat</strong>: 跳转后的 pc 高位是否进退位
 <ul>
 <li>接口类型：<code>UInt(TAR_STAT_SZ.W)</code>（TAR_STAT_SZ = 2）</li>
-<li>说明：slot 存的是 offset，所以地址计算时 pc 加上 offset 可能产生进/退位，加上不产生进退位 共三种情况，编码为 2 bit</li>
+<li>说明：跳转目标地址由当前 PC 的高位、tarState 以及 lower 字段共同计算得出，其中，lower 字段直接存储了跳转目标地址的低位。当前的 PC 高位经过 tarStat 指导进行进退位之后，直接与 lower 拼接便可得到真正的跳转目标地址。tarStat 共有三个可能的取值：0 - 不进不退, 1 - 进位, 2 - 退位。</li>
 </ul>
 </li>
 <li><strong>sharing</strong>: 无条件跳转指令槽中存储了一条条件分支指令。
@@ -498,7 +498,7 @@
 </ul>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 27, 2024: <a href="https://github.com/XS-MLVP/course/commit/4fdc17467fddafde54625ec48ada413b2d5f1887">Add BPU documents (4fdc174)</a>
+  最后修改 April 24, 2024: <a href="https://github.com/XS-MLVP/course/commit/2dfee3181ec561624f994101c04952fe76b639e5">Updated uFTB and FTB interface list and optimized some documentation (2dfee31)</a>
 </div>
 
 </div>

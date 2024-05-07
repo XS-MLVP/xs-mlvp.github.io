@@ -125,7 +125,7 @@
 &lt;li&gt;&lt;strong&gt;tarStat&lt;/strong&gt;: 跳转后的 pc 高位是否进退位
 &lt;ul&gt;
 &lt;li&gt;接口类型：&lt;code&gt;UInt(TAR_STAT_SZ.W)&lt;/code&gt;（TAR_STAT_SZ = 2）&lt;/li&gt;
-&lt;li&gt;说明：slot 存的是 offset，所以地址计算时 pc 加上 offset 可能产生进/退位，加上不产生进退位 共三种情况，编码为 2 bit&lt;/li&gt;
+&lt;li&gt;说明：跳转目标地址由当前 PC 的高位、tarState 以及 lower 字段共同计算得出，其中，lower 字段直接存储了跳转目标地址的低位。当前的 PC 高位经过 tarStat 指导进行进退位之后，直接与 lower 拼接便可得到真正的跳转目标地址。tarStat 共有三个可能的取值：0 - 不进不退, 1 - 进位, 2 - 退位。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;sharing&lt;/strong&gt;: 无条件跳转指令槽中存储了一条条件分支指令。

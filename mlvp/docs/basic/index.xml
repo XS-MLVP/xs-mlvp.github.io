@@ -1,8 +1,8 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>开放验证平台学习资源 – 基础知识</title>
+    <title>开放验证平台学习资源 – 验证基础</title>
     <link>https://xs-mlvp.github.io/mlvp/docs/basic/</link>
-    <description>Recent content in 基础知识 on 开放验证平台学习资源</description>
+    <description>Recent content in 验证基础 on 开放验证平台学习资源</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     
@@ -274,63 +274,76 @@
         
 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;本节主要介绍如何基于Picker创建DUT。&lt;/p&gt;
+&lt;p&gt;以果壳cache为例，介绍如何创建基于Chisel的DUT&lt;/p&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;创建DUT（Design Under Test）是指在芯片验证过程中，设计并实现被测对象的电路或系统。DUT是验证的主体，是需要验证的电路设计。在创建DUT时，通常需要考虑被测对象的功能、性能要求和验证目标，然后使用硬件描述语言（HDL）如Verilog或VHDL编写相应的电路描述代码，或通过图形化设计工具生成电路设计。创建DUT是验证过程中的第一步，其质量和准确性直接影响着后续的验证工作。&lt;/p&gt;
-&lt;p&gt;以&lt;a href=&#34;%22/zh-cn/docs/quick-start/%22&#34;&gt;加法器DUT的创建：&lt;/a&gt;为例，进行解释：&lt;/p&gt;
-&lt;p&gt;创建一个名为 Adder 的文件夹，并在其中创建一个名为 Adder.v 的文件。这个文件将包含加法器的 Verilog 代码。下面是一个示例的加法器 Verilog 代码：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;module&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Adder&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;#(&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;parameter&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;WIDTH&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;64&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WIDTH&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WIDTH&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;cin&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;output&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WIDTH&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;output&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;cout&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;p&gt;在本文档中，DUT（Design Under Test）是指在芯片验证过程中，被验证的对象电路或系统。DUT是验证的主体，在基于picker工具创建DUT时，需要考虑被测对象的功能、性能要求和验证目标，例如是需要更快的执行速度，还是需要更详细的测试信息。通常情况下DUT，即RTL编写的源码，与外围环境一起构成验证环境（test_env），然后基于该验证环境编写测试用例。在本项目中，DUT是需要测试的Python模块，需要通过RTL进行转换。传统的RTL语言包括Verilog、System Verilog、VHDL等，然而作为新兴的RTL设计语言，Chisel（&lt;a href=&#34;https://www.chisel-lang.org/&#34;&gt;https://www.chisel-lang.org/&lt;/a&gt;）也以其面向对象的特征和便捷性，逐渐在RTL设计中扮演越来越重要的角色。本章以&lt;a href=&#34;https://github.com/OSCPU/NutShell&#34;&gt;果壳处理器-NutShell&lt;/a&gt;中的cache源代码到Python模块的转换为例进行介绍如何创建DUT。&lt;/p&gt;
+&lt;h2 id=&#34;chisel与果壳&#34;&gt;Chisel与果壳&lt;/h2&gt;
+&lt;p&gt;准确来说，Chisel是基于Scala语言的高级硬件构造（HCL）语言。传统HDL是描述电路，而HCL则是生成电路，更加抽象和高级。同时Chisel中提供的Stage包则可以将HCL设计转化成Verilog、System Verilog等传统的HDL语言设计。配合上Mill、Sbt等Scala工具则可以实现自动化的开发。&lt;/p&gt;
+&lt;p&gt;果壳是使用 Chisel 语言模块化设计的、基于 RISC-V RV64 开放指令集的顺序单发射处理器实现。果壳更详细的介绍请参考链接：&lt;a href=&#34;https://oscpu.github.io/NutShell-doc/&#34;&gt;https://oscpu.github.io/NutShell-doc/&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;果壳-cache&#34;&gt;果壳 cache&lt;/h2&gt;
+&lt;p&gt;果壳cache（Nutshell Cache）是果壳处理器中使用的缓存模块。其采用三级流水设计，当第三级流水检出当前请求为MMIO或者发生重填（refill）时，会阻塞流水线。同时，果壳cache采用可定制的模块化设计，通过改变参数可以生成存储空间大小不同的一级cache（L1 Cache）或者二级cache（L2 Cache）。此外，果壳cache留有一致性（coherence）接口，可以处理一致性相关的请求。&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;nt_cache&#34; src=&#34;nt_cache.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;chisel-转-verilog&#34;&gt;Chisel 转 Verilog&lt;/h2&gt;
+&lt;p&gt;Chisel中的&lt;code&gt;stage&lt;/code&gt;库可以帮助由Chisel代码生成Verilog、System Verilog等传统的HDL代码。以下将简单介绍如何由基于Chisel的cache实现转换成对应的Verilog电路描述。&lt;/p&gt;
+&lt;h3 id=&#34;初始化果壳环境&#34;&gt;初始化果壳环境&lt;/h3&gt;
+&lt;p&gt;首先从源仓库下载整个果壳源代码，并进行初始化：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mkdir cache-ut
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; cache-ut
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/OSCPU/NutShell.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; NutShell &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; git checkout 97a025d
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make init
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;创建scala编译配置&#34;&gt;创建scala编译配置&lt;/h3&gt;
+&lt;p&gt;在cache-ut目录下创建build.sc，其中内容如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-scala&#34; data-lang=&#34;scala&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$file.NutShell.build&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;mill._&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;scalalib&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;_&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;coursier.maven.MavenRepository&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;mill.scalalib.TestModule._&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;assign&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;cout&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;  &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;cin&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// 指定Nutshell的依赖
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;object&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;difftest&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;extends&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;NutShell&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;build&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;CommonNS&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;override&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;millSourcePath&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;os&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;pwd&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;/&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;NutShell&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;/&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;difftest&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;endmodule&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;UDT解释：&lt;/p&gt;
-&lt;p&gt;module Adder &amp;hellip; endmodule: 定义了一个名为 Adder 的模块，该模块实现了加法器的功能。&lt;/p&gt;
-&lt;p&gt;parameter WIDTH = 64: 使用 parameter 关键字定义了一个名为 WIDTH 的参数，默认值为 64。这个参数可以控制加法器的输入和输出的位宽。&lt;/p&gt;
-&lt;p&gt;input [WIDTH-1:0] a, input [WIDTH-1:0] b: 定义了两个输入端口 a 和 b，它们的宽度为 WIDTH。这里使用了一个向量（vector）来表示输入端口的多个位。&lt;/p&gt;
-&lt;p&gt;input cin: 定义了一个输入端口 cin，表示加法器的进位输入。&lt;/p&gt;
-&lt;p&gt;output [WIDTH-1:0] sum, output cout: 定义了两个输出端口 sum 和 cout，分别表示加法器的和输出和进位输出。&lt;/p&gt;
-&lt;p&gt;assign: 该关键字用于将一个表达式的值赋给一个信号。&lt;/p&gt;
-&lt;p&gt;{cout, sum}: 这是一个连续赋值语句，表示将右边表达式的值分别赋给左边的两个信号 cout 和 sum。&lt;/p&gt;
-&lt;p&gt;a + b + cin: 这是一个表达式，表示将输入端口 a、b 和 cin 的值相加。由于 a、b 和 sum 都是位宽为 WIDTH 的向量，因此这里进行的是位宽为 WIDTH 的加法运算。&lt;/p&gt;
-&lt;p&gt;通过连续赋值语句，将加法器的输出 sum 和 cout 分别赋值为表达式 a + b + cin 的结果的低 WIDTH 位和高 WIDTH 位。&lt;/p&gt;
-&lt;p&gt;endmodule: 表示模块定义结束。&lt;/p&gt;
-&lt;p&gt;这段 Verilog 代码定义了一个参数化的加法器模块，能够根据参数 WIDTH 控制输入输出的位宽。加法器的输入包括两个 WIDTH 位的数 a 和 b，以及一个单独的进位信号 cin。输出包括一个 WIDTH 位的和 sum 和一个单独的进位输出 cout。加法器的实现通过简单的连续赋值语句，将输入的两个数和进位相加，得到输出的和与进位。&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: DUT编译</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/compile/</guid>
-      <description>
-        
-        
-        
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;本节主要介绍如何基于Picker编译DUT。&lt;/p&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;编译DUT是指将被测设计（Design Under Test，即DUT）的硬件描述语言（HDL）代码转换为可供仿真和验证使用的逻辑网表的过程。这个过程通常包括综合、优化、映射和布线等步骤，其主要目的是将抽象的HDL代码转换为实际的电路网表，以便进行后续的仿真和验证工作。&lt;/p&gt;
-&lt;p&gt;以&lt;a href=&#34;%22/content/zh-cn/docs/quick-start/%22&#34;&gt;加法器DUT的编译：&lt;/a&gt;为例进行解释：&lt;/p&gt;
-&lt;p&gt;在 Adder 文件夹中，执行以下命令将 Verilog 文件编译为 C++ Class：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;picker&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Adder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;w&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Adder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;fst&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;S&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Adder&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;t&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;picker_out_adder&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;l&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;cpp&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;e&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;--&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;sim&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;verilator&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这个命令会将 Adder.v 文件作为 Top 文件，并将其编译为 C++ Class，使用 verilator 仿真器。编译过程会生成一系列中间文件，其中包括 Verilog 文件、C++ 源代码等。&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Nutshell 配置
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;object&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;NtShell&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;extends&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;NutShell&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;build&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;CommonNS&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;with&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;NutShell&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;build&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;HasChiselTests&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;override&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;millSourcePath&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;os&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;pwd&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;/&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;NutShell&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;override&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;moduleDeps&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;super&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;moduleDeps&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;++&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Seq&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;difftest&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// UT环境配置
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;object&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;ut&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;extends&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;NutShell&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;build&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;CommonNS&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;with&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;ScalaTest&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;override&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;millSourcePath&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;os&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;pwd&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;override&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;moduleDeps&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;super&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;moduleDeps&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;++&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Seq&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;NtShell&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;实例化-cache&#34;&gt;实例化 cache&lt;/h3&gt;
+&lt;p&gt;创建好配置信息后，按照scala规范，创建src/main/scala源代码目录。之后，就可以在源码目录中创建nut_cache.scala，利用如下代码实例化Cache并转换成Verilog代码：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-scala&#34; data-lang=&#34;scala&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;package&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;ut_nutshell&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;chisel3._&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;chisel3.util._&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;nutcore._&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;top._&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;chisel3.stage._&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;object&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;CacheMain&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;extends&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;App&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;ChiselStage&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;execute&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;args&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Seq&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000&#34;&gt;ChiselGeneratorAnnotation&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(()&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Cache&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;CacheConfig&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ro&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;false&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;tcache&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;userBits&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;16&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;生成rtl&#34;&gt;生成RTL&lt;/h3&gt;
+&lt;p&gt;完成上述所有文件的创建后（build.sc，src/main/scala/nut_cache.scala），在cache-ut目录下执行如下命令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mkdir build
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mill --no-server -d ut.runMain ut_nutshell.CacheMain --target-dir build --output-file Cache
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;注：mill环境的配置请参考 &lt;a href=&#34;https://mill-build.com/mill/Intro_to_Mill.html&#34;&gt;https://mill-build.com/mill/Intro_to_Mill.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;上述命令成功执行完成后，会在build目录下生成verilog文件：Cache.v。之后就可以通过picker工具进行Cache.v到 Python模块的转换。除去chisel外，其他HCL语言几乎都能生成对应的 RTL代码，因此上述基本流程也适用于其他HCL。&lt;/p&gt;
+&lt;h3 id=&#34;dut编译&#34;&gt;DUT编译&lt;/h3&gt;
+&lt;p&gt;一般情况下，如果需要DUT生成波形、覆盖率等会导致DUT的执行速度变慢，因此在通过picker工具生成python模块时会根据多种配置进行生成：（1）关闭所有debug信息；（2）开启波形；（3）开启代码行覆盖率。其中第一种配置的目标是快速构建环境，进行回归测试等；第二种配置用于分析具体错误，时序等；第三种用于提升覆盖率。&lt;/p&gt;
 
       </description>
     </item>
@@ -347,27 +360,130 @@
         
 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;本节主要介绍如何基于Picker验证DUT。&lt;/p&gt;
+&lt;p&gt;本节介绍基于Picker验证DUT的一般流程&lt;/p&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;DUT测试是芯片验证过程中的关键步骤之一，指的是对被测设计（Design Under Test，即DUT）进行验证和测试的过程。在DUT测试中，验证工程师会通过各种测试方法和技术，对DUT的功能、性能和时序等方面进行全面的评估，以确保DUT能够按照设计要求正常工作，并且满足用户的需求和期望。&lt;/p&gt;
-&lt;p&gt;以&lt;a href=&#34;%22/content/zh-cn/docs/quick-start/%22&#34;&gt;加法器DUT的测试：&lt;/a&gt;为例进行解释：&lt;/p&gt;
-&lt;p&gt;在测试过程中，我们将创建一个示例项目，并编写测试代码来验证加法器的功能。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-verilog&#34; data-lang=&#34;verilog&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;#&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;include&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;UT_Adder.hpp&amp;#34;&lt;/span&gt;
+&lt;p&gt;开放验证平台的目标是功能性验证，其一般有以下步骤：&lt;/p&gt;
+&lt;h3 id=&#34;1-确定验证对象和目标&#34;&gt;1. 确定验证对象和目标&lt;/h3&gt;
+&lt;p&gt;通常来说，同时交付给验证工程师的还有DUT的设计文档。此时您需要阅读文档或者源代码，了解验证对象的基本功能、主体结构以及预期功能。&lt;/p&gt;
+&lt;h3 id=&#34;2-构建基本验证环境&#34;&gt;2. 构建基本验证环境&lt;/h3&gt;
+&lt;p&gt;充分了解设计之后，您需要构建验证的基本环境。例如，除了由Picker生成的DUT外，您可能还需要搭建用于比对的参考模型，也可能需要为后续功能点的评测搭建信号的监听平台。&lt;/p&gt;
+&lt;h3 id=&#34;3-功能点与测试点分解&#34;&gt;3. 功能点与测试点分解&lt;/h3&gt;
+&lt;p&gt;在正式开始验证之前，您还需要提取功能点，并将其进一步分解成测试点。提取和分解方法可以参考：&lt;a href=&#34;https://blog.csdn.net/W1Z1Q/article/details/124547192&#34;&gt;CSDN:芯片验证系列——Testpoints分解&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;4-构造测试用例&#34;&gt;4. 构造测试用例&lt;/h3&gt;
+&lt;p&gt;有了测试点之后，您需要构造测试用例来覆盖相应的测试点。一个用例可能覆盖多个测试点。&lt;/p&gt;
+&lt;h3 id=&#34;5-收集测试结果&#34;&gt;5. 收集测试结果&lt;/h3&gt;
+&lt;p&gt;运行完所有的测试用例之后，您需要汇总所有的测试结果。一般来说包括代码行覆盖率以及功能覆盖率。前者可以通过Picker工具提供的覆盖率功能获得，后者则需要您通过监听DUT的行为判断某功能是否被用例覆盖到。&lt;/p&gt;
+&lt;h3 id=&#34;6-评估测试结果&#34;&gt;6. 评估测试结果&lt;/h3&gt;
+&lt;p&gt;最后您需要评估得到的结果，如是否存在错误的设计、某功能是否无法被触发、设计文档表述是否与DUT行为一致、设计文档是否表述清晰等。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;接下来我们以&lt;strong&gt;果壳Cache的MMIO读写为例&lt;/strong&gt;，介绍一般验证流程：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1 确定验证对象和目标&lt;/strong&gt;：&lt;br&gt;
+果壳Cache的MMIO读写功能。MMIO是一类特殊的IO映射，其支持通过访问内存地址的方式访问IO设备寄存器。由于IO设备的寄存器状态是随时可能改变的，因此不适合将其缓存在cache中。当收到MMIO请求时，果壳cache不会在普通的cache行中查询命中/缺失情况，而是会直接访问MMIO的内存区域来读取或者写入数据。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2 构建基本验证环境&lt;/strong&gt;：&lt;br&gt;
+我们可以将验证环境大致分为五个部分：
+&lt;img alt=&#34;env&#34; src=&#34;env.png&#34;&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;1. Testcase Driver&lt;/strong&gt;：负责由用例产生相应的信号驱动&lt;br&gt;
+&lt;strong&gt;2. Monitor&lt;/strong&gt;：监听信号，判断功能是否被覆盖以及功能是否正确&lt;br&gt;
+&lt;strong&gt;3. Ref Cache&lt;/strong&gt;：一个简单的参考模型&lt;br&gt;
+&lt;strong&gt;4. Memory/MMIO Ram&lt;/strong&gt;：外围设备的模拟，用于模拟相应cache的请求&lt;br&gt;
+&lt;strong&gt;5. Nutshell Cache Dut&lt;/strong&gt;：由Picker生成的DUT&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;此外，您可能还需要对DUT的接口做进一步封装以实现更方便的读写请求操作，具体可以参考&lt;a href=&#34;https://github.com/yzcccccccccc/XS-MLVP-NutShellCache/blob/master/UT_Cache/util/cachewrapper.py&#34;&gt;Nutshll cachewrapper&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3 功能点与测试点分解&lt;/strong&gt;：&lt;br&gt;
+果壳cache可以响应MMIO请求，进一步分解可以得到一下测试点：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;测试点1&lt;/strong&gt;：MMIO请求会被转发到MMIO端口上&lt;br&gt;
+&lt;strong&gt;测试点2&lt;/strong&gt;：cache响应MMIO请求时，不会发出突发传输（Burst Transfer）的请求&lt;br&gt;
+&lt;strong&gt;测试点3&lt;/strong&gt;：cache响应MMIO请求时，会阻塞流水线&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;4 构造测试用例&lt;/strong&gt;：
+测试用例的构造是简单的，已知通过&lt;a href=&#34;https://xs-mlvp.github.io/mlvp/zh-cn/docs/basic/create_dut&#34;&gt;创建DUT&lt;/a&gt;得到的Nutshell cache的MMIO地址范围是&lt;code&gt;0x30000000&lt;/code&gt;~&lt;code&gt;0x7fffffff&lt;/code&gt;，则我们只需访问这段内存区间，应当就能获得MMIO的预期结果。需要注意的是，为了触发阻塞流水线的测试点，您可能需要连续地发起请求。&lt;br&gt;
+以下是一个简单的测试用例：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# import CacheWrapper here&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;UTAdder&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;dut&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;UTAdder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;libDPIAdder.so&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;mmio_test&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;cache&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;CacheWrapper&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;mmio_lb&lt;/span&gt;	&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0x30000000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;mmio_rb&lt;/span&gt;	&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0x30001000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;[MMIO Test]: Start MMIO Serial Test&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;addr&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#204a87&#34;&gt;range&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;mmio_lb&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;mmio_rb&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;16&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;addr&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;amp;=&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;~&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0xf&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;addr1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;addr&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;addr2&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;addr&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;addr3&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;addr&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;8&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// 进行测试...
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;delete&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;dut&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;在这段代码中，我们创建了一个 UTAdder 类的实例，然后进行测试。&lt;/p&gt;
-&lt;p&gt;接着，编译测试代码。在 Adder 文件夹中，执行 make 命令，编译测试代码并生成可执行文件。&lt;/p&gt;
-&lt;p&gt;最后，运行测试。执行生成的可执行文件，即可运行测试，并观察输出结果。&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;cache&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;trigger_read_req&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;addr1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;cache&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;trigger_read_req&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;addr2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;cache&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;trigger_read_req&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;addr3&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;cache&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;recv&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;cache&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;recv&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		&lt;span style=&#34;color:#000&#34;&gt;cache&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;recv&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;		
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;[MMIO Test]: Finish MMIO Serial Test&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;5 收集测试结果&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;&amp;#39;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;    In tb_cache.py
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# import packages here&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TestCache&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;():&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;setup_class&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;color&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;print_blue&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;Cache Test Start&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;dut&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;DUTCache&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;libDPICache.so&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;dut&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;init_clock&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;clock&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Init here&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# ...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;testlist&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;mmio_serial&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;teardown_class&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;dut&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;finalize&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;color&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;print_blue&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;Cache Test End&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;__reset&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Reset cache and devices&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# MMIO Test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;test_mmio&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;mmio_serial&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;testlist&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Run test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;from&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;..test.test_mmio&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;mmio_test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#000&#34;&gt;mmio_test&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;cache&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ref_cache&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;else&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;mmio test is not included&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;setup_class&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;test_mmio&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#3465a4&#34;&gt;self&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;teardown_class&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;pass&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;__name__&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;__main__&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;tb&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TestCache&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;tb&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;运行：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    python3 tb_cache.py
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;以上仅为大致的运行流程，具体可以参考：&lt;a href=&#34;https://github.com/yzcccccccccc/XS-MLVP-NutShellCache&#34;&gt;Nutshell Cache Verify&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;6 评估运行结果&lt;/strong&gt;&lt;br&gt;
+运行结束之后可以得到以下数据：&lt;br&gt;
+行覆盖率：
+&lt;img alt=&#34;line_cov&#34; src=&#34;line_cov.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;功能覆盖率：
+&lt;img alt=&#34;func_cov&#34; src=&#34;func_cov.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;可以看到预设的MMIO功能均被覆盖且被正确触发。
+&amp;hellip;..&lt;/p&gt;
+&lt;p&gt;(嘉怡、俊宇、泽辰)&lt;/p&gt;
+&lt;p&gt;(&lt;strong&gt;TBD&lt;/strong&gt;：将cache验证移植到MLVP平台)&lt;/p&gt;
 
       </description>
     </item>
@@ -388,98 +504,45 @@
 
 &lt;/div&gt;
 
-&lt;h2 id=&#34;1-验证的范围&#34;&gt;1. 验证的范围&lt;/h2&gt;
-&lt;p&gt;1.1 什么是验证范围&lt;/p&gt;
-&lt;p&gt;在芯片验证过程中，验证范围是指需要进行验证的范围或内容的总体描述。它确定了验证活动所需覆盖的功能、性能、边界条件、接口以及其他关键方面。&lt;/p&gt;
-&lt;p&gt;1.2 举例说明&lt;/p&gt;
-&lt;p&gt;以加法器功能验证为例，本块内容应该至少描述清楚以下内容：&lt;/p&gt;
-&lt;p&gt;（1）基本功能验证：&lt;/p&gt;
-&lt;p&gt;确认加法器能够正确执行加法运算，包括对两个输入数进行相加并产生正确的结果。
-测试加法器对不同数据宽度（例如8位、16位、32位）的支持，并验证其在不同数据宽度下的加法功能是否正常工作。
-边界条件验证：&lt;/p&gt;
-&lt;p&gt;验证加法器在最小值、最大值以及边界情况下的加法运算是否正确，例如边界值加法、最大值加法和最小值加法。
-测试加法器对于特殊情况（如进位、溢出）的处理是否符合设计要求。&lt;/p&gt;
-&lt;p&gt;（2）异常输入验证：&lt;/p&gt;
-&lt;p&gt;检查加法器对于不合法输入的处理能力，如无效输入、非数字字符或格式错误输入的情况。
-验证加法器在面对不符合规范的输入时能够产生正确的错误提示或异常处理。&lt;/p&gt;
-&lt;p&gt;（3）多输入/多操作模式验证：&lt;/p&gt;
-&lt;p&gt;确认加法器能够处理多组输入，并正确执行相加操作。
-验证加法器在连续多次相加操作下是否能够保持正确的累加结果。&lt;/p&gt;
-&lt;h2 id=&#34;2-验证环境说明&#34;&gt;2. 验证环境说明&lt;/h2&gt;
-&lt;p&gt;2.1 什么是验证环境&lt;/p&gt;
-&lt;p&gt;验证环境是用于运行芯片顶层功能验证的各个组件（component）的集合。它主要包含以下几个部分：&lt;/p&gt;
-&lt;p&gt;（1）被测设计（DUT）：&lt;/p&gt;
-&lt;p&gt;DUT是待验证的设计单元，即加法器。它是验证的主体，通过验证环境中的测试向量和输入数据进行功能验证。&lt;/p&gt;
-&lt;p&gt;（2）CPU子环境（MPI Agent）：&lt;/p&gt;
-&lt;p&gt;MPI（Message Passing Interface）Agent是与外部处理器（CPU）通信的组件。它负责处理来自CPU的验证指令，并将验证结果返回给CPU。MPI Agent与CPU之间通过消息传递机制进行通信，以启动验证过程并提供验证结果。&lt;/p&gt;
-&lt;p&gt;（3）PTU/PRU子环境（SPT Agent）：&lt;/p&gt;
-&lt;p&gt;SPT（System Port Test）Agent是与外部测试单元（PTU/PRU）通信的组件。它负责与PTU/PRU进行数据交换和配置寄存器访问，以验证加法器的功能和性能。SPT Agent通过与PTU/PRU之间的接口通信，控制测试流程并收集验证数据。&lt;/p&gt;
-&lt;p&gt;（4）参考模块（RM）：&lt;/p&gt;
-&lt;p&gt;参考模块（Reference Model）是验证过程中的参照标准。它包含了预期的加法器功能和性能规格。验证结果将与参考模块的预期结果进行比对，以确认验证的正确性。参考模块通常由设计规格或功能规范定义，并在验证环境中用于验证结果的验证。&lt;/p&gt;
-&lt;p&gt;（5）检查器（Checker）：&lt;/p&gt;
-&lt;p&gt;检查器是验证环境中的组件，用于检查仿真结果与参考模块预期结果之间的一致性。它负责比对仿真输出和参考模块的预期输出，并生成验证报告。检查器确保验证结果与设计规格的一致性，以确认验证的准确性和完整性。&lt;/p&gt;
-&lt;p&gt;（6）脚本（Makefile）：&lt;/p&gt;
-&lt;p&gt;Makefile是验证环境的自动化脚本，用于管理验证流程的各个步骤。它包括编译、运行仿真、分析结果等操作，并提供了一种方便的方式来执行验证任务。通过脚本的自动化处理，可以提高验证效率并减少人工错误的可能性。&lt;/p&gt;
-&lt;p&gt;2.2 举例说明&lt;/p&gt;
-&lt;p&gt;以加法器功能验证为例，本块内容应该至少描述清楚以下内容：&lt;/p&gt;
-&lt;p&gt;（1）DUT版本信息：&lt;/p&gt;
-&lt;p&gt;DUT名称： 加法器
-版本信息： v1.0
-设计语言： Verilog HDL
-设计工具： Synopsys Design Compiler&lt;/p&gt;
-&lt;p&gt;（2）验证平台说明：&lt;/p&gt;
-&lt;p&gt;平台名称： FPGA Verification Platform
-FPGA型号： Xilinx Virtex UltraScale+ VU9P
-仿真工具： Cadence Xcelium Simulator
-编译工具： Xilinx Vivado&lt;/p&gt;
-&lt;p&gt;（2.1）验证环境架构：&lt;/p&gt;
-&lt;p&gt;MPI Agent： 负责与CPU子环境通信，接收和发送验证指令。
-SPT Agent： 与PTU/PRU子环境通信，负责与芯片接口进行数据交换和配置寄存器访问。
-参考模块（RM）： 包含了预期的加法器功能和性能规格，作为验证结果的参照。
-检查器（Checker）： 检查仿真结果与参考模块预期结果之间的一致性，以确认验证的正确性。
-脚本（Makefile）： 包含了验证流程的自动化脚本，用于编译、运行仿真以及结果分析。&lt;/p&gt;
-&lt;p&gt;（2.2）目录结构：&lt;/p&gt;
-&lt;p&gt;列出工作目录下所有文件及文件的概要。&lt;/p&gt;
-&lt;p&gt;（2.3）主要文件说明：&lt;/p&gt;
-&lt;p&gt;对工作目录中重要文件进行补充说明。&lt;/p&gt;
-&lt;h2 id=&#34;3-覆盖率分析&#34;&gt;3. 覆盖率分析&lt;/h2&gt;
-&lt;p&gt;3.1 什么是覆盖率分析&lt;/p&gt;
-&lt;p&gt;覆盖率分析是软件开发和测试过程中的一种质量评估技术，用于衡量测试对软件代码或功能的覆盖程度。它主要分为两个方面：代码覆盖率分析和功能覆盖率分析。&lt;/p&gt;
-&lt;p&gt;（1）代码覆盖率分析：&lt;/p&gt;
-&lt;p&gt;代码覆盖率分析关注的是测试用例对软件代码的覆盖程度。它衡量了测试用例执行过程中究竟有多少代码被执行到，以及这些代码中的哪些部分被执行。代码覆盖率分析通常包括语句覆盖率（Statement Coverage）、分支覆盖率（Branch Coverage）、条件覆盖率（Condition Coverage）和路径覆盖率（Path Coverage）等指标。&lt;/p&gt;
-&lt;p&gt;（2）功能覆盖率分析：&lt;/p&gt;
-&lt;p&gt;功能覆盖率分析关注的是测试用例对软件功能的覆盖程度。它衡量了测试用例是否覆盖了软件规格中定义的各项功能需求。功能覆盖率分析通常包括输入空间覆盖率（Input Space Coverage）、功能操作覆盖率（Functional Operation Coverage）、错误处理覆盖率（Error Handling Coverage）等指标。
-覆盖率分析通过分析测试用例的执行情况，可以帮助评估测试的全面性和有效性。较高的覆盖率通常意味着测试用例对软件的覆盖程度更高，从而提高了软件的质量和可靠性。覆盖率分析结果也可以指导测试用例的设计和调整，以进一步提高测试的效率和完整性。&lt;/p&gt;
-&lt;p&gt;3.2 举例说明&lt;/p&gt;
-&lt;p&gt;以加法器功能验证为例，本块内容应该至少描述清楚以下内容：&lt;/p&gt;
-&lt;p&gt;（1）代码覆盖率分析：&lt;/p&gt;
-&lt;p&gt;代码覆盖率分析用于评估测试是否覆盖了设计代码中的各个部分和逻辑路径。对于加法器的验证，代码覆盖率分析可以通过以下方式进行：&lt;/p&gt;
-&lt;p&gt;语句覆盖率： 确保测试覆盖了加法器设计代码中的所有语句和指令，以验证代码的执行路径。
-分支覆盖率： 确保测试覆盖了加法器设计代码中的所有条件分支和控制流程，以验证不同条件下的执行路径。
-条件覆盖率： 确保测试覆盖了加法器设计代码中的所有条件表达式的各种可能取值，以验证条件判断的正确性。
-路径覆盖率： 确保测试覆盖了加法器设计代码中的所有可能执行路径，以验证代码的完整性和正确性。&lt;/p&gt;
-&lt;p&gt;（2）功能覆盖率分析：&lt;/p&gt;
-&lt;p&gt;功能覆盖率分析旨在评估测试是否涵盖了设计规格中定义的各项功能要求。对于加法器的验证，功能覆盖率可以通过以下方式进行分析和优化：&lt;/p&gt;
-&lt;p&gt;输入空间覆盖率： 确保测试覆盖了所有可能的输入组合，包括边界情况和特殊情况（如进位、溢出）。
-功能操作覆盖率： 确保测试覆盖了加法器所有可能的操作模式和功能特性，如单次加法、多次连续加法、不同数据宽度下的加法等。
-错误处理覆盖率： 确保测试覆盖了加法器对异常情况的处理，如无效输入、非法操作等，以验证其错误处理能力和容错性。&lt;/p&gt;
-&lt;h2 id=&#34;4-未解决bug列表或待改进方案&#34;&gt;4. 未解决Bug列表或待改进方案&lt;/h2&gt;
-&lt;p&gt;4.1 什么是未解决Bug列表或待改进方案&lt;/p&gt;
-&lt;p&gt;在芯片验证过程中，未解决Bug列表或待改进方案是一个关键的文档，用于跟踪和记录在验证过程中发现的问题和改进点。该列表通常由验证团队维护，并在整个验证过程中进行更新和追踪。&lt;/p&gt;
-&lt;p&gt;内容包括但不限于以下方面：&lt;/p&gt;
-&lt;p&gt;（1）Bug描述： 每个Bug或待改进方案应该清晰地描述问题的性质、出现的条件、预期行为和实际行为之间的差异。&lt;/p&gt;
-&lt;p&gt;（2）Bug优先级： 每个Bug应该根据其对验证工作的影响和紧迫程度确定优先级，以帮助团队优先处理关键问题。&lt;/p&gt;
-&lt;p&gt;（3）Bug状态： 每个Bug应该有一个明确定义的状态，如“已确认”、“正在修复”、“待验证”、“已关闭”等，以跟踪Bug的处理进度。&lt;/p&gt;
-&lt;p&gt;（4）Bug责任人： 每个Bug应指定一个责任人负责跟进和解决，确保问题得到及时处理。&lt;/p&gt;
-&lt;p&gt;（5）Bug跟踪编号： 每个Bug应有一个唯一的标识符，便于跟踪和引用，通常使用Bug跟踪系统中提供的编号。&lt;/p&gt;
-&lt;p&gt;4.2 举例说明&lt;/p&gt;
-&lt;p&gt;Bug编号	    Bug描述	                                优先级	    状态	     责任人
-BUG-001	    加法器对于带有进位的加法操作结果错误	     高	      待修复	    小明
-BUG-002	    加法器在32位输入时出现性能下降              中	      正在修复      小红
-BUG-003	    加法器在处理负数输入时产生异常结果	         低	      已确认	    小刚
-BUG-004	    加法器在高速时钟下出现时序问题	             高	      待验证	    小亮&lt;/p&gt;
-&lt;h2 id=&#34;7-验证结论&#34;&gt;7. 验证结论&lt;/h2&gt;
-&lt;p&gt;验证结论是在完成芯片验证过程后得出的最终结论，用于总结验证工作的结果并对验证对象的状态进行评估和描述。此处需要明确覆盖率具体指标等内容。&lt;/p&gt;
+&lt;p&gt;验证报告是对整个验证过程的回顾，是验证合理与否的重要支持文件。一般情况下，验证报告需要包含以下内容：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;文档基本信息（作者、日志、版本等）&lt;/li&gt;
+&lt;li&gt;验证对象（验证目标）&lt;/li&gt;
+&lt;li&gt;功能点介绍&lt;/li&gt;
+&lt;li&gt;验证方案&lt;/li&gt;
+&lt;li&gt;测试点分解&lt;/li&gt;
+&lt;li&gt;测试用例&lt;/li&gt;
+&lt;li&gt;测试环境&lt;/li&gt;
+&lt;li&gt;结果分析&lt;/li&gt;
+&lt;li&gt;缺陷分析&lt;/li&gt;
+&lt;li&gt;测试结论&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;以下内容对列表进行进一步解释，具体示例可以参考（link to cache_report.pdf，TBD）&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;1-基本信息&#34;&gt;1. 基本信息&lt;/h3&gt;
+&lt;p&gt;应当包括作者、日志、版本、日期等。&lt;/p&gt;
+&lt;h3 id=&#34;2-验证对象验证目标&#34;&gt;2. 验证对象（验证目标）&lt;/h3&gt;
+&lt;p&gt;需要对您的验证对象做必要的介绍，可以包括其结构、基本功能、接口信息等。&lt;/p&gt;
+&lt;h3 id=&#34;3-功能点介绍&#34;&gt;3. 功能点介绍&lt;/h3&gt;
+&lt;p&gt;通过阅读设计文档或者源码，您需要总结DUT的目标功能，并将其细化为各功能点。&lt;/p&gt;
+&lt;h3 id=&#34;4-验证方案&#34;&gt;4. 验证方案&lt;/h3&gt;
+&lt;p&gt;应当包括您计划的验证流程以及验证框架。同时，您也应当接受您的框架各部分是如何协同工作的。&lt;/p&gt;
+&lt;h3 id=&#34;5-测试点分解&#34;&gt;5. 测试点分解&lt;/h3&gt;
+&lt;p&gt;针对功能点提出的测试方法。具体可以包括在怎样的信号输入下应当观测到怎样的信号输出。&lt;/p&gt;
+&lt;h3 id=&#34;6-测试用例&#34;&gt;6. 测试用例&lt;/h3&gt;
+&lt;p&gt;测试点的具体实现。一个测试用例可以包括多个测试点。&lt;/p&gt;
+&lt;h3 id=&#34;7-测试环境&#34;&gt;7. 测试环境&lt;/h3&gt;
+&lt;p&gt;包括硬件信息、软件版本信息等。&lt;/p&gt;
+&lt;h3 id=&#34;8-结果分析&#34;&gt;8. 结果分析&lt;/h3&gt;
+&lt;p&gt;结果分析一般指覆盖率分析。通常来说应当考虑两类覆盖率：&lt;br&gt;
+&lt;strong&gt;1. 行覆盖率&lt;/strong&gt;： 在测试用例中有多少RTL行代码被执行。一般来说我们要求行覆盖率在98%以上。&lt;br&gt;
+&lt;strong&gt;2. 功能覆盖率&lt;/strong&gt;：根据相应的信号判断您提取的功能点是否被覆盖且被正确触发。一般我们要求测试用例覆盖每个功能点。&lt;/p&gt;
+&lt;h3 id=&#34;9-缺陷分析&#34;&gt;9. 缺陷分析&lt;/h3&gt;
+&lt;p&gt;对DUT存在的缺陷进行分析。可以包括设计文档的规范性和详细性、DUT功能的正确性（是否存在bug）、DUT功能是否能被触发等方面。&lt;/p&gt;
+&lt;h3 id=&#34;10-验证结论&#34;&gt;10. 验证结论&lt;/h3&gt;
+&lt;p&gt;验证结论是在完成芯片验证过程后得出的最终结论，是对以上内容的总结。&lt;/p&gt;
 
       </description>
     </item>

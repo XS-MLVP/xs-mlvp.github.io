@@ -75,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.c7bf24d50e8829ee3882d7818665b706.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7b789e39221f500bf445ef126659a179.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -284,7 +284,7 @@
 <li><strong>tarStat</strong>: 跳转后的 pc 高位是否进退位
 <ul>
 <li>接口类型：<code>UInt(TAR_STAT_SZ.W)</code>（TAR_STAT_SZ = 2）</li>
-<li>说明：slot 存的是 offset，所以地址计算时 pc 加上 offset 可能产生进/退位，加上不产生进退位 共三种情况，编码为 2 bit</li>
+<li>说明：跳转目标地址由当前 PC 的高位、tarState 以及 lower 字段共同计算得出，其中，lower 字段直接存储了跳转目标地址的低位。当前的 PC 高位经过 tarStat 指导进行进退位之后，直接与 lower 拼接便可得到真正的跳转目标地址。tarStat 共有三个可能的取值：0 - 不进不退, 1 - 进位, 2 - 退位。</li>
 </ul>
 </li>
 <li><strong>sharing</strong>: 无条件跳转指令槽中存储了一条条件分支指令。
