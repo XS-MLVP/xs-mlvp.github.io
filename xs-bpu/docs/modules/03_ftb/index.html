@@ -28,12 +28,12 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/03_ftb/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-04-24T16:14:29+08:00" />
+<meta property="article:modified_time" content="2024-05-10T14:09:56+08:00" />
 <meta itemprop="name" content="FTB 分支预测器">
 <meta itemprop="description" content="FTB 简介 FTB 是香山 BPU 的第三个子预测器，它也能一并获取到 uFTB 和 TAGE-SC 的输出。在 FTB 的输入接口中，s1 通道含有 uFTB 的基础预测结果，s2 通道和 s3 通道中仅有 br_taken_mask 一组信号被 TAGE-SC 填充，并无 FTB 项生成的基础预测结果。FTB 的工作便是为 s2 和 s3 通道提供基础预测结果。
 FTB 在功能和结构上都与 uFTB 类似，其主要区别就是 FTB 能够容纳更多的 FTB 项，并且 FTB 的预测结果是在 s2 与 s3 通道输出。正是由于容量大，其读出的速度上会比 uFTB 慢，无法被放置在第一周期产生预测结果，但大容量也使它能够获得更加精准的预测结果。
 uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测结果。 FTB 预测器的本质是一个较大容量的存储器，其会根据当前预测的 PC 读出对应的 FTB 项，并在 s2 阶段产出预测结果。与此同时该 FTB 项还会被再保存一个周期，生成 s3 阶段预测结果。生成结果需要注意的点是要考虑到上一预测器输入的 br_taken_mask 字段，避免在生成时丢失。 根据更新请求，更新存储中的 FTB 项。 FTB 存储结构 FTB 预测器中 FTB 项被放置在了一个专门的存储结构中，叫做 FTBBank ，在进一步查看 FTBBank 的结构之前，我们先来看一下 FTBBank 是怎样使用的。">
-<meta itemprop="dateModified" content="2024-04-24T16:14:29+08:00" />
+<meta itemprop="dateModified" content="2024-05-10T14:09:56+08:00" />
 <meta itemprop="wordCount" content="956">
 <meta itemprop="keywords" content="子预测器,FTB," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTB 分支预测器"/>
 <meta name="twitter:description" content="FTB 简介 FTB 是香山 BPU 的第三个子预测器，它也能一并获取到 uFTB 和 TAGE-SC 的输出。在 FTB 的输入接口中，s1 通道含有 uFTB 的基础预测结果，s2 通道和 s3 通道中仅有 br_taken_mask 一组信号被 TAGE-SC 填充，并无 FTB 项生成的基础预测结果。FTB 的工作便是为 s2 和 s3 通道提供基础预测结果。
@@ -43,8 +43,8 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 
 
 
-<link rel="preload" href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" as="style">
-<link href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" as="style">
+<link href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.6.3.min.js"
@@ -86,7 +86,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7b789e39221f500bf445ef126659a179.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.906fcb156efb32b6e54f18063691dd57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -110,7 +110,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7b789e39221f500bf445ef126659a179.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.906fcb156efb32b6e54f18063691dd57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -505,25 +505,25 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_s0_pc_0</td>
 <td>输入位s0_pc 的 第0个复制</td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_s0_pc_1</td>
 <td>同上 第1个</td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_s0_pc_2</td>
 <td>同上 第2个</td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_s0_pc_3</td>
 <td>同上 第3个</td>
 </tr>
@@ -649,19 +649,19 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_0_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_0_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_0_jalr_target</td>
 <td></td>
 </tr>
@@ -679,7 +679,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_0_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -721,19 +721,19 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_1_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_1_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_1_jalr_target</td>
 <td></td>
 </tr>
@@ -751,7 +751,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_1_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -793,19 +793,19 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_2_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_2_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_2_jalr_target</td>
 <td></td>
 </tr>
@@ -823,7 +823,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_2_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -889,19 +889,19 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_3_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_3_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_3_jalr_target</td>
 <td></td>
 </tr>
@@ -919,7 +919,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_3_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -967,25 +967,25 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_0_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_0_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_0_jalr_target</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_0_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1033,25 +1033,25 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_1_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_1_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_1_jalr_target</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_1_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1099,25 +1099,25 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_2_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_2_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_2_jalr_target</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_2_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1183,19 +1183,19 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_3_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_3_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_3_jalr_target</td>
 <td></td>
 </tr>
@@ -1213,7 +1213,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_3_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1237,7 +1237,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>output</td>
-<td>[218:0]</td>
+<td>[222:0]</td>
 <td>io_out_last_stage_meta</td>
 <td>最后一个阶段输出的 meta 信息</td>
 </tr>
@@ -1447,7 +1447,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_update_bits_pc</td>
 <td>传回的预测块pc（用于指示更新的预测块）</td>
 </tr>
@@ -1573,7 +1573,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </tr>
 <tr>
 <td>input</td>
-<td>[218:0]</td>
+<td>[222:0]</td>
 <td>io_update_bits_meta</td>
 <td>meta 信息</td>
 </tr>
@@ -1581,7 +1581,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 24, 2024: <a href="https://github.com/XS-MLVP/course/commit/2dfee3181ec561624f994101c04952fe76b639e5">Updated uFTB and FTB interface list and optimized some documentation (2dfee31)</a>
+  最后修改 May 10, 2024: <a href="https://github.com/XS-MLVP/course/commit/842c41af183c5b9160c952d2c7a26cb366f524b7">fix broken math formula (842c41a)</a>
 </div>
 
 </div>

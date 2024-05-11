@@ -27,7 +27,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。 第二流水级运行：访存SRAM，读取预测用信息。通过寄存器输出到s2
 第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。
 第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：
-预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。">
+预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：41 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。">
 <meta property="og:title" content="ITTAGE 分支预测器" />
 <meta property="og:description" content="功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。
 ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 TAGE-SC分支预测器。
@@ -38,11 +38,11 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。 第二流水级运行：访存SRAM，读取预测用信息。通过寄存器输出到s2
 第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。
 第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：
-预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。" />
+预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：41 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/04_ittage/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-04-17T19:41:24+08:00" />
+<meta property="article:modified_time" content="2024-05-10T14:09:56+08:00" />
 <meta itemprop="name" content="ITTAGE 分支预测器">
 <meta itemprop="description" content="功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。
 ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 TAGE-SC分支预测器。
@@ -53,9 +53,9 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。 第二流水级运行：访存SRAM，读取预测用信息。通过寄存器输出到s2
 第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。
 第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：
-预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。">
-<meta itemprop="dateModified" content="2024-04-17T19:41:24+08:00" />
-<meta itemprop="wordCount" content="1020">
+预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：41 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。">
+<meta itemprop="dateModified" content="2024-05-10T14:09:56+08:00" />
+<meta itemprop="wordCount" content="1026">
 <meta itemprop="keywords" content="子预测器,ITTAGE," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="ITTAGE 分支预测器"/>
 <meta name="twitter:description" content="功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。
 ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 TAGE-SC分支预测器。
@@ -66,13 +66,13 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。 第二流水级运行：访存SRAM，读取预测用信息。通过寄存器输出到s2
 第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。
 第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：
-预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。"/>
+预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：41 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。"/>
 
 
 
 
-<link rel="preload" href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" as="style">
-<link href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" as="style">
+<link href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.6.3.min.js"
@@ -114,7 +114,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7b789e39221f500bf445ef126659a179.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.906fcb156efb32b6e54f18063691dd57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -138,7 +138,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7b789e39221f500bf445ef126659a179.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.906fcb156efb32b6e54f18063691dd57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -245,9 +245,13 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
         <li><a href="#训练过程">训练过程</a></li>
       </ul>
     </li>
-    <li><a href="#接口列表">接口列表</a></li>
+    <li><a href="#接口列表">接口列表</a>
+      <ul>
+        <li><a href="#不产生影响的透传信号">不产生影响的透传信号</a></li>
+      </ul>
+    </li>
     <li><a href="#其他meta见对应子预测其文档">其他Meta见对应子预测其文档</a></li>
-    <li><a href="#ittage_io_out_last_stage_meta960">ittage_io_out_last_stage_meta[96:0]</a></li>
+    <li><a href="#ittage_io_out_last_stage_meta1000">ittage_io_out_last_stage_meta[100:0]</a></li>
   </ul>
 </nav>
       </div>
@@ -380,7 +384,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 <tr>
 <td>预测表T1-T2</td>
 <td>对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定</td>
-<td>target：39 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器）</td>
+<td>target：41 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器）</td>
 <td>256项</td>
 </tr>
 <tr>
@@ -525,7 +529,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_s0_pc_3</td>
 <td>用于预测的PC</td>
 </tr>
@@ -579,6 +583,237 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
+<td>[40:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_0_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[40:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_1_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[40:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_2_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td>[40:0]</td>
+<td>io_in_bits_resp_in_0_s3_full_pred_3_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[40:0]</td>
+<td>io_out_s3_full_pred_0_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[40:0]</td>
+<td>io_out_s3_full_pred_1_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[40:0]</td>
+<td>io_out_s3_full_pred_2_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[40:0]</td>
+<td>io_out_s3_full_pred_3_jalr_target</td>
+<td></td>
+</tr>
+<tr>
+<td>output</td>
+<td>[222:0]</td>
+<td>io_out_last_stage_meta</td>
+<td>[100:0] 有效，是ITTAGE的Meta信息</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s0_fire_3</td>
+<td>s0阶段使能信号</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s1_fire_3</td>
+<td>s1阶段使能信号</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s2_fire_0</td>
+<td>s2阶段使能信号，相同</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s2_fire_1</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s2_fire_2</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_s2_fire_3</td>
+<td></td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_valid</td>
+<td>是否进行更新</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[40:0]</td>
+<td>io_update_bits_pc</td>
+<td>待更新的预测块pc索引</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_14_folded_hist</td>
+<td>T2 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[8:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_13_folded_hist</td>
+<td>T3 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_12_folded_hist</td>
+<td>T1 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[8:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_10_folded_hist</td>
+<td>T5 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[8:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_6_folded_hist</td>
+<td>T4 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_4_folded_hist</td>
+<td>T3 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_3_folded_hist</td>
+<td>T5 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[7:0]</td>
+<td>io_update_bits_spec_info_folded_hist_hist_2_folded_hist</td>
+<td>T4 更新时传入的历史</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_update_bits_ftb_entry_tailSlot_offset</td>
+<td>待更新的FTB项offset</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_ftb_entry_tailSlot_sharing</td>
+<td>待更新的FTB项是否是有条件跳转</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_ftb_entry_tailSlot_valid</td>
+<td>待更新的tailSlot是否启用</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_ftb_entry_isRet</td>
+<td>tailSlot是否是Ret指令</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_ftb_entry_isJalr</td>
+<td>tailSlot是否是Jalr指令</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_cfi_idx_valid</td>
+<td>控制流指令在预测块中的索引.valid信号</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[3:0]</td>
+<td>io_update_bits_cfi_idx_bits</td>
+<td>控制流指令在预测块中的索引</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_jmp_taken</td>
+<td>预测块内无条件跳转指令被触发</td>
+</tr>
+<tr>
+<td>input</td>
+<td></td>
+<td>io_update_bits_mispred_mask_2</td>
+<td>是否预测错误</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[222:0]</td>
+<td>io_update_bits_meta</td>
+<td>预测时传出 meta 信息的[222:25] 即{25h0, _ubtb_io_out_last_stage_meta[5:0] ,_tage_io_out_last_stage_meta[87:0] ,_ftb_io_out_last_stage_meta[2:0], _ittage_io_out_last_stage_meta[100:0]}</td>
+</tr>
+<tr>
+<td>input</td>
+<td>[40:0]</td>
+<td>io_update_bits_full_target</td>
+<td>预测块的跳转目标（下一个预测块的起始地址）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="不产生影响的透传信号">不产生影响的透传信号</h3>
+<details>
+    <summary> 这里的信号不产生影响，不重要</summary>
+    <table>
+<thead>
+<tr>
+<th>接口类型</th>
+<th>位宽</th>
+<th>信号名</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>input</td>
 <td></td>
 <td>io_in_bits_resp_in_0_s2_full_pred_0_br_taken_mask_0</td>
 <td>从FTB输入 完全透传到输出 包括jalr_target</td>
@@ -603,19 +838,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_0_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_0_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_0_jalr_target</td>
 <td></td>
 </tr>
@@ -633,7 +868,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_0_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -675,19 +910,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_1_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_1_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_1_jalr_target</td>
 <td></td>
 </tr>
@@ -705,7 +940,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_1_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -747,19 +982,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_2_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_2_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_2_jalr_target</td>
 <td></td>
 </tr>
@@ -777,7 +1012,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_2_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -843,19 +1078,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_3_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_3_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_3_jalr_target</td>
 <td></td>
 </tr>
@@ -873,7 +1108,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s2_full_pred_3_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -921,25 +1156,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_0_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_0_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
-<td>io_in_bits_resp_in_0_s3_full_pred_0_jalr_target</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_0_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -987,25 +1216,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_1_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_1_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
-<td>io_in_bits_resp_in_0_s3_full_pred_1_jalr_target</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_1_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1053,25 +1276,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_2_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_2_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
-<td>io_in_bits_resp_in_0_s3_full_pred_2_jalr_target</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_2_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1137,20 +1354,14 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_3_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_3_targets_1</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>[38:0]</td>
-<td>io_in_bits_resp_in_0_s3_full_pred_3_jalr_target</td>
 <td></td>
 </tr>
 <tr>
@@ -1167,7 +1378,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>input</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_in_bits_resp_in_0_s3_full_pred_3_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1329,19 +1540,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_0_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_0_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_0_jalr_target</td>
 <td></td>
 </tr>
@@ -1359,7 +1570,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_0_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1401,19 +1612,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_1_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_1_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_1_jalr_target</td>
 <td></td>
 </tr>
@@ -1431,7 +1642,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_1_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1473,19 +1684,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_2_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_2_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_2_jalr_target</td>
 <td></td>
 </tr>
@@ -1503,7 +1714,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_2_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1569,19 +1780,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_3_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_3_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_3_jalr_target</td>
 <td></td>
 </tr>
@@ -1599,7 +1810,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s2_full_pred_3_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1647,25 +1858,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_0_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_0_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
-<td>io_out_s3_full_pred_0_jalr_target</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_0_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1713,25 +1918,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_1_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_1_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
-<td>io_out_s3_full_pred_1_jalr_target</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_1_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1779,25 +1978,19 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_2_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_2_targets_1</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
-<td>io_out_s3_full_pred_2_jalr_target</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_2_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1863,20 +2056,14 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_3_targets_0</td>
 <td></td>
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_3_targets_1</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>[38:0]</td>
-<td>io_out_s3_full_pred_3_jalr_target</td>
 <td></td>
 </tr>
 <tr>
@@ -1893,7 +2080,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </tr>
 <tr>
 <td>output</td>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>io_out_s3_full_pred_3_fallThroughAddr</td>
 <td></td>
 </tr>
@@ -1914,12 +2101,6 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 <td></td>
 <td>io_out_s3_full_pred_3_hit</td>
 <td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>[218:0]</td>
-<td>io_out_last_stage_meta</td>
-<td>[96:0] 有效，是ITTAGE的Meta信息</td>
 </tr>
 <tr>
 <td>output</td>
@@ -2035,175 +2216,14 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 <td>io_out_last_stage_ftb_entry_always_taken_1</td>
 <td></td>
 </tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_s0_fire_3</td>
-<td>s0阶段使能信号</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_s1_fire_3</td>
-<td>s1阶段使能信号</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_s2_fire_0</td>
-<td>s2阶段使能信号，相同</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_s2_fire_1</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_s2_fire_2</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_s2_fire_3</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_update_valid</td>
-<td>是否进行更新</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[38:0]</td>
-<td>io_update_bits_pc</td>
-<td>待更新的预测块pc索引</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_14_folded_hist</td>
-<td>T2 更新时传入的历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[8:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_13_folded_hist</td>
-<td>T3 更新时传入的历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[3:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_12_folded_hist</td>
-<td>T1 更新时传入的历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[8:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_10_folded_hist</td>
-<td>T5 更新时传入的历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[8:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_6_folded_hist</td>
-<td>T4 更新时传入的历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_4_folded_hist</td>
-<td>T3 更新时传入的历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_3_folded_hist</td>
-<td>T5 更新时传入的历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_2_folded_hist</td>
-<td>T4 更新时传入的历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[3:0]</td>
-<td>io_update_bits_ftb_entry_tailSlot_offset</td>
-<td>待更新的FTB项offset</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_update_bits_ftb_entry_tailSlot_sharing</td>
-<td>待更新的FTB项是否是有条件跳转</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_update_bits_ftb_entry_tailSlot_valid</td>
-<td>待更新的tailSlot是否启用</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_update_bits_ftb_entry_isRet</td>
-<td>tailSlot是否是Ret指令</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_update_bits_ftb_entry_isJalr</td>
-<td>tailSlot是否是Jalr指令</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_update_bits_cfi_idx_valid</td>
-<td>控制流指令在预测块中的索引.valid信号</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[3:0]</td>
-<td>io_update_bits_cfi_idx_bits</td>
-<td>控制流指令在预测块中的索引</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_update_bits_jmp_taken</td>
-<td>预测块内无条件跳转指令被触发</td>
-</tr>
-<tr>
-<td>input</td>
-<td></td>
-<td>io_update_bits_mispred_mask_2</td>
-<td>是否预测错误</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[218:0]</td>
-<td>io_update_bits_meta</td>
-<td>预测时传出 meta 信息的[218:25] 即{25h0, _ubtb_io_out_last_stage_meta[5:0] ,_tage_io_out_last_stage_meta[87:0] ,_ftb_io_out_last_stage_meta[2:0], _ittage_io_out_last_stage_meta[96:0]}</td>
-</tr>
-<tr>
-<td>input</td>
-<td>[38:0]</td>
-<td>io_update_bits_full_target</td>
-<td>预测块的跳转目标（下一个预测块的起始地址）</td>
-</tr>
 </tbody>
 </table>
+</details>
 <h2 id="其他meta见对应子预测其文档">其他Meta见对应子预测其文档</h2>
 <p>_ubtb_io_out_last_stage_meta</p>
 <p>_tage_io_out_last_stage_meta</p>
 <p>_ftb_io_out_last_stage_meta</p>
-<h2 id="ittage_io_out_last_stage_meta960">ittage_io_out_last_stage_meta[96:0]</h2>
+<h2 id="ittage_io_out_last_stage_meta1000">ittage_io_out_last_stage_meta[100:0]</h2>
 <table>
 <thead>
 <tr>
@@ -2214,67 +2234,67 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </thead>
 <tbody>
 <tr>
-<td>96</td>
+<td>100</td>
 <td>s3_provided</td>
 <td>是否有结果</td>
 </tr>
 <tr>
-<td>[95:93]</td>
+<td>[99:97]</td>
 <td>s3_provider</td>
 <td>提供结果的表项</td>
 </tr>
 <tr>
-<td>92</td>
+<td>96</td>
 <td>s3_altProvided</td>
 <td>是否有替代预测表项</td>
 </tr>
 <tr>
-<td>[91:89]</td>
+<td>[95:93]</td>
 <td>s3_altProvider</td>
 <td>提供结果的替代预测表项</td>
 </tr>
 <tr>
-<td>88</td>
+<td>92</td>
 <td>resp_meta_altDiffers</td>
 <td>替代预测是否是弱信心的（FTB不算）</td>
 </tr>
 <tr>
-<td>87</td>
+<td>91</td>
 <td>s3_providerU</td>
 <td>主预测的useful bit</td>
 </tr>
 <tr>
-<td>[86:85]</td>
+<td>[90:89]</td>
 <td>s3_providerCtr</td>
 <td>主预测给出的置信度</td>
 </tr>
 <tr>
-<td>[84:83]</td>
+<td>[88:87]</td>
 <td>s3_altProviderCtr</td>
 <td>替代预测给出的置信度</td>
 </tr>
 <tr>
-<td>82</td>
+<td>86</td>
 <td>resp_meta_allocate_valid_r</td>
 <td>有空余的表项可供申请</td>
 </tr>
 <tr>
-<td>[81:79]</td>
+<td>[85:83]</td>
 <td>resp_meta_allocate_bits_r</td>
 <td>申请哪个表中的表项</td>
 </tr>
 <tr>
-<td>78</td>
+<td>82</td>
 <td>s3_tageTaken_dup_3</td>
 <td>在不使用FTB的情况下始为true，使用FTB也为true</td>
 </tr>
 <tr>
-<td>[77:39]</td>
+<td>[81:41]</td>
 <td>s3_providerTarget</td>
 <td>主预测给出的跳转地址</td>
 </tr>
 <tr>
-<td>[38:0]</td>
+<td>[40:0]</td>
 <td>s3_altProviderTarget</td>
 <td>替代预测给出的跳转地址</td>
 </tr>
@@ -2282,7 +2302,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 17, 2024: <a href="https://github.com/XS-MLVP/course/commit/f3fa42abc87fa9ff32d85bf89f564918f9100e6c">update ittage part (f3fa42a)</a>
+  最后修改 May 10, 2024: <a href="https://github.com/XS-MLVP/course/commit/842c41af183c5b9160c952d2c7a26cb366f524b7">fix broken math formula (842c41a)</a>
 </div>
 
 </div>

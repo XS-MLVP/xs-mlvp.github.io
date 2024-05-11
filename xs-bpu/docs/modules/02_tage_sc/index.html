@@ -36,7 +36,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/02_tage_sc/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-04-17T19:41:24+08:00" />
+<meta property="article:modified_time" content="2024-05-10T14:09:56+08:00" />
 <meta itemprop="name" content="TAGE-SC 分支预测器">
 <meta itemprop="description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
@@ -45,8 +45,8 @@
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
 如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
-<meta itemprop="dateModified" content="2024-04-17T19:41:24+08:00" />
-<meta itemprop="wordCount" content="1086">
+<meta itemprop="dateModified" content="2024-05-10T14:09:56+08:00" />
+<meta itemprop="wordCount" content="1085">
 <meta itemprop="keywords" content="子预测器,TAGE-SC," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="TAGE-SC 分支预测器"/>
 <meta name="twitter:description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
@@ -59,8 +59,8 @@
 
 
 
-<link rel="preload" href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" as="style">
-<link href="/xs-bpu/scss/main.min.b57c11116582dfb62ae140b6ea11e4a58b7567b721dd79552e9ae2535883cce9.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" as="style">
+<link href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.6.3.min.js"
@@ -102,7 +102,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7b789e39221f500bf445ef126659a179.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.906fcb156efb32b6e54f18063691dd57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -126,7 +126,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7b789e39221f500bf445ef126659a179.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.906fcb156efb32b6e54f18063691dd57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -427,7 +427,7 @@
 <h3 id="t0tn表的检索方法">T0，Tn表的检索方法</h3>
 <ul>
 <li>对于T0表，在查找时用 PC[11:1] 位进行索引2048表项，因此对于T0来说，不可能存在检索不到的情况。</li>
-<li>对于表Tn，除了 PC[11:1] 外，<strong>还需要</strong>基于全局分支历史进行检索。在昆明湖中，顶层分支预测器维护了一个256bit的全局历史记录GH，可以根据子预测器需要将GH的最近n位历史信息，按目标位数x进行折叠。 即把n，以长度x为基本单元，拆分成ceil(x/n)个长为x的数，然后<strong>按位进行异或</strong>得到。通常用FH（Folded History）表示，具体流程请参考 XXX章节。TAGE预测器查找Tn的表项时，用到了index和tag，他们的计算公式如下表所示：</li>
+<li>对于表Tn，除了 PC[11:1] 外，<strong>还需要</strong>基于全局分支历史进行检索。在昆明湖中，顶层分支预测器维护了一个256bit的全局历史记录GH，可以根据子预测器需要将GH的最近n位历史信息，按目标位数x进行折叠。 即把n，以长度x为基本单元，拆分成ceil(x/n)个长为x的数，然后<strong>按位进行异或</strong>得到。通常用FH（Folded History）表示，具体流程请参考 <a href="../00_bpu_top/#%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2">分支折叠历史章节</a>。TAGE预测器查找Tn的表项时，用到了index和tag，他们的计算公式如下表所示：</li>
 </ul>
 <table>
 <thead>
@@ -562,7 +562,7 @@
 </thead>
 <tbody>
 <tr>
-<td>Index = (index FH) ^ ((pc&raquo;1)低位)</td>
+<td>Index = (FH) ^ ((pc&raquo;1)低位)</td>
 </tr>
 </tbody>
 </table>
@@ -604,8 +604,8 @@
 </tbody>
 </table>
 <p>在计算统计预测结果时，总得统计结果计算公式如下：</p>
-<p>$$scCtrSum=\sum_{i=0}^{i&lt;4}( (ctr_{sc} &laquo; 1) +1)$$</p>
-<p>其中ctr_sc表示每个表的有符号饱和计数器。对其进行左移加一是进行<strong>权重调整</strong>。累加后的scCtrSum就是SC的最终预测结果，如果为该值大于零，则预测跳转，小于零则预测不跳转。其绝对值越大，表示预测置信度越高。</p>
+
+<div class="math">$$scCtrSum=\sum_{i=0}^{i<4}( (ctr_{sc} << 1) +1)$$</div><p>其中ctr_sc表示每个表的有符号饱和计数器。对其进行左移加一是进行<strong>权重调整</strong>。累加后的scCtrSum就是SC的最终预测结果，如果为该值大于零，则预测跳转，小于零则预测不跳转。其绝对值越大，表示预测置信度越高。</p>
 <p>典型数据转换结果如下（在计算时为了不溢出，扩展到了9位）：</p>
 <ol>
 <li>均为 6b100000（强不跳转） ，求得 9b100000100，值为 -252</li>
@@ -662,14 +662,13 @@
 <p>由于TAGE的预测结果是无符号饱和计数器，而SC的预测结果是有符号饱和计数器，如果对他们进行相加，需要进行数据转换。</p>
 </li>
 <li>
-<p>昆明湖在实现上，采用了对TAGE的结果进行转换。转换后的结果用</p>
+<p>昆明湖在实现上，采用了对TAGE的结果进行转换。转换后的结果用
+tageCtrCentered
+表示，具体转换过程如下：</p>
 </li>
 </ol>
-<p>tageCtrCentered</p>
-<p>表示，具体转换过程如下：</p>
-<pre><code> $$tageCtrCentered=((((ctr_{tage} -4)&lt;&lt;1)+1)&lt;&lt;3)$$
-</code></pre>
-<ol start="3">
+
+<div class="math">$$tageCtrCentered=((((ctr_{tage} -4)<<1)+1)<<3) $$</div><ol start="3">
 <li>
 <p>3比特的无符号饱和计数器转换为8比特的有符号饱和计数器结果举例如下所示：</p>
 </li>
@@ -688,8 +687,11 @@
 </ol>
 </li>
 <li>
-<p>对TAGE和SC的预测结果进行相加得到最终预测结果P，在实现上用totalSum进行表示。 $$totalSum = scCtrSum + tageCtrCentered$$</p>
+<p>对TAGE和SC的预测结果进行相加得到最终预测结果P，在实现上用totalSum进行表示。</p>
 </li>
+</ol>
+
+<div class="math">$$totalSum = scCtrSum + tageCtrCentered$$</div><ol start="4">
 <li>
 <p>根据 <strong>totalSum 以及 sc_bank_thres</strong> <strong>决定最终预测方向</strong></p>
 <ol>
@@ -743,19 +745,19 @@
 </tr>
 <tr>
 <td>input</td>
-<td>*[38:0]</td>
+<td>*[40:0]</td>
 <td>io_in_bits_s0_pc_0</td>
 <td>复制的s0_pc的dup数组的第1个，给顶层BPU的PC</td>
 </tr>
 <tr>
 <td>input</td>
-<td>*[38:0]</td>
+<td>*[40:0]</td>
 <td>io_in_bits_s0_pc_1</td>
 <td>复制的s0_pc第2个，给Tage的PC</td>
 </tr>
 <tr>
 <td>input</td>
-<td>*[38:0]</td>
+<td>*[40:0]</td>
 <td>io_in_bits_s0_pc_3</td>
 <td>复制的s0_pc的第4个，给SC的PC</td>
 </tr>
@@ -941,7 +943,7 @@
 </tr>
 <tr>
 <td>output</td>
-<td>*[218:0]</td>
+<td>*[222:0]</td>
 <td>io_out_last_stage_meta</td>
 <td>见附表</td>
 </tr>
@@ -1037,7 +1039,7 @@
 </tr>
 <tr>
 <td>input</td>
-<td>*[38:0]</td>
+<td>*[40:0]</td>
 <td>io_update_bits_pc</td>
 <td>（后端执行过的）预测块的PC</td>
 </tr>
@@ -1181,7 +1183,7 @@
 </tr>
 <tr>
 <td>input</td>
-<td>*[218:0]</td>
+<td>*[222:0]</td>
 <td>io_update_bits_meta</td>
 <td>见附表</td>
 </tr>
@@ -1444,7 +1446,7 @@
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 17, 2024: <a href="https://github.com/XS-MLVP/course/commit/f3fa42abc87fa9ff32d85bf89f564918f9100e6c">update ittage part (f3fa42a)</a>
+  最后修改 May 10, 2024: <a href="https://github.com/XS-MLVP/course/commit/842c41af183c5b9160c952d2c7a26cb366f524b7">fix broken math formula (842c41a)</a>
 </div>
 
 </div>
@@ -1488,7 +1490,17 @@
 </footer>
 
     </div>
-    <script src="/xs-bpu/js/main.min.fc653db1f3d4f4a8b4eacd389f96d8afe966937ba9dded8b07d3a1b17d967d22.js" integrity="sha256-/GU9sfPU9Ki06s04n5bYr&#43;lmk3up3e2LB9OhsX2WfSI=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+      integrity="sha512-fHwaWebuwA7NSF5Qg/af4UeDx9XqUpYpOGgubo3yWu+b2IQR4UeQwbb42Ti7gVAjNtVoI/I9TEoYeu9omwcC6g==" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+        integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+       integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous"
+       onload='renderMathInElement(document.body, null);'>
+</script>
+<script src="/xs-bpu/js/main.min.fc653db1f3d4f4a8b4eacd389f96d8afe966937ba9dded8b07d3a1b17d967d22.js" integrity="sha256-/GU9sfPU9Ki06s04n5bYr&#43;lmk3up3e2LB9OhsX2WfSI=" crossorigin="anonymous"></script>
 <script defer src="/xs-bpu/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
 <script src='/xs-bpu/js/tabpane-persist.js'></script>
 

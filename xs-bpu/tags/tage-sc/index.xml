@@ -112,7 +112,7 @@
 &lt;h3 id=&#34;t0tn表的检索方法&#34;&gt;T0，Tn表的检索方法&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;对于T0表，在查找时用 PC[11:1] 位进行索引2048表项，因此对于T0来说，不可能存在检索不到的情况。&lt;/li&gt;
-&lt;li&gt;对于表Tn，除了 PC[11:1] 外，&lt;strong&gt;还需要&lt;/strong&gt;基于全局分支历史进行检索。在昆明湖中，顶层分支预测器维护了一个256bit的全局历史记录GH，可以根据子预测器需要将GH的最近n位历史信息，按目标位数x进行折叠。 即把n，以长度x为基本单元，拆分成ceil(x/n)个长为x的数，然后&lt;strong&gt;按位进行异或&lt;/strong&gt;得到。通常用FH（Folded History）表示，具体流程请参考 XXX章节。TAGE预测器查找Tn的表项时，用到了index和tag，他们的计算公式如下表所示：&lt;/li&gt;
+&lt;li&gt;对于表Tn，除了 PC[11:1] 外，&lt;strong&gt;还需要&lt;/strong&gt;基于全局分支历史进行检索。在昆明湖中，顶层分支预测器维护了一个256bit的全局历史记录GH，可以根据子预测器需要将GH的最近n位历史信息，按目标位数x进行折叠。 即把n，以长度x为基本单元，拆分成ceil(x/n)个长为x的数，然后&lt;strong&gt;按位进行异或&lt;/strong&gt;得到。通常用FH（Folded History）表示，具体流程请参考 &lt;a href=&#34;../00_bpu_top/#%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2&#34;&gt;分支折叠历史章节&lt;/a&gt;。TAGE预测器查找Tn的表项时，用到了index和tag，他们的计算公式如下表所示：&lt;/li&gt;
 &lt;/ul&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -247,7 +247,7 @@
 &lt;/thead&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
-&lt;td&gt;Index = (index FH) ^ ((pc&amp;raquo;1)低位)&lt;/td&gt;
+&lt;td&gt;Index = (FH) ^ ((pc&amp;raquo;1)低位)&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -289,8 +289,8 @@
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;在计算统计预测结果时，总得统计结果计算公式如下：&lt;/p&gt;
-&lt;p&gt;$$scCtrSum=\sum_{i=0}^{i&amp;lt;4}( (ctr_{sc} &amp;laquo; 1) +1)$$&lt;/p&gt;
-&lt;p&gt;其中ctr_sc表示每个表的有符号饱和计数器。对其进行左移加一是进行&lt;strong&gt;权重调整&lt;/strong&gt;。累加后的scCtrSum就是SC的最终预测结果，如果为该值大于零，则预测跳转，小于零则预测不跳转。其绝对值越大，表示预测置信度越高。&lt;/p&gt;
+
+&lt;div class=&#34;math&#34;&gt;$$scCtrSum=\sum_{i=0}^{i&lt;4}( (ctr_{sc} &lt;&lt; 1) +1)$$&lt;/div&gt;&lt;p&gt;其中ctr_sc表示每个表的有符号饱和计数器。对其进行左移加一是进行&lt;strong&gt;权重调整&lt;/strong&gt;。累加后的scCtrSum就是SC的最终预测结果，如果为该值大于零，则预测跳转，小于零则预测不跳转。其绝对值越大，表示预测置信度越高。&lt;/p&gt;
 &lt;p&gt;典型数据转换结果如下（在计算时为了不溢出，扩展到了9位）：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;均为 6b100000（强不跳转） ，求得 9b100000100，值为 -252&lt;/li&gt;
@@ -347,14 +347,13 @@
 &lt;p&gt;由于TAGE的预测结果是无符号饱和计数器，而SC的预测结果是有符号饱和计数器，如果对他们进行相加，需要进行数据转换。&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;昆明湖在实现上，采用了对TAGE的结果进行转换。转换后的结果用&lt;/p&gt;
+&lt;p&gt;昆明湖在实现上，采用了对TAGE的结果进行转换。转换后的结果用
+tageCtrCentered
+表示，具体转换过程如下：&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;tageCtrCentered&lt;/p&gt;
-&lt;p&gt;表示，具体转换过程如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; $$tageCtrCentered=((((ctr_{tage} -4)&amp;lt;&amp;lt;1)+1)&amp;lt;&amp;lt;3)$$
-&lt;/code&gt;&lt;/pre&gt;
-&lt;ol start=&#34;3&#34;&gt;
+
+&lt;div class=&#34;math&#34;&gt;$$tageCtrCentered=((((ctr_{tage} -4)&lt;&lt;1)+1)&lt;&lt;3) $$&lt;/div&gt;&lt;ol start=&#34;3&#34;&gt;
 &lt;li&gt;
 &lt;p&gt;3比特的无符号饱和计数器转换为8比特的有符号饱和计数器结果举例如下所示：&lt;/p&gt;
 &lt;/li&gt;
@@ -373,8 +372,11 @@
 &lt;/ol&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;对TAGE和SC的预测结果进行相加得到最终预测结果P，在实现上用totalSum进行表示。 $$totalSum = scCtrSum + tageCtrCentered$$&lt;/p&gt;
+&lt;p&gt;对TAGE和SC的预测结果进行相加得到最终预测结果P，在实现上用totalSum进行表示。&lt;/p&gt;
 &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&#34;math&#34;&gt;$$totalSum = scCtrSum + tageCtrCentered$$&lt;/div&gt;&lt;ol start=&#34;4&#34;&gt;
 &lt;li&gt;
 &lt;p&gt;根据 &lt;strong&gt;totalSum 以及 sc_bank_thres&lt;/strong&gt; &lt;strong&gt;决定最终预测方向&lt;/strong&gt;&lt;/p&gt;
 &lt;ol&gt;
@@ -428,19 +430,19 @@
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;input&lt;/td&gt;
-&lt;td&gt;*[38:0]&lt;/td&gt;
+&lt;td&gt;*[40:0]&lt;/td&gt;
 &lt;td&gt;io_in_bits_s0_pc_0&lt;/td&gt;
 &lt;td&gt;复制的s0_pc的dup数组的第1个，给顶层BPU的PC&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;input&lt;/td&gt;
-&lt;td&gt;*[38:0]&lt;/td&gt;
+&lt;td&gt;*[40:0]&lt;/td&gt;
 &lt;td&gt;io_in_bits_s0_pc_1&lt;/td&gt;
 &lt;td&gt;复制的s0_pc第2个，给Tage的PC&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;input&lt;/td&gt;
-&lt;td&gt;*[38:0]&lt;/td&gt;
+&lt;td&gt;*[40:0]&lt;/td&gt;
 &lt;td&gt;io_in_bits_s0_pc_3&lt;/td&gt;
 &lt;td&gt;复制的s0_pc的第4个，给SC的PC&lt;/td&gt;
 &lt;/tr&gt;
@@ -626,7 +628,7 @@
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;output&lt;/td&gt;
-&lt;td&gt;*[218:0]&lt;/td&gt;
+&lt;td&gt;*[222:0]&lt;/td&gt;
 &lt;td&gt;io_out_last_stage_meta&lt;/td&gt;
 &lt;td&gt;见附表&lt;/td&gt;
 &lt;/tr&gt;
@@ -722,7 +724,7 @@
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;input&lt;/td&gt;
-&lt;td&gt;*[38:0]&lt;/td&gt;
+&lt;td&gt;*[40:0]&lt;/td&gt;
 &lt;td&gt;io_update_bits_pc&lt;/td&gt;
 &lt;td&gt;（后端执行过的）预测块的PC&lt;/td&gt;
 &lt;/tr&gt;
@@ -866,7 +868,7 @@
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;input&lt;/td&gt;
-&lt;td&gt;*[218:0]&lt;/td&gt;
+&lt;td&gt;*[222:0]&lt;/td&gt;
 &lt;td&gt;io_update_bits_meta&lt;/td&gt;
 &lt;td&gt;见附表&lt;/td&gt;
 &lt;/tr&gt;
