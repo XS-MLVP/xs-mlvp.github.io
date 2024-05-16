@@ -693,6 +693,7 @@
 &lt;/li&gt;
 &lt;li&gt;Tn 表项通过 异或 pc 与 折叠全局历史 索引
 &lt;ol&gt;
+&lt;li&gt;1 bit valid 有效位&lt;/li&gt;
 &lt;li&gt;3 bit pred &lt;strong&gt;无符号&lt;/strong&gt;饱和计数器&lt;/li&gt;
 &lt;li&gt;8 bit tag （基于Hash校验是否命中，而非巧合）&lt;/li&gt;
 &lt;li&gt;1 bit useful 用于控制有效期&lt;/li&gt;
@@ -738,7 +739,7 @@
 &lt;tr&gt;
 &lt;td&gt;预测表T1-T4&lt;/td&gt;
 &lt;td&gt;对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为最后预测结果。历史记录长度由输入的H决定&lt;/td&gt;
-&lt;td&gt;3 bit ctr 饱和计数器8 bit tag 校验命中1 bit us 作为usefulness计数器&lt;/td&gt;
+&lt;td&gt;1 bit valid 有效位 3 bit ctr 饱和计数器8 bit tag 校验命中1 bit us 作为usefulness计数器&lt;/td&gt;
 &lt;td&gt;4096项、奇数项对应第一条分支指令，偶数项对应第二条分支指令&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;

@@ -75,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7fbcd8a5ea40ba0f63cc1e6c8f91db2c.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.51ab2acbe6e8a13831f36d792b79dc1e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -2705,6 +2705,7 @@
 </li>
 <li>Tn 表项通过 异或 pc 与 折叠全局历史 索引
 <ol>
+<li>1 bit valid 有效位</li>
 <li>3 bit pred <strong>无符号</strong>饱和计数器</li>
 <li>8 bit tag （基于Hash校验是否命中，而非巧合）</li>
 <li>1 bit useful 用于控制有效期</li>
@@ -2750,7 +2751,7 @@
 <tr>
 <td>预测表T1-T4</td>
 <td>对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为最后预测结果。历史记录长度由输入的H决定</td>
-<td>3 bit ctr 饱和计数器8 bit tag 校验命中1 bit us 作为usefulness计数器</td>
+<td>1 bit valid 有效位 3 bit ctr 饱和计数器8 bit tag 校验命中1 bit us 作为usefulness计数器</td>
 <td>4096项、奇数项对应第一条分支指令，偶数项对应第二条分支指令</td>
 </tr>
 </tbody>
