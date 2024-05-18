@@ -36,7 +36,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/02_tage_sc/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-05-17T17:19:36+08:00" />
+<meta property="article:modified_time" content="2024-05-18T22:03:28+08:00" />
 <meta itemprop="name" content="TAGE-SC 分支预测器">
 <meta itemprop="description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
@@ -45,8 +45,8 @@
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
 如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
-<meta itemprop="dateModified" content="2024-05-17T17:19:36+08:00" />
-<meta itemprop="wordCount" content="1093">
+<meta itemprop="dateModified" content="2024-05-18T22:03:28+08:00" />
+<meta itemprop="wordCount" content="1092">
 <meta itemprop="keywords" content="子预测器,TAGE-SC," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="TAGE-SC 分支预测器"/>
 <meta name="twitter:description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
@@ -102,7 +102,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.51ab2acbe6e8a13831f36d792b79dc1e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.44d978fd88d136d5bcbf5ec2794e59f5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -126,7 +126,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.51ab2acbe6e8a13831f36d792b79dc1e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.44d978fd88d136d5bcbf5ec2794e59f5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -490,7 +490,7 @@
 <p>注：pc&raquo;1是因为使用了RISC-C拓展，2Byte对齐，而PC本身已经省略了1B对齐，所以只用1b</p>
 <h3 id="替代预测器">替代预测器</h3>
 <p>由于 Tn 表使用饱和计数器进行预测，因此其输出结果可能存在“<strong>信心不足</strong>”的情况。例如在昆明湖中，对3比特饱和计数器，100、011时都是<strong>弱预测</strong>。为了为该状态提供更多的选择参考，TAGE 预测器还提供了一个“替代预测器”机制，他的作用是告诉 TAGE 在 Tn 表预测的结果 “信心不足” 时，是该选择 Tn 的预测结果，还是选择 T0 的预测结果。</p>
-<p>在昆明湖的具体实现中，“替代预测器” 基于 <strong>useAltOnNaCtrs</strong> 的寄存器组实现。它由128 个 <strong>4-bit饱和计数器</strong> 构成，每个计数器都被初始化为 <strong>0b1000</strong>。在TAGE进行预测时，使用 <strong>PC(7,1)</strong> 进行索引得到对应的饱和计数器。如果该计数器的值大于预设值，且Tn预测结果信心不高，则选择T0的结果，否则选择Tn的结果。</p>
+<p>在昆明湖的具体实现中，“替代预测器” 基于 <strong>useAltOnNaCtrs</strong> 的寄存器组实现。它由两路128个 <strong>4-bit饱和计数器</strong> 构成，每个计数器都被初始化为 <strong>0b1000</strong>。在TAGE进行预测时，使用 <strong>PC(7,1)</strong> 进行索引得到对应的饱和计数器。如果该计数器的值大于预设值，且Tn预测结果信心不高，则选择T0的结果，否则选择Tn的结果。</p>
 <h3 id="预测过程">预测过程</h3>
 <p>综上所述，昆明湖中TAGE预测器的预测步骤如下：</p>
 <ol>
@@ -1449,7 +1449,7 @@ tageCtrCentered
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 May 17, 2024: <a href="https://github.com/XS-MLVP/course/commit/8daadba15317639a87afc28032a159fc2cd97a25">Improve the format of the example for converting of the value from 3-bit counter to 4bit counter. (8daadba)</a>
+  最后修改 May 18, 2024: <a href="https://github.com/XS-MLVP/course/commit/183253e2bfe8954c61b1c1f568a7538a20f16006">Fix the description issue of the structure of useAltOnNaCtrs. (183253e)</a>
 </div>
 
 </div>
