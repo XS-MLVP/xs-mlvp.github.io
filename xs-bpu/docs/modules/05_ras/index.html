@@ -34,7 +34,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/05_ras/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-05-18T22:03:28+08:00" />
+<meta property="article:modified_time" content="2024-05-19T19:55:58+08:00" />
 <meta itemprop="name" content="RAS 分支预测器">
 <meta itemprop="description" content="RAS介绍 RAS 指的是 &ldquo;Return Address Stack&rdquo;，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
 等。RAS分支预测器则专门针对 call/return类型。
@@ -42,7 +42,7 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
 具体的，在香山的RAS预测器中，其s2阶段，需要判断上一级s2的输出是否预测为call或者ret（即输入信号io.s2_full_pred.hit_taken_on_call/ret有效 ），如果是call则push其后续指令地址入栈，是ret则从栈中pop出地址作为预测结果。因为在BPU的预测器中，人为假定s3阶段得到的结果比s2阶段好，所以RAS预测器在s3阶段需要进行检查，如果上一级的s3预测结果与s2不一致，则采信s3的结果，并按需求判断是否需要撤销或者补齐之前s2阶段的栈操作。例如s2阶段预测为call指令，进行了push操作，而s3为普通分支指令，不需要进行任何操作，此时就需要撤销push；如果s2预测为普通分支指令，s3预测为call，则需要进行push操作补齐。
 RAS的栈操作 在RAS设计中，通过栈进行预测函数返回地址。在理想情况下，本节假定RAS可进行随时备份，栈顶指针用sp表示，预测地址用paddr表示。RAS的基本操作有以下4种：
 PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。">
-<meta itemprop="dateModified" content="2024-05-18T22:03:28+08:00" />
+<meta itemprop="dateModified" content="2024-05-19T19:55:58+08:00" />
 <meta itemprop="wordCount" content="302">
 <meta itemprop="keywords" content="子预测器,RAS," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RAS 分支预测器"/>
 <meta name="twitter:description" content="RAS介绍 RAS 指的是 &ldquo;Return Address Stack&rdquo;，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
@@ -98,7 +98,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.44d978fd88d136d5bcbf5ec2794e59f5.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7a13c9b97be041e8f0c6683b12d33a5b.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -122,7 +122,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.44d978fd88d136d5bcbf5ec2794e59f5.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7a13c9b97be041e8f0c6683b12d33a5b.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -691,7 +691,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
 <p>由于RASStack对外表现为当拍内就能完成任务，因此在Stack内需要进行数据旁路，对数据进行缓存。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 May 18, 2024: <a href="https://github.com/XS-MLVP/course/commit/183253e2bfe8954c61b1c1f568a7538a20f16006">Fix the description issue of the structure of useAltOnNaCtrs. (183253e)</a>
+  最后修改 May 19, 2024: <a href="https://github.com/XS-MLVP/course/commit/a6080de11961b760074cf2006b4ecda649bc805f">Fix the issue with the incorrect description about &#34;useAltOnNaCtrs&#34;. (a6080de)</a>
 </div>
 
 </div>

@@ -75,7 +75,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.44d978fd88d136d5bcbf5ec2794e59f5.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7a13c9b97be041e8f0c6683b12d33a5b.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -1200,7 +1200,7 @@
 <p>注：pc&raquo;1是因为使用了RISC-C拓展，2Byte对齐，而PC本身已经省略了1B对齐，所以只用1b</p>
 <h3 id="替代预测器">替代预测器</h3>
 <p>由于 Tn 表使用饱和计数器进行预测，因此其输出结果可能存在“<strong>信心不足</strong>”的情况。例如在昆明湖中，对3比特饱和计数器，100、011时都是<strong>弱预测</strong>。为了为该状态提供更多的选择参考，TAGE 预测器还提供了一个“替代预测器”机制，他的作用是告诉 TAGE 在 Tn 表预测的结果 “信心不足” 时，是该选择 Tn 的预测结果，还是选择 T0 的预测结果。</p>
-<p>在昆明湖的具体实现中，“替代预测器” 基于 <strong>useAltOnNaCtrs</strong> 的寄存器组实现。它由两路128个 <strong>4-bit饱和计数器</strong> 构成，每个计数器都被初始化为 <strong>0b1000</strong>。在TAGE进行预测时，使用 <strong>PC(7,1)</strong> 进行索引得到对应的饱和计数器。如果该计数器的值大于预设值，且Tn预测结果信心不高，则选择T0的结果，否则选择Tn的结果。</p>
+<p>在昆明湖的具体实现中，“替代预测器” 基于 <strong>useAltOnNaCtrs</strong> 的寄存器组实现。它由两路128个 <strong>4-bit饱和计数器</strong> 构成，每个计数器都被初始化为 <strong>0b1000</strong>。在TAGE进行预测时，使用 <strong>PC(7,1)</strong> 进行索引得到对应的饱和计数器。如果该计数器的值大于等于预设值，且Tn预测结果信心不高，则选择T0的结果，否则选择Tn的结果。</p>
 <h3 id="预测过程">预测过程</h3>
 <p>综上所述，昆明湖中TAGE预测器的预测步骤如下：</p>
 <ol>
@@ -1210,7 +1210,7 @@
 <li>如果<strong>没有命中</strong>Tn表，则由<strong>T0表</strong>的饱和计数器给出最终预测结果。</li>
 </ol>
 </li>
-<li>如果匹配到的<strong>Tn表的潜在预测结果为弱预测</strong>(100,011)，且<strong>替代预测中PC对应4-bit计数器的值</strong>大于阈值，则采用T0表的结果为最终结果，否则采用Tn表的预测结果为最终预测结果。</li>
+<li>如果匹配到的<strong>Tn表的潜在预测结果为弱预测</strong>(100,011)，且<strong>替代预测中PC对应4-bit计数器的值</strong>大于等于阈值，则采用T0表的结果为最终结果，否则采用Tn表的预测结果为最终预测结果。</li>
 </ol>
 <h3 id="训练过程">训练过程</h3>
 <p>由于TAGE的预测过程用到了很多计数器和tag，他们需要根据一定的规则进行更新，该过程称为训练。该训练过程发生在BPU的update阶段，该阶段会输入PC，分支历史、以及否预测正确等信息。香山昆明湖的分支预测进行训练的流程根据不同情况，分为如下几个步骤：</p>
@@ -1238,7 +1238,7 @@
 <li>若结果还同时为<strong>弱预测</strong>，则选用T0的替代预测计数器 -1</li>
 </ol>
 </li>
-<li>若<strong>Tn错误</strong>则表项 useful -1，同时如 <strong>3.b.ii</strong> 在更长历史表中申请新表项
+<li>若<strong>Tn错误</strong>则表项 useful -1，同时如 <strong>3.ii.b</strong> 在更长历史表中申请新表项
 <ol>
 <li>若结果还同时为<strong>弱预测</strong>，则选用T0的替代预测计数器 +1</li>
 </ol>
