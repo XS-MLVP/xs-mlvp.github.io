@@ -1032,7 +1032,7 @@
 &lt;h3 id=&#34;训练过程&#34;&gt;训练过程&lt;/h3&gt;
 &lt;p&gt;由于TAGE的预测过程用到了很多计数器和tag，他们需要根据一定的规则进行更新，该过程称为训练。该训练过程发生在BPU的update阶段，该阶段会输入PC，分支历史、以及否预测正确等信息。香山昆明湖的分支预测进行训练的流程根据不同情况，分为如下几个步骤：&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;T0&lt;/strong&gt;始终更新：发生跳转（即taken）则 pc 索引的 ctr 饱和计数器 +1，否则 -1&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;T0&lt;/strong&gt;作为最终使用的预测结果时更新：发生跳转（即taken）则 pc 索引的 ctr 饱和计数器 +1，否则 -1&lt;/li&gt;
 &lt;li&gt;在&lt;strong&gt;只有T0&lt;/strong&gt;命中时，进行如下操作
 &lt;ol&gt;
 &lt;li&gt;T0&lt;strong&gt;预测正确&lt;/strong&gt;则不额外更新&lt;/li&gt;

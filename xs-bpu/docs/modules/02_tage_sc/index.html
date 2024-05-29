@@ -36,7 +36,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/02_tage_sc/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-05-22T17:38:56+08:00" />
+<meta property="article:modified_time" content="2024-05-23T01:10:26+08:00" />
 <meta itemprop="name" content="TAGE-SC 分支预测器">
 <meta itemprop="description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
@@ -45,7 +45,7 @@
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
 如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
-<meta itemprop="dateModified" content="2024-05-22T17:38:56+08:00" />
+<meta itemprop="dateModified" content="2024-05-23T01:10:26+08:00" />
 <meta itemprop="wordCount" content="1092">
 <meta itemprop="keywords" content="子预测器,TAGE-SC," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="TAGE-SC 分支预测器"/>
 <meta name="twitter:description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
@@ -102,7 +102,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.1005a2bf086b849b6e685f6004de2ae1.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.5bca422b8b82fefabb75f976326c12dc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -126,7 +126,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.1005a2bf086b849b6e685f6004de2ae1.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.5bca422b8b82fefabb75f976326c12dc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -505,7 +505,7 @@
 <h3 id="训练过程">训练过程</h3>
 <p>由于TAGE的预测过程用到了很多计数器和tag，他们需要根据一定的规则进行更新，该过程称为训练。该训练过程发生在BPU的update阶段，该阶段会输入PC，分支历史、以及否预测正确等信息。香山昆明湖的分支预测进行训练的流程根据不同情况，分为如下几个步骤：</p>
 <ol>
-<li><strong>T0</strong>始终更新：发生跳转（即taken）则 pc 索引的 ctr 饱和计数器 +1，否则 -1</li>
+<li><strong>T0</strong>作为最终使用的预测结果时更新：发生跳转（即taken）则 pc 索引的 ctr 饱和计数器 +1，否则 -1</li>
 <li>在<strong>只有T0</strong>命中时，进行如下操作
 <ol>
 <li>T0<strong>预测正确</strong>则不额外更新</li>
@@ -1449,7 +1449,7 @@ tageCtrCentered
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 May 22, 2024: <a href="https://github.com/XS-MLVP/course/commit/b0f29a3053420ccf2aef1c3c1ad7157c7205ea46">Fix the issue with the numbering of TAGE&#39;s training steps. (b0f29a3)</a>
+  最后修改 May 23, 2024: <a href="https://github.com/XS-MLVP/course/commit/4b478754b004391bbea5764fc9adc4cf8b332390">Fix: Fix the error about the conditon of updating T0. (4b47875)</a>
 </div>
 
 </div>
