@@ -84,7 +84,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7f84014aee3e98273d7c1b2fe34638fc.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.9307adac5e4355a47f5b60591ab52129.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -5517,11 +5517,11 @@ tageCtrCentered
 <image src="RAS_Arch.png" width="800px">
 <p>如上图所示，根据普通预测的call/ret和commit提交的call/ret，把原始的RAS栈可以拆分成两个独立的栈，分别称为“预测栈”（ spec_stack，链式结构）和“提交栈”（commit_stack，普通结构），由于栈结构发生了变化，具体的Pop/Push操作如下：</p>
 <p>1、遇到普通call和ret：</p>
-<p>（1）call指令，在spec_stack上进行push操作，具体为上述链式栈Push过程；</p>
-<p>（2）ret指令，利用spec_stack的栈顶作为预测值，然后进行pop操作。如果spec_stack为空，则使用commit_stack的栈顶元素作为预测结果（不进行pop操作）。</p>
+<p>（1）预测块为call正确，在spec_stack上进行push操作，具体为上述链式栈Push过程；</p>
+<p>（2）预测块为ret正确，利用spec_stack的栈顶作为预测值，然后进行pop操作。如果spec_stack为空，则使用commit_stack的栈顶元素作为预测结果（不进行pop操作）。</p>
 <p>2、Commit操作：</p>
-<p>（1）预测块为call正确，在commit_stack上进行普通push操作。</p>
-<p>（2）预测块为ret正确，在commit_stack上进行普通pop操作。</p>
+<p>（1）FTQ执行结果为call正确 ，在commit_stack上进行普通push操作。</p>
+<p>（2）FTQ执行结果为ret正确 ，在commit_stack上进行普通pop操作。</p>
 <p>3、Redirect操作：</p>
 <p>（1）从redirect消息中获取之前预测时的栈指针（BOS、TOSR、TOSW，ssp），覆盖当前值指针值完成预测栈回滚。</p>
 <p>（2）该操作不影响提交栈。</p>
@@ -5577,21 +5577,21 @@ tageCtrCentered
 <tbody>
 <tr>
 <td>in.spec_push_valid</td>
-<td>进行PUSH操作</td>
+<td>预测有Call指令，Spec压栈</td>
 <td>in.s2_fire</td>
 <td>s2信号有效</td>
 </tr>
 <tr>
 <td>in.spec_pop_valid</td>
-<td>进行POP操作</td>
+<td>预测有Ret指令，Spec出栈</td>
 <td>in.s3_fire</td>
 <td>s3信号有效</td>
 </tr>
 <tr>
 <td>in.spec_push_addr</td>
-<td>PUSH地址</td>
+<td>Ret地址</td>
 <td>in.s3_cancel</td>
-<td>s3的信号表示需要撤销s2的操作</td>
+<td>s3和s2的预测结果不一样，需要撤销s2的操作</td>
 </tr>
 <tr>
 <td>out.spec_pop_addr</td>
@@ -5627,19 +5627,19 @@ tageCtrCentered
 <td>out.TOSR</td>
 <td>spec栈栈顶指针</td>
 <td>in.redirect_valid</td>
-<td>是否发生了重定向</td>
+<td>需要重定向</td>
 </tr>
 <tr>
 <td>out.TOSW</td>
 <td>spec栈数据分配指针</td>
 <td>in.redirect_isCall</td>
-<td>真实情况是call</td>
+<td>真实执行情况是Call</td>
 </tr>
 <tr>
 <td>out.BOS</td>
 <td>spec栈栈低指针</td>
 <td>in.redirect_isRet</td>
-<td>真实情况是return</td>
+<td>真实执行情况是Return</td>
 </tr>
 <tr>
 <td>in.commit_push_valid</td>
@@ -5655,19 +5655,19 @@ tageCtrCentered
 </tr>
 <tr>
 <td>in.commit_pop_valid</td>
-<td>pop操作正确</td>
+<td>FTQ执行结果为Call正确</td>
 <td>in.redirect_meta_sctr</td>
 <td>之前预测时的现场信息sctr</td>
 </tr>
 <tr>
 <td>in.commit_push_addr</td>
-<td>push的正确地址</td>
+<td>更新信息中的Ret地址</td>
 <td>in.redirect_meta_TOSW</td>
 <td>之前预测时的现场信息TOSW</td>
 </tr>
 <tr>
 <td>in.commit_meta_TOSW</td>
-<td>之前预测时的现场信息TOSW</td>
+<td>更新信息中的TOSW</td>
 <td></td>
 <td></td>
 </tr>
@@ -5679,19 +5679,19 @@ tageCtrCentered
 </tr>
 <tr>
 <td>in.commit_meta_TOSR</td>
-<td>之前预测时的现场信息TOSR</td>
+<td>更新信息中的TOSR</td>
 <td>in.redirect_meta_NOS</td>
 <td>之前预测时的现场信息NOS</td>
 </tr>
 <tr>
 <td>in.commit_meta_ssp</td>
-<td>之前预测时的现场信息SSP</td>
+<td>更新信息中的现场信息SSP</td>
 <td>in.redirect_callAddr</td>
 <td>重定向地址</td>
 </tr>
 <tr>
 <td>in.commit_meta_sctr</td>
-<td>之前预测时的现场信息SCTR</td>
+<td>更新信息中的现场信息SCTR</td>
 <td></td>
 <td></td>
 </tr>
