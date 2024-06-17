@@ -42,7 +42,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/04_ittage/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-06-12T11:22:43+08:00" />
+<meta property="article:modified_time" content="2024-06-17T15:10:58+08:00" />
 <meta itemprop="name" content="ITTAGE 分支预测器">
 <meta itemprop="description" content="功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。
 ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 TAGE-SC分支预测器。
@@ -54,7 +54,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。
 第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：
 预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target：41 bitsvalid 1bittag 9bitsctr 2bitsus: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。">
-<meta itemprop="dateModified" content="2024-06-12T11:22:43+08:00" />
+<meta itemprop="dateModified" content="2024-06-17T15:10:58+08:00" />
 <meta itemprop="wordCount" content="1026">
 <meta itemprop="keywords" content="子预测器,ITTAGE," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="ITTAGE 分支预测器"/>
 <meta name="twitter:description" content="功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。
@@ -123,7 +123,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7c16d0118695c4110f66cdaa9adead62.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.0657e32adb882d82c5c067c27fa33b57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -147,7 +147,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7c16d0118695c4110f66cdaa9adead62.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.0657e32adb882d82c5c067c27fa33b57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -2311,7 +2311,7 @@ ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 June 12, 2024: <a href="https://github.com/XS-MLVP/course/commit/a1964a64f7c4b78892f0d1c677ddea09b29cb5e1">Add description about scMeta.ctr in last_stage_meta (a1964a6)</a>
+  最后修改 June 17, 2024: <a href="https://github.com/XS-MLVP/course/commit/f4960dc24b0b25747b74697be0fc043c4886c8bb">The Δ used to update bankTickCtrs should be  instead of . (f4960dc)</a>
 </div>
 
 </div>

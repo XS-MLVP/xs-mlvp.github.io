@@ -38,7 +38,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/00_bpu_top/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-06-12T11:22:43+08:00" />
+<meta property="article:modified_time" content="2024-06-17T15:10:58+08:00" />
 <meta itemprop="name" content="BPU 顶层模块">
 <meta itemprop="description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
 生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。
@@ -48,7 +48,7 @@ npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全�
 val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
 npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
 s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。">
-<meta itemprop="dateModified" content="2024-06-12T11:22:43+08:00" />
+<meta itemprop="dateModified" content="2024-06-17T15:10:58+08:00" />
 <meta itemprop="wordCount" content="633">
 <meta itemprop="keywords" content="香山,BPU 顶层,全局分支历史,分支折叠历史,流水线控制," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="BPU 顶层模块"/>
 <meta name="twitter:description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
@@ -115,7 +115,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7c16d0118695c4110f66cdaa9adead62.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.0657e32adb882d82c5c067c27fa33b57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -139,7 +139,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.7c16d0118695c4110f66cdaa9adead62.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.0657e32adb882d82c5c067c27fa33b57.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -529,7 +529,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
 <p>所以在重定向恢复时，不仅需要将重定向接口中的信息恢复，还需要将这条预测错误的指令的执行情况也更新到历史中去。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 June 12, 2024: <a href="https://github.com/XS-MLVP/course/commit/a1964a64f7c4b78892f0d1c677ddea09b29cb5e1">Add description about scMeta.ctr in last_stage_meta (a1964a6)</a>
+  最后修改 June 17, 2024: <a href="https://github.com/XS-MLVP/course/commit/f4960dc24b0b25747b74697be0fc043c4886c8bb">The Δ used to update bankTickCtrs should be  instead of . (f4960dc)</a>
 </div>
 
 </div>
