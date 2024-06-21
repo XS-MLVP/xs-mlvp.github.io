@@ -1,0 +1,418 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>OpenVerify Courses – Basic Design of Shanshan Branch Prediction Unit (BPU)</title>
+    <link>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/</link>
+    <description>Recent content in Basic Design of Shanshan Branch Prediction Unit (BPU) on OpenVerify Courses</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    
+	  <atom:link href="https://xs-mlvp.github.io/xs-bpu/en/docs/basic/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: What is Branch Prediction</title>
+      <link>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/00_bp/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/00_bp/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;why-do-we-need-branch-prediction&#34;&gt;Why Do We Need Branch Prediction?&lt;/h2&gt;
+&lt;p&gt;There are mainly two reasons for branch prediction: one is that &lt;strong&gt;the program&amp;rsquo;s execution flow contains branch instructions&lt;/strong&gt;, and the other is that &lt;strong&gt;high-performance processors use pipeline design&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;programs-execution-flow-contains-branch-instructions&#34;&gt;Program&amp;rsquo;s Execution Flow Contains Branch Instructions&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;result&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;result&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;else&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;result&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The above is a piece of C code. It first defines three variables x, y, and result, and then assigns a value to result based on the comparison of x and y. It can be observed that the program assigns values to variables in sequence in the first three lines. However, in the 5th line, due to the presence of the if instruction, the program branches, jumping directly from the 5th line to the 8th line to continue execution, which causes a &lt;strong&gt;branch&lt;/strong&gt; in the program&amp;rsquo;s execution.&lt;/p&gt;
+&lt;p&gt;After translating into RISC-V assembly code, the code is as follows:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-asm&#34; data-lang=&#34;asm&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;li&lt;/span&gt;  &lt;span style=&#34;color:#000&#34;&gt;a0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;               &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# x = 10
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;li&lt;/span&gt;  &lt;span style=&#34;color:#000&#34;&gt;a1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;               &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# y = 20
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;li&lt;/span&gt;  &lt;span style=&#34;color:#000&#34;&gt;a2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;                &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# result = 0
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;blt&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;else_branch&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Jump to else_branch if x &amp;lt; y
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;add&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a1&lt;/span&gt;           &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Execute result = x + y
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;j&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;end&lt;/span&gt;                    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Jump to end
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;else_branch:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;sub&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a1&lt;/span&gt;           &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Execute result = x - y
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;end:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It can be seen that the program still maintains the previous branching behavior. In the first three lines of the code, instructions are executed in sequence. Then, in the 5th line of the program, a special instruction blt appears, which we call a branch instruction. It will determine whether to execute the next instruction based on the relationship between x and y, and the appearance of this instruction causes a branch in the program&amp;rsquo;s execution.&lt;/p&gt;
+&lt;h3 id=&#34;high-performance-processors-use-pipeline-design&#34;&gt;High-performance Processors Use Pipeline Design&lt;/h3&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;f4669877-a9f9-4f5d-9fe3-8ba976973513.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Therefore, the concept of &lt;strong&gt;branch prediction&lt;/strong&gt; arises. If we can accurately predict the address of the next instruction before the execution result is generated, the processor can continue to run efficiently.&lt;/p&gt;
+&lt;h2 id=&#34;feasibility-of-branch-prediction&#34;&gt;Feasibility of Branch Prediction&lt;/h2&gt;
+&lt;p&gt;Why can branch prediction be done? Let&amp;rsquo;s look at an example:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-C&#34; data-lang=&#34;C&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;data&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;128&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;data&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Assuming that this instruction will be executed repeatedly, and data is incremented from 0, i.e., data = 0, 1, 2, 3 &amp;hellip; 128, 129&amp;hellip;, let&amp;rsquo;s analyze the behavior of executing this instruction each time.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-Plain&#34; data-lang=&#34;Plain&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;T = branch taken
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;N = branch not taken
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;data   = 0, 1, 2, 3, s, ... 126, 127, 128, 129, 130, ... 250, 251, 252, ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;branch = N  N  N  N  N  ...   N    N    T    T    T  ...   T    T    T  ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       = NNNNNNNNNNNN ... NNNNNNNTTTTTTTTT ... TTTTTTTTTT  (easy to predict)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It can be seen that in the first 128 times, the branch is always Not Taken (the condition is not met), but after 128 times, the branch is always Taken (the condition is met). If we predict whether it is Taken based on whether it was Taken last time, we will only make one prediction error throughout the prediction process.&lt;/p&gt;
+&lt;p&gt;The occurrence of the above phenomenon is due to a basic fact—&lt;strong&gt;whether a branch instruction jumps is related to the past jumping behavior of that instruction&lt;/strong&gt;. By summarizing the past jumping rules, we can make a relatively accurate prediction for this jump, which also makes branch prediction possible.&lt;/p&gt;
+&lt;p&gt;In fact, the jump of branch instructions is also related to factors such as the jumping situation of other branch instructions. Fully exploiting effective information to produce accurate prediction results is one of the main tasks of branch prediction.&lt;/p&gt;
+&lt;h2 id=&#34;basic-types-of-branch-prediction&#34;&gt;Basic Types of Branch Prediction&lt;/h2&gt;
+&lt;p&gt;In RISC-V, branch instructions include two types:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Conditional Branch Instructions (beq, bne, blt, bge, bltu, bgeu)&lt;/strong&gt; For these instructions, whether to jump is determined by the condition in the instruction, and the jump target can be obtained from the instruction. Therefore, we need to predict whether the instruction will jump.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Unconditional Jump Instructions (jal, jalr)&lt;/strong&gt; For these instructions, the jump is always executed when encountered, but the jump target may be specified by a register. Therefore, we need to predict the jump target of the instruction.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Fortunately, due to the concise design of the RISC-V architecture, we do not need to handle conditional jump instructions. Every jump instruction we need to predict is unconditional, which is also convenient for our design.&lt;/p&gt;
+&lt;p&gt;From the above analysis, we can summarize the two basic types of branch prediction—&lt;strong&gt;direction prediction&lt;/strong&gt; and &lt;strong&gt;target address prediction&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;direction-prediction-of-branch-instructions&#34;&gt;Direction Prediction of Branch Instructions&lt;/h3&gt;
+&lt;p&gt;Direction prediction of branch instructions corresponds to conditional branch instructions in RISC-V instructions. We need to predict whether it needs to jump, which is called direction prediction.&lt;/p&gt;
+&lt;h4 id=&#34;two-bit-saturation-counters&#34;&gt;Two-Bit Saturation Counters&lt;/h4&gt;
+&lt;p&gt;Direction prediction has a very simple and efficient prediction method called two-bit saturation counter. The basic idea can be seen in the figure below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;c7e5cf3e-8131-430b-a728-659fb7775f53.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;The two-bit saturating counter is regarded as a state machine, and we maintain such a state machine for each branch instruction. When a branch instruction is taken, the corresponding state in the diagram moves to the right; otherwise, it moves to the left. So, the next time we encounter this branch instruction, we first look up its two-bit saturating counter. If the state is more biased to the right, we predict it to be taken; otherwise, we predict it not to be taken.&lt;/p&gt;
+&lt;p&gt;Of course, it&amp;rsquo;s impractical to maintain a two-bit saturating counter for each branch instruction. Therefore, in practice, we usually use part of the PC or a hash method to index the two-bit saturating counter, as shown in the diagram below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;e2cf0e6d-f050-4aff-bee3-c72a2b9004e1.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;branch-history&#34;&gt;Branch History&lt;/h4&gt;
+&lt;p&gt;Branch history is a very commonly used data in branch prediction and the basis of most branch prediction algorithms because it directly shows the past jumping behavior of instructions.&lt;/p&gt;
+&lt;p&gt;There are two basic types of branch history:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Local Branch History&lt;/strong&gt; Maintain a set of registers for each branch instruction, recording the historical jumping behavior of that instruction.
+&lt;ul&gt;
+&lt;li&gt;For example: 0101000000101 (0 means not taken, 1 means taken)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;全Global Branch History&lt;/strong&gt; All instructions share a set of registers, recording the branching behavior during program execution.
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;For example:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;    beg a0, a1, label1          not taken  record 0
+    bne a1, a2, label2          not taken  record 0
+-&amp;gt;  beq a2, a3, label4          taken      record 1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;After executing these three different branch instructions, the global branch history becomes 001.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;branch-target-address-prediction&#34;&gt;Branch Target Address Prediction&lt;/h3&gt;
+&lt;p&gt;In the RISC-V architecture, branch target address prediction refers to predicting the target address of unconditional jump instructions (e.g., jal, jalr). Since these instructions always perform a jump operation, we need to predict their target address.&lt;/p&gt;
+&lt;h4 id=&#34;branch-target-buffer-btb&#34;&gt;Branch Target Buffer (BTB)&lt;/h4&gt;
+&lt;p&gt;BTB is a common method for predicting target addresses. Its core idea is to use a cache to store the target addresses of past unconditional jump instructions. When encountering the same unconditional jump instruction again, the BTB can be checked to see if there is a record for that instruction. If so, the recorded target address is used as the predicted target address for the current execution.&lt;/p&gt;
+&lt;p&gt;The diagram below illustrates this:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;540d418a-2760-4724-aad4-502bd0775185.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;predicting-instruction-types&#34;&gt;Predicting Instruction Types&lt;/h3&gt;
+&lt;p&gt;As we know, in branch prediction, for conditional branch instructions, we need to predict their direction, and for unconditional jump instructions, we need to predict their target. However, there is a problem: when we get a PC that needs to be predicted, we don&amp;rsquo;t know whether the corresponding instruction is a normal instruction or a branch instruction. Therefore, we cannot predict it.&lt;/p&gt;
+&lt;p&gt;How to solve this? One way is to predict the behavior of the instruction after fetching it. But fetching from ICache or Memory may take several cycles, which is a major drawback of this method.&lt;/p&gt;
+&lt;p&gt;A better way is to directly predict the type of instruction. After getting a PC, we can directly predict whether this instruction is a branch instruction and predict its behavior. In this way, we don&amp;rsquo;t have to wait for fetching to complete, and the predicted result can also guide the CPU to fetch from the correct location.&lt;/p&gt;
+&lt;p&gt;The method of type prediction can be similar to BTB, where a field in the cache contains the type of instruction for use in the next prediction.&lt;/p&gt;
+&lt;h2 id=&#34;general-steps-of-branch-prediction&#34;&gt;General Steps of Branch Prediction&lt;/h2&gt;
+&lt;p&gt;Through the introduction in this section, we can summarize the general steps of branch prediction:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Get the PC.&lt;/li&gt;
+&lt;li&gt;Predict whether it is a branch instruction.
+&lt;ol&gt;
+&lt;li&gt;If it is a conditional branch instruction, predict its direction and target.&lt;/li&gt;
+&lt;li&gt;If it is an unconditional jump instruction, predict its target.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Note that since predicting the type of instruction is required in prediction, and we haven&amp;rsquo;t obtained the specific content of the instruction, predicting the target of a conditional branch instruction also becomes our task.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Basic of the Xiangshan Branch Prediction Unit (BPU)</title>
+      <link>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/01_xsbpu_basic/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/01_xsbpu_basic/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;branch-prediction-block-concept&#34;&gt;Branch Prediction Block Concept&lt;/h2&gt;
+&lt;p&gt;For a general branch predictor, it usually predicts the relevant information of an instruction corresponding to a given PC, such as whether it is a conditional branch instruction or a jump instruction. For conditional branch instructions, it predicts whether it will jump, while for jump instructions, it predicts the jump target. However, predicting instructions one by one is inefficient, leading to slow instruction supply in the frontend.&lt;/p&gt;
+&lt;p&gt;In contrast, the prediction method used in Xiangshan is to predict a block of instructions each time. That is to say, &lt;strong&gt;given a PC, Xiangshan will predict a branch prediction block starting from this PC, including the situation of several subsequent instructions, such as whether there is a branch instruction, the position of the branch instruction, whether there is a jump, and the jump target.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This prediction method can predict multiple instructions at once and send the prediction results to the fetch unit (IFU) to guide the IFU to fetch instructions. In addition, since the IFU needs to consider the performance of cache lines, it can fetch multiple instructions at once based on the prediction block, thereby improving throughput efficiency.&lt;/p&gt;
+&lt;p&gt;After the prediction block is generated, &lt;strong&gt;the branch prediction block will also generate the PC to which it jumps after executing this prediction block, and then the BPU will continue to generate the next branch prediction block based on this PC.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Here&amp;rsquo;s a simple example:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;1.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;As shown in the above figure, when the PC reaches 0x20000118, the BPU goes through the following steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The BPU learns that the PC is 0x20000118.&lt;/li&gt;
+&lt;li&gt;The BPU generates a branch prediction block starting from 0x20000118, with the following approximate contents:
+&lt;ol&gt;
+&lt;li&gt;In the next several instructions,&lt;/li&gt;
+&lt;li&gt;The third instruction is a conditional branch instruction.&lt;/li&gt;
+&lt;li&gt;For this conditional branch instruction, it predicts that it will be taken.&lt;/li&gt;
+&lt;li&gt;The address to which it jumps is 0x20000110.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;The BPU sets the PC to 0x20000110 and continues to generate the next branch prediction block.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is the basic prediction process of the Shanshan BPU using branch prediction blocks.&lt;/p&gt;
+&lt;h2 id=&#34;multiple-predictors-multiple-pipeline-structure&#34;&gt;Multiple Predictors, Multiple Pipeline Structure&lt;/h2&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;2.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;The figure below shows the overall architecture of the Xiangshan BPU, where we need to focus on two main aspects:&lt;/p&gt;
+&lt;h3 id=&#34;multiple-predictors&#34;&gt;Multiple Predictors&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;To ensure prediction accuracy, Xiangshan BPU uses multiple predictors, and these predictors collectively generate the BPU&amp;rsquo;s prediction results. For example, FTB generates basic prediction results for subsequent predictors to use, while TAGE produces more accurate prediction results for conditional branch instructions, and so on.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;multiple-pipelines&#34;&gt;Multiple Pipelines&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;To meet the requirements of high performance, Xiangshan BPU adopts a pipeline design. Various predictors are at different pipeline levels. Among them, the uFTB (also known as uBTB in the figure) predictor is at the first pipeline level, capable of generating prediction results in one cycle. The other predictors need 2-3 cycles to generate prediction results. Although the prediction time is longer, the prediction results are relatively more accurate.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;However, if it takes three cycles to get the prediction result and start predicting based on the new result, this design inevitably leads to performance loss. Because of this, it takes three clock cycles to complete one prediction.&lt;/p&gt;
+&lt;p&gt;To be able to get the prediction results of some predictors in the first and second cycles, we set up three prediction result channels and output the prediction results of the three pipeline levels simultaneously, as shown in the figure below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;3.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h2 id=&#34;fetch-target-queue-ftq&#34;&gt;Fetch Target Queue (FTQ)&lt;/h2&gt;
+&lt;h3 id=&#34;storing-branch-prediction-results&#34;&gt;Storing Branch Prediction Results&lt;/h3&gt;
+&lt;p&gt;Although the BPU can provide prediction results in the form of branch prediction blocks and the IFU can fetch multiple instructions at once, there is still a performance gap between them. In general, the BPU generates prediction results faster.&lt;/p&gt;
+&lt;p&gt;Therefore, a Fetch Target Queue (FTQ) is added between the BPU and the IFU as a buffer. The FTQ is essentially a queue used to store individual data items. The prediction results generated by the BPU are first stored in the FTQ, and then fetched by the IFU from the FTQ, as shown in the figure below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;4.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Whenever the BPU generates a prediction block, the prediction block is placed at the head of the FTQ. When the IFU is idle, it will fetch the next prediction block from the tail of the FTQ. The diagram below illustrates this process.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;5.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;In Xiangshan, the FTQ&amp;rsquo;s functionality goes far beyond this. Referring to the FTQ&amp;rsquo;s external interface in the figure above, it is also responsible for sending prefetch information to the ICache, storing various training information of the BPU, analyzing redirection information and update information sent from the fetch module and the backend execution module, sending update requests to the BPU, and even updating the basic data structure of the FTB predictor in the FTQ.&lt;/p&gt;
+&lt;h3 id=&#34;bpu-prediction-result-redirection&#34;&gt;BPU Prediction Result Redirection&lt;/h3&gt;
+&lt;p&gt;As mentioned earlier, the Xiangshan branch prediction results have three channels, which simultaneously output the prediction results of stages s1, s2, and s3. How does the FTQ use the prediction results of the three stages?&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s start from exploring the timing of the pipeline, as shown in the figure below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;6.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;ul&gt;
+&lt;li&gt;In the first cycle, a new PC 0x4 is fetched, and the predictor (called uFTB) that can produce a prediction result within one cycle outputs its prediction result at the s1 interface, indicating the next PC as 0xf, with no output from other interfaces yet.&lt;/li&gt;
+&lt;li&gt;In the second cycle, the PC is set to 0xf, and uFTB also generates a prediction result of 0xf, which is sent out from the s1 channel. At the same time, the two-cycle predictor generates the prediction result for the previous address 0x4, which is sent out from the s2 channel.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;However, a problem arises here: in the second cycle, the prediction result generated by s2 is 0x4, but the prediction result for 0x4 has already been output by s1 in the previous cycle and placed in an entry in the FTQ. In other words, the prediction result generated by s2 has already been generated by s1. The difference is that the result from s2 is generated by the two-cycle predictor, making it more accurate.&lt;/p&gt;
+&lt;p&gt;Therefore, what we need to do is not to place a new FTQ entry based on the prediction result from s2 but to &lt;strong&gt;compare the prediction results from s2 and the previous cycle&amp;rsquo;s s1 prediction results. If there is a difference, then overwrite the FTQ entry placed by the previous stage&amp;rsquo;s s1 interface.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;So we add two additional signal lines to the s2 and s3 channels, which we call redirect signals. If this signal is valid, it indicates that there is a difference between the prediction result of this stage and the previous prediction result, and it is necessary to overwrite an FTQ entry from before. The structure is shown in the diagram below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;7.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;At the time corresponding to the second cycle of the pipeline in the structural diagram, the s1 channel has already placed a branch prediction block result with an address of 0x4 into the FTQ. At this time, the s2 prediction result is generated, and the BPU finds that the s2 prediction result is different from s1, so the redirect interface for this cycle is set to valid. The FTQ will use the s2 channel&amp;rsquo;s prediction result to overwrite the FTQ entry previously storing the 0x4 prediction result.&lt;/p&gt;
+&lt;p&gt;At this time, although the s1 channel has also generated a branch prediction block with 0xf as the head, it is obviously an incorrect prediction result generated by s1 based on the PC of the first cycle. Therefore, at this time, the s1 result can be directly discarded.&lt;/p&gt;
+&lt;p&gt;In the third cycle, s1 starts a new round of prediction with the correct prediction result indicated by s2, the new PC 0x8. After that, if no prediction errors are detected by the s2 and s3 channels, the pipeline will continue to run at full capacity.&lt;/p&gt;
+&lt;h3 id=&#34;bpu-redirect-requests&#34;&gt;BPU Redirect Requests&lt;/h3&gt;
+&lt;p&gt;No matter how accurate a branch predictor is, it is not always correct. This inaccuracy can lead to incorrect instructions being filled in the subsequent pipeline. Therefore, there needs to be a mechanism to correct this, and this mechanism is redirection. When an instruction is executed by the backend execution module, the true behavior of this instruction is determined. At this time, if the backend execution module detects a branch prediction error, it will issue a &lt;strong&gt;redirect request&lt;/strong&gt; to restore the processor&amp;rsquo;s state to the state before executing the incorrect instruction. For us, we only need to pay attention to how the BPU and FTQ restore the state when redirecting.&lt;/p&gt;
+&lt;p&gt;In addition to redirect requests from the backend, the Shan Mountain processor will perform a simple analysis of the instruction after it is fetched by the IFU to detect the most basic prediction errors. The specific process is as follows: after the FTQ sends a fetch request to the IFU, it will wait for the IFU to return the pre-decoded information (pre-decoding is the IFU&amp;rsquo;s simple decoding of the instruction, such as whether it is a jump instruction, what is the target of the jump). The FTQ will write the pre-decoded information back to a field in the corresponding entry in the FTQ and will also analyze the pre-decoded information. If a prediction error is detected, it will generate an IFU redirect request.&lt;/p&gt;
+&lt;p&gt;Redirect requests from the backend execution module do not need to be generated by the FTQ but are directly sent from the backend to the FTQ for processing. The FTQ will forward the generated IFU redirect request and the backend redirect request to the BPU&amp;rsquo;s redirect interface. If both are valid in the same cycle, the FTQ will choose to forward the backend redirect request.&lt;/p&gt;
+&lt;p&gt;The BPU with the added redirect interface is shown in the diagram below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;8.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;bpu-update-requests&#34;&gt;BPU Update Requests&lt;/h3&gt;
+&lt;p&gt;The current BPU already has the ability to correct errors, but there is still a problem: the data in the BPU cannot be updated. If it is impossible to obtain information such as the location, type, whether a jump occurred, and the jump address of the instruction, the BPU will not be trained and the accuracy will be greatly reduced.&lt;/p&gt;
+&lt;p&gt;To obtain this information, we still need to rely on the Fetch Target Queue (FTQ) because it can not only interact with the IFU to obtain instruction-related information but also interact with the backend to obtain execution-related information. Therefore, there will be an update request channel directly connecting the FTQ to the BPU.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;9.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;When the backend completes the execution of an entry in the FTQ, the entry is marked as committed. Next, the FTQ forwards the update information of this entry to the BPU through the Update channel.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Through this section, we have learned about all the main interfaces required for BPU external interaction and the role of FTQ in BPU. With the BPU equipped with prediction result interfaces, redirect interfaces, and update interfaces, it can already support all external interactions of the BPU. Next, we will delve deeper into the internals of the BPU.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Introduction to the Xiangshan Branch Prediction Unit Structure</title>
+      <link>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/02_xsbpu_structure/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/02_xsbpu_structure/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;how-does-the-bpu-integrate-internal-sub-predictors&#34;&gt;How Does the BPU Integrate Internal Sub-predictors?&lt;/h2&gt;
+&lt;p&gt;We already know that the Xiangshan BPU adopts multiple predictors and multiple pipeline schemes. To adapt to multiple pipelines, the BPU uses a three-channel result output interface. But how does it adapt to multiple predictors? This requires us to further explore the internal structure of the BPU.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;1.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;The above figure is the BPU architecture diagram from the Xiangshan documentation. Currently, we only need to focus on one piece of information: all internal sub-predictors are encapsulated in a structure called &lt;code&gt;Composer&lt;/code&gt;. The BPU only needs to interact with &lt;code&gt;Composer&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;What is &lt;code&gt;Composer&lt;/code&gt;? Let&amp;rsquo;s first look at their definition in the Xiangshan code.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;2.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;It can be seen that &lt;code&gt;Composer&lt;/code&gt; and the five sub-predictors have a common characteristic: they all inherit from the &lt;code&gt;BasePredictor&lt;/code&gt; base class. And the interface has been defined in the &lt;code&gt;BasePredictor&lt;/code&gt; class. In other words, &lt;code&gt;Composer&lt;/code&gt; and &lt;strong&gt;the five sub-predictors all have the same interface&lt;/strong&gt;! The top-level BPU can directly regard &lt;code&gt;Composer&lt;/code&gt; as a sub-predictor, without worrying about how the internal sub-predictors are connected.&lt;/p&gt;
+&lt;h2 id=&#34;sub-predictor-interface&#34;&gt;Sub-predictor Interface&lt;/h2&gt;
+&lt;p&gt;Next, we will look at what the sub-predictor interface looks like. This interface will involve the interaction between &lt;code&gt;Composer&lt;/code&gt; and the top-level BPU, as well as the interaction between each sub-predictor and &lt;code&gt;Composer&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s take &lt;code&gt;Composer&lt;/code&gt; as an example to illustrate the structure of the sub-predictor interface.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;3.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;As shown in the above figure, the three-channel prediction results of &lt;code&gt;Composer&lt;/code&gt; are directly output to the outside of the BPU. There is also a set of three-channel prediction results connected from the inside of the BPU to &lt;code&gt;Composer&lt;/code&gt;. However, since the prediction results are generated by &lt;code&gt;Composer&lt;/code&gt;, the BPU will pass an empty prediction result to &lt;code&gt;Composer&lt;/code&gt;. The significance of this is to make the sub-predictor act as a &amp;ldquo;processor.&amp;rdquo; The sub-predictor will process the input prediction results and then output the processed prediction results.&lt;/p&gt;
+&lt;p&gt;Next, the top-level BPU will provide the information needed for prediction to the pipeline. First is the &lt;strong&gt;PC&lt;/strong&gt; and &lt;strong&gt;branch history records&lt;/strong&gt; (including global history and global folding history). Next, the BPU will connect some pipeline control signals between &lt;code&gt;Composer&lt;/code&gt; and the &lt;strong&gt;pipeline control signals&lt;/strong&gt;. Finally, the BPU will directly connect the externally input &lt;strong&gt;redirect request interface&lt;/strong&gt; and &lt;strong&gt;update interface&lt;/strong&gt; to &lt;code&gt;Composer&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In the end, a simple definition of the sub-predictor interface can be given (for detailed definitions, please refer to the interface documentation):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;in&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;(s1, s2, s3)&lt;/strong&gt; Prediction information input&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;s0_pc&lt;/strong&gt;         PC to be predicted&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ghist&lt;/strong&gt;         Global branch history&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;folded_hist&lt;/strong&gt; Global folding history&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;out  (s1, s2, s3)&lt;/strong&gt; Prediction information output&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;流水线控制信号&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;s0_fire, s1_fire, s2_fire, s3_fire&lt;/strong&gt; Whether the corresponding pipeline stage is working&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;s2_redirect, s3_redirect&lt;/strong&gt;              Redirect signals when a prediction error is discovered in the subsequent pipeline stage&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;s1_ready, s2_ready, s3_ready&lt;/strong&gt;    Whether the sub-predictor corresponding pipeline stage is ready&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;update&lt;/strong&gt;        Update request&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;redirect&lt;/strong&gt;      Redirect request&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;connection-between-sub-predictors&#34;&gt;Connection Between Sub-predictors&lt;/h2&gt;
+&lt;p&gt;We now know that the interfaces between each sub-predictor and &lt;code&gt;Composer&lt;/code&gt; are the same, and we also know how &lt;code&gt;Composer&lt;/code&gt; is connected to the top-level BPU. This section will explain how sub-predictors are connected within &lt;code&gt;Composer&lt;/code&gt;.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;4.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;The above figure shows the connection structure of sub-predictors in &lt;code&gt;Composer&lt;/code&gt;. It can be seen that after the three-channel prediction results are input into &lt;code&gt;Composer&lt;/code&gt;, they are first processed by &lt;code&gt;uFTB&lt;/code&gt; and then output. They are then successively processed by &lt;code&gt;TAGE-SC&lt;/code&gt;, &lt;code&gt;FTB&lt;/code&gt;, &lt;code&gt;ITTAGE&lt;/code&gt;, and &lt;code&gt;RAS&lt;/code&gt;, and finally connected to the prediction result output of &lt;code&gt;Composer&lt;/code&gt;, which is then directly connected to the outside of the BPU by &lt;code&gt;Composer&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;For other signals, because the interfaces between &lt;code&gt;Composer&lt;/code&gt; and each sub-predictor are the same, they are directly connected to the corresponding interfaces of each predictor by &lt;code&gt;Composer&lt;/code&gt;, without much additional processing.&lt;/p&gt;
+&lt;h3 id=&#34;prediction-result-interface-connection&#34;&gt;Prediction Result Interface Connection&lt;/h3&gt;
+&lt;p&gt;For sub-predictors, the connection of their prediction result is that the prediction result output of one predictor is the input of the next predictor. However, it should be noted that this connection is a combinational circuit connection and is not affected by timing.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;5.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;As shown in the above figure, taking the s1 channel as an example, from input to the output of the last predictor, it is all modified by combinational circuits, unaffected by timing. Registers only exist between the s1, s2, and s3 channels.&lt;/p&gt;
+&lt;p&gt;Therefore, increasing the number of sub-predictors will not increase the number of cycles required for prediction, but will only increase the delay required for prediction per cycle.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Introduction to the Timing of Xiangshan Branch Prediction Unit</title>
+      <link>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/03_xsbpu_timing/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/03_xsbpu_timing/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;single-cycle-prediction-without-bubble&#34;&gt;Single-Cycle Prediction without Bubble&lt;/h2&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;1.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;code&gt;uFTB&lt;/code&gt; is the only predictor in Xiangshan BPU that can generate prediction results in a single cycle. The figure below shows the prediction process of &lt;code&gt;uFTB&lt;/code&gt;. The &lt;code&gt;s0_pc&lt;/code&gt; is sent from the top level of BPU, and when the s1 stage is active, the &lt;code&gt;s1_pc&lt;/code&gt; retains the value of &lt;code&gt;s0_pc&lt;/code&gt; from the previous cycle. This means that the value of &lt;code&gt;s0_pc&lt;/code&gt; will move down the pipeline.&lt;/p&gt;
+&lt;p&gt;When the s1 stage is active, &lt;code&gt;uFTB&lt;/code&gt; receives the &lt;code&gt;s1_fire&lt;/code&gt; signal from the current cycle and generates a prediction result based on the &lt;code&gt;s1_pc&lt;/code&gt; address in this cycle, which can obtain the new PC value in the prediction result.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;2.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;As shown in the figure, the top level of BPU analyzes the next PC value position based on the prediction result channel s1 and sends it to &lt;code&gt;npc_Gen&lt;/code&gt; (new PC generator) for generating the s0_pc of the next cycle.&lt;/p&gt;
+&lt;p&gt;In the next cycle, &lt;code&gt;uFTB&lt;/code&gt; gets the new PC value and starts generating the prediction block for the new PC value. Therefore, with only the s1 stage, the prediction block can be generated at a rate of one block per cycle.&lt;/p&gt;
+&lt;h2 id=&#34;prediction-result-redirection&#34;&gt;Prediction Result Redirection&lt;/h2&gt;
+&lt;p&gt;However, except for &lt;code&gt;uFTB&lt;/code&gt;, other predictors require 2-3 cycles to generate prediction results. How to utilize their prediction results? And how to generate the prediction result redirection signal?&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;3.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;As shown in the figure, a &lt;code&gt;Predirector 2&lt;/code&gt; that takes two cycles to generate a prediction result can output its prediction result to the s2 prediction result channel in the s2 stage. After the top level of BPU receives the prediction result, it analyzes the jump target address &lt;code&gt;target&lt;/code&gt; of the prediction block and connects it to &lt;code&gt;npc_Gen&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;At this point, the signal connected to &lt;code&gt;npc_Gen&lt;/code&gt; contains both the old PC prediction result generated by s2 and the new PC prediction result generated by s1. How to choose which one to use for the new PC?&lt;/p&gt;
+&lt;p&gt;As mentioned earlier, BPU compares the prediction result of s2 with the prediction result of s1 from the previous cycle. If the prediction results are different, it indicates that s1 has made a wrong prediction, and naturally, the prediction result of the current cycle generated based on the wrong prediction result of the previous cycle is also wrong. Therefore, if the prediction result is incorrect in the current cycle, &lt;code&gt;npc_Gen&lt;/code&gt; will use the &lt;code&gt;target&lt;/code&gt; provided by s2 as the new &lt;code&gt;s0_pc&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This process is shown in the pipeline structure diagram as follows:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;4.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;The Diff comparator compares the prediction results of the s1 stage with those of the previous cycle to generate a diff signal, guiding &lt;code&gt;npc_Gen&lt;/code&gt; to generate the next PC. At the same time, the diff signal indicates that the prediction result of the s1 stage is incorrect and can be used directly by BPU to redirect the prediction result channel of the s2 stage in the FTQ, instructing the FTQ to overwrite the previous prediction result.&lt;/p&gt;
+&lt;p&gt;The diff signal is also sent to each predictor through the s2_redirect interface to guide the predictors to update their states.&lt;/p&gt;
+&lt;p&gt;Furthermore, when the prediction result redirection of the s2 stage occurs, indicating that the prediction result of the s1 channel is incorrect, the s2 stage cannot continue to predict and needs to invalidate the &lt;code&gt;s2_fire&lt;/code&gt; signal of the predictor pipeline and wait for the corrected prediction result to flow in.&lt;/p&gt;
+&lt;p&gt;The prediction result redirection of the s3 stage is similar to this. Its pipeline structure diagram is as follows. The specific processing process is left for you to analyze.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;5.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h2 id=&#34;redirection-requests-and-other-information-generation&#34;&gt;Redirection Requests and Other Information Generation&lt;/h2&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;6.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Only when the prediction information of all three stages is incorrect will an external redirection request occur. At this time, &lt;code&gt;npc_Gen&lt;/code&gt; will receive the PC address from the redirection request. Since when a redirection request occurs, we assume that all three stages have predicted incorrectly, so all three stages&amp;rsquo; &lt;code&gt;fire&lt;/code&gt; signals need to be invalidated. Then, &lt;code&gt;npc_Gen&lt;/code&gt; uses the PC that needs to be restored from the redirection request to restart the prediction.&lt;/p&gt;
+&lt;p&gt;Other information, such as the generation of the global history and the PC, follows the same principle and is maintained based on the prediction information of each stage. The global history generates a new branch history based on the prediction results of each stage.&lt;/p&gt;
+&lt;h2 id=&#34;pipeline-control-signals&#34;&gt;Pipeline Control Signals&lt;/h2&gt;
+&lt;p&gt;After learning about the specific process of the pipeline, you should understand the pipeline control signals in the predictor interface, as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;s0_fire, s1_fire, s2_fire, s3_fire&lt;/strong&gt; Indicate whether each stage of the pipeline is working.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;s2_redirect, s3_redirect&lt;/strong&gt;           Indicate whether a prediction result redirection has occurred.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;s1_ready, s2_ready, s3_ready&lt;/strong&gt;    Sent from the predictor to the top level of BPU, indicating whether each stage of the pipeline is ready.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;By now, you should understand the basic design principles, external interaction logic, internal structure, timing, etc., of the Xiangshan Branch Prediction Unit, and have a rough understanding of the working principle of BPU. Xiangshan&amp;rsquo;s BPU is no longer mysterious to you.&lt;/p&gt;
+&lt;p&gt;Next, you can read the &lt;code&gt;Important Structures and Interfaces Document&lt;/code&gt; and combine it with the source code of Xiangshan BPU to form a more detailed understanding of BPU. When you clearly understand the working principle and signal details of BPU, you can start your verification work!&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

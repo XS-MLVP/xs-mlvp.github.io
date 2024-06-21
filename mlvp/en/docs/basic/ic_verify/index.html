@@ -1,0 +1,475 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/mlvp/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/mlvp/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/mlvp/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/mlvp/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
+
+<title>Chip Verification | OpenVerify Courses</title>
+<meta name="description" content="Basic concepts of chip verification
+">
+<meta property="og:title" content="Chip Verification" />
+<meta property="og:description" content="Basic concepts of chip verification
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/en/docs/basic/ic_verify/" /><meta property="article:section" content="docs" />
+
+<meta property="article:modified_time" content="2024-06-21T19:31:47+08:00" />
+<meta itemprop="name" content="Chip Verification">
+<meta itemprop="description" content="Basic concepts of chip verification
+">
+<meta itemprop="dateModified" content="2024-06-21T19:31:47+08:00" />
+<meta itemprop="wordCount" content="3129">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Chip Verification"/>
+<meta name="twitter:description" content="Basic concepts of chip verification
+"/>
+
+
+
+
+<link rel="preload" href="/mlvp/scss/main.min.b4b58abc1e222a911c2cd9b9340c4a7470810bf24c7cb4ad38aafd2ddac67022.css" as="style">
+<link href="/mlvp/scss/main.min.b4b58abc1e222a911c2cd9b9340c4a7470810bf24c7cb4ad38aafd2ddac67022.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/mlvp/en/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">OpenVerify Courses</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/mlvp/docs/basic/ic_verify/">中文</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="Search this site…"
+    aria-label="Search this site…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/mlvp/offline-search-index.e950df133dbd3e5600942285dd588740.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="Search this site…"
+    aria-label="Search this site…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/mlvp/offline-search-index.e950df133dbd3e5600942285dd588740.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse" id="td-section-nav">
+    <div class="td-sidebar-nav__section nav-item dropdown d-block d-lg-none">
+      <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/mlvp/docs/basic/ic_verify/">中文</a></li>
+    </ul>
+</div>
+    </div>
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpendocs-li">
+  <a href="/mlvp/en/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-mlvpendocs"><span class="">Learning Resources</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpendocsquick-start-li">
+  <a href="/mlvp/en/docs/quick-start/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpendocsquick-start"><span class="">Quick Start</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsquick-startinstaller-li">
+  <a href="/mlvp/en/docs/quick-start/installer/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsquick-startinstaller"><span class="">Setting Up the Verification Environment</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsquick-starteg-adder-li">
+  <a href="/mlvp/en/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsquick-starteg-adder"><span class="">Case: 1 Adder</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsquick-starteg-rmg-li">
+  <a href="/mlvp/en/docs/quick-start/eg-rmg/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsquick-starteg-rmg"><span class="">Case 2: Random Number Generator</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpendocsenv_usage-li">
+  <a href="/mlvp/en/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpendocsenv_usage"><span class="">Environment Usage</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsenv_usagepicker_usage-li">
+  <a href="/mlvp/en/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsenv_usagepicker_usage"><span class="">Basic Usage</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsenv_usagewave-li">
+  <a href="/mlvp/en/docs/env_usage/wave/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsenv_usagewave"><span class="">Waveform Generation</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsenv_usagemultifile-li">
+  <a href="/mlvp/en/docs/env_usage/multifile/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsenv_usagemultifile"><span class="">Multi-File Input</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsenv_usagecoverage-li">
+  <a href="/mlvp/en/docs/env_usage/coverage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsenv_usagecoverage"><span class="">Coverage Statistics</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpendocsenv_usageframeworks-li">
+  <a href="/mlvp/en/docs/env_usage/frameworks/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpendocsenv_usageframeworks"><span class="">Integrated Testing Framework</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsenv_usageframeworkspytest-li">
+  <a href="/mlvp/en/docs/env_usage/frameworks/pytest/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsenv_usageframeworkspytest"><span class="">PyTest</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsenv_usageframeworkshypothesis-li">
+  <a href="/mlvp/en/docs/env_usage/frameworks/hypothesis/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsenv_usageframeworkshypothesis"><span class="">Hypothesis</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpendocsbasic-li">
+  <a href="/mlvp/en/docs/basic/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpendocsbasic"><span class="">Verification Basics</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpendocsbasicic_verify-li">
+  <a href="/mlvp/en/docs/basic/ic_verify/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsbasicic_verify"><span class="td-sidebar-nav-active-item">Chip Verification</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsbasicic_base-li">
+  <a href="/mlvp/en/docs/basic/ic_base/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsbasicic_base"><span class="">Digital Circuits</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsbasiccreate_dut-li">
+  <a href="/mlvp/en/docs/basic/create_dut/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsbasiccreate_dut"><span class="">Creating DUT</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsbasictest_dut-li">
+  <a href="/mlvp/en/docs/basic/test_dut/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsbasictest_dut"><span class="">DUT Verification</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsbasicreport-li">
+  <a href="/mlvp/en/docs/basic/report/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsbasicreport"><span class="">Verification Report</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpendocsadvance_func-li">
+  <a href="/mlvp/en/docs/advance_func/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpendocsadvance_func"><span class="">Advanced Tutorial</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsadvance_funccallback-li">
+  <a href="/mlvp/en/docs/advance_func/callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsadvance_funccallback"><span class="">Callback Functions</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsadvance_funcasync-li">
+  <a href="/mlvp/en/docs/advance_func/async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsadvance_funcasync"><span class="">Asynchronous Programming</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsadvance_funcmessage-li">
+  <a href="/mlvp/en/docs/advance_func/message/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsadvance_funcmessage"><span class="">Message-Driven</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsadvance_funcmlvp-li">
+  <a href="/mlvp/en/docs/advance_func/mlvp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsadvance_funcmlvp"><span class="">Verification Framework</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpendocsadvance_case-li">
+  <a href="/mlvp/en/docs/advance_case/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpendocsadvance_case"><span class="">Advanced Case Studies</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsadvance_casenutshellcache-li">
+  <a href="/mlvp/en/docs/advance_case/nutshellcache/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsadvance_casenutshellcache"><span class="">Complete Verification of Nutshell Cache</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsadvance_casetilelink-li">
+  <a href="/mlvp/en/docs/advance_case/tilelink/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsadvance_casetilelink"><span class="">TileLink Protocol</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpendocsmulti-lang-li">
+  <a href="/mlvp/en/docs/multi-lang/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpendocsmulti-lang"><span class="">Multi-language Support</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsmulti-langcpp-li">
+  <a href="/mlvp/en/docs/multi-lang/cpp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsmulti-langcpp"><span class="">Using C&#43;&#43;</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpendocsmulti-langjava-li">
+  <a href="/mlvp/en/docs/multi-lang/java/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpendocsmulti-langjava"><span class="">Using Java ...</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            
+<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/course/tree/main/content/en/docs/basic/ic_verify.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> View page source</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/en/docs/basic/ic_verify.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> Edit this page</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/en/docs/basic?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> Create child page</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=Chip%20Verification" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> Create documentation issue</a>
+  <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> Create project issue</a>
+  <a id="print" href="/mlvp/en/docs/basic/_print/"><i class="fa-solid fa-print fa-fw"></i> Print entire section</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#what-is-chip-verification">What is Chip Verification?</a></li>
+    <li><a href="#chip-verification-process">Chip Verification Process</a></li>
+    <li><a href="#levels-of-chip-verification">Levels of Chip Verification</a></li>
+    <li><a href="#chip-verification-metrics">Chip Verification Metrics</a></li>
+    <li><a href="#chip-verification-management">Chip Verification Management</a></li>
+    <li><a href="#current-state-of-chip-verification">Current State of Chip Verification</a></li>
+    <li><a href="#crowdsourcing-chip-verification">Crowdsourcing Chip Verification</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tag Cloud</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/en/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">27</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/en/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">23</span></a></li>
+        </ul>
+    </div>
+  <div class="taxonomy taxonomy-terms-cloud taxo-categories">
+      <h5 class="taxonomy-title">Categories</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/en/categories/example-projects/" data-taxonomy-term="example-projects"><span class="taxonomy-label">Example Projects</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/en/categories/learning-materials/" data-taxonomy-term="learning-materials"><span class="taxonomy-label">Learning Materials</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/en/categories/sample-projects/" data-taxonomy-term="sample-projects"><span class="taxonomy-label">Sample Projects</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/en/categories/tutorial/" data-taxonomy-term="tutorial"><span class="taxonomy-label">Tutorial</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/en/categories/tutorials/" data-taxonomy-term="tutorials"><span class="taxonomy-label">Tutorials</span><span class="taxonomy-count">22</span></a></li>
+        </ul>
+    </div>
+  
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/mlvp/en/docs/">Learning Resources</a></li>
+  <li class="breadcrumb-item">
+    <a href="/mlvp/en/docs/basic/">Verification Basics</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Chip Verification</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>Chip Verification</h1>
+	<div class="lead">Basic concepts of chip verification</div>
+	<header class="article-meta">
+		
+  </header>
+	
+
+<div class="pageinfo pageinfo-primary">
+<p>This page provides a brief introduction to chip verification, including concepts used in examples such as DUT (Design Under Test) and RM (Reference Model).</p>
+<p>The chip verification process needs to align with the actual situation of the company or team. There is no absolute standard that meets all requirements and must be referenced.</p>
+
+</div>
+
+<h2 id="what-is-chip-verification">What is Chip Verification?</h2>
+<hr>
+<p>The chip design-to-production process involves three main stages: chip design, chip manufacturing, and chip packaging/testing. Chip design is further divided into front-end and back-end design. Front-end design, also known as logic design, aims to achieve the desired circuit logic functionality. Back-end design, or physical design, focuses on optimizing layout and routing to reduce chip area, lower power consumption, and increase frequency. Chip verification is a critical step in the chip design process. Its goal is to ensure that the designed chip meets the specified requirements in terms of functionality, performance, and power consumption. The verification process typically includes functional verification, timing verification, and power verification, using methods and tools such as simulation, formal verification, hardware acceleration, and prototyping. <strong>For this tutorial, chip verification refers only to the verification of the front-end design to ensure that the circuit logic meets the specified requirements (&ldquo;Does this proposed design do what is intended?&rdquo;), commonly known as functional verification. This does not include back-end design aspects like power and frequency.</strong></p>
+<blockquote><p>
+For chip products, design errors that make it to production can be extremely costly to fix, as it might require recalling products and remanufacturing chips, incurring significant financial and time costs. Here are some classic examples of failures due to inadequate chip verification:
+<p><strong>Intel Pentium FDIV Bug</strong>：In 1994, Intel&rsquo;s Pentium processor was found to have a severe division error known as the FDIV bug. This error was due to incorrect entries in a lookup table within the chip&rsquo;s floating-point unit. Although it rarely affected most applications, it caused incorrect results in specific calculations. Intel had to recall a large number of processors, leading to significant financial losses.</p>
+<p><strong>Ariane 5 Rocket Failure</strong>：Though not a chip example, this highlights the importance of hardware verification. In 1996, the European Space Agency&rsquo;s Ariane 5 rocket exploded shortly after launch due to an overflow when converting a 64-bit floating-point number to a 16-bit integer in the navigation system, causing the system to crash. This error went undetected during design and led to the rocket&rsquo;s failure.</p>
+<p><strong>AMD Barcelona Bug</strong>：In 2007, AMD&rsquo;s Barcelona processor had a severe Translation Lookaside Buffer (TLB) error that could cause system crashes or reboots. AMD had to mitigate this by lowering the processor&rsquo;s frequency and releasing BIOS updates, which negatively impacted their reputation and financial status.</p>
+<p>These cases emphasize the importance of chip verification. Errors detected and fixed during the design phase can prevent these costly failures. Insufficient verification continues to cause issues today, such as a new entrant in the ASIC chip market rushing a 55nm chip without proper verification, leading to three failed tape-outs and approximately $500,000 in losses per failure.</p>
+</p></blockquote>
+<h2 id="chip-verification-process">Chip Verification Process</h2>
+<hr>
+<p><img alt="Position of Verification in Chip Design" src="ic-verify.drawio.svg"></p>
+<p>The coupling relationship between chip design and verification is shown in the diagram above. Both design and verification have the same input: the specification document. Based on this document, both design and verification teams independently code according to their understanding and requirements. The design team needs to ensure that the RTL code is &ldquo;synthesizable,&rdquo; considering circuit characteristics, while the verification team mainly focuses on whether the functionality meets the requirements, with fewer coding constraints. After both teams complete module development, a sanity test is conducted to check if the functionality matches. If there are discrepancies, collaborative debugging is done to identify and fix issues before retesting. Due to the high coupling between chip design and verification, some companies directly couple their design and verification teams, assigning verification teams to each design submodule. The coupling process in the diagram is coarse-grained, with specific chips (e.g., SoC, DDR) and companies having their cooperation models.</p>
+<p>In the above comparison test, the module produced by the design team is usually called DUT (Design Under Test), while the model developed by the verification team is called RM (Reference Model). The verification process includes: writing a verification plan, creating a verification platform, organizing functional points, constructing test cases, running and debugging, collecting bugs/coverage, regression testing, and writing test reports.</p>
+<blockquote><p>
+<p><strong>Verification Plan：</strong> The verification plan describes how verification will be carried out and how verification quality will be ensured to meet functional verification requirements. It typically includes verification goals, strategies, environment, items, process, risk mitigation, resources, schedule, results, and reports. Verification goals specify the functions or performance metrics to be verified, directly extracted from the chip specification. Verification strategy outlines the methods to be used, such as simulation, formal verification, FPGA acceleration, etc., and how to organize the verification tasks. The verification environment details the specific testing environment, including verification tools and versions. The verification item library lists specific items to be verified and expected results. Verification plans can be general or specific to sub-tasks.</p>
+<p><strong>Platform Setup：</strong> The verification platform is the execution environment for specific verification tasks. Similar verification tasks can use the same platform. Setting up the platform is a key step, including choosing verification tools (e.g., software simulation, formal verification, hardware acceleration), configuring the environment (e.g., server, FPGA), creating the test environment, and basic test cases. Initial basic test cases are often called &ldquo;smoke tests.&rdquo; Subsequent test codes are based on this platform, so it must be reusable. The platform includes the test framework, the code being tested, and basic signal stimuli.</p>
+<p><strong>Organizing Functional Points：</strong> This involves listing the DUT&rsquo;s basic functions based on the specification manual and detailing how to test each function. Functional points are prioritized based on importance, risk, and complexity. They also need to be tracked for status, with updates synchronized to the plan if changes occur.</p>
+<p><strong>Test Cases</strong> These are conditions or variables used to determine if the DUT meets specific requirements and operates correctly. Each case includes test conditions, input data, expected results, actual results, and test outcomes. Running test cases and comparing expected vs. actual results help verify the system or application&rsquo;s correct implementation of functions or requirements. Test cases are crucial tools for verifying chip design against specifications.</p>
+<p><strong>Coding Implementation：</strong> This is the execution of test cases, including generating test data, selecting the test framework, programming language, and writing the reference model. This phase requires a deep understanding of functional points and test cases. Misunderstandings can lead to the DUT being undrivable or undetected bugs.</p>
+<p><strong>Collecting Bugs/Coverage：</strong> The goal of verification is to find design bugs early, so collected bugs need unique identifiers, severity ratings, and status tracking with design engineers. Discovering bugs is ideal, but since not every test finds bugs, coverage is another metric to evaluate verification thoroughness. Sufficient verification is indicated when coverage (e.g., code coverage &gt;90%) exceeds a threshold.</p>
+<p><strong>Regression Testing：</strong> As verification and design are iterative, regression tests ensure the modified DUT still functions correctly after bug fixes. This catches new errors or reactivates old ones due to changes. Regression tests can be comprehensive or selective, covering all functions or specific parts.</p>
+<p><strong>Test Report：</strong> This summarizes the entire verification process, providing a comprehensive view of the testing activities, including objectives, executed test cases, discovered issues, coverage, and efficiency.</p>
+</blockquote></p>
+<h2 id="levels-of-chip-verification">Levels of Chip Verification</h2>
+<hr>
+<p>Chip verification typically includes four levels based on the object size: UT, BT, IT, and ST.</p>
+<p><strong>Unit Testing（UT）：</strong> The lowest verification level, focusing on single modules or components to ensure their functionality is correct.</p>
+<p><strong>Block Testing (BT) ：</strong> Modules often have tight coupling, making isolated UT testing complex. BT merges several coupled modules into one DUT block for testing.</p>
+<p><strong>Integration Testing (IT) ：</strong> Builds on UT by combining multiple modules or components to verify their collaborative functionality, usually testing subsystem functionality.</p>
+<p><strong>System Testing (ST) ：</strong> Also called Top verification, ST combines all modules or components into a complete system to verify overall functionality and performance requirements.</p>
+<p>In theory, these levels follow a bottom-up order, each building on the previous level. However, practical verification activities depend on the scale, expertise, and functional needs of the enterprise, so not all levels are always involved. At each level, relevant test cases are written, tests run, and results analyzed to ensure the chip design&rsquo;s correctness and quality.</p>
+<h2 id="chip-verification-metrics">Chip Verification Metrics</h2>
+<hr>
+<p>Verification metrics typically include functional correctness, test coverage, defect density, verification efficiency, and verification cost. Functional correctness is the fundamental metric, ensuring the chip executes its designed functions correctly. This is validated through functional test cases, including normal and robustness tests. Test coverage indicates the extent to which test cases cover design functionality, with higher coverage implying higher verification quality. Coverage can be further divided into code coverage, functional coverage, condition coverage, etc. Defect density measures the number of defects found in a given design scale or code volume, with lower density indicating higher design quality. Verification efficiency measures the amount of verification work completed within a given time and resource frame, with higher efficiency indicating higher productivity. Verification cost encompasses all resources required for verification, including manpower, equipment, and time, with lower costs indicating higher cost-effectiveness.</p>
+<blockquote><p>
+<p>Functional correctness is the absolute benchmark for verification. However, in practice, it is often impossible to determine if the test plan is comprehensive and if all test spaces have been adequately covered. Therefore, a quantifiable metric is needed to guide whether verification is sufficient and when it can be concluded. This metric is commonly referred to as &ldquo;test coverage.&rdquo; Test coverage typically includes code coverage (lines, functions, branches) and functional coverage.</p>
+<p><strong>Code Line Coverage：</strong> This indicates how many lines of the DUT design code were executed during testing.</p>
+<p><strong>Function Coverage：</strong> This indicates how many functions of the DUT design code were executed during testing.</p>
+<p><strong>Branch Coverage：</strong> This indicates how many branches (if-else) of the DUT design code were executed during testing.</p>
+<p><strong>Functional Coverage：</strong> This indicates how many predefined functions were triggered during testing.</p>
+<p>High code coverage can improve the quality and reliability of verification but does not guarantee complete correctness since it cannot cover all input and state combinations. Therefore, in addition to pursuing high code coverage, other testing methods and metrics, such as functional testing, performance testing, and defect density, should be combined.</p>
+</blockquote></p>
+<h2 id="chip-verification-management">Chip Verification Management</h2>
+<hr>
+<p>Chip verification management is a <strong>comprehensive process</strong> that encompasses all activities in the chip verification process, including the development of verification strategies, the setup of the verification environment, the writing and execution of test cases, the collection and analysis of results, and the tracking and resolution of issues and defects. The goal of chip verification management is to ensure that the chip design meets all functional and performance requirements, as well as specifications and standards.</p>
+<p>In chip verification management, the first step is to formulate a detailed verification strategy, including objectives, scope, methods, and schedules. Then, a suitable verification environment must be set up, including hardware, software tools, and test data. Next, a series of test cases covering all functional and performance points must be written and executed, with results collected and analyzed to identify problems and defects. Finally, these issues and defects need to be tracked and fixed until all test cases pass.</p>
+<p>Chip verification management is a complex process requiring a variety of skills and knowledge, including chip design, testing methods, and project management. It requires close collaboration with other activities, such as chip design, production, and sales, to ensure the quality and performance of the chip. The effectiveness of chip verification management directly impacts the success of the chip and the company&rsquo;s competitiveness. Therefore, chip verification management is a crucial part of the chip development process.</p>
+<p>The chip verification management process can be based on a &ldquo;project management platform&rdquo; and a &ldquo;bug management platform,&rdquo; with platform-based management typically being significantly more efficient than manual management.</p>
+<h2 id="current-state-of-chip-verification">Current State of Chip Verification</h2>
+<hr>
+<p>Currently, chip verification is typically completed within chip design companies. This process is not only technically complex but also entails significant costs. Given the close relationship between acceptance and design, chip verification inevitably involves the source code of the chip design. However, chip design companies usually consider the source code as a trade secret, necessitating internal personnel to perform the verification, making outsourcing difficult.</p>
+
+<figure>
+    <img src="time_of_verification.png"
+         alt="Verification Workload Proportion" width="700px"/> 
+</figure>
+
+<p>The importance of chip verification lies in ensuring that the designed chip operates reliably under various conditions. Verification is not only for meeting technical specifications but also for addressing the growing complexity and emerging technology demands. As the semiconductor industry evolves, the workload of chip verification has been continuously increasing, especially for complex chips, where verification work has exceeded design work, accounting for more than 70%. This means that in terms of engineer personnel ratio, verification engineers are usually twice the number of design engineers (e.g., in a team of three thousand at Zeku, there are about one thousand design engineers and two thousand verification engineers. Similar or higher ratios apply to other large chip design companies).</p>
+<p>Due to the specificity of verification work, which requires access to the chip design source code, it significantly limits the possibility of outsourcing chip verification. The source code is considered the company&rsquo;s core trade secret, involving technical details and innovations, thus making it legally and securely unfeasible to share with external parties. Consequently, internal personnel must shoulder the verification work, increasing the internal workload and costs.</p>
+<p>Given the current situation, the demand for chip verification engineers continues to grow. They need a solid technical background, familiarity with various verification tools and methods, and keen insight into emerging technologies. Due to the complexity of verification work, verification teams typically need a large scale, contrasting sharply with the design team size.</p>
+<p>To meet this challenge, the industry may need to continuously explore innovative verification methods and tools to improve efficiency and reduce costs.</p>
+<blockquote><p>
+Summary: Complex Chip Verification Costs
+<p><strong>High Verification Workload：</strong> For complex chips, verification work accounts for over 70% of the entire chip design work.</p>
+<p><strong>High Labor Costs：</strong> The number of verification engineers is twice that of design engineers, with complex tasks requiring thousands of engineers.</p>
+<p><strong>Internal Verification：</strong> To ensure trade secrets (chip design code) are not leaked, chip design companies can only hire a large number of verification engineers to perform verification work internally.</p>
+</blockquote></p>
+<h2 id="crowdsourcing-chip-verification">Crowdsourcing Chip Verification</h2>
+<hr>
+<p>In contrast to hardware, the software field has already made testing outsourcing (subcontracting) a norm to reduce testing costs. This business is highly mature, with a market size in the billions of yuan, advancing towards the trillion-yuan scale. From the content perspective, software testing and hardware verification share significant similarities (different targets with the same system objective). Is it feasible to subcontract hardware verification in the same way as software?</p>
+<p><img alt="Software Outsourcing Market" src="maket_of_soft_test.png"></p>
+<blockquote><p>
+Crowdsourcing chip verification faces many challenges, such as:
+<p><strong>Small Number of Practitioners：</strong> Compared to the software field, the number of hardware developers is several orders of magnitude smaller. For instance, according to GitHub statistics (<a href="https://madnight.github.io/githut/#/pull_requests/2023/2)">https://madnight.github.io/githut/#/pull_requests/2023/2)</a>, traditional software programming languages (Python, Java, C++, Go) account for nearly 50%, whereas hardware description languages like Verilog account for only 0.076%, reflecting the disparity in developer numbers.</p>
+<p><strong>Commercial Verification Tools：</strong> The verification tools used in enterprises (simulators, formal verification, data analysis) are almost all commercial tools, which are nearly invisible to ordinary people and difficult to self-learn.</p>
+<p><strong>Lack of Open Learning Materials：</strong> Chip verification involves accessing the chip design source code, which is typically regarded as the company&rsquo;s trade secrets and proprietary technology. Chip design companies may be unwilling to disclose detailed verification processes and techniques, limiting the availability of learning materials.</p>
+</blockquote></p>
+<h4 id="feasibility-analysis">Feasibility Analysis</h4>
+<p>Although the chip verification field has been relatively closed, from a technical perspective, adopting a subcontracting approach for verification is a feasible option due to several factors:</p>
+<p>Firstly, with the gradual increase of open-source chip projects, the source code involved in verification has become more open and transparent. These open-source projects do not have concerns about trade secrets in their design and verification process, providing more possibilities for learning and research. Even if some projects involve trade secrets, encryption and other methods can be used to hide design codes, addressing trade secret issues to a certain extent and making verification easier to achieve.</p>
+<p>Secondly, many fundamental verification tools have emerged in the chip verification field, such as Verilator and SystemC. These tools provide robust support for verification engineers, helping them perform verification work more efficiently. These tools alleviate some of the complexity and difficulty of the verification process, providing a more feasible technical foundation for adopting subcontracted verification methods.</p>
+<p>In the open-source software field, some successful cases can be referenced. For example, the Linux kernel verification process adopts a subcontracting approach, with different developers and teams responsible for verifying different modules, ultimately forming a complete system. Similarly, in the machine learning field, the ImageNet project adopted a crowdsourced annotation strategy, completing large-scale image annotation tasks through crowdsourcing. These cases provide successful experiences for the chip verification field, proving the potential of subcontracted verification to improve efficiency and reduce costs.</p>
+<p>Therefore, despite the chip verification field being relatively closed compared to other technical fields, technological advances and the increase of open-source projects offer new possibilities for adopting subcontracted verification. By drawing on successful experiences from other fields and utilizing existing verification tools, we can promote the application of more open and efficient verification methods in chip verification, further advancing the industry. This openness and flexibility in technology will provide more choices for verification engineers, promoting innovative and diverse development in the chip verification field.</p>
+<h4 id="technical-route">Technical Route</h4>
+<blockquote><p>
+<p>To overcome challenges and engage more people in chip verification, this project continuously attempts the following technical directions:</p>
+<p><strong>Provide Multi-language Verification Tools：</strong> Traditional chip verification is based on the System Verilog programming language, which has a small user base. To allow other software development/testing professionals to participate in chip verification, this project provides multi-language verification conversion tools <a href="https://github.com/XS-MLVP/picker">Picker</a>, enabling verifiers to use familiar programming languages (e.g., C++, Python, Java, Go) with open-source verification tools.</p>
+<p><strong>Provide Verification Learning Materials：</strong> The scarcity of chip verification learning materials is mainly due to the improbability of commercial companies disclosing internal data. Therefore, this project will continuously update learning materials, allowing verifiers to learn the necessary skills online for free.</p>
+<p><strong>Provide Real Chip Verification Cases：</strong> To make the learning materials more practical, this project uses the &ldquo;Xiangshan Kunming Lake (an industrial-grade high-performance RISC-V processor) IP core&rdquo; as a basis, continuously updating verification cases by extracting modules from it.</p>
+<p><strong>Organize Chip Design Subcontracted Verification：</strong> Applying what is learned is the goal of every learner. Therefore, this project periodically organizes subcontracted chip design verification, allowing everyone (whether you are a university student, verification expert, software developer, tester, or high school student) to participate in real chip design work.</p>
+</blockquote></p>
+<p>The goal of this project is to achieve the following vision: &ldquo;Open the black box of traditional verification modes, allowing anyone interested to participate in chip verification anytime, anywhere, using their preferred programming language.&rdquo;</p>
+
+<figure>
+    <img src="landscape.png"
+         alt="Vision" width="700px"/> 
+</figure>
+
+
+	<div class="text-muted mt-5 pt-3 border-top">
+  Last modified June 21, 2024: <a href="https://github.com/XS-MLVP/course/commit/06010f4bc24f6782b049965804e81e72fe03bb72">add en static (06010f4)</a>
+</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
+        <span>&copy; 2024 BOSC All Rights Reserved</span>
+        <span class="ms-1"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></span>
+        
+      </div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <script src="/mlvp/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
+<script defer src="/mlvp/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/mlvp/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

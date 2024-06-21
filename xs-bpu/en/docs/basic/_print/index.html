@@ -1,0 +1,668 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="canonical" type="text/html" href="https://xs-mlvp.github.io/xs-bpu/en/docs/basic/">
+<link rel="alternate" type="application/rss&#43;xml" href="https://xs-mlvp.github.io/xs-bpu/en/docs/basic/index.xml">
+<meta name="robots" content="noindex, nofollow">
+
+
+<link rel="shortcut icon" href="/xs-bpu/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/xs-bpu/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-192x192.png" sizes="192x192">
+
+<title>Basic Design of Shanshan Branch Prediction Unit (BPU) | OpenVerify Courses</title>
+<meta name="description" content="This document introduces the basic design principles of the Shanshan branch prediction unit. By reading this document, you can understand the approximate workflow of the Shanshan BPU without needing to know specific signal names and code details.">
+<meta property="og:title" content="Basic Design of Shanshan Branch Prediction Unit (BPU)" />
+<meta property="og:description" content="This document introduces the basic design principles of the Shanshan branch prediction unit. By reading this document, you can understand the approximate workflow of the Shanshan BPU without needing to know specific signal names and code details." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/en/docs/basic/" />
+<meta itemprop="name" content="Basic Design of Shanshan Branch Prediction Unit (BPU)">
+<meta itemprop="description" content="This document introduces the basic design principles of the Shanshan branch prediction unit. By reading this document, you can understand the approximate workflow of the Shanshan BPU without needing to know specific signal names and code details."><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Basic Design of Shanshan Branch Prediction Unit (BPU)"/>
+<meta name="twitter:description" content="This document introduces the basic design principles of the Shanshan branch prediction unit. By reading this document, you can understand the approximate workflow of the Shanshan BPU without needing to know specific signal names and code details."/>
+
+
+
+
+<link rel="preload" href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" as="style">
+<link href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+
+  </head>
+  <body class="td-section">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/xs-bpu/en/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">OpenVerify Courses</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/xs-bpu/docs/basic/">中文</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="Search this site…"
+    aria-label="Search this site…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.4071d1bf65bfd8de150895f1ebea33ea.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+
+
+
+
+<div class="td-content">
+<div class="pageinfo pageinfo-primary d-print-none">
+<p>
+This is the multi-page printable view of this section.
+<a href="#" onclick="print();return false;">Click here to print</a>.
+</p><p>
+<a href="/xs-bpu/en/docs/basic/">Return to the regular view of this page</a>.
+</p>
+</div>
+
+
+
+<h1 class="title">Basic Design of Shanshan Branch Prediction Unit (BPU)</h1>
+<div class="lead">This document introduces the basic design principles of the Shanshan branch prediction unit. By reading this document, you can understand the approximate workflow of the Shanshan BPU without needing to know specific signal names and code details.</div>
+
+
+
+
+    <ul>
+    
+  
+  
+  
+  
+
+  
+    
+    
+	
+<li>1: <a href="#pg-fe21ea780ba57fbb564bd5b9d0edb476">What is Branch Prediction</a></li>
+
+
+    
+  
+    
+    
+	
+<li>2: <a href="#pg-d61a51e555575e837489cec4d799e293">Basic of the Xiangshan Branch Prediction Unit (BPU)</a></li>
+
+
+    
+  
+    
+    
+	
+<li>3: <a href="#pg-5ba037ce5b0684d09c2046d64d401ab7">Introduction to the Xiangshan Branch Prediction Unit Structure</a></li>
+
+
+    
+  
+    
+    
+	
+<li>4: <a href="#pg-4be070861f535b0326baa1f87f4937e4">Introduction to the Timing of Xiangshan Branch Prediction Unit</a></li>
+
+
+    
+  
+
+    </ul>
+
+
+<div class="content">
+      <p>In processor design, a well-designed branch predictor (BPU) is a key component for improving processor performance. It is responsible for guiding the processor&rsquo;s fetch, determining where the next instruction should be fetched and executed. The BPU is the starting point of an instruction&rsquo;s lifecycle, so exploring a high-performance processor from the BPU is a good starting point.</p>
+<p>This is also true for Shanshan, a high-performance processor with out-of-order six-issue execution, which naturally requires a branch prediction unit with high accuracy and efficiency. The design of a branch prediction unit often needs to consider many factors, such as timing, complexity of structure, silicon area occupation, prediction accuracy, and speed of recovery from prediction errors. The branch prediction unit of the Shanshan processor has achieved a good balance among these factors through many clever designs, giving it high branch prediction efficiency and accuracy, providing a basic guarantee for the supply of instructions to the backend.</p>
+<p>In this section, we will introduce the basic design of the Shanshan prediction unit. By reading this section, you can learn the following:</p>
+
+
+<div class="pageinfo pageinfo-primary">
+<ul>
+<li>Basic concepts of branch prediction</li>
+<li>Basic prediction unit of the Shanshan branch prediction unit - branch prediction block</li>
+<li>External interfaces of the Shanshan branch prediction unit</li>
+<li>Basic structure of the Shanshan branch prediction unit</li>
+<li>Basic timing of the Shanshan branch prediction unit</li>
+</ul>
+
+</div>
+
+<p>Anyone participating in the BPU crowdsourcing verification work should read this section first to have a basic understanding of the Shanshan branch prediction unit.</p>
+
+</div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+  
+
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-fe21ea780ba57fbb564bd5b9d0edb476">1 - What is Branch Prediction</h1>
+    <div class="lead">The branch prediction unit, as the name suggests, needs to perform a basic task—branch prediction. Before delving into the branch prediction unit, it is necessary to understand what branch prediction is.</div>
+	<h2 id="why-do-we-need-branch-prediction">Why Do We Need Branch Prediction?</h2>
+<p>There are mainly two reasons for branch prediction: one is that <strong>the program&rsquo;s execution flow contains branch instructions</strong>, and the other is that <strong>high-performance processors use pipeline design</strong>.</p>
+<h3 id="programs-execution-flow-contains-branch-instructions">Program&rsquo;s Execution Flow Contains Branch Instructions</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">x</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">10</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">y</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">20</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">x</span> <span style="color:#ce5c00;font-weight:bold">&gt;=</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">x</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">x</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#000">y</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>The above is a piece of C code. It first defines three variables x, y, and result, and then assigns a value to result based on the comparison of x and y. It can be observed that the program assigns values to variables in sequence in the first three lines. However, in the 5th line, due to the presence of the if instruction, the program branches, jumping directly from the 5th line to the 8th line to continue execution, which causes a <strong>branch</strong> in the program&rsquo;s execution.</p>
+<p>After translating into RISC-V assembly code, the code is as follows:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#000">li</span>  <span style="color:#000">a0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">10</span>               <span style="color:#8f5902;font-style:italic"># x = 10
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">li</span>  <span style="color:#000">a1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">20</span>               <span style="color:#8f5902;font-style:italic"># y = 20
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">li</span>  <span style="color:#000">a2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">0</span>                <span style="color:#8f5902;font-style:italic"># result = 0
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#000">blt</span> <span style="color:#000">a0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">else_branch</span>  <span style="color:#8f5902;font-style:italic"># Jump to else_branch if x &lt; y
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">add</span> <span style="color:#000">a2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a1</span>           <span style="color:#8f5902;font-style:italic"># Execute result = x + y
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">j</span> <span style="color:#000">end</span>                    <span style="color:#8f5902;font-style:italic"># Jump to end
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#f57900">else_branch:</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">sub</span> <span style="color:#000">a2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a1</span>           <span style="color:#8f5902;font-style:italic"># Execute result = x - y
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#f57900">end:</span>
+</span></span></code></pre></div><p>It can be seen that the program still maintains the previous branching behavior. In the first three lines of the code, instructions are executed in sequence. Then, in the 5th line of the program, a special instruction blt appears, which we call a branch instruction. It will determine whether to execute the next instruction based on the relationship between x and y, and the appearance of this instruction causes a branch in the program&rsquo;s execution.</p>
+<h3 id="high-performance-processors-use-pipeline-design">High-performance Processors Use Pipeline Design</h3>
+
+<figure>
+    <img src="f4669877-a9f9-4f5d-9fe3-8ba976973513.png" width="400px"/> 
+</figure>
+
+<p>Therefore, the concept of <strong>branch prediction</strong> arises. If we can accurately predict the address of the next instruction before the execution result is generated, the processor can continue to run efficiently.</p>
+<h2 id="feasibility-of-branch-prediction">Feasibility of Branch Prediction</h2>
+<p>Why can branch prediction be done? Let&rsquo;s look at an example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C" data-lang="C"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">data</span> <span style="color:#ce5c00;font-weight:bold">&gt;=</span> <span style="color:#0000cf;font-weight:bold">128</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">+=</span> <span style="color:#000">data</span><span style="color:#000;font-weight:bold">;</span>
+</span></span></code></pre></div><p>Assuming that this instruction will be executed repeatedly, and data is incremented from 0, i.e., data = 0, 1, 2, 3 &hellip; 128, 129&hellip;, let&rsquo;s analyze the behavior of executing this instruction each time.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plain" data-lang="Plain"><span style="display:flex;"><span>T = branch taken
+</span></span><span style="display:flex;"><span>N = branch not taken
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data   = 0, 1, 2, 3, s, ... 126, 127, 128, 129, 130, ... 250, 251, 252, ...
+</span></span><span style="display:flex;"><span>branch = N  N  N  N  N  ...   N    N    T    T    T  ...   T    T    T  ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       = NNNNNNNNNNNN ... NNNNNNNTTTTTTTTT ... TTTTTTTTTT  (easy to predict)
+</span></span></code></pre></div><p>It can be seen that in the first 128 times, the branch is always Not Taken (the condition is not met), but after 128 times, the branch is always Taken (the condition is met). If we predict whether it is Taken based on whether it was Taken last time, we will only make one prediction error throughout the prediction process.</p>
+<p>The occurrence of the above phenomenon is due to a basic fact—<strong>whether a branch instruction jumps is related to the past jumping behavior of that instruction</strong>. By summarizing the past jumping rules, we can make a relatively accurate prediction for this jump, which also makes branch prediction possible.</p>
+<p>In fact, the jump of branch instructions is also related to factors such as the jumping situation of other branch instructions. Fully exploiting effective information to produce accurate prediction results is one of the main tasks of branch prediction.</p>
+<h2 id="basic-types-of-branch-prediction">Basic Types of Branch Prediction</h2>
+<p>In RISC-V, branch instructions include two types:</p>
+<ol>
+<li><strong>Conditional Branch Instructions (beq, bne, blt, bge, bltu, bgeu)</strong> For these instructions, whether to jump is determined by the condition in the instruction, and the jump target can be obtained from the instruction. Therefore, we need to predict whether the instruction will jump.</li>
+<li><strong>Unconditional Jump Instructions (jal, jalr)</strong> For these instructions, the jump is always executed when encountered, but the jump target may be specified by a register. Therefore, we need to predict the jump target of the instruction.</li>
+</ol>
+<p>Fortunately, due to the concise design of the RISC-V architecture, we do not need to handle conditional jump instructions. Every jump instruction we need to predict is unconditional, which is also convenient for our design.</p>
+<p>From the above analysis, we can summarize the two basic types of branch prediction—<strong>direction prediction</strong> and <strong>target address prediction</strong>.</p>
+<h3 id="direction-prediction-of-branch-instructions">Direction Prediction of Branch Instructions</h3>
+<p>Direction prediction of branch instructions corresponds to conditional branch instructions in RISC-V instructions. We need to predict whether it needs to jump, which is called direction prediction.</p>
+<h4 id="two-bit-saturation-counters">Two-Bit Saturation Counters</h4>
+<p>Direction prediction has a very simple and efficient prediction method called two-bit saturation counter. The basic idea can be seen in the figure below.</p>
+
+<figure>
+    <img src="c7e5cf3e-8131-430b-a728-659fb7775f53.png" width="700px"/> 
+</figure>
+
+<p>The two-bit saturating counter is regarded as a state machine, and we maintain such a state machine for each branch instruction. When a branch instruction is taken, the corresponding state in the diagram moves to the right; otherwise, it moves to the left. So, the next time we encounter this branch instruction, we first look up its two-bit saturating counter. If the state is more biased to the right, we predict it to be taken; otherwise, we predict it not to be taken.</p>
+<p>Of course, it&rsquo;s impractical to maintain a two-bit saturating counter for each branch instruction. Therefore, in practice, we usually use part of the PC or a hash method to index the two-bit saturating counter, as shown in the diagram below.</p>
+
+<figure>
+    <img src="e2cf0e6d-f050-4aff-bee3-c72a2b9004e1.png" width="700px"/> 
+</figure>
+
+<h4 id="branch-history">Branch History</h4>
+<p>Branch history is a very commonly used data in branch prediction and the basis of most branch prediction algorithms because it directly shows the past jumping behavior of instructions.</p>
+<p>There are two basic types of branch history:</p>
+<ul>
+<li><strong>Local Branch History</strong> Maintain a set of registers for each branch instruction, recording the historical jumping behavior of that instruction.
+<ul>
+<li>For example: 0101000000101 (0 means not taken, 1 means taken)</li>
+</ul>
+</li>
+<li><strong>全Global Branch History</strong> All instructions share a set of registers, recording the branching behavior during program execution.
+<ul>
+<li>
+<p>For example:</p>
+<pre tabindex="0"><code>    beg a0, a1, label1          not taken  record 0
+    bne a1, a2, label2          not taken  record 0
+-&gt;  beq a2, a3, label4          taken      record 1
+</code></pre><p>After executing these three different branch instructions, the global branch history becomes 001.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="branch-target-address-prediction">Branch Target Address Prediction</h3>
+<p>In the RISC-V architecture, branch target address prediction refers to predicting the target address of unconditional jump instructions (e.g., jal, jalr). Since these instructions always perform a jump operation, we need to predict their target address.</p>
+<h4 id="branch-target-buffer-btb">Branch Target Buffer (BTB)</h4>
+<p>BTB is a common method for predicting target addresses. Its core idea is to use a cache to store the target addresses of past unconditional jump instructions. When encountering the same unconditional jump instruction again, the BTB can be checked to see if there is a record for that instruction. If so, the recorded target address is used as the predicted target address for the current execution.</p>
+<p>The diagram below illustrates this:</p>
+
+<figure>
+    <img src="540d418a-2760-4724-aad4-502bd0775185.png" width="500px"/> 
+</figure>
+
+<h3 id="predicting-instruction-types">Predicting Instruction Types</h3>
+<p>As we know, in branch prediction, for conditional branch instructions, we need to predict their direction, and for unconditional jump instructions, we need to predict their target. However, there is a problem: when we get a PC that needs to be predicted, we don&rsquo;t know whether the corresponding instruction is a normal instruction or a branch instruction. Therefore, we cannot predict it.</p>
+<p>How to solve this? One way is to predict the behavior of the instruction after fetching it. But fetching from ICache or Memory may take several cycles, which is a major drawback of this method.</p>
+<p>A better way is to directly predict the type of instruction. After getting a PC, we can directly predict whether this instruction is a branch instruction and predict its behavior. In this way, we don&rsquo;t have to wait for fetching to complete, and the predicted result can also guide the CPU to fetch from the correct location.</p>
+<p>The method of type prediction can be similar to BTB, where a field in the cache contains the type of instruction for use in the next prediction.</p>
+<h2 id="general-steps-of-branch-prediction">General Steps of Branch Prediction</h2>
+<p>Through the introduction in this section, we can summarize the general steps of branch prediction:</p>
+<ol>
+<li>Get the PC.</li>
+<li>Predict whether it is a branch instruction.
+<ol>
+<li>If it is a conditional branch instruction, predict its direction and target.</li>
+<li>If it is an unconditional jump instruction, predict its target.</li>
+</ol>
+</li>
+</ol>
+<p>Note that since predicting the type of instruction is required in prediction, and we haven&rsquo;t obtained the specific content of the instruction, predicting the target of a conditional branch instruction also becomes our task.</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-d61a51e555575e837489cec4d799e293">2 - Basic of the Xiangshan Branch Prediction Unit (BPU)</h1>
+    <div class="lead">This section introduces the basic ideas and working principles of the Xiangshan Branch Prediction Unit (BPU), including the use of branch prediction block concepts, multiple predictors, multiple pipeline structures, and the role of the Fetch Target Queue (FTQ), explaining the main interfaces of BPU for external interaction.</div>
+	<h2 id="branch-prediction-block-concept">Branch Prediction Block Concept</h2>
+<p>For a general branch predictor, it usually predicts the relevant information of an instruction corresponding to a given PC, such as whether it is a conditional branch instruction or a jump instruction. For conditional branch instructions, it predicts whether it will jump, while for jump instructions, it predicts the jump target. However, predicting instructions one by one is inefficient, leading to slow instruction supply in the frontend.</p>
+<p>In contrast, the prediction method used in Xiangshan is to predict a block of instructions each time. That is to say, <strong>given a PC, Xiangshan will predict a branch prediction block starting from this PC, including the situation of several subsequent instructions, such as whether there is a branch instruction, the position of the branch instruction, whether there is a jump, and the jump target.</strong></p>
+<p>This prediction method can predict multiple instructions at once and send the prediction results to the fetch unit (IFU) to guide the IFU to fetch instructions. In addition, since the IFU needs to consider the performance of cache lines, it can fetch multiple instructions at once based on the prediction block, thereby improving throughput efficiency.</p>
+<p>After the prediction block is generated, <strong>the branch prediction block will also generate the PC to which it jumps after executing this prediction block, and then the BPU will continue to generate the next branch prediction block based on this PC.</strong></p>
+<p>Here&rsquo;s a simple example:</p>
+
+<figure>
+    <img src="1.png" width="700px"/> 
+</figure>
+
+<p>As shown in the above figure, when the PC reaches 0x20000118, the BPU goes through the following steps:</p>
+<ol>
+<li>The BPU learns that the PC is 0x20000118.</li>
+<li>The BPU generates a branch prediction block starting from 0x20000118, with the following approximate contents:
+<ol>
+<li>In the next several instructions,</li>
+<li>The third instruction is a conditional branch instruction.</li>
+<li>For this conditional branch instruction, it predicts that it will be taken.</li>
+<li>The address to which it jumps is 0x20000110.</li>
+</ol>
+</li>
+<li>The BPU sets the PC to 0x20000110 and continues to generate the next branch prediction block.</li>
+</ol>
+<p>This is the basic prediction process of the Shanshan BPU using branch prediction blocks.</p>
+<h2 id="multiple-predictors-multiple-pipeline-structure">Multiple Predictors, Multiple Pipeline Structure</h2>
+
+<figure>
+    <img src="2.png" width="500px"/> 
+</figure>
+
+<p>The figure below shows the overall architecture of the Xiangshan BPU, where we need to focus on two main aspects:</p>
+<h3 id="multiple-predictors">Multiple Predictors</h3>
+<ol>
+<li>To ensure prediction accuracy, Xiangshan BPU uses multiple predictors, and these predictors collectively generate the BPU&rsquo;s prediction results. For example, FTB generates basic prediction results for subsequent predictors to use, while TAGE produces more accurate prediction results for conditional branch instructions, and so on.</li>
+</ol>
+<h3 id="multiple-pipelines">Multiple Pipelines</h3>
+<ol>
+<li>To meet the requirements of high performance, Xiangshan BPU adopts a pipeline design. Various predictors are at different pipeline levels. Among them, the uFTB (also known as uBTB in the figure) predictor is at the first pipeline level, capable of generating prediction results in one cycle. The other predictors need 2-3 cycles to generate prediction results. Although the prediction time is longer, the prediction results are relatively more accurate.</li>
+</ol>
+<p>However, if it takes three cycles to get the prediction result and start predicting based on the new result, this design inevitably leads to performance loss. Because of this, it takes three clock cycles to complete one prediction.</p>
+<p>To be able to get the prediction results of some predictors in the first and second cycles, we set up three prediction result channels and output the prediction results of the three pipeline levels simultaneously, as shown in the figure below.</p>
+
+<figure>
+    <img src="3.png" width="600px"/> 
+</figure>
+
+<h2 id="fetch-target-queue-ftq">Fetch Target Queue (FTQ)</h2>
+<h3 id="storing-branch-prediction-results">Storing Branch Prediction Results</h3>
+<p>Although the BPU can provide prediction results in the form of branch prediction blocks and the IFU can fetch multiple instructions at once, there is still a performance gap between them. In general, the BPU generates prediction results faster.</p>
+<p>Therefore, a Fetch Target Queue (FTQ) is added between the BPU and the IFU as a buffer. The FTQ is essentially a queue used to store individual data items. The prediction results generated by the BPU are first stored in the FTQ, and then fetched by the IFU from the FTQ, as shown in the figure below.</p>
+
+<figure>
+    <img src="4.png" width="400px"/> 
+</figure>
+
+<p>Whenever the BPU generates a prediction block, the prediction block is placed at the head of the FTQ. When the IFU is idle, it will fetch the next prediction block from the tail of the FTQ. The diagram below illustrates this process.</p>
+
+<figure>
+    <img src="5.png" width="600px"/> 
+</figure>
+
+<p>In Xiangshan, the FTQ&rsquo;s functionality goes far beyond this. Referring to the FTQ&rsquo;s external interface in the figure above, it is also responsible for sending prefetch information to the ICache, storing various training information of the BPU, analyzing redirection information and update information sent from the fetch module and the backend execution module, sending update requests to the BPU, and even updating the basic data structure of the FTB predictor in the FTQ.</p>
+<h3 id="bpu-prediction-result-redirection">BPU Prediction Result Redirection</h3>
+<p>As mentioned earlier, the Xiangshan branch prediction results have three channels, which simultaneously output the prediction results of stages s1, s2, and s3. How does the FTQ use the prediction results of the three stages?</p>
+<p>Let&rsquo;s start from exploring the timing of the pipeline, as shown in the figure below.</p>
+
+<figure>
+    <img src="6.png" width="400px"/> 
+</figure>
+
+<ul>
+<li>In the first cycle, a new PC 0x4 is fetched, and the predictor (called uFTB) that can produce a prediction result within one cycle outputs its prediction result at the s1 interface, indicating the next PC as 0xf, with no output from other interfaces yet.</li>
+<li>In the second cycle, the PC is set to 0xf, and uFTB also generates a prediction result of 0xf, which is sent out from the s1 channel. At the same time, the two-cycle predictor generates the prediction result for the previous address 0x4, which is sent out from the s2 channel.</li>
+</ul>
+<p>However, a problem arises here: in the second cycle, the prediction result generated by s2 is 0x4, but the prediction result for 0x4 has already been output by s1 in the previous cycle and placed in an entry in the FTQ. In other words, the prediction result generated by s2 has already been generated by s1. The difference is that the result from s2 is generated by the two-cycle predictor, making it more accurate.</p>
+<p>Therefore, what we need to do is not to place a new FTQ entry based on the prediction result from s2 but to <strong>compare the prediction results from s2 and the previous cycle&rsquo;s s1 prediction results. If there is a difference, then overwrite the FTQ entry placed by the previous stage&rsquo;s s1 interface.</strong></p>
+<p>So we add two additional signal lines to the s2 and s3 channels, which we call redirect signals. If this signal is valid, it indicates that there is a difference between the prediction result of this stage and the previous prediction result, and it is necessary to overwrite an FTQ entry from before. The structure is shown in the diagram below.</p>
+
+<figure>
+    <img src="7.png" width="600px"/> 
+</figure>
+
+<p>At the time corresponding to the second cycle of the pipeline in the structural diagram, the s1 channel has already placed a branch prediction block result with an address of 0x4 into the FTQ. At this time, the s2 prediction result is generated, and the BPU finds that the s2 prediction result is different from s1, so the redirect interface for this cycle is set to valid. The FTQ will use the s2 channel&rsquo;s prediction result to overwrite the FTQ entry previously storing the 0x4 prediction result.</p>
+<p>At this time, although the s1 channel has also generated a branch prediction block with 0xf as the head, it is obviously an incorrect prediction result generated by s1 based on the PC of the first cycle. Therefore, at this time, the s1 result can be directly discarded.</p>
+<p>In the third cycle, s1 starts a new round of prediction with the correct prediction result indicated by s2, the new PC 0x8. After that, if no prediction errors are detected by the s2 and s3 channels, the pipeline will continue to run at full capacity.</p>
+<h3 id="bpu-redirect-requests">BPU Redirect Requests</h3>
+<p>No matter how accurate a branch predictor is, it is not always correct. This inaccuracy can lead to incorrect instructions being filled in the subsequent pipeline. Therefore, there needs to be a mechanism to correct this, and this mechanism is redirection. When an instruction is executed by the backend execution module, the true behavior of this instruction is determined. At this time, if the backend execution module detects a branch prediction error, it will issue a <strong>redirect request</strong> to restore the processor&rsquo;s state to the state before executing the incorrect instruction. For us, we only need to pay attention to how the BPU and FTQ restore the state when redirecting.</p>
+<p>In addition to redirect requests from the backend, the Shan Mountain processor will perform a simple analysis of the instruction after it is fetched by the IFU to detect the most basic prediction errors. The specific process is as follows: after the FTQ sends a fetch request to the IFU, it will wait for the IFU to return the pre-decoded information (pre-decoding is the IFU&rsquo;s simple decoding of the instruction, such as whether it is a jump instruction, what is the target of the jump). The FTQ will write the pre-decoded information back to a field in the corresponding entry in the FTQ and will also analyze the pre-decoded information. If a prediction error is detected, it will generate an IFU redirect request.</p>
+<p>Redirect requests from the backend execution module do not need to be generated by the FTQ but are directly sent from the backend to the FTQ for processing. The FTQ will forward the generated IFU redirect request and the backend redirect request to the BPU&rsquo;s redirect interface. If both are valid in the same cycle, the FTQ will choose to forward the backend redirect request.</p>
+<p>The BPU with the added redirect interface is shown in the diagram below.</p>
+
+<figure>
+    <img src="8.png" width="700px"/> 
+</figure>
+
+<h3 id="bpu-update-requests">BPU Update Requests</h3>
+<p>The current BPU already has the ability to correct errors, but there is still a problem: the data in the BPU cannot be updated. If it is impossible to obtain information such as the location, type, whether a jump occurred, and the jump address of the instruction, the BPU will not be trained and the accuracy will be greatly reduced.</p>
+<p>To obtain this information, we still need to rely on the Fetch Target Queue (FTQ) because it can not only interact with the IFU to obtain instruction-related information but also interact with the backend to obtain execution-related information. Therefore, there will be an update request channel directly connecting the FTQ to the BPU.</p>
+
+<figure>
+    <img src="9.png" width="700px"/> 
+</figure>
+
+<p><strong>When the backend completes the execution of an entry in the FTQ, the entry is marked as committed. Next, the FTQ forwards the update information of this entry to the BPU through the Update channel.</strong></p>
+<h2 id="summary">Summary</h2>
+<p>Through this section, we have learned about all the main interfaces required for BPU external interaction and the role of FTQ in BPU. With the BPU equipped with prediction result interfaces, redirect interfaces, and update interfaces, it can already support all external interactions of the BPU. Next, we will delve deeper into the internals of the BPU.</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-5ba037ce5b0684d09c2046d64d401ab7">3 - Introduction to the Xiangshan Branch Prediction Unit Structure</h1>
+    <div class="lead">This section introduces the structure of the Xiangshan Branch Prediction Unit (BPU), including the integration of multiple predictors and multiple pipeline schemes, as well as the organization structure and interface design of internal sub-predictors, demonstrating how the BPU interacts with the Composer, and explaining the connection methods between sub-predictors.</div>
+	<h2 id="how-does-the-bpu-integrate-internal-sub-predictors">How Does the BPU Integrate Internal Sub-predictors?</h2>
+<p>We already know that the Xiangshan BPU adopts multiple predictors and multiple pipeline schemes. To adapt to multiple pipelines, the BPU uses a three-channel result output interface. But how does it adapt to multiple predictors? This requires us to further explore the internal structure of the BPU.</p>
+
+<figure>
+    <img src="1.png" width="600px"/> 
+</figure>
+
+<p>The above figure is the BPU architecture diagram from the Xiangshan documentation. Currently, we only need to focus on one piece of information: all internal sub-predictors are encapsulated in a structure called <code>Composer</code>. The BPU only needs to interact with <code>Composer</code>.</p>
+<p>What is <code>Composer</code>? Let&rsquo;s first look at their definition in the Xiangshan code.</p>
+
+<figure>
+    <img src="2.png" width="700px"/> 
+</figure>
+
+<p>It can be seen that <code>Composer</code> and the five sub-predictors have a common characteristic: they all inherit from the <code>BasePredictor</code> base class. And the interface has been defined in the <code>BasePredictor</code> class. In other words, <code>Composer</code> and <strong>the five sub-predictors all have the same interface</strong>! The top-level BPU can directly regard <code>Composer</code> as a sub-predictor, without worrying about how the internal sub-predictors are connected.</p>
+<h2 id="sub-predictor-interface">Sub-predictor Interface</h2>
+<p>Next, we will look at what the sub-predictor interface looks like. This interface will involve the interaction between <code>Composer</code> and the top-level BPU, as well as the interaction between each sub-predictor and <code>Composer</code>.</p>
+<p>Let&rsquo;s take <code>Composer</code> as an example to illustrate the structure of the sub-predictor interface.</p>
+
+<figure>
+    <img src="3.png" width="400px"/> 
+</figure>
+
+<p>As shown in the above figure, the three-channel prediction results of <code>Composer</code> are directly output to the outside of the BPU. There is also a set of three-channel prediction results connected from the inside of the BPU to <code>Composer</code>. However, since the prediction results are generated by <code>Composer</code>, the BPU will pass an empty prediction result to <code>Composer</code>. The significance of this is to make the sub-predictor act as a &ldquo;processor.&rdquo; The sub-predictor will process the input prediction results and then output the processed prediction results.</p>
+<p>Next, the top-level BPU will provide the information needed for prediction to the pipeline. First is the <strong>PC</strong> and <strong>branch history records</strong> (including global history and global folding history). Next, the BPU will connect some pipeline control signals between <code>Composer</code> and the <strong>pipeline control signals</strong>. Finally, the BPU will directly connect the externally input <strong>redirect request interface</strong> and <strong>update interface</strong> to <code>Composer</code>.</p>
+<p>In the end, a simple definition of the sub-predictor interface can be given (for detailed definitions, please refer to the interface documentation):</p>
+<ul>
+<li><strong>in</strong>
+<ul>
+<li><strong>(s1, s2, s3)</strong> Prediction information input</li>
+<li><strong>s0_pc</strong>         PC to be predicted</li>
+<li><strong>ghist</strong>         Global branch history</li>
+<li><strong>folded_hist</strong> Global folding history</li>
+</ul>
+</li>
+<li><strong>out  (s1, s2, s3)</strong> Prediction information output</li>
+<li><strong>流水线控制信号</strong>
+<ul>
+<li><strong>s0_fire, s1_fire, s2_fire, s3_fire</strong> Whether the corresponding pipeline stage is working</li>
+<li><strong>s2_redirect, s3_redirect</strong>              Redirect signals when a prediction error is discovered in the subsequent pipeline stage</li>
+<li><strong>s1_ready, s2_ready, s3_ready</strong>    Whether the sub-predictor corresponding pipeline stage is ready</li>
+</ul>
+</li>
+<li><strong>update</strong>        Update request</li>
+<li><strong>redirect</strong>      Redirect request</li>
+</ul>
+<h2 id="connection-between-sub-predictors">Connection Between Sub-predictors</h2>
+<p>We now know that the interfaces between each sub-predictor and <code>Composer</code> are the same, and we also know how <code>Composer</code> is connected to the top-level BPU. This section will explain how sub-predictors are connected within <code>Composer</code>.</p>
+
+<figure>
+    <img src="4.png" width="400px"/> 
+</figure>
+
+<p>The above figure shows the connection structure of sub-predictors in <code>Composer</code>. It can be seen that after the three-channel prediction results are input into <code>Composer</code>, they are first processed by <code>uFTB</code> and then output. They are then successively processed by <code>TAGE-SC</code>, <code>FTB</code>, <code>ITTAGE</code>, and <code>RAS</code>, and finally connected to the prediction result output of <code>Composer</code>, which is then directly connected to the outside of the BPU by <code>Composer</code>.</p>
+<p>For other signals, because the interfaces between <code>Composer</code> and each sub-predictor are the same, they are directly connected to the corresponding interfaces of each predictor by <code>Composer</code>, without much additional processing.</p>
+<h3 id="prediction-result-interface-connection">Prediction Result Interface Connection</h3>
+<p>For sub-predictors, the connection of their prediction result is that the prediction result output of one predictor is the input of the next predictor. However, it should be noted that this connection is a combinational circuit connection and is not affected by timing.</p>
+
+<figure>
+    <img src="5.png" width="400px"/> 
+</figure>
+
+<p>As shown in the above figure, taking the s1 channel as an example, from input to the output of the last predictor, it is all modified by combinational circuits, unaffected by timing. Registers only exist between the s1, s2, and s3 channels.</p>
+<p>Therefore, increasing the number of sub-predictors will not increase the number of cycles required for prediction, but will only increase the delay required for prediction per cycle.</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-4be070861f535b0326baa1f87f4937e4">4 - Introduction to the Timing of Xiangshan Branch Prediction Unit</h1>
+    <div class="lead">The timing design of the three-stage pipeline is the essence of the Xiangshan BPU. This section will introduce how the prediction result redirection signal is generated, how a new PC is generated based on the prediction result, and how the prediction results of the three channels are handled.</div>
+	<h2 id="single-cycle-prediction-without-bubble">Single-Cycle Prediction without Bubble</h2>
+
+<figure>
+    <img src="1.png" width="500px"/> 
+</figure>
+
+<p><code>uFTB</code> is the only predictor in Xiangshan BPU that can generate prediction results in a single cycle. The figure below shows the prediction process of <code>uFTB</code>. The <code>s0_pc</code> is sent from the top level of BPU, and when the s1 stage is active, the <code>s1_pc</code> retains the value of <code>s0_pc</code> from the previous cycle. This means that the value of <code>s0_pc</code> will move down the pipeline.</p>
+<p>When the s1 stage is active, <code>uFTB</code> receives the <code>s1_fire</code> signal from the current cycle and generates a prediction result based on the <code>s1_pc</code> address in this cycle, which can obtain the new PC value in the prediction result.</p>
+
+<figure>
+    <img src="2.png" width="500px"/> 
+</figure>
+
+<p>As shown in the figure, the top level of BPU analyzes the next PC value position based on the prediction result channel s1 and sends it to <code>npc_Gen</code> (new PC generator) for generating the s0_pc of the next cycle.</p>
+<p>In the next cycle, <code>uFTB</code> gets the new PC value and starts generating the prediction block for the new PC value. Therefore, with only the s1 stage, the prediction block can be generated at a rate of one block per cycle.</p>
+<h2 id="prediction-result-redirection">Prediction Result Redirection</h2>
+<p>However, except for <code>uFTB</code>, other predictors require 2-3 cycles to generate prediction results. How to utilize their prediction results? And how to generate the prediction result redirection signal?</p>
+
+<figure>
+    <img src="3.png" width="500px"/> 
+</figure>
+
+<p>As shown in the figure, a <code>Predirector 2</code> that takes two cycles to generate a prediction result can output its prediction result to the s2 prediction result channel in the s2 stage. After the top level of BPU receives the prediction result, it analyzes the jump target address <code>target</code> of the prediction block and connects it to <code>npc_Gen</code>.</p>
+<p>At this point, the signal connected to <code>npc_Gen</code> contains both the old PC prediction result generated by s2 and the new PC prediction result generated by s1. How to choose which one to use for the new PC?</p>
+<p>As mentioned earlier, BPU compares the prediction result of s2 with the prediction result of s1 from the previous cycle. If the prediction results are different, it indicates that s1 has made a wrong prediction, and naturally, the prediction result of the current cycle generated based on the wrong prediction result of the previous cycle is also wrong. Therefore, if the prediction result is incorrect in the current cycle, <code>npc_Gen</code> will use the <code>target</code> provided by s2 as the new <code>s0_pc</code>.</p>
+<p>This process is shown in the pipeline structure diagram as follows:</p>
+
+<figure>
+    <img src="4.png" width="500px"/> 
+</figure>
+
+<p>The Diff comparator compares the prediction results of the s1 stage with those of the previous cycle to generate a diff signal, guiding <code>npc_Gen</code> to generate the next PC. At the same time, the diff signal indicates that the prediction result of the s1 stage is incorrect and can be used directly by BPU to redirect the prediction result channel of the s2 stage in the FTQ, instructing the FTQ to overwrite the previous prediction result.</p>
+<p>The diff signal is also sent to each predictor through the s2_redirect interface to guide the predictors to update their states.</p>
+<p>Furthermore, when the prediction result redirection of the s2 stage occurs, indicating that the prediction result of the s1 channel is incorrect, the s2 stage cannot continue to predict and needs to invalidate the <code>s2_fire</code> signal of the predictor pipeline and wait for the corrected prediction result to flow in.</p>
+<p>The prediction result redirection of the s3 stage is similar to this. Its pipeline structure diagram is as follows. The specific processing process is left for you to analyze.</p>
+
+<figure>
+    <img src="5.png" width="500px"/> 
+</figure>
+
+<h2 id="redirection-requests-and-other-information-generation">Redirection Requests and Other Information Generation</h2>
+
+<figure>
+    <img src="6.png" width="500px"/> 
+</figure>
+
+<p>Only when the prediction information of all three stages is incorrect will an external redirection request occur. At this time, <code>npc_Gen</code> will receive the PC address from the redirection request. Since when a redirection request occurs, we assume that all three stages have predicted incorrectly, so all three stages&rsquo; <code>fire</code> signals need to be invalidated. Then, <code>npc_Gen</code> uses the PC that needs to be restored from the redirection request to restart the prediction.</p>
+<p>Other information, such as the generation of the global history and the PC, follows the same principle and is maintained based on the prediction information of each stage. The global history generates a new branch history based on the prediction results of each stage.</p>
+<h2 id="pipeline-control-signals">Pipeline Control Signals</h2>
+<p>After learning about the specific process of the pipeline, you should understand the pipeline control signals in the predictor interface, as follows:</p>
+<ul>
+<li><strong>s0_fire, s1_fire, s2_fire, s3_fire</strong> Indicate whether each stage of the pipeline is working.</li>
+<li><strong>s2_redirect, s3_redirect</strong>           Indicate whether a prediction result redirection has occurred.</li>
+<li><strong>s1_ready, s2_ready, s3_ready</strong>    Sent from the predictor to the top level of BPU, indicating whether each stage of the pipeline is ready.</li>
+</ul>
+<h2 id="conclusion">Conclusion</h2>
+<p>By now, you should understand the basic design principles, external interaction logic, internal structure, timing, etc., of the Xiangshan Branch Prediction Unit, and have a rough understanding of the working principle of BPU. Xiangshan&rsquo;s BPU is no longer mysterious to you.</p>
+<p>Next, you can read the <code>Important Structures and Interfaces Document</code> and combine it with the source code of Xiangshan BPU to form a more detailed understanding of BPU. When you clearly understand the working principle and signal details of BPU, you can start your verification work!</p>
+
+</div>
+
+
+
+    
+	
+  
+
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2024
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/xs-bpu/js/main.min.fc653db1f3d4f4a8b4eacd389f96d8afe966937ba9dded8b07d3a1b17d967d22.js" integrity="sha256-/GU9sfPU9Ki06s04n5bYr&#43;lmk3up3e2LB9OhsX2WfSI=" crossorigin="anonymous"></script>
+<script defer src="/xs-bpu/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/xs-bpu/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

@@ -1,0 +1,138 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>OpenVerify Courses – Redirect Request</title>
+    <link>https://xs-mlvp.github.io/xs-bpu/en/tags/redirect-request/</link>
+    <description>Recent content in Redirect Request on OpenVerify Courses</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    
+	  <atom:link href="https://xs-mlvp.github.io/xs-bpu/en/tags/redirect-request/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Basic of the Xiangshan Branch Prediction Unit (BPU)</title>
+      <link>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/01_xsbpu_basic/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/xs-bpu/en/docs/basic/01_xsbpu_basic/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;branch-prediction-block-concept&#34;&gt;Branch Prediction Block Concept&lt;/h2&gt;
+&lt;p&gt;For a general branch predictor, it usually predicts the relevant information of an instruction corresponding to a given PC, such as whether it is a conditional branch instruction or a jump instruction. For conditional branch instructions, it predicts whether it will jump, while for jump instructions, it predicts the jump target. However, predicting instructions one by one is inefficient, leading to slow instruction supply in the frontend.&lt;/p&gt;
+&lt;p&gt;In contrast, the prediction method used in Xiangshan is to predict a block of instructions each time. That is to say, &lt;strong&gt;given a PC, Xiangshan will predict a branch prediction block starting from this PC, including the situation of several subsequent instructions, such as whether there is a branch instruction, the position of the branch instruction, whether there is a jump, and the jump target.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This prediction method can predict multiple instructions at once and send the prediction results to the fetch unit (IFU) to guide the IFU to fetch instructions. In addition, since the IFU needs to consider the performance of cache lines, it can fetch multiple instructions at once based on the prediction block, thereby improving throughput efficiency.&lt;/p&gt;
+&lt;p&gt;After the prediction block is generated, &lt;strong&gt;the branch prediction block will also generate the PC to which it jumps after executing this prediction block, and then the BPU will continue to generate the next branch prediction block based on this PC.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Here&amp;rsquo;s a simple example:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;1.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;As shown in the above figure, when the PC reaches 0x20000118, the BPU goes through the following steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The BPU learns that the PC is 0x20000118.&lt;/li&gt;
+&lt;li&gt;The BPU generates a branch prediction block starting from 0x20000118, with the following approximate contents:
+&lt;ol&gt;
+&lt;li&gt;In the next several instructions,&lt;/li&gt;
+&lt;li&gt;The third instruction is a conditional branch instruction.&lt;/li&gt;
+&lt;li&gt;For this conditional branch instruction, it predicts that it will be taken.&lt;/li&gt;
+&lt;li&gt;The address to which it jumps is 0x20000110.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;The BPU sets the PC to 0x20000110 and continues to generate the next branch prediction block.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is the basic prediction process of the Shanshan BPU using branch prediction blocks.&lt;/p&gt;
+&lt;h2 id=&#34;multiple-predictors-multiple-pipeline-structure&#34;&gt;Multiple Predictors, Multiple Pipeline Structure&lt;/h2&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;2.png&#34; width=&#34;500px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;The figure below shows the overall architecture of the Xiangshan BPU, where we need to focus on two main aspects:&lt;/p&gt;
+&lt;h3 id=&#34;multiple-predictors&#34;&gt;Multiple Predictors&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;To ensure prediction accuracy, Xiangshan BPU uses multiple predictors, and these predictors collectively generate the BPU&amp;rsquo;s prediction results. For example, FTB generates basic prediction results for subsequent predictors to use, while TAGE produces more accurate prediction results for conditional branch instructions, and so on.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;multiple-pipelines&#34;&gt;Multiple Pipelines&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;To meet the requirements of high performance, Xiangshan BPU adopts a pipeline design. Various predictors are at different pipeline levels. Among them, the uFTB (also known as uBTB in the figure) predictor is at the first pipeline level, capable of generating prediction results in one cycle. The other predictors need 2-3 cycles to generate prediction results. Although the prediction time is longer, the prediction results are relatively more accurate.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;However, if it takes three cycles to get the prediction result and start predicting based on the new result, this design inevitably leads to performance loss. Because of this, it takes three clock cycles to complete one prediction.&lt;/p&gt;
+&lt;p&gt;To be able to get the prediction results of some predictors in the first and second cycles, we set up three prediction result channels and output the prediction results of the three pipeline levels simultaneously, as shown in the figure below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;3.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h2 id=&#34;fetch-target-queue-ftq&#34;&gt;Fetch Target Queue (FTQ)&lt;/h2&gt;
+&lt;h3 id=&#34;storing-branch-prediction-results&#34;&gt;Storing Branch Prediction Results&lt;/h3&gt;
+&lt;p&gt;Although the BPU can provide prediction results in the form of branch prediction blocks and the IFU can fetch multiple instructions at once, there is still a performance gap between them. In general, the BPU generates prediction results faster.&lt;/p&gt;
+&lt;p&gt;Therefore, a Fetch Target Queue (FTQ) is added between the BPU and the IFU as a buffer. The FTQ is essentially a queue used to store individual data items. The prediction results generated by the BPU are first stored in the FTQ, and then fetched by the IFU from the FTQ, as shown in the figure below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;4.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Whenever the BPU generates a prediction block, the prediction block is placed at the head of the FTQ. When the IFU is idle, it will fetch the next prediction block from the tail of the FTQ. The diagram below illustrates this process.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;5.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;In Xiangshan, the FTQ&amp;rsquo;s functionality goes far beyond this. Referring to the FTQ&amp;rsquo;s external interface in the figure above, it is also responsible for sending prefetch information to the ICache, storing various training information of the BPU, analyzing redirection information and update information sent from the fetch module and the backend execution module, sending update requests to the BPU, and even updating the basic data structure of the FTB predictor in the FTQ.&lt;/p&gt;
+&lt;h3 id=&#34;bpu-prediction-result-redirection&#34;&gt;BPU Prediction Result Redirection&lt;/h3&gt;
+&lt;p&gt;As mentioned earlier, the Xiangshan branch prediction results have three channels, which simultaneously output the prediction results of stages s1, s2, and s3. How does the FTQ use the prediction results of the three stages?&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s start from exploring the timing of the pipeline, as shown in the figure below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;6.png&#34; width=&#34;400px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;ul&gt;
+&lt;li&gt;In the first cycle, a new PC 0x4 is fetched, and the predictor (called uFTB) that can produce a prediction result within one cycle outputs its prediction result at the s1 interface, indicating the next PC as 0xf, with no output from other interfaces yet.&lt;/li&gt;
+&lt;li&gt;In the second cycle, the PC is set to 0xf, and uFTB also generates a prediction result of 0xf, which is sent out from the s1 channel. At the same time, the two-cycle predictor generates the prediction result for the previous address 0x4, which is sent out from the s2 channel.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;However, a problem arises here: in the second cycle, the prediction result generated by s2 is 0x4, but the prediction result for 0x4 has already been output by s1 in the previous cycle and placed in an entry in the FTQ. In other words, the prediction result generated by s2 has already been generated by s1. The difference is that the result from s2 is generated by the two-cycle predictor, making it more accurate.&lt;/p&gt;
+&lt;p&gt;Therefore, what we need to do is not to place a new FTQ entry based on the prediction result from s2 but to &lt;strong&gt;compare the prediction results from s2 and the previous cycle&amp;rsquo;s s1 prediction results. If there is a difference, then overwrite the FTQ entry placed by the previous stage&amp;rsquo;s s1 interface.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;So we add two additional signal lines to the s2 and s3 channels, which we call redirect signals. If this signal is valid, it indicates that there is a difference between the prediction result of this stage and the previous prediction result, and it is necessary to overwrite an FTQ entry from before. The structure is shown in the diagram below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;7.png&#34; width=&#34;600px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;At the time corresponding to the second cycle of the pipeline in the structural diagram, the s1 channel has already placed a branch prediction block result with an address of 0x4 into the FTQ. At this time, the s2 prediction result is generated, and the BPU finds that the s2 prediction result is different from s1, so the redirect interface for this cycle is set to valid. The FTQ will use the s2 channel&amp;rsquo;s prediction result to overwrite the FTQ entry previously storing the 0x4 prediction result.&lt;/p&gt;
+&lt;p&gt;At this time, although the s1 channel has also generated a branch prediction block with 0xf as the head, it is obviously an incorrect prediction result generated by s1 based on the PC of the first cycle. Therefore, at this time, the s1 result can be directly discarded.&lt;/p&gt;
+&lt;p&gt;In the third cycle, s1 starts a new round of prediction with the correct prediction result indicated by s2, the new PC 0x8. After that, if no prediction errors are detected by the s2 and s3 channels, the pipeline will continue to run at full capacity.&lt;/p&gt;
+&lt;h3 id=&#34;bpu-redirect-requests&#34;&gt;BPU Redirect Requests&lt;/h3&gt;
+&lt;p&gt;No matter how accurate a branch predictor is, it is not always correct. This inaccuracy can lead to incorrect instructions being filled in the subsequent pipeline. Therefore, there needs to be a mechanism to correct this, and this mechanism is redirection. When an instruction is executed by the backend execution module, the true behavior of this instruction is determined. At this time, if the backend execution module detects a branch prediction error, it will issue a &lt;strong&gt;redirect request&lt;/strong&gt; to restore the processor&amp;rsquo;s state to the state before executing the incorrect instruction. For us, we only need to pay attention to how the BPU and FTQ restore the state when redirecting.&lt;/p&gt;
+&lt;p&gt;In addition to redirect requests from the backend, the Shan Mountain processor will perform a simple analysis of the instruction after it is fetched by the IFU to detect the most basic prediction errors. The specific process is as follows: after the FTQ sends a fetch request to the IFU, it will wait for the IFU to return the pre-decoded information (pre-decoding is the IFU&amp;rsquo;s simple decoding of the instruction, such as whether it is a jump instruction, what is the target of the jump). The FTQ will write the pre-decoded information back to a field in the corresponding entry in the FTQ and will also analyze the pre-decoded information. If a prediction error is detected, it will generate an IFU redirect request.&lt;/p&gt;
+&lt;p&gt;Redirect requests from the backend execution module do not need to be generated by the FTQ but are directly sent from the backend to the FTQ for processing. The FTQ will forward the generated IFU redirect request and the backend redirect request to the BPU&amp;rsquo;s redirect interface. If both are valid in the same cycle, the FTQ will choose to forward the backend redirect request.&lt;/p&gt;
+&lt;p&gt;The BPU with the added redirect interface is shown in the diagram below.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;8.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;bpu-update-requests&#34;&gt;BPU Update Requests&lt;/h3&gt;
+&lt;p&gt;The current BPU already has the ability to correct errors, but there is still a problem: the data in the BPU cannot be updated. If it is impossible to obtain information such as the location, type, whether a jump occurred, and the jump address of the instruction, the BPU will not be trained and the accuracy will be greatly reduced.&lt;/p&gt;
+&lt;p&gt;To obtain this information, we still need to rely on the Fetch Target Queue (FTQ) because it can not only interact with the IFU to obtain instruction-related information but also interact with the backend to obtain execution-related information. Therefore, there will be an update request channel directly connecting the FTQ to the BPU.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&#34;9.png&#34; width=&#34;700px&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;When the backend completes the execution of an entry in the FTQ, the entry is marked as committed. Next, the FTQ forwards the update information of this entry to the BPU through the Update channel.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Through this section, we have learned about all the main interfaces required for BPU external interaction and the role of FTQ in BPU. With the BPU equipped with prediction result interfaces, redirect interfaces, and update interfaces, it can already support all external interactions of the BPU. Next, we will delve deeper into the internals of the BPU.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

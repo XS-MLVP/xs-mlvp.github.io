@@ -1,0 +1,438 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>OpenVerify Courses – Xiangshan BPU Submodules</title>
+    <link>https://xs-mlvp.github.io/xs-bpu/en/categories/xiangshan-bpu-submodules/</link>
+    <description>Recent content in Xiangshan BPU Submodules on OpenVerify Courses</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    
+	  <atom:link href="https://xs-mlvp.github.io/xs-bpu/en/categories/xiangshan-bpu-submodules/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Submodule Documentation</title>
+      <link>https://xs-mlvp.github.io/xs-bpu/en/docs/modules/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/xs-bpu/en/docs/modules/</guid>
+      <description>
+        
+        
+        &lt;p&gt;This section of the documentation will provide a detailed introduction to each module of the Xiangshan Branch Prediction Unit, including the BPU top-level and five sub-predictors.&lt;/p&gt;
+&lt;p&gt;In each module&amp;rsquo;s documentation, we will provide a detailed explanation of the module&amp;rsquo;s role in the Xiangshan Branch Prediction Unit, as well as the module&amp;rsquo;s algorithm principles, structure, and timing.&lt;/p&gt;
+&lt;p&gt;Students responsible for verifying a specific module should read the corresponding documentation thoroughly and understand it in conjunction with the code. Other documents can also be read to help you understand the overall functionality of the Xiangshan Branch Prediction Unit. During the understanding process, you may need to constantly review the basic design concepts and interface signals described in previous documents.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: RAS Branch Predictor</title>
+      <link>https://xs-mlvp.github.io/xs-bpu/en/docs/modules/05_ras/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/xs-bpu/en/docs/modules/05_ras/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;ras介绍&#34;&gt;RAS介绍&lt;/h2&gt;
+&lt;p&gt;RAS stands for &amp;ldquo;Return Address Stack.&amp;rdquo; It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;_add&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;?&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;?&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;add&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;sub&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;add&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;d&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;sub&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As shown above, the main function calls add and sub, and add calls the function _add. In this process, each call&amp;rsquo;s jump address and return address are fixed, and the return address can be obtained at the time of the call. The function call process is a &amp;ldquo;stack push and pop&amp;rdquo; process, so branch prediction can be performed using a &amp;ldquo;stack&amp;rdquo; structure: each time a call instruction is encountered, the current PC+4 (compressed instructions and regular instructions have different offsets) is pushed onto the stack; when a return instruction is encountered, a pop operation is performed, and the address obtained is the target jump address. In the block-based BPU, RAS cannot know whether the current block is a call or ret, so it relies on other predictors, using the results of previous predictors for RAS operations.&lt;/p&gt;
+&lt;p&gt;Specifically, in Xiangshan&amp;rsquo;s RAS predictor, at the s2 stage, it needs to determine whether the previous stage&amp;rsquo;s s2 output predicts a call or ret (i.e., the input signal io.s2_full_pred.hit_taken_on_call/ret is valid). If it&amp;rsquo;s a call, it pushes the subsequent instruction address onto the stack; if it&amp;rsquo;s a ret, it pops the address from the stack as the prediction result. Because in the BPU predictor, the result obtained at the s3 stage is assumed to be better than the s2 stage, the RAS predictor needs to check at the s3 stage. If the previous stage&amp;rsquo;s s3 prediction result is inconsistent with s2, the s3 result is taken, and it needs to determine whether to cancel or complete the stack operations of the previous s2 stage as needed. For example, if the s2 stage predicted a call instruction and performed a push operation, but s3 predicted a regular branch instruction with no need for any operation, the push must be canceled; if s2 predicted a regular branch instruction and s3 predicted a call, a push operation must be performed to complete.&lt;/p&gt;
+&lt;h2 id=&#34;ras-stack-operations&#34;&gt;RAS Stack Operations&lt;/h2&gt;
+&lt;p&gt;In RAS design, function return addresses are predicted using a stack. Ideally, this section assumes that RAS can be backed up at any time, with the stack top pointer represented by sp and the predicted address represented by paddr. The basic RAS operations are as follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;h3 id=&#34;push&#34;&gt;PUSH&lt;/h3&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Since predictions can be wrong, the current stack state needs to be backed up (often referred to as a &amp;ldquo;snapshot&amp;rdquo; in software; this term is also used in subsequent content). When encountering a call instruction, get the return address of the call instruction addr = current pc + 4 (if it&amp;rsquo;s a compressed instruction, addr = pc+2), then push onto the stack: sp = addr; sp += 1.&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;
+&lt;h3 id=&#34;pop&#34;&gt;POP&lt;/h3&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;For the same reason, take a snapshot of the current stack, marked as s. When encountering a ret instruction, the predicted jump address is paddr = sp, then pop: sp = sp - 1. Take a snapshot of the current stack, marked as s.&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;
+&lt;h3 id=&#34;redirect-operation&#34;&gt;Redirect Operation&lt;/h3&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Since the BPU predicts program branches, there are &amp;ldquo;correct predictions&amp;rdquo; and &amp;ldquo;wrong predictions.&amp;rdquo; When the CPU backend detects a branch prediction error, it performs a redirect operation, informing the BPU where the prediction was wrong and what the correct result is. During redirection, the RAS module receives the correct branch and the RAS stack information at the time of prediction. Depending on the type of correct branch instruction, the following snapshot recovery situations arise:&lt;/p&gt;
+&lt;p&gt;(1) The previously predicted instruction is actually a call instruction, and the push operation is executed based on the addr address provided in the redirect.
+(2) The previously predicted instruction is actually a ret instruction, and the pop operation is executed.&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;
+&lt;h3 id=&#34;commit-operation&#34;&gt;Commit Operation&lt;/h3&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The commit operation is when the backend informs the frontend that the previous prediction was correct. Ideally, the RAS predictor doesn&amp;rsquo;t need to perform any operations at this time.&lt;/p&gt;
+&lt;h2 id=&#34;implementation-of-ras-in-kunming-lake&#34;&gt;Implementation of RAS in Kunming Lake&lt;/h2&gt;
+&lt;p&gt;In actual circuit design, an infinitely large stack is impossible, and constant backups are not feasible. Therefore, in Kunming Lake&amp;rsquo;s RAS implementation, the problems and solutions are as follows:&lt;/p&gt;
+&lt;h3 id=&#34;how-to-obtain-ras-stack-snapshots-for-each-prediction&#34;&gt;&lt;strong&gt;How to obtain RAS stack snapshots for each prediction?&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;To achieve the function of taking snapshots of the RAS stack, Kunming Lake adopts a &lt;strong&gt;linked representation&lt;/strong&gt; based on a circular array. The design is as follows:&lt;/p&gt;
+&lt;image src=&#34;Linked_RAS.png&#34; width=&#34;800px&#34;&gt;
+&lt;p&gt;As shown above, a circular array is used for data management. The circular array has a starting address marked as BOS and a tail pointer marked as TOSW. The data between them are valid, and the data outside are free. Within the valid data, a linked structure represents the &amp;ldquo;RAS stack,&amp;rdquo; where each stack element records the number of its previous data. When performing stack operations, the corresponding previous element can be obtained through this number. The RAS stack&amp;rsquo;s bottom pointer shares the BOS. In the initial state S in the figure, the RAS stack elements are 0, 1, 3, 5. Element 5 records the position of its previous element 3, and element 3 records the position of its previous element 1. When a push operation is needed, the RAS stack top pointer TOSR = TOSW, the new element is stored at the new TOSR position 7, and the position of its previous element 5 is recorded in the new element, then TOSW is moved back (TOSW = TOSW+1). When a pop operation is performed, the RAS stack top pointer TOSR moves to the previous element&amp;rsquo;s position 3 based on the index saved in the stack top element. Therefore, under the condition that the stack does not overflow, the above RAS stack always allocates new data on the array through TOSW during normal Push/Pop operations, so all process states and intermediate data are saved. So, to restore to the state S, it only needs to reset the corresponding stack pointers. Therefore, in each prediction, the corresponding stack pointers (BOS, TOSR, TOSW) also need to be saved in the prediction result for later restoration in case of redirection. The advantage of this structure is that it can save complete process data, but frequent push operations can lead to large space resource consumption.&lt;/p&gt;
+&lt;h3 id=&#34;chain-ra-storage-space-waste&#34;&gt;&lt;strong&gt;Chain RA storage space waste?&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;Since the prediction result is correct after commit, the stack will not roll back. When the RAS predictor receives the commit message of the prediction block &amp;ldquo;P,&amp;rdquo; it will no longer receive the redirect message of block P, so the snapshot taken during the push operation for block P will not be used again. Therefore, the RAS stack elements can be categorized, with uncommitted elements stored in a &amp;ldquo;linked&amp;rdquo; structure and committed elements stored in a regular stack structure (the original RAS stack is split into two parts: the uncommitted part stored in a snapshot-saving linked structure and the committed part stored in a regular stack structure). The optimized RAS structure is shown below:&lt;/p&gt;
+&lt;image src=&#34;RAS_Arch.png&#34; width=&#34;800px&#34;&gt;
+&lt;p&gt;As shown above, based on the normal call/ret predictions and commit call/ret, the original RAS stack can be split into two independent stacks, called the &amp;ldquo;speculative stack&amp;rdquo; (spec_stack, linked structure) and the &amp;ldquo;commit stack&amp;rdquo; (commit_stack, regular structure). Due to the change in stack structure, the specific Pop/Push operations are as follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Encounter normal call and ret:
+(1) The call predicted by the prediction block is correct, and a push operation is performed on the spec_stack, specifically the linked stack Push process mentioned above.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;(2) The ret predicted by the prediction block is correct, and the stack top of the spec_stack is used as the prediction value, then a pop operation is performed. If the spec_stack is empty, the stack top element of the commit_stack is used as the prediction result (no pop operation is performed).&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;Commit operation:
+(1) The FTQ execution result is call correct, and a regular push operation is performed on the commit_stack.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;(2) The FTQ execution result is ret correct, and a regular pop operation is performed on the commit_stack.&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;Redirect operation:
+(1) Obtain the stack pointers (BOS, TOSR, TOSW, ssp) from the redirect message during the previous prediction and cover the current pointer values to complete the speculative stack rollback.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;(2) This operation does not affect the commit stack.&lt;/p&gt;
+&lt;h3 id=&#34;how-to-handle-when-the-s3-prediction-result-is-inconsistent-with-s2-at-the-input-end&#34;&gt;&lt;strong&gt;How to handle when the S3 prediction result is inconsistent with S2 at the input end?&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;Since the S3 result is assumed to be better than S2, the RAS stack needs to be repaired again in case of inconsistency. The specific inconsistency and corresponding repair operations are shown in the table below:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;S2 Pred. Res.&lt;/th&gt;
+&lt;th&gt;S3 Pred. Res.&lt;/th&gt;
+&lt;th&gt;Repair Operation&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;push&lt;/td&gt;
+&lt;td&gt;keep&lt;/td&gt;
+&lt;td&gt;pop&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;keep&lt;/td&gt;
+&lt;td&gt;pop&lt;/td&gt;
+&lt;td&gt;pop&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;pop&lt;/td&gt;
+&lt;td&gt;keep&lt;/td&gt;
+&lt;td&gt;push&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;keep&lt;/td&gt;
+&lt;td&gt;push&lt;/td&gt;
+&lt;td&gt;push&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;S2 and S3 operations do not exist, pop/push or push/pop scenarios (Why not exist?)&lt;/p&gt;
+&lt;h2 id=&#34;other-optimizations&#34;&gt;Other Optimizations&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Each element in the RAS stack has a counter, which is used to save repeated values (for recursive calls). For example, when the address pushed for the first time is 0xff00, and the address pushed for the second time is also 0xff00, only the counter of the top element of the stack needs to be incremented, and there is no need to actually push the address onto the stack.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;interface-description&#34;&gt;Interface Description&lt;/h2&gt;
+&lt;p&gt;In the RAS predictor, the core component is the &lt;strong&gt;RASStack&lt;/strong&gt;, with the following interface:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;接口名称&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;功能描述&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;接口名称&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;功能描述&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;in.spec_push_valid&lt;/td&gt;
+&lt;td&gt;预测有Call指令，Spec压栈&lt;/td&gt;
+&lt;td&gt;in.s2_fire&lt;/td&gt;
+&lt;td&gt;s2信号有效&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.spec_pop_valid&lt;/td&gt;
+&lt;td&gt;预测有Ret指令，Spec出栈&lt;/td&gt;
+&lt;td&gt;in.s3_fire&lt;/td&gt;
+&lt;td&gt;s3信号有效&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.spec_push_addr&lt;/td&gt;
+&lt;td&gt;Ret地址&lt;/td&gt;
+&lt;td&gt;in.s3_cancel&lt;/td&gt;
+&lt;td&gt;s3和s2的预测结果不一样，需要撤销s2的操作&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;out.spec_pop_addr&lt;/td&gt;
+&lt;td&gt;RAS的栈顶数据&lt;/td&gt;
+&lt;td&gt;in.s3_meta&lt;/td&gt;
+&lt;td&gt;s3需要的s2时的现场信息&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;out.ssp&lt;/td&gt;
+&lt;td&gt;commit栈顶指针&lt;/td&gt;
+&lt;td&gt;in.s3_missed_pop&lt;/td&gt;
+&lt;td&gt;s3判断需要再次进行pop&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;out.sctr&lt;/td&gt;
+&lt;td&gt;commit栈顶重复元素计数器&lt;/td&gt;
+&lt;td&gt;in.s3_missed_push&lt;/td&gt;
+&lt;td&gt;s3判断需要再次进行push&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;out.nsp&lt;/td&gt;
+&lt;td&gt;commit栈顶，会被ssp覆盖&lt;/td&gt;
+&lt;td&gt;in.s3_pushAddr&lt;/td&gt;
+&lt;td&gt;需要再次push时的地址&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;out.TOSR&lt;/td&gt;
+&lt;td&gt;spec栈栈顶指针&lt;/td&gt;
+&lt;td&gt;in.redirect_valid&lt;/td&gt;
+&lt;td&gt;需要重定向&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;out.TOSW&lt;/td&gt;
+&lt;td&gt;spec栈数据分配指针&lt;/td&gt;
+&lt;td&gt;in.redirect_isCall&lt;/td&gt;
+&lt;td&gt;真实执行情况是Call&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;out.BOS&lt;/td&gt;
+&lt;td&gt;spec栈栈低指针&lt;/td&gt;
+&lt;td&gt;in.redirect_isRet&lt;/td&gt;
+&lt;td&gt;真实执行情况是Return&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.commit_push_valid&lt;/td&gt;
+&lt;td&gt;push操作正确&lt;/td&gt;
+&lt;td&gt;in.redirect_meta_ssp&lt;/td&gt;
+&lt;td&gt;之前预测时的现场信息ssp&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.commit_pop_valid&lt;/td&gt;
+&lt;td&gt;FTQ执行结果为Call正确&lt;/td&gt;
+&lt;td&gt;in.redirect_meta_sctr&lt;/td&gt;
+&lt;td&gt;之前预测时的现场信息sctr&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.commit_push_addr&lt;/td&gt;
+&lt;td&gt;更新信息中的Ret地址&lt;/td&gt;
+&lt;td&gt;in.redirect_meta_TOSW&lt;/td&gt;
+&lt;td&gt;之前预测时的现场信息TOSW&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.commit_meta_TOSW&lt;/td&gt;
+&lt;td&gt;更新信息中的TOSW&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.redirect_meta_TOSR&lt;/td&gt;
+&lt;td&gt;之前预测时的现场信息TOSR&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.commit_meta_TOSR&lt;/td&gt;
+&lt;td&gt;更新信息中的TOSR&lt;/td&gt;
+&lt;td&gt;in.redirect_meta_NOS&lt;/td&gt;
+&lt;td&gt;之前预测时的现场信息NOS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.commit_meta_ssp&lt;/td&gt;
+&lt;td&gt;更新信息中的现场信息SSP&lt;/td&gt;
+&lt;td&gt;in.redirect_callAddr&lt;/td&gt;
+&lt;td&gt;重定向地址&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in.commit_meta_sctr&lt;/td&gt;
+&lt;td&gt;更新信息中的现场信息SCTR&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The relationship between the RASStack module and the BasePredictor interface is as follows:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;stack接口&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;转换过程&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;描述&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;s.spec_push_valid&lt;/td&gt;
+&lt;td&gt;io.s2_fire(2) &amp;amp;&amp;amp; s2_full_pred.hit_taken_on_call &amp;amp;&amp;amp; !io.s3_redirect(2)&lt;/td&gt;
+&lt;td&gt;s2输入有效，且上级预测为call跳转&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;s.spec_pop_valid&lt;/td&gt;
+&lt;td&gt;io.s2_fire(2) &amp;amp;&amp;amp; s2_full_pred.hit_taken_on_ret  &amp;amp;&amp;amp; !io.s3_redirect(2)&lt;/td&gt;
+&lt;td&gt;s2输入有效，且上级预测为ret跳转&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;s.spec_push_addr&lt;/td&gt;
+&lt;td&gt;s2_full_pred.fallThroughAddr + Mux(s2_full_pred.last_may_be_rvi_call, 2.U, 0.U)&lt;/td&gt;
+&lt;td&gt;上级预测器s2预测的fallThroughAddr（即PC+2），判断是否压缩指令是否需要 +2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;s.redirect_isCall&lt;/td&gt;
+&lt;td&gt;redirect.bits.level === 0.U &amp;amp;&amp;amp; recover_cfi.pd.isCall&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;s.redirect_isRet&lt;/td&gt;
+&lt;td&gt;redirect.bits.level === 0.U &amp;amp;&amp;amp; recover_cfi.pd.isRet&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;s.redirect_meta_*&lt;/td&gt;
+&lt;td&gt;redirect.bits.cfiUpdate.*&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;s.commit_push_valid&lt;/td&gt;
+&lt;td&gt;io.update.is_call_taken&lt;/td&gt;
+&lt;td&gt;call指令预测正确&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;s.commit_push_valid&lt;/td&gt;
+&lt;td&gt;io.update.is_ret_taken&lt;/td&gt;
+&lt;td&gt;ret指令预测正确&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;s.commit_push_addr&lt;/td&gt;
+&lt;td&gt;update.ftb_entry.getFallThrough(update.pc) + Mux(update.ftb_entry.last_may_be_rvi_call, 2.U, 0.U)&lt;/td&gt;
+&lt;td&gt;根据是否为压缩指令，进行地址+2或者+0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;s.commit_meta_*&lt;/td&gt;
+&lt;td&gt;io.update.bits.meta.asTypeOf(new RASMeta)&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;io.out.last_stage_spec_info.*&lt;/td&gt;
+&lt;td&gt;s3_meta.*&lt;/td&gt;
+&lt;td&gt;s3_meta = RegEnable(s2_meta, io.s2_fire(2))由s2_meta延迟一怕得到&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;io.out.last_stage_meta&lt;/td&gt;
+&lt;td&gt;s3_meta&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;io.out.s2.full_pred.*.jalr_target&lt;/td&gt;
+&lt;td&gt;:=stack.spec_pop_addr&lt;/td&gt;
+&lt;td&gt;预测地址（栈顶地址，只预测ret）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;io.out.s3.full_pred.*.jalr_target&lt;/td&gt;
+&lt;td&gt;:=RegEnable(stack.spec_pop_addr, io.s2_fire(2))&lt;/td&gt;
+&lt;td&gt;由s2延迟一拍得到&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;io.out.s2/3.full_pred.targets.last&lt;/td&gt;
+&lt;td&gt;:=Mux(s2/3_is_jalr, s2/3_jalr_target, s2/3_last_target_in)&lt;/td&gt;
+&lt;td&gt;如果时call执行，更新targets.last的结果&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;timing-description&#34;&gt;Timing Description&lt;/h2&gt;
+&lt;p&gt;In RAS, there are only 2 stages, S2 and S3.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Main tasks in S2&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Based on the S2 prediction result of the previous predictor, complete the prediction through the push/pop process and obtain the result spec_pop_addr.&lt;/li&gt;
+&lt;li&gt;Perform update operations based on commit signal.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Main tasks in S3&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Based on the prediction result in the previous predictor S3 and the operations in S2, determine whether to undo the Pop/Push operation. The predictor assumes that the S3 prediction result is better than S2. If S2 and S3 predictions are inconsistent, the RAS predictor accepts the S3 result for stack operation.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The prediction process in S3 is the same as in S2, but the data is different.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Perform redirection operations (redirection information obtained from the previous cycle).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Since the RASStack appears to complete its tasks within a cycle, data bypassing is needed inside the stack to cache data for processing.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

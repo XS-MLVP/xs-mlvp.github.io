@@ -1,0 +1,1097 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="canonical" type="text/html" href="https://xs-mlvp.github.io/xs-bpu/en/docs/ports/">
+<link rel="alternate" type="application/rss&#43;xml" href="https://xs-mlvp.github.io/xs-bpu/en/docs/ports/index.xml">
+<meta name="robots" content="noindex, nofollow">
+
+
+<link rel="shortcut icon" href="/xs-bpu/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/xs-bpu/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/xs-bpu/favicons/android-192x192.png" sizes="192x192">
+
+<title>Important Structures and Interface Documentation | OpenVerify Courses</title>
+<meta name="description" content="This document will describe the important structures and external interfaces in the BPU, with a description granularity that delves into the code level. By reading this document, you can understand the role of each signal in the Xiangshan branch prediction unit, comprehend the specific implementation methods of various requests, and gain a functional understanding in conjunction with the code.">
+<meta property="og:title" content="Important Structures and Interface Documentation" />
+<meta property="og:description" content="This document will describe the important structures and external interfaces in the BPU, with a description granularity that delves into the code level. By reading this document, you can understand the role of each signal in the Xiangshan branch prediction unit, comprehend the specific implementation methods of various requests, and gain a functional understanding in conjunction with the code." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/en/docs/ports/" />
+<meta itemprop="name" content="Important Structures and Interface Documentation">
+<meta itemprop="description" content="This document will describe the important structures and external interfaces in the BPU, with a description granularity that delves into the code level. By reading this document, you can understand the role of each signal in the Xiangshan branch prediction unit, comprehend the specific implementation methods of various requests, and gain a functional understanding in conjunction with the code."><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Important Structures and Interface Documentation"/>
+<meta name="twitter:description" content="This document will describe the important structures and external interfaces in the BPU, with a description granularity that delves into the code level. By reading this document, you can understand the role of each signal in the Xiangshan branch prediction unit, comprehend the specific implementation methods of various requests, and gain a functional understanding in conjunction with the code."/>
+
+
+
+
+<link rel="preload" href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" as="style">
+<link href="/xs-bpu/scss/main.min.5081230fda7a265fa5fc10130b5bca4f0868fd0e77a3fa6ae4f2d28669ce5899.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+
+  </head>
+  <body class="td-section">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/xs-bpu/en/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">OpenVerify Courses</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/xs-bpu/docs/ports/">中文</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="Search this site…"
+    aria-label="Search this site…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.4071d1bf65bfd8de150895f1ebea33ea.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+
+
+
+
+<div class="td-content">
+<div class="pageinfo pageinfo-primary d-print-none">
+<p>
+This is the multi-page printable view of this section.
+<a href="#" onclick="print();return false;">Click here to print</a>.
+</p><p>
+<a href="/xs-bpu/en/docs/ports/">Return to the regular view of this page</a>.
+</p>
+</div>
+
+
+
+<h1 class="title">Important Structures and Interface Documentation</h1>
+<div class="lead">This document will describe the important structures and external interfaces in the BPU, with a description granularity that delves into the code level. By reading this document, you can understand the role of each signal in the Xiangshan branch prediction unit, comprehend the specific implementation methods of various requests, and gain a functional understanding in conjunction with the code.</div>
+
+
+
+
+    <ul>
+    
+  
+  
+  
+  
+
+  
+    
+    
+	
+<li>1: <a href="#pg-82ca2994e72c69cffbb84db4c9379254">FTB Item and Complete Prediction Result Interface</a></li>
+
+
+    
+  
+    
+    
+	
+<li>2: <a href="#pg-31e8ba09abfd18f2000562cd1e9c5357">Redirection and Update Interfaces</a></li>
+
+
+    
+  
+    
+    
+	
+<li>3: <a href="#pg-356688b245f87b5c6a87c8d73ece8cd7">BPU Global Interface</a></li>
+
+
+    
+  
+    
+    
+	
+<li>4: <a href="#pg-9ec9b2e73fd778d6c722398e3805b765">Base Predictor Class and Sub Predictor Interface</a></li>
+
+
+    
+  
+
+    </ul>
+
+
+<div class="content">
+      <p>This document will describe the important structures and external interfaces in the BPU, with a description granularity that delves into the code level. The structures described in the document will be consistent with the Chisel version of the Xiangshan branch prediction unit code, and the signal structures and names also come from the Chisel version code.</p>
+<p>This document is intended for those who have already understood the basic design of the Xiangshan branch prediction unit and want to delve into the signal details. You can selectively read according to the content needed for verification or refer to it at any time.</p>
+<p>Among them, the FTB entry and the full prediction result interface involve the way the BPU generates prediction results, which is recommended for every reader to read.</p>
+
+</div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+  
+
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-82ca2994e72c69cffbb84db4c9379254">1 - FTB Item and Complete Prediction Result Interface</h1>
+    <div class="lead">The basic prediction unit of BPU is the branch prediction block, but what is the structure of a branch prediction block? Why can a branch prediction block guide the execution of so many subsequent instructions? This section will describe the core data structure for generating branch prediction blocks—the FTB item, and the complete prediction result structure generated from the FTB item.</div>
+	<h2 id="ftb-item">FTB item</h2>
+<p>The FTB item is the core data structure of branch prediction blocks in Xiangshan. It stores the information needed to generate a branch prediction block. When BPU performs predictions, the initial branch prediction block is first generated from a read-out FTB item. Then, this branch prediction block is passed to subsequent predictors, which read and modify the information to generate the final prediction result.</p>
+<p>Therefore, to understand the structure of a branch prediction block, we first need to understand the structure of an FTB item. An FTB item corresponds to a branch prediction block, and its general structure is as follows:</p>
+
+<figure>
+    <img src="1.png" width="750px"/> 
+</figure>
+
+<p>First, it is necessary to clarify one piece of information: whether it is a branch prediction block or an FTB item, the number of instructions they can contain is set to a specific limit (16 RVC instructions in the current version of Xiangshan), called the <strong>maximum prediction length</strong>. This means that if we need to record the position of an instruction within the branch prediction block, we can use a fixed-length bit vector to specify the offset of this instruction relative to the starting address of the prediction block.</p>
+<p>The determinant of the branch prediction block&rsquo;s execution process is the information about the branch instructions. The other instructions are considered ordinary instructions and do not affect the program&rsquo;s execution flow. Therefore, in a branch prediction block, we only need to record the positions of the branch instructions, while the positions of ordinary instructions are not our concern.</p>
+<p>Therefore, the FTB item defines two types of <strong>branch instruction slots</strong>—<code>brSlots</code> and <code>tailSlot</code>, used to store the branch instructions within the branch prediction block. In the current version of Xiangshan, <code>brSlots</code> contains only one slot, while <code>tailSlot</code> is a separate slot, totaling two slots.</p>
+<p>Within the instructions of the maximum prediction length, if a branch instruction appears, the FTB item will record it in the corresponding slot and mark the slot as valid. If too many branch instructions appear, reaching the capacity limit of the FTB item, the excess branch instructions will be handed over to the next FTB item for storage. In each slot, we record the offset of a branch instruction relative to the starting address of the prediction block and information such as its jump target address.</p>
+<h3 id="the-unique-tailslot">The Unique tailSlot</h3>
+<p>In RISC-V, branch instructions are mainly divided into two types: conditional branches and unconditional jumps. Therefore, <strong>for a branch prediction block, it will contain at most one unconditional jump instruction</strong>. Because once this instruction is executed, the program&rsquo;s execution flow will change, and subsequent instructions will no longer be executed. Hence, we define a type of slot called <code>tailSlot</code> specifically for storing this unconditional jump instruction. As for conditional branch instructions, they are stored in <code>brSlots</code>.</p>
+<p>As its name suggests, <code>tailSlot</code> is located in the last slot of the entire prediction block. This is also because once the unconditional jump instruction is filled, the program will definitely jump, and subsequent instructions will be handled by other prediction blocks, so we do not need to care about the subsequent instructions. However, among the instructions before the unconditional jump instruction, we need to care about whether there are conditional branch instructions, because conditional branch instructions may or may not jump. Therefore, we need to record the relevant information of the conditional branch instructions.</p>
+<h3 id="tailslot-sharing">tailSlot Sharing</h3>
+<p>Consider a situation: if no unconditional jump instructions appear from the starting PC of the prediction block to the maximum prediction length, but two conditional branch instructions appear instead, the <code>tailSlot</code> will be idle, and the second conditional branch instruction cannot be stored, causing space waste.</p>
+<p>To solve this problem, Xiangshan adopts a method of setting a <code>sharing</code> mark. We can directly store the second branch instruction into the <code>tailSlot</code> and set the sharing mark to true, indicating that the second conditional branch instruction shares the tailSlot of the unconditional jump instruction. This way, the space of the <code>tailSlot</code> is effectively utilized.</p>
+<p>The <code>isCall</code>, <code>isRet</code>, and <code>isJalr</code> fields in the prediction block serve the <code>tailSlot</code>. If the tailSlot records an unconditional jump instruction, these fields will further indicate the type of the jump instruction. There is also a field in the FTB item called <code>always_taken</code>, which records whether each conditional branch instruction stored in each slot is always predicted to jump. If so, subsequent predictors can directly adopt this prediction result.</p>
+<p>Through the FTB item, we can know the instruction situation in a branch prediction block, including the position and type of branch instructions. This information will be handed over to subsequent predictors, which will predict more accurate jump targets, whether to jump, and other information.</p>
+<h2 id="complete-structure-of-ftb-item-ftbentry">Complete Structure of FTB Item (FTBEntry)</h2>
+<p>Interface Definition: <code>src/main/scala/xiangshan/frontend/FTB.scala</code></p>
+<p>This section describes the complete structural definition of the FTB item, containing the following signals:</p>
+<ul>
+<li><strong>valid</strong>: Whether the FTB entry is valid.
+<ul>
+<li>Interface Type: <code>Bool</code></li>
+</ul>
+</li>
+<li><strong>brSlots</strong>: Conditional branch instruction slots.
+<ul>
+<li>Interface Type: <code>Vec(numBrSlot, new FtbSlot(BR_OFFSET_LEN))</code> （see FtbSlot for interface list）</li>
+</ul>
+</li>
+<li><strong>tailSlot</strong>: Unconditional jump instruction slot.
+<ul>
+<li>Interface Type: <code>new FtbSlot(JMP_OFFSET_LEN, Some(BR_OFFSET_LEN))</code> （see FtbSlot for interface list）</li>
+</ul>
+</li>
+<li><strong>pftAddr</strong>: Unconditional jump instruction slot
+<ul>
+<li>Interface Type: <code>UInt(log2Up(PredictWidth).W)</code></li>
+</ul>
+</li>
+<li><strong>carry</strong>: Unconditional jump instruction slot.
+<ul>
+<li>Interface Type: <code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>isCall</strong>: The instruction in the unconditional jump instruction slot is a call instruction.
+<ul>
+<li>Interface Type: <code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>isRet</strong>: The instruction in the unconditional jump instruction slot is a ret instruction.
+<ul>
+<li>Interface Type: <code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>isJalr</strong>: The instruction in the unconditional jump instruction slot is a jalr instruction.
+<ul>
+<li>Interface Type: <code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>last_may_be_rvi_call</strong>:  The instruction in the unconditional jump instruction slot may be an RVI type call instruction signal.
+<ul>
+<li>Interface Type: <code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>always_taken</strong>: Whether each branch instruction in the prediction block is always predicted as Taken.
+<ul>
+<li>Interface Type: <code>Vec(numBr, Bool())</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>Explanation: pftAddr and carry</strong></p>
+<p>Here, <code>pftAddr</code> stands for Partial Fallthrough Address. Fallthrough Address means that if there is no jump in the prediction block, the program will sequentially execute to the address reached. In other words, if the offset of an unconditional jump instruction is 5, then the offset corresponding to the Fallthrough Address is 6. This signal is mainly used to get the return address of the program after a function call, and this concept can be understood as the end address of the prediction block.</p>
+<p>Partial means part of the address, which is determined by the address representation method. Here, the address representation method is as follows:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plain" data-lang="Plain"><span style="display:flex;"><span>  pc: | ... |&lt;-- log(predictWidth) --&gt;|&lt;-- log(instBytes) --&gt;|
+</span></span><span style="display:flex;"><span>           ^                         ^
+</span></span><span style="display:flex;"><span>           |                         |
+</span></span><span style="display:flex;"><span>           carryPos                  instOffsetBits
+</span></span></code></pre></div><p><code>pftAddr</code> only records the middle offset part (the part with a length of log(predictWidth)), and a complete PC can be generated by combining it with the current PC. However, a carry might occur, so a <code>carry</code> bit is recorded separately. carryPos is the position in the instruction address within the prediction block where a carry might occur.</p>
+<p>Additionally, <code>last_may_be_rvi_call</code> is an auxiliary signal for this address, indicating that the instruction in the unconditional jump instruction slot is an RVI type call instruction. Since pftAddr assumes the instruction length as the compressed instruction length by default when calculating, the end address is increased by only 2 bytes. If the actual call instruction is not a compressed instruction, it will lead to an incorrect return address calculation. RAS will correct this error based on this signal.</p>
+<h2 id="branch-prediction-slot-ftbslot">Branch Prediction Slot (FTBSlot)</h2>
+<p>Interface Definition: <code>src/main/scala/xiangshan/frontend/FTB.scala</code></p>
+<p>This interface defines the slot in the FTB entry:</p>
+<ul>
+<li><strong>offset</strong>: The offset of the instruction in the slot relative to the start address of the prediction block.
+<ul>
+<li>Interface Type: UInt(log2Ceil(PredictWidth).W)</li>
+</ul>
+</li>
+<li><strong>lower</strong>: The lower bits of the jump target address.
+<ul>
+<li>Interface Type: UInt(offsetLen.W)</li>
+<li>Note: The lower is set to 12 or 20 bits because the addressing capability of branch instructions is 12 bits, while the addressing capability of jump instructions is 20 bits.</li>
+</ul>
+</li>
+<li><strong>tarStat</strong>: Whether the high bits of the PC after the jump are incremented or decremented.
+<ul>
+<li>Interface Type: UInt(TAR_STAT_SZ.W) (TAR_STAT_SZ = 2)</li>
+<li>Note: The jump target address is calculated from the high bits of the current PC, the tarStat, and the lower field. The lower field directly stores the lower bits of the jump target address. The high bits of the current PC are adjusted according to the tarStat, then concatenated with the lower to get the actual jump target address. The tarStat can take three values: 0 - no increment or decrement, 1 - increment, 2 - decrement.</li>
+</ul>
+</li>
+<li><strong>sharing</strong>: Indicates that a conditional branch instruction is stored in an unconditional jump instruction slot.
+<ul>
+<li>Interface Type: Bool()</li>
+</ul>
+</li>
+<li><strong>valid</strong>: Indicates whether the slot is valid.
+<ul>
+<li>Interface Type: Bool()</li>
+</ul>
+</li>
+</ul>
+<h2 id="full-branch-prediction">Full Branch Prediction</h2>
+<ul>
+<li>Interface Definition: <code>src/main/scala/xiangshan/frontend/FrontendBundle.scala</code></li>
+</ul>
+<p>This interface defines the complete branch prediction results, included in the prediction results of each pipeline stage.</p>
+<p>The full branch prediction result interface is similar to the FTB entry and is initially generated from the FTB entry. Two slots are split into individual signals: <code>slot_valids</code>, <code>targets</code>, <code>offsets</code>, <code>is_br_sharing</code>, etc. Additionally, several fields are added such as <code>br_taken_mask</code>, <code>jalr_target</code> to facilitate the provision of precise prediction results by subsequent predictors. The <code>hit</code> indicates whether an FTB entry is hit, i.e., the PC in the current prediction round indexed to an FTB entry.</p>
+<p><strong>Full Interface List：</strong></p>
+<ul>
+<li><strong>hit</strong>: Indicates whether the FTB entry is hit.</li>
+<li>Interface Type: <code>Bool()</code></li>
+<li><strong>slot_valids</strong>: Indicates whether each slot in the FTB entry is valid.</li>
+<li>Interface Type: <code>Vec(totalSlot, Bool())</code></li>
+<li><strong>targets</strong>: The jump target address corresponding to each slot.</li>
+<li>Interface Type: <code>Vec(totalSlot, UInt(VAddrBits.W))</code></li>
+<li><strong>offsets</strong>: The offset of the instruction in each slot relative to the start address of the prediction block.</li>
+<li>Interface Type: <code>Vec(totalSlot, UInt(log2Ceil(PredictWidth).W))</code></li>
+<li><strong>fallThroughAddr</strong>: The end address of the prediction block.</li>
+<li>Interface Type: <code>UInt(VAddrBits.W)</code></li>
+<li><strong>fallThroughErr</strong>: Indicates that the pftAddr recorded in the FTB entry is incorrect.</li>
+<li>Interface Type: <code>Bool()</code></li>
+<li><strong>is_jal</strong>: Indicates that the prediction block contains a jal instruction.</li>
+<li>Interface Type: <code>Bool()</code></li>
+<li><strong>is_jalr</strong>: Indicates that the prediction block contains a jalr instruction.</li>
+<li>Interface Type: <code>Bool()</code></li>
+<li><strong>is_call</strong>: Indicates that the prediction block contains a call instruction.</li>
+<li>Interface Type: <code>Bool()</code></li>
+<li><strong>is_ret</strong>: Indicates that the prediction block contains a ret instruction.</li>
+<li>Interface Type: <code>Bool()</code></li>
+<li><strong>last_may_be_rvi_call</strong>: Indicates that the instruction in the unconditional jump instruction slot might be an RVI type call instruction.</li>
+<li>Interface Type: <code>Bool()</code></li>
+<li><strong>is_br_sharing</strong>: Indicates that the last slot (tailSlot) stores a conditional branch instruction.</li>
+<li>Interface Type: <code>Bool()</code></li>
+<li><strong>br_taken_mask</strong>: The branch prediction result, with each bit corresponding to a branch (slot), indicating whether the branch is predicted to be taken.</li>
+<li>Interface Type: <code>Vec(numBr, Bool())</code></li>
+<li><strong>jalr_target</strong>: The jump target of the jalr instruction in the prediction block.</li>
+<li>Interface Type: <code>UInt(VAddrBits.W)</code></li>
+</ul>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-31e8ba09abfd18f2000562cd1e9c5357">2 - Redirection and Update Interfaces</h1>
+    <div class="lead">Redirection and update requests are the two main types of information sent from the FTQ to the BPU. This section details the specific structure of these request interfaces.</div>
+	<h2 id="branch-prediction-redirectionbranchpredictionredirect"><strong>Branch Prediction Redirection（BranchPredictionRedirect）</strong></h2>
+<p><strong>Interface Definition：</strong><code>src/main/scala/xiangshan/frontend/FrontendBundle.scala</code></p>
+<p><strong>Interface Type：</strong><code>BranchPredictionRedirect</code></p>
+<p>This interface defines the redirection requests from the branch prediction unit, mainly used to redirect the state of the branch predictor.</p>
+<p>The <code>BranchPredictionRedirect</code> interface inherits from the <code>Redirect</code> interface and includes many signals, only a subset of which are used by the BPU redirection. The documented structure contains only the interfaces used by the BPU.</p>
+<p>Redirection requests have two sources: those generated by comparing IFU pre-decode information and those generated during the backend execution process.</p>
+<p><strong>In redirection requests, the key information is <code>cfiUpdate</code>, which corresponds to a control flow instruction. This information pertains to an instruction where the BPU made a prediction error</strong>. For example, if the BPU indicates that the third instruction in the prediction block is a normal instruction with no jump, but the pre-decode shows it is an unconditional jump instruction, a prediction error has occurred. In this case, the FTQ generates a redirection request. The <code>cfiUpdate</code> in the redirection request corresponds to this unconditional jump instruction.</p>
+<p>The information in <code>cfiUpdate</code> can be broadly classified into three types:</p>
+<ol>
+<li><strong>Information about the corresponding instruction and its execution status</strong>. This includes the slot (shift) and PC of the instruction in the prediction block, the type-related information of the instruction (pd), and the execution status, such as jump target and whether it jumps.</li>
+<li><strong>History maintenance related information</strong>. The redirection request contains branch history information corresponding to the prediction block of the instruction to help the BPU restore branch history. folded_hist represents the global folded history, histPtr represents the global history pointer, and other information assists in maintaining branch history. For detailed information, refer to the BPU Top-Level Module.</li>
+<li><strong>RAS maintenance related information</strong>. For detailed meaning, refer to the RAS sub-predictor documentation.</li>
+</ol>
+<p>The meaning of <code>level</code> is whether the redirection includes this instruction. If not included, the redirection request receiver will assume the instruction has been executed, and the next prediction will start from the next instruction. The <code>BPU</code> top-level will default to not including this instruction, and upon receiving a redirection request, it will include the execution status of this instruction in the branch history.</p>
+<p><strong>The detailed signal list for the redirection interface is as follows:</strong></p>
+<ul>
+<li>
+<p><strong>level</strong>: Indicates whether the redirection request includes the current position. Low means redirection after this position, high means redirection at this position.</p>
+<ul>
+<li>Interface Type: <code>UInt(1.W)</code></li>
+</ul>
+</li>
+<li>
+<p><strong>cfiUpdate</strong>: Control flow instruction update information</p>
+<ul>
+<li>
+<p>Interface Type: <code>CfiUpdateInfo</code></p>
+</li>
+<li>
+<p>Interface List</p>
+<ul>
+<li><strong>pc</strong>: The PC of the instruction corresponding to the redirection request
+<ul>
+<li>Interface Type: <code>UInt(VaddrBits.W)</code></li>
+</ul>
+</li>
+<li><strong>pd</strong>: Pre-decode information of the redirection instruction
+<ul>
+<li><strong>isRVC</strong>: Whether it is a compressed instruction
+<ul>
+<li>Interface Type: <code>Bool</code></li>
+</ul>
+</li>
+<li><strong>isCall</strong>: Whether it is a function call
+<ul>
+<li>Interface Type: <code>Bool</code></li>
+</ul>
+</li>
+<li><strong>isRet</strong>: Whether it is a function return
+<ul>
+<li>Interface Type: <code>Bool</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>target</strong>: Target address of the redirection request instruction
+<ul>
+<li>Interface Type: <code>UInt(VaddrBits.W)</code></li>
+</ul>
+</li>
+<li><strong>taken</strong>: Whether the redirection request instruction is taken
+<ul>
+<li>Interface Type: <code>Bool</code></li>
+</ul>
+</li>
+<li><strong>shift</strong>: Slot in which the redirection request instruction is located, 0 if it is a normal instruction.
+<ul>
+<li>Interface Type: <code>UInt((log2Ceil(numBr)+1).W)</code></li>
+</ul>
+</li>
+<li><strong>addIntoHist</strong>: Whether to include the execution information of the redirection request instruction in the branch history.
+<ul>
+<li>Interface Type: <code>Bool</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>folded_hist</strong>: Folded history corresponding to the redirection request
+<ul>
+<li>Interface Type: <code>AllFoldedHistories(foldedGHistInfos)</code></li>
+</ul>
+</li>
+<li><strong>afhob</strong>: Oldest bit of the branch history corresponding to the redirection request instruction
+<ul>
+<li>Interface Type: <code>AllAheadFoldedHistoryOldestBits(foldedGHistInfos)</code></li>
+</ul>
+</li>
+<li><strong>lastBrNumOH</strong>: Last branch position corresponding to the redirection request
+<ul>
+<li>Interface Type: <code>UInt((numBr+1).W)</code></li>
+</ul>
+</li>
+<li><strong>histPtr</strong>: Global history pointer to be restored by the redirection request
+<ul>
+<li>Interface Type: <code>CGHPtr</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>ssp</strong>: RAS speculative stack top pointer at the commit stack position corresponding to the redirection request instruction
+<ul>
+<li>Interface Type: <code>UInt(log2Up(RasSize).W)</code></li>
+</ul>
+</li>
+<li><strong>sctr</strong>: RAS speculative stack top recursion counter corresponding to the redirection request instruction
+<ul>
+<li>Interface Type: <code>UInt(log2Up(RasCtrSize).W)</code></li>
+</ul>
+</li>
+<li><strong>TOSW</strong>: RAS speculative stack (queue) write pointer corresponding to the redirection request instruction
+<ul>
+<li>Interface Type: <code>CGHPtr</code></li>
+</ul>
+</li>
+<li><strong>TOSR</strong>: RAS speculative stack (queue) read pointer corresponding to the redirection request instruction
+<ul>
+<li>Interface Type: <code>CGHPtr</code></li>
+</ul>
+</li>
+<li><strong>NOS</strong>: RAS stack top counter corresponding to the redirection request instruction
+<ul>
+<li>Interface Type: <code>CGHPtr</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="branch-prediction-updatebranchpredictionupdate"><strong>Branch Prediction Update（BranchPredictionUpdate）</strong></h2>
+<p>Interface Definition: <code>src/main/scala/xiangshan/frontend/FrontendBundle.scala</code></p>
+<p>This interface defines the update requests for the branch predictor, mainly used to update the state of the branch predictor. The document lists only the interfaces used in the BPU.</p>
+<p>Update requests correspond to each branch prediction block. When a branch prediction block in the FTQ has been executed, the FTQ generates an update request for this prediction block to train the predictor. Thus, an important role of the update request is to feed back the actual execution status of the instructions to the BPU. Additionally, in the Xiangshan branch prediction unit, the update request is responsible for updating FTB entries.</p>
+<p>The information in the update request can be broadly classified into four categories:</p>
+<ul>
+<li><strong>PC</strong>: Indicates the starting address of the prediction block, specifying which prediction block the update request corresponds to</li>
+<li><strong>FTB Entry Update Information</strong>: The update channel contains an FTB entry structure (ftb_entry), outputs the newly generated FTB entry from the FTQ, and indicates whether it is the same as the old FTB entry (old_entry)</li>
+<li><strong>Actual Execution Status Information of Instructions</strong>: The update channel indicates the execution status of branch and unconditional jump instructions in the prediction block, and provides the address and final target of control flow instructions (i.e., instructions that jump)</li>
+<li><strong>Predictor-Related Data Corresponding to the Prediction Block</strong>: Contains spec_info and meta information (refer to the BPU Global Interface Documentation for details)</li>
+</ul>
+<p><strong>The interface list of the update request is as follows:</strong></p>
+<ul>
+<li><strong>pc</strong> PC of the update request (starting address of the prediction block)
+<ul>
+<li>Interface Type：<code>UInt(VAddrBits.W)</code></li>
+</ul>
+<hr>
+</li>
+<li><strong>ftb_entry</strong> Updated FTB entry
+<ul>
+<li>Interface Type：<code>new FTBEntry()</code></li>
+<li>Interface List：See（<code>FTBEntry</code>）</li>
+</ul>
+</li>
+<li><strong>old_entry</strong> Whether the updated FTB entry is the same as the old FTB entry
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+<hr>
+</li>
+<li><strong>br_taken_mask</strong> Mask indicating whether each slot instruction in the prediction block jumps
+<ul>
+<li>Interface Type：<code>Vec(numBr, Bool())</code></li>
+</ul>
+</li>
+<li><strong>mispred_mask</strong> Mask indicating prediction errors in the prediction block. The first and second bits indicate whether the two conditional branch instructions were mispredicted, and the third bit indicates whether the unconditional jump instruction was mispredicted.
+<ul>
+<li>Interface Type：<code>Vec(numBr+1, Bool())</code></li>
+</ul>
+</li>
+<li><strong>jmp_taken</strong> Unconditional jump instruction triggered in the prediction block
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>cfi_idx</strong> Index of the control flow instruction in the prediction block
+<ul>
+<li>Interface Type：<code>ValidUndirectioned(UInt(log2Ceil(PredictWidth).W))</code></li>
+</ul>
+</li>
+<li><strong>full_target</strong> Jump target of the prediction block (starting address of the next prediction block)
+<ul>
+<li>Interface Type：<code>UInt(VAddrBits.W)</code></li>
+</ul>
+<hr>
+</li>
+<li><strong>spec_info</strong> Last stage speculative information corresponding to the prediction block
+<ul>
+<li>Interface Type：<code>new SpeculativeInfo</code></li>
+<li>Interface List：（Only <code>foled_hist</code> is used）
+<ul>
+<li><strong>folded_hist</strong> Global folded history
+<ul>
+<li>Interface Type：<code>AllFolededHistories(foldedGHistInfos)</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>meta</strong> Last stage meta information corresponding to the prediction block
+<ul>
+<li>Interface Type：<code>UInt(MaxMetaLength.W)</code></li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-356688b245f87b5c6a87c8d73ece8cd7">3 - BPU Global Interface</h1>
+    <div class="lead">This section introduces the definition of the overall external interaction interface of the Xiangshan Branch Prediction Unit, including the presentation of global branch prediction results and single pipeline stage prediction results.</div>
+	<h2 id="bpu-module-overall-external-interface-predirectio"><strong>BPU Module Overall External Interface (PredirectIO)</strong></h2>
+<p>Interface definition: <code>src/main/scala/xiangshan/frontend/BPU.scala</code></p>
+<p>PredirectIO is the overall external interface of the branch predictor (BPU). It mainly handles the interaction between the branch predictor (BPU) and the fetch target queue (FTQ), which includes the following parts:</p>
+<ul>
+<li><strong>bpu_to_ftq</strong>: Information sent from BPU to FTQ, mainly for sending branch prediction results from BPU to FTQ
+<ul>
+<li>Interface type： <code>BpuToFtqIO</code></li>
+<li>Interface type：
+<ul>
+<li><strong>resp</strong>: Global branch prediction information sent from BPU to FTQ
+<ul>
+<li>Interface type：<code>DecoupledIO(new BpuToFtqBundle())</code>
+<ul>
+<li><code>BpuToFtqBundle</code> inherits from <code>BranchPredictionResp</code>，without additional signals</li>
+</ul>
+</li>
+<li>Interface type：See  (<code>BranchPredictionResp</code>)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>ftq_to_bpu</strong>: Information sent from FTQ to BPU, mainly for handling redirect and update requests
+<ul>
+<li>Interface type： <code>FtqToBpuIO</code></li>
+<li>Interface type：
+<ul>
+<li><strong>redirect</strong>: Redirect request sent from FTQ to BPU
+<ul>
+<li>Interface type： <code>Valid(new BranchPredictionRedirect)</code></li>
+<li>Interface list：See （<code>BranchPredictionRedirect</code>）</li>
+</ul>
+</li>
+<li><strong>update</strong>: Update request sent from FTQ to BPU
+<ul>
+<li>Interface type：<code>Valid(new BranchPredictionUpdate)</code></li>
+<li>Interface list：See （<code>BranchPredictionUpdate</code>）</li>
+</ul>
+</li>
+<li><strong>enq_ptr</strong>: FTQ pointer sent to BPU, indicating which FTQ entry to write to next
+<ul>
+<li>Interface type：<code>FtqPtr</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>ctrl</strong>: BPU control signals, mainly for enabling various predictors
+<ul>
+<li>Interface type：<code>BPUCtrl</code></li>
+<li>Interface list：
+<ul>
+<li><strong>ubtb_enable</strong>: UBTB predictor enable
+<ul>
+<li>Interface type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>btb_enable</strong>: BTB predictor enable
+<ul>
+<li>Interface type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>bim_enable</strong>: BIM predictor enable
+<ul>
+<li>Interface type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>tage_enable</strong>: TAGE predictor enable
+<ul>
+<li>Interface type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>sc_enable</strong>: SC predictor enable
+<ul>
+<li>Interface type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>ras_enable</strong>: RAS predictor enable
+<ul>
+<li>Interface type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>loop_enable</strong>: LOOP predictor enable
+<ul>
+<li>Interface type：<code>Bool()</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>reset_vector</strong>: Reset vector, which the BPU&rsquo;s PC will be reset to upon reset
+<ul>
+<li>Interface type：<code>UInt(PAddrBits.W)</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="global-branch-prediction-information-branchpredictionresp"><strong>Global Branch Prediction Information (BranchPredictionResp)</strong></h2>
+<p>Interface definition: <code>src/main/scala/xiangshan/frontend/FrontendBundle.scala</code></p>
+<p>This interface defines all the prediction result information of the branch predictor, including the prediction results of each stage and the related information output by the last pipeline stage.</p>
+<ul>
+<li><strong>s1</strong> Branch prediction result of the s1 pipeline stage</li>
+<li><strong>s2</strong> Branch prediction result of the s2 pipeline stage</li>
+<li><strong>s3</strong> Branch prediction result of the s3 pipeline stage
+<ul>
+<li>Interface type：<code>BranchPredictionBundle</code></li>
+<li>Interface type：See （<code>BranchPredictionBundle</code>）</li>
+</ul>
+</li>
+<li><strong>last_stage_meta</strong> Metadata of the prediction result output by the last pipeline stage. It is a bit vector output by each predictor and combined by the Composer.
+<ul>
+<li>Interface type：<code>UInt(MaxMetaLength.W)</code></li>
+</ul>
+</li>
+<li><strong>last_stage_spec_info</strong> Related information of the prediction result output by the last pipeline stage
+<ul>
+<li>Interface type：<code>Ftq_Redirect_SRAMEntry</code></li>
+<li>Interface list：
+<ul>
+<li><strong>folded_hist</strong>  Global folded history
+<ul>
+<li>Interface type：<code>AllFoldedHistories(foldedGHistInfos)</code></li>
+</ul>
+</li>
+<li><strong>afhob</strong> Global branch history oldest bit
+<ul>
+<li>Interface type：<code>AllAheadFoldedHistoryOldestBits(foldedGHistInfos)</code></li>
+</ul>
+</li>
+<li><strong>lastBrNumOH</strong> Last branch position
+<ul>
+<li>Interface type：<code>UInt((numBr+1).W)</code></li>
+</ul>
+</li>
+<li><strong>histPtr</strong> Global branch history pointer
+<ul>
+<li>Interface type：<code>CGHPtr</code></li>
+</ul>
+</li>
+<li><strong>ssp</strong> RAS speculation stack pointer at commit stack position
+<ul>
+<li>Interface type：<code>UInt(log2Up(RasSize).W)</code></li>
+</ul>
+</li>
+<li><strong>sctr</strong> RAS speculation stack recursion counter
+<ul>
+<li>Interface type：<code>UInt(log2Up(RasCtrSize).W)</code></li>
+</ul>
+</li>
+<li><strong>TOSW</strong> RAS speculation stack (queue) write pointer
+<ul>
+<li>Interface type：<code>CGHPtr</code></li>
+</ul>
+</li>
+<li><strong>TOSR</strong> RAS speculation stack (queue) read pointer
+<ul>
+<li>Interface type：<code>CGHPtr</code></li>
+</ul>
+</li>
+<li><strong>NOS</strong> RAS stack top counter
+<ul>
+<li>Interface type：<code>CGHPtr</code></li>
+</ul>
+</li>
+<li><strong>topAddr</strong> RAS stack top return address
+<ul>
+<li>Interface type：<code>UInt(VAddrBits.W)</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>last_stage_ftb_entry</strong> FTB entry output by the last pipeline stage
+<ul>
+<li>Interface type：<code>FtqEntry</code></li>
+<li>Interface list：See（<code>FtqEntry</code>）</li>
+</ul>
+</li>
+</ul>
+<h2 id="ftb-entry-output-by-the-last-pipeline-stage"><strong>FTB entry output by the last pipeline stage</strong></h2>
+<p>Interface definition: <code>src/main/scala/xiangshan/frontend/FrontendBundle.scala</code></p>
+<p>This interface defines the branch prediction result information output by each pipeline stage,</p>
+<ul>
+<li><strong>pc</strong> Starting PC of the predicted block
+<ul>
+<li>Interface type: <code>Vec(numDup, UInt(VAddrBits.W))</code> numDup is only for register replication, with identical signals</li>
+</ul>
+</li>
+<li><strong>valid</strong> Whether the prediction result is valid
+<ul>
+<li>Interface type: <code>Vec(numDup, Bool())</code></li>
+</ul>
+</li>
+<li><strong>hasRedirect</strong> Whether a redirect is needed
+<ul>
+<li>Interface description: Only the s2 and s3 stages will redirect, and the prediction result of this stage will override the previous pipeline stage&rsquo;s result when a redirect occurs</li>
+<li>Interface type: <code>Vec(numDup, Bool())</code></li>
+</ul>
+</li>
+<li><strong>ftq_idx</strong> FTQ pointer, pointing to the FTQ entry corresponding to the prediction information of this stage
+<ul>
+<li>Interface type: <code>new FtqPtr</code></li>
+</ul>
+</li>
+<li><strong>full_pred</strong> Complete branch prediction result
+<ul>
+<li>Interface type: <code>Vec(numDup, new FullBranchPrediction)</code></li>
+<li>Interface list: See (<code>FullBranchPrediction</code>)</li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-9ec9b2e73fd778d6c722398e3805b765">4 - Base Predictor Class and Sub Predictor Interface</h1>
+    <div class="lead">This document introduces the sub-predictor interface in the Xiangshan BPU, as well as the use of the sub-predictor base class. Reading this document can help you understand the external interactions of sub-predictors and the use of signals in the sub-predictor base class.</div>
+	<p>In the Xiangshan branch prediction unit, all its sub-predictors and the class implementations of Composer are inherited from the sub-predictor base class (BasePredictor). The sub-predictor interface (BasePredictorIO) is also defined in the sub-predictor base class. Therefore, we can consider that Composer and all sub-predictors have the same interface.</p>
+<p>In the understanding and verification of sub-prediction, our most direct external interaction occurs in the sub-predictor interface and some variables defined in the sub-predictor base class. Therefore, before verifying the sub-predictor, it is strongly recommended that you read and understand this section of the document.</p>
+<p>The general content and usage of the sub-branch predictor interface have been introduced in the <code>Xiangshan Branch Prediction Unit (BPU) Basic Design</code> section. This document will focus on the signal details of the interface.</p>
+<h2 id="sub-branch-predictor-interface-basepredictorio"><strong>Sub-Branch Predictor Interface (BasePredictorIO)</strong></h2>
+<p>Interface Definition: <code>src/main/scala/xiangshan/frontend/BPU.scala</code></p>
+<p>Each sub-branch predictor needs to implement this interface, which defines the input and output interfaces of the sub-branch predictor.</p>
+<p>Note: Some signals are defined as <code>numDup</code> quantities, where each signal is exactly the same. Multiple identical signals are for other considerations.</p>
+<p>The detailed signal list is as follows:</p>
+<ul>
+<li>
+<p><strong>reset_vector</strong> Reset vector, when reset occurs, the BPU&rsquo;s pc will be reset to this value.</p>
+<ul>
+<li>Interface Type：<code>UInt(PAddrBits.W)</code></li>
+</ul>
+</li>
+<li>
+<p><strong>in</strong> Information sent from the BPU to the sub-branch predictor</p>
+<ul>
+<li>Interface Type：<code>DecoupledIO(new BasePredictorInput)</code></li>
+<li>Signal List：
+<ul>
+<li><strong>s0_pc</strong> PC of the s0 pipeline stage
+<ul>
+<li>Interface Type：<code>Vec(numDup, UInt(VAddrBits.W))</code></li>
+</ul>
+</li>
+<li><strong>folded_hist</strong> Global folded history information
+<ul>
+<li>Interface Type：<code>Vec(numDup, new AllFoldedHistories(foldedGHistInfos))</code></li>
+<li>Signal List：See（<code>AllFoldedHistories</code>）</li>
+</ul>
+</li>
+<li><strong>ghist</strong> Global branch history information
+<ul>
+<li>Interface Type：<code>UInt(HistoryLength.W)</code></li>
+</ul>
+</li>
+<li><strong>resp_in</strong>  Global branch prediction information (including s1, s2, s3 prediction result information)
+<ul>
+<li>Interface Type：<code>BranchPredictionResp</code></li>
+<li>Signal List：See（<code>BranchPredictionResp</code>）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>out</strong> Information sent from the sub-branch predictor to the BPU (including s1, s2, s3 prediction result information)</p>
+<ul>
+<li>Interface Type：<code>new BasePredictorOutput</code> 继承自 <code>BranchPredictionResp</code></li>
+<li>Signal List：See（<code>BranchPredictionResp</code>）</li>
+</ul>
+</li>
+<li>
+<p><strong>ctrl</strong> BPU sub-predictor enable control signal, mainly used to control whether each predictor is enabled</p>
+<ul>
+<li>Interface Type：<code>BPUCtrl</code></li>
+<li>Interface Type：
+<ul>
+<li><strong>ubtb_enable</strong>: UBTB predictor enable
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>btb_enable</strong>: BTB predictor enable
+<ul>
+<li>接Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>bim_enable</strong>: BIM predictor enable
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>tage_enable</strong>: TAGE predictor enable
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>sc_enable</strong>: SC predictor enable
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>ras_enable</strong>: RAS predictor enable
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li><strong>loop_enable</strong>: LOOP predictor enable
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>s0_fire</strong> s0 stage handshake success signal</p>
+<ul>
+<li>Interface Type：<code>Vec(numDup, Bool())</code></li>
+</ul>
+</li>
+<li>
+<p><strong>s1_fire</strong> s1 stage handshake success signal</p>
+<ul>
+<li>Interface Type：<code>Vec(numDup, Bool())</code></li>
+</ul>
+</li>
+<li>
+<p><strong>s2_fire</strong> s2 stage handshake success signal</p>
+<ul>
+<li>Interface Type：<code>Vec(numDup, Bool())</code></li>
+</ul>
+</li>
+<li>
+<p><strong>s3_fire</strong> s3 stage handshake success signal</p>
+<ul>
+<li>Interface Type：<code>Vec(numDup, Bool())</code></li>
+</ul>
+</li>
+<li>
+<p><strong>s2_redirect</strong> s2 stage redirection signal</p>
+<ul>
+<li>Interface Type：<code>Vec(numDup, Bool())</code></li>
+</ul>
+</li>
+<li>
+<p><strong>s3_redirect</strong> s3 stage redirection signal</p>
+<ul>
+<li>Interface Type：<code>Vec(numDup, Bool())</code></li>
+</ul>
+</li>
+<li>
+<p><strong>s1_ready</strong> s1 stage ready to receive information (Direction: output from the sub-predictor)</p>
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li>
+<p><strong>s2_ready</strong> s2 stage ready to receive information (Direction: output from the sub-predictor)</p>
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li>
+<p><strong>s3_ready</strong> s3 stage ready to receive information (Direction: output from the sub-predictor)</p>
+<ul>
+<li>Interface Type：<code>Bool()</code></li>
+</ul>
+</li>
+<li>
+<p><strong>update</strong> Update request forwarded from the BPU to the sub-branch predictor</p>
+<ul>
+<li>Interface Type：<code>Valid(new BranchPredictionUpdate)</code></li>
+<li>Signal List：See（<code>BranchPredictionUpdate</code>）</li>
+</ul>
+</li>
+<li>
+<p><strong>redirect</strong> Redirect request forwarded from the BPU to the sub-branch predictor</p>
+<ul>
+<li>Interface Type：<code>Valid(new BranchPredictionRedirect)</code></li>
+<li>Signal List：See（<code>BranchPredictionRedirect</code>）</li>
+</ul>
+</li>
+</ul>
+<p>The pipeline control signals will be further explained in the following content.</p>
+<h3 id="global-folding-history-allfoldedhistories">Global Folding History (AllFoldedHistories)</h3>
+<p><strong>Interface Definition：</strong><code>src/main/scala/xiangshan/frontend/FrontendBundle.scala</code></p>
+<p><strong>Interface Type：</strong><code>AllFoldedHistories(foldedGHistInfos))</code></p>
+<p>The interface information of the global folding history consists of only one <code>FoldedHistory</code> list.</p>
+<ul>
+<li><strong>hist</strong> List of folded histories
+<ul>
+<li>Interface Type：<code>MixedVec(gen.map{case (l, cl) =&gt; new FoldedHistory(l, cl, numBr)})</code></li>
+</ul>
+</li>
+</ul>
+<p>The interface information of <code>FoldedHistory</code> also has only one item.</p>
+<ul>
+<li><strong>folded_hist</strong> Single folded history, with a bit width equal to the compressed history length.
+<ul>
+<li>Interface Type：<code>UInt(compLen.W)</code></li>
+</ul>
+</li>
+</ul>
+<p>This means that the interface of the global folding history is actually a list that stores folded histories, where each item is a folded history of a specific length.</p>
+<h2 id="base-predictor-class">Base Predictor Class</h2>
+<p>The base predictor class defines several signals, which can be accessed in each sub-predictor, and several connections are made within it.</p>
+<p>Most of the signals are relatively easy to understand. We need to pay particular attention to the pc of each pipeline, which also involves your understanding of pipeline control signals. Therefore, next, we will introduce the meanings of pipeline control signals that need to be paid attention to in sub-predictors, as well as the meanings of the s1_pc, s2_pc, s3_pc signals.</p>
+<p>There are three groups of pipeline control signals:</p>
+<ul>
+<li>fire signals  (s0, s1, s2, s3)</li>
+<li>redirect signals  (s2, s3)</li>
+<li>ready signals  (s1, s2, s3)</li>
+</ul>
+<p>The pc signals in the base predictor class are divided into four groups, <code>s0_pc_dup</code>, <code>s1_pc_dup</code>, <code>s2_pc_dup</code>, <code>s3_pc_dup</code>. Each group of signals contains multiple pc signals, which are exactly the same and are duplicated for some other reasons. Therefore, we can simply consider them as <code>s0_pc</code>, <code>s1_pc</code>, <code>s2_pc</code>, <code>s3_pc</code>.</p>
+<p>Their usage can be seen in the following diagram:</p>
+
+<figure>
+    <img src="1.png" width="700px"/> 
+</figure>
+
+<p>Their relationship with the pipeline control signals is as follows:</p>
+<ul>
+<li><code>s0_pc</code> is directly connected from the <code>in.s0_pc</code> in the input interface.</li>
+<li>When <code>s0_fire</code> is active, the next cycle <code>s1_pc</code> will output the value of <code>s0_pc</code>.</li>
+<li>When <code>s1_fire</code> is active, the next cycle <code>s2_pc</code> will output the value of <code>s1_pc</code>.</li>
+<li>When <code>s2_fire</code> is active, the next cycle <code>s3_pc</code> will output the value of <code>s2_pc</code>.</li>
+</ul>
+<p>In other words, the <code>fire</code> signal affects whether the data of the next cycle is valid. For example, the <code>s0_fire</code> signal affects whether the data of the s1 pipeline is valid, and the <code>s1_fire</code> signal affects whether the data of the s2 pipeline is valid.</p>
+<p>Whether the <code>fire</code> signal is valid depends on whether the data of this pipeline stage is valid and whether the next pipeline stage is ready. For example, the <code>s1_fire</code> signal is valid only if the data of the s1 stage is valid and the <code>s2_ready</code> signal from the sub-predictor output is valid. At this point, it can be considered that the data processing of the s1 stage is completed, the s2 stage is ready, and the data of the next cycle will be directly sent to the s2 stage.</p>
+<p>Therefore, in the sub-predictor, taking the s1 stage as an example, <code>s1_ready</code> can block data from entering the s1 stage. When <code>s1_ready</code> is active, the data for the s1 stage will be valid in the next cycle. <strong>When <code>s1_fire</code> is active, it indicates that the data in the s1 stage is already valid and the predictor has generated the result for the s1 stage</strong>. The data will then be directly sent to the s2 stage in the next cycle.</p>
+<p>The <code>redirect</code> signal is relatively clear. For example, in the s2 stage, when <code>s2_redirect</code> is valid, it indicates that when <code>s2_fire</code> is valid, the s2 prediction result is different from the s1 prediction result in the previous cycle.</p>
+
+</div>
+
+
+
+    
+	
+  
+
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2024
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/xs-bpu/js/main.min.fc653db1f3d4f4a8b4eacd389f96d8afe966937ba9dded8b07d3a1b17d967d22.js" integrity="sha256-/GU9sfPU9Ki06s04n5bYr&#43;lmk3up3e2LB9OhsX2WfSI=" crossorigin="anonymous"></script>
+<script defer src="/xs-bpu/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/xs-bpu/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
