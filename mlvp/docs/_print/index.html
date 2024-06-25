@@ -91,7 +91,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.e950df133dbd3e5600942285dd588740.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.1bccb835c64e696f9152f3c5503d2a73.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -574,65 +574,51 @@
 </blockquote>
 <h3 id="安装测试">安装测试</h3>
 <p>执行命令并检查输出：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>➜  picker git:<span style="color:#ce5c00;font-weight:bold">(</span>master<span style="color:#ce5c00;font-weight:bold">)</span> picker
-</span></span><span style="display:flex;"><span>XDut Generate.
-</span></span><span style="display:flex;"><span>Convert DUT<span style="color:#ce5c00;font-weight:bold">(</span>*.v/*.sv<span style="color:#ce5c00;font-weight:bold">)</span> to C++ DUT libs. Notice that <span style="color:#ce5c00;font-weight:bold">[</span>file<span style="color:#ce5c00;font-weight:bold">]</span> option allow only one file.
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>➜  picker git:<span style="color:#ce5c00;font-weight:bold">(</span>master<span style="color:#ce5c00;font-weight:bold">)</span> picker <span style="color:#204a87">export</span>
+</span></span><span style="display:flex;"><span>Export RTL Projects Sources as Software libraries such as C++/Python
+</span></span><span style="display:flex;"><span>Usage: picker <span style="color:#204a87">export</span> <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Usage:
-</span></span><span style="display:flex;"><span>  XDut Gen <span style="color:#ce5c00;font-weight:bold">[</span>file<span style="color:#ce5c00;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">[</span>OPTION...<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>Positionals:
+</span></span><span style="display:flex;"><span>  file TEXT REQUIRED          DUT .v/.sv <span style="color:#204a87">source</span> file, contain the top module
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  -f, --filelist arg            DUT .v/.sv <span style="color:#204a87">source</span> files, contain the top
-</span></span><span style="display:flex;"><span>                                module, split by comma.
-</span></span><span style="display:flex;"><span>                                Or use <span style="color:#4e9a06">&#39;*.txt&#39;</span> file  with one RTL file path
-</span></span><span style="display:flex;"><span>                                per line to specify the file list <span style="color:#ce5c00;font-weight:bold">(</span>default:
-</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>      --sim arg                 vcs or verilator as simulator, default is
-</span></span><span style="display:flex;"><span>                                verilator <span style="color:#ce5c00;font-weight:bold">(</span>default: verilator<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>  -l, --language arg            Build example project, default is cpp,
-</span></span><span style="display:flex;"><span>                                choose cpp or python <span style="color:#ce5c00;font-weight:bold">(</span>default: cpp<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>  -s, --source_dir arg          Template Files Dir, default is
-</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">${</span><span style="color:#000">picker_install_path</span><span style="color:#4e9a06">}</span>/../picker/template
-</span></span><span style="display:flex;"><span>                                <span style="color:#ce5c00;font-weight:bold">(</span>default: /usr/local/share/picker/template<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>  -t, --target_dir arg          Render files to target dir, default is
-</span></span><span style="display:flex;"><span>                                ./picker_out <span style="color:#ce5c00;font-weight:bold">(</span>default: ./picker_out<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>  -S, --source_module_name arg  Pick the module in DUT .v file, default is
-</span></span><span style="display:flex;"><span>                                the last module in the -f marked file
-</span></span><span style="display:flex;"><span>                                <span style="color:#ce5c00;font-weight:bold">(</span>default: <span style="color:#4e9a06">&#34;&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>  -T, --target_module_name arg  Set the module name and file name of target
-</span></span><span style="display:flex;"><span>                                DUT, default is the same as source. For
-</span></span><span style="display:flex;"><span>                                example, -T top, will generate UTtop.cpp
-</span></span><span style="display:flex;"><span>                                and UTtop.hpp with UTtop class <span style="color:#ce5c00;font-weight:bold">(</span>default:
-</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>      --internal arg            Exported internal signal config file,
-</span></span><span style="display:flex;"><span>                                default is empty, means no internal pin
-</span></span><span style="display:flex;"><span>                                <span style="color:#ce5c00;font-weight:bold">(</span>default: <span style="color:#4e9a06">&#34;&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>  -F, --frequency arg           Set the frequency of the **only VCS** DUT,
-</span></span><span style="display:flex;"><span>                                default is 100MHz, use Hz, KHz, MHz, GHz as
-</span></span><span style="display:flex;"><span>                                unit <span style="color:#ce5c00;font-weight:bold">(</span>default: 100MHz<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>  -w, --wave_file_name arg      Wave file name, emtpy mean don<span style="color:#4e9a06">&#39;t dump wave
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                                (default: &#34;&#34;)
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -c, --coverage                Enable coverage, default is not selected as
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                                OFF
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -V, --vflag arg               User defined simulator compile args,
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                                passthrough. Eg: &#39;</span>-v -x-assign<span style="color:#ce5c00;font-weight:bold">=</span>fast -Wall
-</span></span><span style="display:flex;"><span>                                --trace<span style="color:#4e9a06">&#39; || &#39;</span>-C vcs -cc -f filelist.f<span style="color:#4e9a06">&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                                (default: &#34;&#34;)
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -C, --cflag arg               User defined gcc/clang compile command,
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                                passthrough. Eg:&#39;</span>-O3 -std<span style="color:#ce5c00;font-weight:bold">=</span>c++17
-</span></span><span style="display:flex;"><span>                                -I./include<span style="color:#a40000">&#39;</span> <span style="color:#ce5c00;font-weight:bold">(</span>default: <span style="color:#4e9a06">&#34;&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>  -v, --verbose                 Verbose mode
-</span></span><span style="display:flex;"><span>  -e, --example                 Build example project, default is OFF
-</span></span><span style="display:flex;"><span>  -h, --help                    Print usage
+</span></span><span style="display:flex;"><span>Options:
+</span></span><span style="display:flex;"><span>  -h,--help                   Print this <span style="color:#204a87">help</span> message and <span style="color:#204a87">exit</span>
+</span></span><span style="display:flex;"><span>  --fs,--filelist TEXT        DUT .v/.sv <span style="color:#204a87">source</span> files, contain the top module, split by comma.
+</span></span><span style="display:flex;"><span>                              Or use <span style="color:#4e9a06">&#39;*.txt&#39;</span> file  with one RTL file path per line to specify the file list
+</span></span><span style="display:flex;"><span>  --sim TEXT <span style="color:#ce5c00;font-weight:bold">[</span>verilator<span style="color:#ce5c00;font-weight:bold">]</span>      vcs or verilator as simulator, default is verilator
+</span></span><span style="display:flex;"><span>  --lang,--language TEXT <span style="color:#ce5c00;font-weight:bold">[</span>python<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>                              Build example project, default is python, choose cpp, java or python
+</span></span><span style="display:flex;"><span>  --sdir,--source_dir TEXT <span style="color:#ce5c00;font-weight:bold">[</span>/usr/local/share/picker/template<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>                              Template Files Dir, default is <span style="color:#4e9a06">${</span><span style="color:#000">picker_install_path</span><span style="color:#4e9a06">}</span>/../picker/template
+</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT <span style="color:#ce5c00;font-weight:bold">[</span>./picker_out<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>                              Codegen render files to target dir, default is ./picker_out
+</span></span><span style="display:flex;"><span>  --sname,--source_module_name TEXT
+</span></span><span style="display:flex;"><span>                              Pick the module in DUT .v file, default is the last module in the -f marked file
+</span></span><span style="display:flex;"><span>  --tname,--target_module_name TEXT
+</span></span><span style="display:flex;"><span>                              Set the module name and file name of target DUT, default is the same as source. For example, -T top, will generate UTtop.cpp and UTtop.hpp with UTtop class
+</span></span><span style="display:flex;"><span>  --internal TEXT             Exported internal signal config file, default is empty, means no internal pin
+</span></span><span style="display:flex;"><span>  -F,--frequency TEXT <span style="color:#ce5c00;font-weight:bold">[</span>100MHz<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>                              Set the frequency of the **only VCS** DUT, default is 100MHz, use Hz, KHz, MHz, GHz as unit
+</span></span><span style="display:flex;"><span>  -w,--wave_file_name TEXT    Wave file name, emtpy mean don<span style="color:#4e9a06">&#39;t dump wave
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -c,--coverage               Enable coverage, default is not selected as OFF
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -V,--vflag TEXT             User defined simulator compile args, passthrough. Eg: &#39;</span>-v -x-assign<span style="color:#ce5c00;font-weight:bold">=</span>fast -Wall --trace<span style="color:#4e9a06">&#39; || &#39;</span>-C vcs -cc -f filelist.f<span style="color:#4e9a06">&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. Eg:&#39;</span>-O3 -std<span style="color:#ce5c00;font-weight:bold">=</span>c++17 -I./include<span style="color:#a40000">&#39;</span>
+</span></span><span style="display:flex;"><span>  --verbose                   Verbose mode
+</span></span><span style="display:flex;"><span>  -e,--example                Build example project, default is OFF
+</span></span><span style="display:flex;"><span>  --autobuild <span style="color:#ce5c00;font-weight:bold">[</span>1<span style="color:#ce5c00;font-weight:bold">]</span>             Auto build the generated project, default is <span style="color:#204a87">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>file is required
+</span></span><span style="display:flex;"><span>Run with --help <span style="color:#204a87;font-weight:bold">for</span> more information.
 </span></span></code></pre></div><h4 id="参数解释">参数解释</h4>
 <ul>
 <li><code>[file]</code>: 必需。DUT 的 Verilog 或 SystemVerilog 源文件，包含顶层模块</li>
-<li><code>--filelist, -f</code>: 可选。DUT 的 Verilog 或 SystemVerilog 源文件，逗号分隔。也可以使用 <code>*.txt</code> 文件，每行指定一个 RTL 文件路径，来指定文件列表。</li>
+<li><code>--filelist, -fs</code>: 可选。DUT 的 Verilog 或 SystemVerilog 源文件，逗号分隔。也可以使用 <code>*.txt</code> 文件，每行指定一个 RTL 文件路径，来指定文件列表。</li>
 <li><code>--sim</code>: 可选。模拟器类型，可以是 vcs 或 verilator，默认是 verilator。</li>
-<li><code>--language, -l</code>: 可选。构建示例项目的语言，可以是 cpp 或 python，默认是 cpp。</li>
-<li><code>--source_dir, -s</code>: 可选。模板文件目录，默认是 ${mcv_install_path}/../mcv/template。</li>
-<li><code>--target_dir, -t</code>: 可选。渲染文件的目标目录，默认是 ./mcv_out。</li>
-<li><code>--source_module_name, -S</code>: 可选。在 DUT 的 Verilog 文件中选择模块，默认是  标记的文件中的最后一个模块。</li>
-<li><code>--target_module_name, -T</code>: 可选。设置目标 DUT 的模块名和文件名，默认与源相同。例如，-T top 将生成 UTtop.cpp 和 UTtop.hpp，并包含 UTtop 类。</li>
+<li><code>--language, --lang</code>: 可选。构建示例项目的语言，可以是 cpp 或 python，默认是 cpp。</li>
+<li><code>--source_dir, -sdir</code>: 可选。模板文件目录，默认是 ${mcv_install_path}/../mcv/template。</li>
+<li><code>--target_dir, -tdir</code>: 可选。渲染文件的目标目录，默认是 ./mcv_out。</li>
+<li><code>--source_module_name, -sname</code>: 可选。在 DUT 的 Verilog 文件中选择模块，默认是  标记的文件中的最后一个模块。</li>
+<li><code>--target_module_name, -tname</code>: 可选。设置目标 DUT 的模块名和文件名，默认与源相同。例如，-T top 将生成 UTtop.cpp 和 UTtop.hpp，并包含 UTtop 类。</li>
 <li><code>--internal</code>: 可选。导出的内部信号配置文件，默认为空，表示没有内部引脚。</li>
 <li><code>--frequency, -F</code>: 可选。设置 仅 VCS DUT 的频率，默认是 100MHz，可以使用 Hz、KHz、MHz、GHz 作为单位。</li>
 <li><code>--wave_file_name, -w</code>: 可选。波形文件名，为空表示不导出波形。</li>
@@ -641,11 +627,12 @@
 <li><code>--cflag, -C</code>: 可选。用户定义的 gcc/clang 编译参数，透传。例如：&rsquo;-O3 -std=c++17 -I./include&rsquo;。</li>
 <li><code>--verbose, -v</code>: 可选。详细模式，保留生成的中间文件。</li>
 <li><code>--example, -e</code>: 可选。构建示例项目，默认是 OFF。</li>
+<li><code>--autobuild</code>: 可选。自动构建生成的项目，默认是true。</li>
 <li><code>--help, -h</code>: 可选。打印使用帮助。</li>
 </ul>
 <h3 id="功能测试">功能测试</h3>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker <span style="color:#8f5902;font-style:italic"># 进入项目根目录，即git clone的目录</span>
-</span></span><span style="display:flex;"><span>./example/Adder/release-verilator.sh -l cpp -e
+</span></span><span style="display:flex;"><span>bash example/Adder/release-verilator.sh --lang cpp
 </span></span></code></pre></div><p>程序应当输出<strong>类似</strong>的内容，表示安装成功：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>cycle 114515<span style="color:#ce5c00;font-weight:bold">]</span> <span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">=</span>0xa9c430d2942bd554, <span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">=</span>0xe26feda874dac8b7, <span style="color:#000">cin</span><span style="color:#ce5c00;font-weight:bold">=</span>0x0
