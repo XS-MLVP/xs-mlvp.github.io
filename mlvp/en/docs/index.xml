@@ -67,7 +67,7 @@ If you want to know how Picker generates C++ classes, please refer to &lt;a href
 &lt;/ul&gt;
 &lt;h2 id=&#34;using-python-modules&#34;&gt;Using Python Modules&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;The parameter &lt;code&gt;--language python&lt;/code&gt; or &lt;code&gt;-l python&lt;/code&gt; is used to specify the generation of the Python base library.&lt;/li&gt;
+&lt;li&gt;The parameter &lt;code&gt;--language python&lt;/code&gt; or &lt;code&gt;--lang python&lt;/code&gt; is used to specify the generation of the Python base library.&lt;/li&gt;
 &lt;li&gt;The parameter &lt;code&gt;--example, -e&lt;/code&gt; is used to generate an executable file that includes example projects.&lt;/li&gt;
 &lt;li&gt;The parameter &lt;code&gt;--verbose, -v&lt;/code&gt; is used to retain intermediate files generated during project generation.&lt;/li&gt;
 &lt;/ul&gt;
@@ -1597,7 +1597,7 @@ Message queues are one of the classic applications of asynchronous programming. 
 &lt;h3 id=&#34;building-the-rtl-into-a-python-module&#34;&gt;Building the RTL into a Python Module&lt;/h3&gt;
 &lt;h4 id=&#34;generating-intermediate-files&#34;&gt;Generating Intermediate Files&lt;/h4&gt;
 &lt;p&gt;Enter the Adder folder and execute the following command:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker --autobuild&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;false&lt;/span&gt; Adder.v -w Adder.fst -S Adder -t picker_out_adder -l python -e --sim verilator
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; --autobuild&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;false&lt;/span&gt; Adder.v -w Adder.fst -sname Adder -tdir picker_out_adder --lang python -e --sim verilator
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The meaning of this command is:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Use Adder.v as the top file and Adder as the top module. Generate a dynamic library using the Verilator simulator, with the target language being Python.&lt;/li&gt;
@@ -2152,10 +2152,10 @@ A key feature of this pattern is the decoupling between publishers and subscribe
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;usage&#34;&gt;Usage&lt;/h3&gt;
 &lt;p&gt;In this case, the module under test is Cache, which is in &lt;code&gt;Cache.sv&lt;/code&gt;. You can generate the DUT using the following command:&lt;/p&gt;
 &lt;h4 id=&#34;command-line-specification&#34;&gt;Command Line Specification&lt;/h4&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker Cache.sv -f CacheStage.sv,CacheMeta.sv -S Cache
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; Cache.sv --fs CacheStage.sv,CacheMeta.sv --sname Cache
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;specification-through-a-file-list-file&#34;&gt;Specification through a File List File&lt;/h4&gt;
 &lt;p&gt;You can also use a .txt file to specify multiple input files:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker Cache.sv -f src.txt -S Cache
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; Cache.sv --fs src.txt --sname Cache
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Where the contents of &lt;code&gt;src.txt&lt;/code&gt; are:&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;CacheStage.sv
 CacheMeta.sv
@@ -2222,7 +2222,7 @@ CacheMeta.sv
 &lt;h3 id=&#34;building-rtl-into-a-python-module&#34;&gt;Building RTL into a Python Module&lt;/h3&gt;
 &lt;h4 id=&#34;generating-intermediate-files&#34;&gt;Generating Intermediate Files&lt;/h4&gt;
 &lt;p&gt;Navigate to the RandomGenerator folder and execute the following command:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker --autobuild&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;false&lt;/span&gt; RandomGenerator.v -w RandomGenerator.fst -S RandomGenerator -t picker_out_rmg -l python -e --sim verilator
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; --autobuild&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;false&lt;/span&gt; RandomGenerator.v -w RandomGenerator.fst --sname RandomGenerator --tdir picker_out_rmg --lang python -e --sim verilator
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This command performs the following actions:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Uses RandomGenerator.v as the top file and RandomGenerator as the top module, generates a dynamic library based on the Verilator simulator, and targets the Python language.&lt;/li&gt;

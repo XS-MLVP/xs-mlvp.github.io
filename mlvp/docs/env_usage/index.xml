@@ -67,7 +67,7 @@
 &lt;/ul&gt;
 &lt;h2 id=&#34;python-模块使用&#34;&gt;Python 模块使用&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;参数 &lt;code&gt;--language python&lt;/code&gt; 或 &lt;code&gt;-l python&lt;/code&gt; 用于指定生成Python基础库。&lt;/li&gt;
+&lt;li&gt;参数 &lt;code&gt;--language python&lt;/code&gt; 或 &lt;code&gt;--lang python&lt;/code&gt; 用于指定生成Python基础库。&lt;/li&gt;
 &lt;li&gt;参数 &lt;code&gt;--example, -e&lt;/code&gt; 用于生成包含示例项目的可执行文件。&lt;/li&gt;
 &lt;li&gt;参数 &lt;code&gt;--verbose, -v&lt;/code&gt; 用于保留生成项目时的中间文件。&lt;/li&gt;
 &lt;/ul&gt;
@@ -428,10 +428,10 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;应用方式&#34;&gt;应用方式&lt;/h3&gt;
 &lt;p&gt;其中，待测模块为Cache，位于&lt;code&gt;Cache.sv&lt;/code&gt;中，则您可以通过以下命令生成DUT：&lt;/p&gt;
 &lt;h4 id=&#34;命令行指定&#34;&gt;命令行指定&lt;/h4&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker Cache.sv -f CacheStage.sv,CacheMeta.sv -S Cache
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; Cache.sv --fs CacheStage.sv,CacheMeta.sv --sname Cache
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;通过文件列表文件指定&#34;&gt;通过文件列表文件指定&lt;/h4&gt;
 &lt;p&gt;您也可以通过传入.txt文件的方式来实现多文件输入：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker Cache.sv -f src.txt -S Cache
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; Cache.sv --fs src.txt --sname Cache
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;其中&lt;code&gt;src.txt&lt;/code&gt;的内容为:&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;CacheStage.sv
 CacheMeta.sv

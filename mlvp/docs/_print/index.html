@@ -91,7 +91,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.1bccb835c64e696f9152f3c5503d2a73.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -681,7 +681,7 @@
 <h3 id="将rtl构建为-python-module">将RTL构建为 Python Module</h3>
 <h4 id="生成中间文件">生成中间文件</h4>
 <p>进入 Adder 文件夹，执行如下命令：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> Adder.v -w Adder.fst -S Adder -t picker_out_adder -l python -e --sim verilator
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> Adder.v -w Adder.fst --sname Adder --tdir picker_out_adder --lang python -e --sim verilator
 </span></span></code></pre></div><p>该命令的含义是：</p>
 <ol>
 <li>将 Adder.v 作为 Top 文件，并将 Adder 作为 Top Module，基于 verilator 仿真器生成动态库，生成目标语言为 Python。</li>
@@ -866,7 +866,7 @@ Test Passed, destroy UTAdder
 <h3 id="将rtl构建为-python-module">将RTL构建为 Python Module</h3>
 <h4 id="生成中间文件">生成中间文件</h4>
 <p>进入 RandomGenerator 文件夹，执行如下命令：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> RandomGenerator.v -w RandomGenerator.fst -S RandomGenerator -t picker_out_rmg -l python -e --sim verilator
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> RandomGenerator.v -w RandomGenerator.fst --sname RandomGenerator --tdir picker_out_rmg --lang python -e --sim verilator
 </span></span></code></pre></div><p>该命令的含义是：</p>
 <ol>
 <li>将RandomGenerator.v作为 Top 文件，并将RandomGenerator作为 Top Module，基于 verilator 仿真器生成动态库，生成目标语言为 Python。</li>
@@ -1039,7 +1039,7 @@ Test Passed, destroy UTAdder
 </ul>
 <h2 id="python-模块使用">Python 模块使用</h2>
 <ul>
-<li>参数 <code>--language python</code> 或 <code>-l python</code> 用于指定生成Python基础库。</li>
+<li>参数 <code>--language python</code> 或 <code>--lang python</code> 用于指定生成Python基础库。</li>
 <li>参数 <code>--example, -e</code> 用于生成包含示例项目的可执行文件。</li>
 <li>参数 <code>--verbose, -v</code> 用于保留生成项目时的中间文件。</li>
 </ul>
@@ -1408,10 +1408,10 @@ Test Passed, destroy UTAdder
 </span></span></code></pre></div><h3 id="应用方式">应用方式</h3>
 <p>其中，待测模块为Cache，位于<code>Cache.sv</code>中，则您可以通过以下命令生成DUT：</p>
 <h4 id="命令行指定">命令行指定</h4>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker Cache.sv -f CacheStage.sv,CacheMeta.sv -S Cache
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> Cache.sv --fs CacheStage.sv,CacheMeta.sv --sname Cache
 </span></span></code></pre></div><h4 id="通过文件列表文件指定">通过文件列表文件指定</h4>
 <p>您也可以通过传入.txt文件的方式来实现多文件输入：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker Cache.sv -f src.txt -S Cache
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> Cache.sv --fs src.txt --sname Cache
 </span></span></code></pre></div><p>其中<code>src.txt</code>的内容为:</p>
 <pre tabindex="0"><code>CacheStage.sv
 CacheMeta.sv

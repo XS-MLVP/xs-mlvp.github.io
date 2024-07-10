@@ -91,7 +91,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.1bccb835c64e696f9152f3c5503d2a73.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -693,7 +693,7 @@ To generate HTML files for test coverage, you also need to install lcov (genhtml
 <h3 id="building-the-rtl-into-a-python-module">Building the RTL into a Python Module</h3>
 <h4 id="generating-intermediate-files">Generating Intermediate Files</h4>
 <p>Enter the Adder folder and execute the following command:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> Adder.v -w Adder.fst -S Adder -t picker_out_adder -l python -e --sim verilator
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> Adder.v -w Adder.fst -sname Adder -tdir picker_out_adder --lang python -e --sim verilator
 </span></span></code></pre></div><p>The meaning of this command is:</p>
 <ol>
 <li>Use Adder.v as the top file and Adder as the top module. Generate a dynamic library using the Verilator simulator, with the target language being Python.</li>
@@ -880,7 +880,7 @@ Test Passed, destroy UTAdder
 <h3 id="building-rtl-into-a-python-module">Building RTL into a Python Module</h3>
 <h4 id="generating-intermediate-files">Generating Intermediate Files</h4>
 <p>Navigate to the RandomGenerator folder and execute the following command:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> RandomGenerator.v -w RandomGenerator.fst -S RandomGenerator -t picker_out_rmg -l python -e --sim verilator
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> RandomGenerator.v -w RandomGenerator.fst --sname RandomGenerator --tdir picker_out_rmg --lang python -e --sim verilator
 </span></span></code></pre></div><p>This command performs the following actions:</p>
 <ol>
 <li>Uses RandomGenerator.v as the top file and RandomGenerator as the top module, generates a dynamic library based on the Verilator simulator, and targets the Python language.</li>
@@ -1053,7 +1053,7 @@ If you want to know how Picker generates C++ classes, please refer to <a href="d
 </ul>
 <h2 id="using-python-modules">Using Python Modules</h2>
 <ul>
-<li>The parameter <code>--language python</code> or <code>-l python</code> is used to specify the generation of the Python base library.</li>
+<li>The parameter <code>--language python</code> or <code>--lang python</code> is used to specify the generation of the Python base library.</li>
 <li>The parameter <code>--example, -e</code> is used to generate an executable file that includes example projects.</li>
 <li>The parameter <code>--verbose, -v</code> is used to retain intermediate files generated during project generation.</li>
 </ul>
@@ -1418,10 +1418,10 @@ The directory structure is as follows:</li>
 </span></span></code></pre></div><h3 id="usage">Usage</h3>
 <p>In this case, the module under test is Cache, which is in <code>Cache.sv</code>. You can generate the DUT using the following command:</p>
 <h4 id="command-line-specification">Command Line Specification</h4>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker Cache.sv -f CacheStage.sv,CacheMeta.sv -S Cache
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> Cache.sv --fs CacheStage.sv,CacheMeta.sv --sname Cache
 </span></span></code></pre></div><h4 id="specification-through-a-file-list-file">Specification through a File List File</h4>
 <p>You can also use a .txt file to specify multiple input files:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker Cache.sv -f src.txt -S Cache
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> Cache.sv --fs src.txt --sname Cache
 </span></span></code></pre></div><p>Where the contents of <code>src.txt</code> are:</p>
 <pre tabindex="0"><code>CacheStage.sv
 CacheMeta.sv

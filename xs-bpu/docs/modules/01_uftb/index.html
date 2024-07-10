@@ -34,7 +34,7 @@ uFTB 功能简介 缓存FTB项，生成一周期预测结果 uFTB 中维护了�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/01_uftb/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-06-21T19:30:08+08:00" />
+<meta property="article:modified_time" content="2024-07-10T09:49:42+08:00" />
 <meta itemprop="name" content="uFTB 分支预测器">
 <meta itemprop="description" content="uFTB 简介 uFTB 是香山所有预测器中第一个预测器，也是其他预测器产生预测结果的基石。uFTB 工作在 s1 阶段，它获取到 s1_pc 后能在本周期内产生预测结果，并在 s1 通道输出，其他通道不予更改。分支指令的位置、指令的跳转目标都是由它来提供，后续预测器也将会根据这一预测结果进行进一步的预测。
 而其本质则是一个 FTB 项缓存，其中存储了 FTB 项，基础的预测结果将直接由读出的 FTB 项生成。
@@ -42,7 +42,7 @@ uFTB 功能简介 缓存FTB项，生成一周期预测结果 uFTB 中维护了�
 uFTB 功能简介 缓存FTB项，生成一周期预测结果 uFTB 中维护了一个小型的 FTB 项缓存，拿到 PC 之后，会在一周期之内读出 PC 所对应的 FTB 项，并从 FTB 项生成 s1 阶段预测结果。 维护两比特饱和计数器，提供基础条件分支结果 uFTB 中为 FTB项缓存的每一行都维护了对应的两比特饱和计数器，其方向预测结果会反映在 uFTB 的预测结果输出中。 根据更新请求更新 FTB 缓存和两比特饱和计数器 uFTB 缓存结构 如上所述，uFTB 本质上是一个存储了 FTB 项的小型缓存，其大致结构如下图所示。
 在当前版本的香山中，uFTB 共有 32 个缓存行，每个缓存行被称作 FauFTBWay，一个缓存行中可以存储一个 FTB 项。
 当 s1 流水有效时，uFTB 会使用 s1_pc 来决定读出 uFTB 缓存的哪一项。缓存是根据 PC 中的 tag 字段来索引，tag 字段被定义为 pc[16: 1]，即在 PC 中截取了 16 比特作为标识来匹配缓存中的某一行。">
-<meta itemprop="dateModified" content="2024-06-21T19:30:08+08:00" />
+<meta itemprop="dateModified" content="2024-07-10T09:49:42+08:00" />
 <meta itemprop="wordCount" content="582">
 <meta itemprop="keywords" content="子预测器,uFTB," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="uFTB 分支预测器"/>
 <meta name="twitter:description" content="uFTB 简介 uFTB 是香山所有预测器中第一个预测器，也是其他预测器产生预测结果的基石。uFTB 工作在 s1 阶段，它获取到 s1_pc 后能在本周期内产生预测结果，并在 s1 通道输出，其他通道不予更改。分支指令的位置、指令的跳转目标都是由它来提供，后续预测器也将会根据这一预测结果进行进一步的预测。
@@ -114,7 +114,7 @@ uFTB 功能简介 缓存FTB项，生成一周期预测结果 uFTB 中维护了�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.4071d1bf65bfd8de150895f1ebea33ea.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.34452482d27adb724c2aa658e44ebef2.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -138,7 +138,7 @@ uFTB 功能简介 缓存FTB项，生成一周期预测结果 uFTB 中维护了�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.4071d1bf65bfd8de150895f1ebea33ea.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.34452482d27adb724c2aa658e44ebef2.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -966,7 +966,7 @@ uFTB 功能简介 缓存FTB项，生成一周期预测结果 uFTB 中维护了�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 June 21, 2024: <a href="https://github.com/XS-MLVP/course/commit/1d7ab9962422ae3d024682b1e0e5cbb73b70c1ae">add english (1d7ab99)</a>
+  最后修改 July 10, 2024: <a href="https://github.com/XS-MLVP/course/commit/2e9ac9f2d119bdf0b19d940e7d34a652ad8ae73d">Improved readability of documentation. (2e9ac9f)</a>
 </div>
 
 </div>
