@@ -91,7 +91,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.34452482d27adb724c2aa658e44ebef2.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.c3eb5574a6b260a9ed71a61d76389bc9.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -5486,7 +5486,7 @@ tageCtrCentered
 </span></span></code></pre></div><p>如上图所示，在main函数中调用了add和sub，add又调用了函数_add。在该过程中，每次调用（call）的跳转地址和返回的地址固定，且在call的时候，就可以同时得到返回地址。函数的调用过程是一个“栈的出入”过程，因此可以通过“栈”结构进行分支预测：每遇到call指令，把当前PC+4（压缩指令和普通指令的偏移不同）进行压栈push操作；遇到return指令，则进行进行pop操作，得到的地址即为目标跳转地址。在基于“预测块”的BPU中，RAS无法知道当前块是否是call或者ret，因此需要依赖其他预测器，利用前级预测器的结果进行RAS操作。</p>
 <p>具体的，在香山的RAS预测器中，其s2阶段，需要判断上一级s2的输出是否预测为call或者ret（即输入信号io.s2_full_pred.hit_taken_on_call/ret有效 ），如果是call则push其后续指令地址入栈，是ret则从栈中pop出地址作为预测结果。因为在BPU的预测器中，人为假定s3阶段得到的结果比s2阶段好，所以RAS预测器在s3阶段需要进行检查，如果上一级的s3预测结果与s2不一致，则采信s3的结果，并按需求判断是否需要撤销或者补齐之前s2阶段的栈操作。例如s2阶段预测为call指令，进行了push操作，而s3为普通分支指令，不需要进行任何操作，此时就需要撤销push；如果s2预测为普通分支指令，s3预测为call，则需要进行push操作补齐。</p>
 <h2 id="ras的栈操作">RAS的栈操作</h2>
-<p>在RAS设计中，通过栈进行预测函数返回地址。在理想情况下，本节假定RAS可进行随时备份，栈顶指针用sp表示，预测地址用paddr表示。RAS的基本操作有以下4种：</p>
+<p>在普通的RAS设计中，通过栈进行预测函数返回地址。在理想情况下，本节假定RAS可进行随时备份，栈顶指针用sp表示，预测地址用paddr表示。RAS的基本操作有以下4种：</p>
 <ol>
 <li>
 <h3 id="push">PUSH</h3>
@@ -5514,26 +5514,29 @@ tageCtrCentered
 </ol>
 <p>提交（Commit）操作即后端告诉前端，之前预测的结果正确。理想情况下，RAS预测器此时不需要进行任何操作。</p>
 <h2 id="昆明湖中ras的实现">昆明湖中RAS的实现</h2>
-<p>在实际电路设计中，不可能存在无限大的栈，且能进行时刻备份，所以在昆明湖的 RAS 实现中，需要解决的问题和应对方案如下：</p>
+<p>由于处理器在执行过程中可能会进行错误的猜测，导致数据污染，RAS需要通过恢复机制来确保数据的准确性。特别是在昆明湖的实际电路设计中，不可能有无限大的栈，也无法随时备份数据。因此，昆明湖的RAS实现中，使用了基于持久化栈的返回地址预测器。具体来说，将RAS分为提交栈（commit stack）和推测栈（spec queue）两个部分，推测栈利用了香山BPU的预测结果来进行预测，然后根据后端返回的信息将数据压入提交栈中。下面详细介绍昆明湖的RAS设计：</p>
 <h3 id="每次预测时ras栈的快照如何获得"><strong>每次预测时，RAS栈的快照如何获得？</strong></h3>
-<p>为了实现对RAS栈进行快照的功能，昆明湖采用了基于循环数组的 <strong>&ldquo;链式表示“</strong> 。设计具体如下：</p>
+<p>为了实现对RAS栈进行快照的功能，昆明湖的<strong>RAS推测栈</strong>采用了基于循环数组的 <strong>&ldquo;链式表示“</strong> 。设计具体如下：</p>
 <image src="Linked_RAS.png" width="800px">
-<p>如上图所示，在该设计中，利用一个循环数组进行数据管理。循环数组有一个起始地址标记为BOS，有一个尾指针标记为TOSW，他们之间的数据为有效数据，之外的数据为空闲数据。在有效数据中，用一个链式结构对“RAS栈”进行表示，即每一个栈元素都记录其上一个数据的编号，当进行栈操作时可以通过该编号获取对应上一个元素。RAS栈的栈底指针公用BOS。如图中的初始状态S，其中RAS栈对应的元素为0，1，3，5。元素5中记录了它的上一个元素的位置3，同理元素3中记录了其上一个元素的位置1。每次需要进行push操作时，让RAS栈顶指针TOSR = TOSW，在新的TOSR位置7中存入新的元素，并在新元素中记录其上一个元素的位置5，然后TOSW后移（TOSW = TOSW+1）。在进行Pop操作时，RAS栈顶指针TOSR根据栈顶元素保存的索引移动到上一个元素的位置3。因此在栈不溢出的情况下，上述RAS栈每次都是通过TOSW在数组上分配新数据，因此在栈的正常Push/Pop中，所有过程状态和中间数据都有保存。所以当要恢复到S状态时，只需要把对应的栈指针复位即可。因此在RAS每次预测时，需要把对应的栈指针（BOS、TOSR、TOSW）也保存于预测结果中，用于之后万一发生重定向操作时恢复到原始栈状态。上述结构的优点是可以保存完整过程数据，但频繁的push操作，会导致空间资源消耗大。</p>
-<h3 id="链式ra存储空间浪费"><strong>链式RA存储空间浪费？</strong></h3>
-<p>由于预测结果在commit后即表示预测正确，不会再进行“栈”回滚，即RAS预测器收到预测块“P”的commit消息后，就不可能再收到P块的redirect消息，在对P块进行push操作时的快照也将不会被用到。因此可以对RAS栈中的元素进行分类，把还未commit的元素用“链式”结构进行存储，已经commit的元素通过普通的基于循环数组的栈表示（即把原始RAS栈拆分成了两部分进行表示，还未commit可能需要快照恢复的部分用可以保存快照的链式结构保存，已经commit不需要快速恢复的部分用普通栈结构保存）。优化后的RAS结构如下所示：</p>
+<p>在这个设计中，数据管理是通过一个循环数组来实现的。循环数组有一个起始地址（BOS）和一个尾指针（TOSW），两者之间的数据是有效数据，其他部分为空闲数据。使用链式结构表示“Sepc栈”，每个栈元素记录其上一个数据的编号，进行栈操作时可以通过该编号获取上一个元素。RAS栈的栈底指针与BOS共用。</p>
+<p>如图所示的初始状态S，RAS栈的元素为0、1、4、5。元素5记录了其上一个元素的位置3，元素3记录了其上一个元素的位置1。在状态S下进行push操作时，RAS栈顶指针TOSR等于TOSW，在新的TOSR位置7存入新元素，并记录其上一个元素的位置5，然后TOSW后移（TOSW = TOSW + 1）。进行pop操作时，RAS栈顶指针TOSR根据栈顶元素保存的索引移动到上一个元素的位置3，但不会修改内存分配指针TOSW，因此Spec栈的元素不一定是连续的。</p>
+<p>在栈不溢出的情况下，RAS栈每次通过TOSW在数组上分配新数据，因此在正常的Push/Pop操作中，所有过程状态和中间数据都被保存。当需要恢复到状态S时，只需复位相应的栈指针。因此，在每次RAS预测时，需要将操作前的栈指针（BOS、TOSR、TOSW）保存于预测结果中，以便用于commit栈操作和在重定向时恢复状态。该结构的优点是可以保存完整的过程数据，但频繁的push操作会导致较大的空间资源消耗。</p>
+<h3 id="链式ras浪费存储空间"><strong>链式RAS浪费存储空间？</strong></h3>
+<p>当预测结果被确认（commit）后，表示预测是正确的，不会再进行“栈”回滚。也就是说，RAS预测器在收到预测块“P”的commit消息后，不会再收到P块的重定向消息，因此在对P块进行push操作时的快照将不会被用到。</p>
+<p>为了优化，RAS栈中的元素被分类处理：未commit的元素存储在链式结构的推测栈中，已commit的元素存储在基于循环数组的提交栈中。这样，原始的RAS栈被拆分成两部分：未commit的部分用链式结构保存，以便需要时可以恢复快照；已commit的部分用普通栈结构保存，因为它们不需要快速恢复。优化后的RAS结构如下所示：</p>
 <image src="RAS_Arch.png" width="800px">
-<p>如上图所示，根据普通预测的call/ret和commit提交的call/ret，把原始的RAS栈可以拆分成两个独立的栈，分别称为“预测栈”（ spec_stack，链式结构）和“提交栈”（commit_stack，普通结构），由于栈结构发生了变化，具体的Pop/Push操作如下：</p>
+<p>如上图所示，根据普通预测的call/ret和commit提交的call/ret，把原始的RAS栈可以拆分成两个独立的栈，分别称为“预测栈”（ spec_stack，链式结构）和“提交栈”（commit_stack，普通结构），由于RASStack对外表现为当拍内就能完成任务，因此在Stack内需要进行数据旁路，对数据进行缓存，由于栈结构发生了变化，具体的Pop/Push操作如下：</p>
 <p>1、遇到普通call和ret：</p>
-<p>（1）预测块为call正确，在spec_stack上进行push操作，具体为上述链式栈Push过程；</p>
-<p>（2）预测块为ret正确，利用spec_stack的栈顶作为预测值，然后进行pop操作。如果spec_stack为空，则使用commit_stack的栈顶元素作为预测结果（不进行pop操作）。</p>
+<p>（1）预测块为call正确，在spec_stack上进行push操作，具体为上述链式栈Push过程，并将产生的快照信息送到FTQ存储；</p>
+<p>（2）预测块为ret正确，利用spec_stack的栈顶作为预测值，然后进行pop操作，并将产生的快照信息送到FTQ存储，如果spec_stack为空，则使用commit_stack的栈顶元素作为预测结果（不进行pop操作）。</p>
 <p>2、Commit操作：</p>
-<p>（1）FTQ执行结果为call正确 ，在commit_stack上进行普通push操作。</p>
-<p>（2）FTQ执行结果为ret正确 ，在commit_stack上进行普通pop操作。</p>
+<p>（1）FTQ执行结果为call正确，通过FTQ传回来的快照信息对commit_stack进行push操作，同时更新spec栈的BOS指针，将此次commit的数据及其之前的数据设置为无效数据。</p>
+<p>（2）FTQ执行结果为ret正确，通过FTQ传回来的快照信息对commit_stack上进行普通pop操作，注意到在commit pop之前会先对spec栈进行pop操作，所以commit栈弹出来的地址不需要使用。</p>
 <p>3、Redirect操作：</p>
-<p>（1）从redirect消息中获取之前预测时的栈指针（BOS、TOSR、TOSW，ssp），覆盖当前值指针值完成预测栈回滚。</p>
+<p>（1）从redirect消息中获取之前预测时的栈指针（BOS、TOSR、TOSW，ssp），覆盖当前值指针值完成预测栈状态回滚，若此时为Call指令或者Ret指令，则再对Spec栈进行对应的操作。</p>
 <p>（2）该操作不影响提交栈。</p>
 <h3 id="输入端s3的预测结果和s2不一致时该如何处理"><strong>输入端，S3的预测结果和S2不一致时该如何处理？</strong></h3>
-<p>由于假定S3的结果比S2好，因此发生不一致时，需要再次对RAS栈进行修复。具体不一致情况和对应的修复操作如下表所示：</p>
+<p>由于昆明湖 BPU 的假定S3的结果比S2好，因此发生不一致时，需要再次对RAS栈进行修复。具体不一致情况和对应的修复操作如下表所示：</p>
 <table>
 <thead>
 <tr>
@@ -5565,10 +5568,10 @@ tageCtrCentered
 </tr>
 </tbody>
 </table>
-<p>S2和S3的操作不存在，pop/push或者push/pop情况（为什么不存在？）</p>
+<p>因为SC预测器的特性，S2和S3的操作不存在pop/push或者push/pop情况</p>
 <h2 id="其他优化">其他优化</h2>
 <ol>
-<li>每个RAS栈中的元素都有一个counter计数器，用于节约重复值（递归调用）。例如：当第一次push地址为0xff00，第二次push的也为0xff00时，则只需要把栈顶元素的 counter 进行+1，不需真的进行push操作。</li>
+<li>每个RAS的spec栈和commit栈的元素都有一个counter计数器，用于节约重复值（递归调用）。例如：当第一次push地址为0xff00，第二次push的也为0xff00时，则只需要把栈顶元素的 counter 进行+1，不需真的进行push操作。</li>
 </ol>
 <h2 id="接口说明">接口说明</h2>
 <p>在RAS预测器中，核心组件为 <strong>RASStack</strong> ，其接口说明如下:</p>
@@ -5644,13 +5647,13 @@ tageCtrCentered
 </tr>
 <tr>
 <td>out.BOS</td>
-<td>spec栈栈低指针</td>
+<td>spec栈栈底指针</td>
 <td>in.redirect_isRet</td>
 <td>真实执行情况是Return</td>
 </tr>
 <tr>
 <td>in.commit_push_valid</td>
-<td>push操作正确</td>
+<td>FTQ执行结果为Call正确</td>
 <td>in.redirect_meta_ssp</td>
 <td>之前预测时的现场信息ssp</td>
 </tr>
@@ -5662,7 +5665,7 @@ tageCtrCentered
 </tr>
 <tr>
 <td>in.commit_pop_valid</td>
-<td>FTQ执行结果为Call正确</td>
+<td>FTQ执行结果为Ret正确</td>
 <td>in.redirect_meta_sctr</td>
 <td>之前预测时的现场信息sctr</td>
 </tr>
@@ -5837,7 +5840,6 @@ tageCtrCentered
 <p>1、根据上一个预测器S3中的预测结果，以及S2进行的操作，判断是否需要进行Pop/Push的撤销操作。预测器假定S3的预测结果比S2好，如果发生S2和S3预测不一致时，RAS预测器采信S3结果进行栈操作。</p>
 <p>2、S3和S2的预测过程一致，只是数据不同。</p>
 <p>3、执行重定向（重定向信息由前一拍获得）操作</p>
-<p>由于RASStack对外表现为当拍内就能完成任务，因此在Stack内需要进行数据旁路，对数据进行缓存。</p>
 
 </div>
 
