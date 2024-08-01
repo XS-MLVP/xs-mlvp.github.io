@@ -34,7 +34,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/05_ras/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-07-15T16:37:33+08:00" />
+<meta property="article:modified_time" content="2024-08-01T10:00:55+08:00" />
 <meta itemprop="name" content="RAS 分支预测器">
 <meta itemprop="description" content="RAS介绍 RAS 指的是 &ldquo;Return Address Stack&rdquo;，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
 等。RAS分支预测器则专门针对 call/return类型。
@@ -42,7 +42,7 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
 具体的，在香山的RAS预测器中，其s2阶段，需要判断上一级s2的输出是否预测为call或者ret（即输入信号io.s2_full_pred.hit_taken_on_call/ret有效 ），如果是call则push其后续指令地址入栈，是ret则从栈中pop出地址作为预测结果。因为在BPU的预测器中，人为假定s3阶段得到的结果比s2阶段好，所以RAS预测器在s3阶段需要进行检查，如果上一级的s3预测结果与s2不一致，则采信s3的结果，并按需求判断是否需要撤销或者补齐之前s2阶段的栈操作。例如s2阶段预测为call指令，进行了push操作，而s3为普通分支指令，不需要进行任何操作，此时就需要撤销push；如果s2预测为普通分支指令，s3预测为call，则需要进行push操作补齐。
 RAS的栈操作 在普通的RAS设计中，通过栈进行预测函数返回地址。在理想情况下，本节假定RAS可进行随时备份，栈顶指针用sp表示，预测地址用paddr表示。RAS的基本操作有以下4种：
 PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。">
-<meta itemprop="dateModified" content="2024-07-15T16:37:33+08:00" />
+<meta itemprop="dateModified" content="2024-08-01T10:00:55+08:00" />
 <meta itemprop="wordCount" content="311">
 <meta itemprop="keywords" content="子预测器,RAS," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RAS 分支预测器"/>
 <meta name="twitter:description" content="RAS介绍 RAS 指的是 &ldquo;Return Address Stack&rdquo;，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
@@ -114,7 +114,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.39a84ea661a10d25aae74e9dd14cb9b2.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.a3c696245b89981f39f142689b6342b0.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -138,7 +138,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.39a84ea661a10d25aae74e9dd14cb9b2.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.a3c696245b89981f39f142689b6342b0.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -722,7 +722,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
 <p>3、执行重定向（重定向信息由前一拍获得）操作</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 July 15, 2024: <a href="https://github.com/XS-MLVP/course/commit/6a1ba9ae977eeb4991855b9db1a944655d41057d">edit ras document (6a1ba9a)</a>
+  最后修改 August 1, 2024: <a href="https://github.com/XS-MLVP/course/commit/06b10f541047343f5a6fb3f182cb4b11c779e531">Fix incorrect filed for FTB Entry which used by ITTAGE. (06b10f5)</a>
 </div>
 
 </div>
