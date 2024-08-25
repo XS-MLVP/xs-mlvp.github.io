@@ -42,6 +42,7 @@
   src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/mlvp/css/prism.css"/>
 
     <script>
         var _hmt = _hmt || [];
@@ -62,7 +63,47 @@
         gtag('config', 'G-4Z2ZY6ZE84');
     </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
 
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
   </head>
   <body class="td-term">
     <header>
@@ -90,7 +131,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -142,47 +183,15 @@
       
         
         <article class="card article-teaser article-type-docs">
-          <h3><a href="/mlvp/docs/advance_func/callback/">回调函数</a></h3>
+          <h3><a href="/mlvp/docs/env_usage/picker_usage/">工具介绍</a></h3>
           <nav class="td-breadcrumbs">
   <ol class="breadcrumb">
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/advance_func/">高级教程</a></li>
+    <a href="/mlvp/docs/env_usage/">基础工具</a></li>
   <li class="breadcrumb-item">
-    回调函数</li>
-  </ol>
-</nav><p>利用回调处理电路事件</p>
-          <header class="article-meta">
-            <div class="taxonomy taxonomy-terms-article taxo-tags">
-  <h5 class="taxonomy-title">Tags:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span></a></li>
-    </ul>
-</div>
-<div class="taxonomy taxonomy-terms-article taxo-categories">
-  <h5 class="taxonomy-title">Categories:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span></a></li>
-    </ul>
-</div>
-
-  </header>
-        </article>
-      
-        
-        <article class="card article-teaser article-type-docs">
-          <h3><a href="/mlvp/docs/env_usage/picker_usage/">基础使用</a></h3>
-          <nav class="td-breadcrumbs">
-  <ol class="breadcrumb">
-  <li class="breadcrumb-item">
-    <a href="/mlvp/docs/">学习资源</a></li>
-  <li class="breadcrumb-item">
-    <a href="/mlvp/docs/env_usage/">环境使用</a></li>
-  <li class="breadcrumb-item">
-    基础使用</li>
+    工具介绍</li>
   </ol>
 </nav><p>验证工具的基本使用。</p>
           <header class="article-meta">
@@ -334,7 +343,7 @@
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/env_usage/">环境使用</a></li>
+    <a href="/mlvp/docs/env_usage/">基础工具</a></li>
   <li class="breadcrumb-item">
     波形生成</li>
   </ol>
@@ -360,15 +369,15 @@
       
         
         <article class="card article-teaser article-type-docs">
-          <h3><a href="/mlvp/docs/env_usage/">环境使用</a></h3>
+          <h3><a href="/mlvp/docs/env_usage/">基础工具</a></h3>
           <nav class="td-breadcrumbs">
   <ol class="breadcrumb">
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    环境使用</li>
+    基础工具</li>
   </ol>
-</nav><p>开放验证平台的环境的详细使用方法。</p>
+</nav><p>开放验证平台的基础工具的详细使用方法。</p>
           <header class="article-meta">
             <div class="taxonomy taxonomy-terms-article taxo-tags">
   <h5 class="taxonomy-title">Tags:</h5>
@@ -420,39 +429,7 @@
       
         
         <article class="card article-teaser article-type-docs">
-          <h3><a href="/mlvp/docs/advance_func/async/">异步编程</a></h3>
-          <nav class="td-breadcrumbs">
-  <ol class="breadcrumb">
-  <li class="breadcrumb-item">
-    <a href="/mlvp/docs/">学习资源</a></li>
-  <li class="breadcrumb-item">
-    <a href="/mlvp/docs/advance_func/">高级教程</a></li>
-  <li class="breadcrumb-item">
-    异步编程</li>
-  </ol>
-</nav><p>利用异步模式简化回调</p>
-          <header class="article-meta">
-            <div class="taxonomy taxonomy-terms-article taxo-tags">
-  <h5 class="taxonomy-title">Tags:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span></a></li>
-    </ul>
-</div>
-<div class="taxonomy taxonomy-terms-article taxo-categories">
-  <h5 class="taxonomy-title">Categories:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span></a></li>
-    </ul>
-</div>
-
-  </header>
-        </article>
-      
-        
-        <article class="card article-teaser article-type-docs">
-          <h3><a href="/mlvp/docs/quick-start/eg-adder/">案例一：加法器</a></h3>
+          <h3><a href="/mlvp/docs/quick-start/eg-adder/">案例一：简单加法器</a></h3>
           <nav class="td-breadcrumbs">
   <ol class="breadcrumb">
   <li class="breadcrumb-item">
@@ -460,7 +437,7 @@
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/quick-start/">快速开始</a></li>
   <li class="breadcrumb-item">
-    案例一：加法器</li>
+    案例一：简单加法器</li>
   </ol>
 </nav><p>基于一个简单的加法器验证展示工具的原理和使用方法，这个加法器内部是简单的组合逻辑。</p>
           <header class="article-meta">
@@ -490,41 +467,11 @@
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/env_usage/">环境使用</a></li>
+    <a href="/mlvp/docs/env_usage/">基础工具</a></li>
   <li class="breadcrumb-item">
     多文件输入</li>
   </ol>
 </nav><p>处理多个Verilog源文件</p>
-          <header class="article-meta">
-            <div class="taxonomy taxonomy-terms-article taxo-tags">
-  <h5 class="taxonomy-title">Tags:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span></a></li>
-    </ul>
-</div>
-<div class="taxonomy taxonomy-terms-article taxo-categories">
-  <h5 class="taxonomy-title">Categories:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span></a></li>
-    </ul>
-</div>
-
-  </header>
-        </article>
-      
-        
-        <article class="card article-teaser article-type-docs">
-          <h3><a href="/mlvp/docs/advance_func/">高级教程</a></h3>
-          <nav class="td-breadcrumbs">
-  <ol class="breadcrumb">
-  <li class="breadcrumb-item">
-    <a href="/mlvp/docs/">学习资源</a></li>
-  <li class="breadcrumb-item">
-    高级教程</li>
-  </ol>
-</nav><p>开放验证平台工具链的高级特性教程。</p>
           <header class="article-meta">
             <div class="taxonomy taxonomy-terms-article taxo-tags">
   <h5 class="taxonomy-title">Tags:</h5>
@@ -576,38 +523,6 @@
       
         
         <article class="card article-teaser article-type-docs">
-          <h3><a href="/mlvp/docs/advance_func/message/">消息驱动</a></h3>
-          <nav class="td-breadcrumbs">
-  <ol class="breadcrumb">
-  <li class="breadcrumb-item">
-    <a href="/mlvp/docs/">学习资源</a></li>
-  <li class="breadcrumb-item">
-    <a href="/mlvp/docs/advance_func/">高级教程</a></li>
-  <li class="breadcrumb-item">
-    消息驱动</li>
-  </ol>
-</nav><p>利用消息对电路和软件激励进行解耦</p>
-          <header class="article-meta">
-            <div class="taxonomy taxonomy-terms-article taxo-tags">
-  <h5 class="taxonomy-title">Tags:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span></a></li>
-    </ul>
-</div>
-<div class="taxonomy taxonomy-terms-article taxo-categories">
-  <h5 class="taxonomy-title">Categories:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span></a></li>
-    </ul>
-</div>
-
-  </header>
-        </article>
-      
-        
-        <article class="card article-teaser article-type-docs">
           <h3><a href="/mlvp/docs/quick-start/eg-rmg/">案例二：随机数生成器</a></h3>
           <nav class="td-breadcrumbs">
   <ol class="breadcrumb">
@@ -646,7 +561,7 @@
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/env_usage/">环境使用</a></li>
+    <a href="/mlvp/docs/env_usage/">基础工具</a></li>
   <li class="breadcrumb-item">
     覆盖率统计</li>
   </ol>
@@ -702,13 +617,45 @@
       
         
         <article class="card article-teaser article-type-docs">
+          <h3><a href="/mlvp/docs/quick-start/eg-stack-callback/">案例三：双端口栈（回调）</a></h3>
+          <nav class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/mlvp/docs/">学习资源</a></li>
+  <li class="breadcrumb-item">
+    <a href="/mlvp/docs/quick-start/">快速开始</a></li>
+  <li class="breadcrumb-item">
+    案例三：双端口栈（回调）</li>
+  </ol>
+</nav><p>双端口栈是一个拥有两个端口的栈，每个端口都支持push和pop操作。本案例以双端口栈为例，展示如何使用回调函数驱动DUT</p>
+          <header class="article-meta">
+            <div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span></a></li>
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span></a></li>
+    </ul>
+</div>
+<div class="taxonomy taxonomy-terms-article taxo-categories">
+  <h5 class="taxonomy-title">Categories:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span></a></li>
+    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span></a></li>
+    </ul>
+</div>
+
+  </header>
+        </article>
+      
+        
+        <article class="card article-teaser article-type-docs">
           <h3><a href="/mlvp/docs/env_usage/frameworks/">集成测试框架</a></h3>
           <nav class="td-breadcrumbs">
   <ol class="breadcrumb">
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/env_usage/">环境使用</a></li>
+    <a href="/mlvp/docs/env_usage/">基础工具</a></li>
   <li class="breadcrumb-item">
     集成测试框架</li>
   </ol>
@@ -734,17 +681,17 @@
       
         
         <article class="card article-teaser article-type-docs">
-          <h3><a href="/mlvp/docs/advance_func/mlvp/">验证框架</a></h3>
+          <h3><a href="/mlvp/docs/quick-start/eg-stack-async/">案例四：双端口栈（协程）</a></h3>
           <nav class="td-breadcrumbs">
   <ol class="breadcrumb">
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/advance_func/">高级教程</a></li>
+    <a href="/mlvp/docs/quick-start/">快速开始</a></li>
   <li class="breadcrumb-item">
-    验证框架</li>
+    案例四：双端口栈（协程）</li>
   </ol>
-</nav><p>MLVP 验证框架。</p>
+</nav><p>双端口栈是一个拥有两个端口的栈，每个端口都支持push和pop操作。本案例以双端口栈为例，展示如何使用协程驱动DUT</p>
           <header class="article-meta">
             <div class="taxonomy taxonomy-terms-article taxo-tags">
   <h5 class="taxonomy-title">Tags:</h5>
@@ -802,7 +749,7 @@
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/env_usage/">环境使用</a></li>
+    <a href="/mlvp/docs/env_usage/">基础工具</a></li>
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/env_usage/frameworks/">集成测试框架</a></li>
   <li class="breadcrumb-item">
@@ -836,7 +783,7 @@
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/env_usage/">环境使用</a></li>
+    <a href="/mlvp/docs/env_usage/">基础工具</a></li>
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/env_usage/frameworks/">集成测试框架</a></li>
   <li class="breadcrumb-item">
@@ -916,7 +863,7 @@
     </div>
     
   <script src="/mlvp/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
-<script defer src="/mlvp/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 
   </body>

@@ -24,10 +24,10 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-07-10T14:25:46+08:00" />
+<meta property="article:modified_time" content="2024-08-20T22:51:47+08:00" />
 <meta itemprop="name" content="创建DUT">
 <meta itemprop="description" content="以果壳cache为例，介绍如何创建基于chisel的DUT">
-<meta itemprop="dateModified" content="2024-07-10T14:25:46+08:00" />
+<meta itemprop="dateModified" content="2024-08-20T22:51:47+08:00" />
 <meta itemprop="wordCount" content="177">
 <meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="创建DUT"/>
 <meta name="twitter:description" content="以果壳cache为例，介绍如何创建基于chisel的DUT"/>
@@ -46,6 +46,7 @@
   src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/mlvp/css/prism.css"/>
 
     <script>
         var _hmt = _hmt || [];
@@ -66,7 +67,47 @@
         gtag('config', 'G-4Z2ZY6ZE84');
     </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
 
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
   </head>
   <body class="td-page">
     <header>
@@ -94,7 +135,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -118,7 +159,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -145,16 +186,20 @@
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-startinstaller-li">
   <a href="/mlvp/docs/quick-start/installer/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startinstaller"><span class="">搭建验证环境</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-adder-li">
-  <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：加法器</span></a>
+  <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：简单加法器</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-rmg-li">
   <a href="/mlvp/docs/quick-start/eg-rmg/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-rmg"><span class="">案例二：随机数生成器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-callback-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-callback"><span class="">案例三：双端口栈（回调）</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-async-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-async"><span class="">案例四：双端口栈（协程）</span></a>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usage-li">
-  <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">环境使用</span></a>
+  <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">基础工具</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagepicker_usage-li">
-  <a href="/mlvp/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagepicker_usage"><span class="">基础使用</span></a>
+  <a href="/mlvp/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagepicker_usage"><span class="">工具介绍</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagewave-li">
   <a href="/mlvp/docs/env_usage/wave/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagewave"><span class="">波形生成</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemultifile-li">
@@ -185,19 +230,6 @@
   <a href="/mlvp/docs/basic/test_dut/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasictest_dut"><span class="">DUT验证</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasicreport-li">
   <a href="/mlvp/docs/basic/report/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicreport"><span class="">验证报告</span></a>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsadvance_func-li">
-  <a href="/mlvp/docs/advance_func/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsadvance_func"><span class="">高级教程</span></a>
-  <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funccallback-li">
-  <a href="/mlvp/docs/advance_func/callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funccallback"><span class="">回调函数</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funcasync-li">
-  <a href="/mlvp/docs/advance_func/async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funcasync"><span class="">异步编程</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funcmessage-li">
-  <a href="/mlvp/docs/advance_func/message/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funcmessage"><span class="">消息驱动</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funcmlvp-li">
-  <a href="/mlvp/docs/advance_func/mlvp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funcmlvp"><span class="">验证框架</span></a>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsadvance_case-li">
@@ -259,16 +291,16 @@
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Tag Cloud</h5>
       <ul class="taxonomy-terms">
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">27</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">20</span></a></li>
         </ul>
     </div>
   <div class="taxonomy taxonomy-terms-cloud taxo-categories">
       <h5 class="taxonomy-title">Categories</h5>
       <ul class="taxonomy-terms">
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99/" data-taxonomy-term="%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99"><span class="taxonomy-label">学习材料</span><span class="taxonomy-count">3</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">24</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">20</span></a></li>
         </ul>
     </div>
   
@@ -384,7 +416,7 @@
 <p>一般情况下，如果需要DUT生成波形、覆盖率等会导致DUT的执行速度变慢，因此在通过picker工具生成python模块时会根据多种配置进行生成：（1）关闭所有debug信息；（2）开启波形；（3）开启代码行覆盖率。其中第一种配置的目标是快速构建环境，进行回归测试等；第二种配置用于分析具体错误，时序等；第三种用于提升覆盖率。</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 July 10, 2024: <a href="https://github.com/XS-MLVP/course/commit/a02fa3c6859ec59049db60aa9be1c86d1d155302">fix picker usage (a02fa3c)</a>
+  最后修改 August 20, 2024: <a href="https://github.com/XS-MLVP/course/commit/82e368a4f4624c560044effc1cd7d1004c7dca4f">Update Case 4 (82e368a)</a>
 </div>
 
 </div>
@@ -441,7 +473,7 @@
     </div>
     
   <script src="/mlvp/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
-<script defer src="/mlvp/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 
   </body>

@@ -26,11 +26,11 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/basic/ic_verify/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-07-10T14:25:46+08:00" />
+<meta property="article:modified_time" content="2024-08-20T22:51:47+08:00" />
 <meta itemprop="name" content="芯片验证">
 <meta itemprop="description" content="关于芯片验证的基本概念
 ">
-<meta itemprop="dateModified" content="2024-07-10T14:25:46+08:00" />
+<meta itemprop="dateModified" content="2024-08-20T22:51:47+08:00" />
 <meta itemprop="wordCount" content="144">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="芯片验证"/>
 <meta name="twitter:description" content="关于芯片验证的基本概念
@@ -50,6 +50,7 @@
   src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/mlvp/css/prism.css"/>
 
     <script>
         var _hmt = _hmt || [];
@@ -70,7 +71,47 @@
         gtag('config', 'G-4Z2ZY6ZE84');
     </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
 
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
   </head>
   <body class="td-page">
     <header>
@@ -98,7 +139,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -122,7 +163,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -149,16 +190,20 @@
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-startinstaller-li">
   <a href="/mlvp/docs/quick-start/installer/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startinstaller"><span class="">搭建验证环境</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-adder-li">
-  <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：加法器</span></a>
+  <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：简单加法器</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-rmg-li">
   <a href="/mlvp/docs/quick-start/eg-rmg/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-rmg"><span class="">案例二：随机数生成器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-callback-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-callback"><span class="">案例三：双端口栈（回调）</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-async-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-async"><span class="">案例四：双端口栈（协程）</span></a>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usage-li">
-  <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">环境使用</span></a>
+  <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">基础工具</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagepicker_usage-li">
-  <a href="/mlvp/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagepicker_usage"><span class="">基础使用</span></a>
+  <a href="/mlvp/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagepicker_usage"><span class="">工具介绍</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagewave-li">
   <a href="/mlvp/docs/env_usage/wave/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagewave"><span class="">波形生成</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemultifile-li">
@@ -189,19 +234,6 @@
   <a href="/mlvp/docs/basic/test_dut/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasictest_dut"><span class="">DUT验证</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasicreport-li">
   <a href="/mlvp/docs/basic/report/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicreport"><span class="">验证报告</span></a>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsadvance_func-li">
-  <a href="/mlvp/docs/advance_func/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsadvance_func"><span class="">高级教程</span></a>
-  <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funccallback-li">
-  <a href="/mlvp/docs/advance_func/callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funccallback"><span class="">回调函数</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funcasync-li">
-  <a href="/mlvp/docs/advance_func/async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funcasync"><span class="">异步编程</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funcmessage-li">
-  <a href="/mlvp/docs/advance_func/message/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funcmessage"><span class="">消息驱动</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funcmlvp-li">
-  <a href="/mlvp/docs/advance_func/mlvp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funcmlvp"><span class="">验证框架</span></a>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsadvance_case-li">
@@ -263,16 +295,16 @@
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Tag Cloud</h5>
       <ul class="taxonomy-terms">
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">27</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">20</span></a></li>
         </ul>
     </div>
   <div class="taxonomy taxonomy-terms-cloud taxo-categories">
       <h5 class="taxonomy-title">Categories</h5>
       <ul class="taxonomy-terms">
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99/" data-taxonomy-term="%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99"><span class="taxonomy-label">学习材料</span><span class="taxonomy-count">3</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">24</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">20</span></a></li>
         </ul>
     </div>
   
@@ -323,12 +355,12 @@
 <p>芯片设计和验证的耦合关系如上图所示，设计和验证有同样的输入，即规范文档（specification）。参考规范，设计与验证人员双方按照各自的理解，以及各自的需求进行独立编码实现。设计方需要满足的前提是编码的RTL代码“可综合”，需要考虑电路特性，而验证方一般只要考虑功能是否满足要求，编码限制少。双方完成模块开发后，需要进行健全性对比测试（Sanity Test），判定功能是否表现一致，若不一致需要进行协同排查，确定问题所在并进行修复，再进行对比测试，直到所有功能点都满足预期。由于芯片设计和芯片验证耦合度很高，因此有些企业在研发队伍上也进行了直接耦合，为每个子模块的设计团队都配置了对应的验证团队（DV）。上图中的设计与验证的耦合流程为粗粒度的关系，具体到具体芯片（例如Soc、DDR）、具体企业等都有其适合自身的合作模式。</p>
 <p>在上述对比测试中，设计方的产出的模块通常称为DUT（Design Under Test），验证方开发的模型通常称为RM（Reference Model）。针对图中的验证工作，按照流程可以有：编写验证计划、创建验证平台、整理功能点、构建测试用例、运行调试、收集Bug/覆盖率、回归测试、编写测试报告等多个阶段。</p>
 <blockquote><p>
-<p><strong>验证计划：</strong> 验证计划描述了如何进行验证，以及如何保证验证质量，达到功能验证要求。在文档结构上通常包含验证目标，验证策略、验证环境、验证项、验证过程、风险防范、资源及时间表、结果和报告等部分。验证目标明确需要验证的功能或性能指标，这些目标应该直接从芯片的规范文档中提取。验证策略描述如何进行验证，包括可能使用的验证方法，例如仿真、形式化、FPGA加速等，以及如何组织验证任务。验证环境用于描述具体的测试环境，例如验证工具类型，版本号等。验证项库俄超关羽需要验证的具体项以及预期结果。验证计划可以有总计划，也可以针对具体验证的子任务进行编写。</p>
-<p><strong>平台搭建：</strong> 验证平台是具体验证任务的执行环境，同一类验证任务可以使用相同的验证平台。验证平台的搭建是验证流程中的关键步骤、具体包含验证工具选择（例如是采用软件仿真，还是采用形式化验证，或者硬件加速）、环境配置（例如配置服务器环境，FPGA环境）、创建测试环境、基本测试案例等。创建好基本测试平台，跑通基本测试案例，也通常称为“冒烟测试”。后继具体的测试代码，都将基于该测试平台进行，因此测试平台需要具有可重用性。验证平台通过包含测试框架和被测试代码，以及对应的基本信号激励。</p>
-<p><strong>功能点整理：</strong> 功能点整理，即需要根据规范手册（spec）列出DUT的基本功能，并对其进行明确的描述，以及如何对该功能点进行测试。功能点整理过程中，需要根据重要性、风险、复杂性等因数对其进行优先级排序。功能点整理还需要对各个功能点进行追踪和状态，如果发现原始功能点有更新需要及时进行对应计划的同步。</p>
+<p><strong>验证计划：</strong> 验证计划描述了如何进行验证，以及如何保证验证质量，达到功能验证要求。在文档结构上通常包含验证目标，验证策略、验证环境、验证项、验证过程、风险防范、资源及时间表、结果和报告等部分。验证目标明确需要验证的功能或性能指标，这些目标应该直接从芯片的规范文档中提取。验证策略描述如何进行验证，包括可能使用的验证方法，例如仿真、形式化、FPGA加速等，以及如何组织验证任务。验证环境用于描述具体的测试环境，例如验证工具类型，版本号等。验证项包含了需要验证的具体项以及预期结果。验证计划可以有总计划，也可以针对具体验证的子任务进行编写。</p>
+<p><strong>平台搭建：</strong> 验证平台是具体验证任务的执行环境，同一类验证任务可以使用相同的验证平台。验证平台的搭建是验证流程中的关键步骤、具体包含验证工具选择（例如是采用软件仿真，还是采用形式化验证，或者硬件加速）、环境配置（例如配置服务器环境，FPGA环境）、创建测试环境、基本测试案例等。创建好基本测试平台，跑通基本测试案例，也通常称为“冒烟测试”。后继具体的测试代码，都将基于该测试平台进行，因此测试平台需要具有可重用性。验证平台通常包含测试框架和被测试代码，以及对应的基本信号激励。</p>
+<p><strong>功能点整理：</strong> 根据规范手册（spec）列出DUT的基本功能，并对其进行明确的描述，以及如何对该功能点进行测试。功能点整理过程中，需要根据重要性、风险、复杂性等因数对其进行优先级排序。功能点整理还需要对各个功能点进行追踪和状态，如果发现原始功能点有更新需要及时进行对应计划的同步。</p>
 <p><strong>测试用例：</strong> 测试用例是指一组条件或变量，用于确定DUT是否满足特定需求并能正确运行。每个测试用例通常包含测试条件，输入数据，预期结果，实际结果和测试结果。通过运行测试用例并比较预期结果和实际结果，可以确定系统或应用是否正确实现了特定的功能或需求。在芯片验证中，测试用例是用来验证芯片设计是否满足规格要求的重要工具。</p>
-<p><strong>编码实现：</strong> 编码实现即对测试用例的具体执行过程，包括测试数据生成、测试框架选择、编程语言选择、参考模型编写等。编码实现是对功能点和测试用例充分理解后工作，如果理解不到位，可能导致DUT无法驱动，不能发现潜在bug等问题。</p>
-<p><strong>收集bug/覆盖率：</strong> 验证的目标就是提前发现设计中存在的bug，因此需要对发现的bug进行收集和管理。没发现一个新缺陷，需要给定唯一标号，并同设计工程师进行bug定级，然后进行状态追踪。能发现bug最好，但在实际验证中不是每次测试都能发现bug，因此需要另外一个指标评价验证是否到位。该指标通常采用覆盖率，当覆盖率超过一点阈值（例如代码覆盖率大于90%）后方可任务进行了充分验证。</p>
+<p><strong>编码实现：</strong> 编码实现即测试用例的具体执行过程，包括测试数据生成、测试框架选择、编程语言选择、参考模型编写等。编码实现是对功能点和测试用例充分理解后工作，如果理解不到位，可能导致DUT无法驱动，不能发现潜在bug等问题。</p>
+<p><strong>收集bug/覆盖率：</strong> 验证的目标就是提前发现设计中存在的bug，因此需要对发现的bug进行收集和管理。每发现一个新缺陷，需要给定唯一标号，并同设计工程师进行bug定级，然后进行状态追踪。能发现bug最好，但在实际验证中不是每次测试都能发现bug，因此需要另外一个指标评价验证是否到位。该指标通常采用覆盖率，当覆盖率超过一点阈值（例如代码覆盖率大于90%）后方可任务进行了充分验证。</p>
 <p><strong>回归测试：</strong> 验证和设计是一个相互迭代的过程，因此当验证出bug后，需要设计进行修正，且需要保证修正后的DUT仍然能正常工作。这种测试的目的是捕获可能由于修改而引入的新错误，或者重新激活旧错误。回归测试可以是全面的，也就是说，它涵盖了所有的功能，或者可以是选择性的，只针对某些特定的功能或系统部分。</p>
 <p><strong>测试报告：</strong> 测试报告是对整个验证过程的总结，它提供了关于测试活动的全面视图，包括测试的目标、执行的测试用例、发现的问题和缺陷、测试覆盖率和测试效率等。</p>
 </blockquote></p>
@@ -409,7 +441,7 @@
 
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 July 10, 2024: <a href="https://github.com/XS-MLVP/course/commit/a02fa3c6859ec59049db60aa9be1c86d1d155302">fix picker usage (a02fa3c)</a>
+  最后修改 August 20, 2024: <a href="https://github.com/XS-MLVP/course/commit/82e368a4f4624c560044effc1cd7d1004c7dca4f">Update Case 4 (82e368a)</a>
 </div>
 
 </div>
@@ -466,7 +498,7 @@
     </div>
     
   <script src="/mlvp/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
-<script defer src="/mlvp/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 
   </body>

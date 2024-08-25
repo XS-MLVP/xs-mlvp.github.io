@@ -24,10 +24,10 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/en/docs/multi-lang/java/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-07-10T14:25:46+08:00" />
+<meta property="article:modified_time" content="2024-08-20T22:51:47+08:00" />
 <meta itemprop="name" content="Using Java ...">
 <meta itemprop="description" content="Encapsulate the DUT hardware runtime environment with Java and package it as a jar file.">
-<meta itemprop="dateModified" content="2024-07-10T14:25:46+08:00" />
+<meta itemprop="dateModified" content="2024-08-20T22:51:47+08:00" />
 <meta itemprop="wordCount" content="22">
 <meta itemprop="keywords" content="docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Using Java ..."/>
 <meta name="twitter:description" content="Encapsulate the DUT hardware runtime environment with Java and package it as a jar file."/>
@@ -46,6 +46,7 @@
   src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/mlvp/css/prism.css"/>
 
     <script>
         var _hmt = _hmt || [];
@@ -66,7 +67,47 @@
         gtag('config', 'G-4Z2ZY6ZE84');
     </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
 
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
   </head>
   <body class="td-page">
     <header>
@@ -94,7 +135,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -118,7 +159,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -295,7 +336,7 @@
 	<p>Currently, Picker supports C++/Python. Other languages such as Java, Golang, Javascript, Scala, etc., will be supported after the Python interface is stabilized.</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  Last modified July 10, 2024: <a href="https://github.com/XS-MLVP/course/commit/a02fa3c6859ec59049db60aa9be1c86d1d155302">fix picker usage (a02fa3c)</a>
+  Last modified August 20, 2024: <a href="https://github.com/XS-MLVP/course/commit/82e368a4f4624c560044effc1cd7d1004c7dca4f">Update Case 4 (82e368a)</a>
 </div>
 
 </div>
@@ -352,7 +393,7 @@
     </div>
     
   <script src="/mlvp/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
-<script defer src="/mlvp/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 
   </body>

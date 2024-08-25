@@ -43,6 +43,7 @@
   src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/mlvp/css/prism.css"/>
 
     <script>
         var _hmt = _hmt || [];
@@ -63,7 +64,47 @@
         gtag('config', 'G-4Z2ZY6ZE84');
     </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
 
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
   </head>
   <body class="td-section">
     <header>
@@ -91,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -234,12 +275,12 @@
 <p>芯片设计和验证的耦合关系如上图所示，设计和验证有同样的输入，即规范文档（specification）。参考规范，设计与验证人员双方按照各自的理解，以及各自的需求进行独立编码实现。设计方需要满足的前提是编码的RTL代码“可综合”，需要考虑电路特性，而验证方一般只要考虑功能是否满足要求，编码限制少。双方完成模块开发后，需要进行健全性对比测试（Sanity Test），判定功能是否表现一致，若不一致需要进行协同排查，确定问题所在并进行修复，再进行对比测试，直到所有功能点都满足预期。由于芯片设计和芯片验证耦合度很高，因此有些企业在研发队伍上也进行了直接耦合，为每个子模块的设计团队都配置了对应的验证团队（DV）。上图中的设计与验证的耦合流程为粗粒度的关系，具体到具体芯片（例如Soc、DDR）、具体企业等都有其适合自身的合作模式。</p>
 <p>在上述对比测试中，设计方的产出的模块通常称为DUT（Design Under Test），验证方开发的模型通常称为RM（Reference Model）。针对图中的验证工作，按照流程可以有：编写验证计划、创建验证平台、整理功能点、构建测试用例、运行调试、收集Bug/覆盖率、回归测试、编写测试报告等多个阶段。</p>
 <blockquote><p>
-<p><strong>验证计划：</strong> 验证计划描述了如何进行验证，以及如何保证验证质量，达到功能验证要求。在文档结构上通常包含验证目标，验证策略、验证环境、验证项、验证过程、风险防范、资源及时间表、结果和报告等部分。验证目标明确需要验证的功能或性能指标，这些目标应该直接从芯片的规范文档中提取。验证策略描述如何进行验证，包括可能使用的验证方法，例如仿真、形式化、FPGA加速等，以及如何组织验证任务。验证环境用于描述具体的测试环境，例如验证工具类型，版本号等。验证项库俄超关羽需要验证的具体项以及预期结果。验证计划可以有总计划，也可以针对具体验证的子任务进行编写。</p>
-<p><strong>平台搭建：</strong> 验证平台是具体验证任务的执行环境，同一类验证任务可以使用相同的验证平台。验证平台的搭建是验证流程中的关键步骤、具体包含验证工具选择（例如是采用软件仿真，还是采用形式化验证，或者硬件加速）、环境配置（例如配置服务器环境，FPGA环境）、创建测试环境、基本测试案例等。创建好基本测试平台，跑通基本测试案例，也通常称为“冒烟测试”。后继具体的测试代码，都将基于该测试平台进行，因此测试平台需要具有可重用性。验证平台通过包含测试框架和被测试代码，以及对应的基本信号激励。</p>
-<p><strong>功能点整理：</strong> 功能点整理，即需要根据规范手册（spec）列出DUT的基本功能，并对其进行明确的描述，以及如何对该功能点进行测试。功能点整理过程中，需要根据重要性、风险、复杂性等因数对其进行优先级排序。功能点整理还需要对各个功能点进行追踪和状态，如果发现原始功能点有更新需要及时进行对应计划的同步。</p>
+<p><strong>验证计划：</strong> 验证计划描述了如何进行验证，以及如何保证验证质量，达到功能验证要求。在文档结构上通常包含验证目标，验证策略、验证环境、验证项、验证过程、风险防范、资源及时间表、结果和报告等部分。验证目标明确需要验证的功能或性能指标，这些目标应该直接从芯片的规范文档中提取。验证策略描述如何进行验证，包括可能使用的验证方法，例如仿真、形式化、FPGA加速等，以及如何组织验证任务。验证环境用于描述具体的测试环境，例如验证工具类型，版本号等。验证项包含了需要验证的具体项以及预期结果。验证计划可以有总计划，也可以针对具体验证的子任务进行编写。</p>
+<p><strong>平台搭建：</strong> 验证平台是具体验证任务的执行环境，同一类验证任务可以使用相同的验证平台。验证平台的搭建是验证流程中的关键步骤、具体包含验证工具选择（例如是采用软件仿真，还是采用形式化验证，或者硬件加速）、环境配置（例如配置服务器环境，FPGA环境）、创建测试环境、基本测试案例等。创建好基本测试平台，跑通基本测试案例，也通常称为“冒烟测试”。后继具体的测试代码，都将基于该测试平台进行，因此测试平台需要具有可重用性。验证平台通常包含测试框架和被测试代码，以及对应的基本信号激励。</p>
+<p><strong>功能点整理：</strong> 根据规范手册（spec）列出DUT的基本功能，并对其进行明确的描述，以及如何对该功能点进行测试。功能点整理过程中，需要根据重要性、风险、复杂性等因数对其进行优先级排序。功能点整理还需要对各个功能点进行追踪和状态，如果发现原始功能点有更新需要及时进行对应计划的同步。</p>
 <p><strong>测试用例：</strong> 测试用例是指一组条件或变量，用于确定DUT是否满足特定需求并能正确运行。每个测试用例通常包含测试条件，输入数据，预期结果，实际结果和测试结果。通过运行测试用例并比较预期结果和实际结果，可以确定系统或应用是否正确实现了特定的功能或需求。在芯片验证中，测试用例是用来验证芯片设计是否满足规格要求的重要工具。</p>
-<p><strong>编码实现：</strong> 编码实现即对测试用例的具体执行过程，包括测试数据生成、测试框架选择、编程语言选择、参考模型编写等。编码实现是对功能点和测试用例充分理解后工作，如果理解不到位，可能导致DUT无法驱动，不能发现潜在bug等问题。</p>
-<p><strong>收集bug/覆盖率：</strong> 验证的目标就是提前发现设计中存在的bug，因此需要对发现的bug进行收集和管理。没发现一个新缺陷，需要给定唯一标号，并同设计工程师进行bug定级，然后进行状态追踪。能发现bug最好，但在实际验证中不是每次测试都能发现bug，因此需要另外一个指标评价验证是否到位。该指标通常采用覆盖率，当覆盖率超过一点阈值（例如代码覆盖率大于90%）后方可任务进行了充分验证。</p>
+<p><strong>编码实现：</strong> 编码实现即测试用例的具体执行过程，包括测试数据生成、测试框架选择、编程语言选择、参考模型编写等。编码实现是对功能点和测试用例充分理解后工作，如果理解不到位，可能导致DUT无法驱动，不能发现潜在bug等问题。</p>
+<p><strong>收集bug/覆盖率：</strong> 验证的目标就是提前发现设计中存在的bug，因此需要对发现的bug进行收集和管理。每发现一个新缺陷，需要给定唯一标号，并同设计工程师进行bug定级，然后进行状态追踪。能发现bug最好，但在实际验证中不是每次测试都能发现bug，因此需要另外一个指标评价验证是否到位。该指标通常采用覆盖率，当覆盖率超过一点阈值（例如代码覆盖率大于90%）后方可任务进行了充分验证。</p>
 <p><strong>回归测试：</strong> 验证和设计是一个相互迭代的过程，因此当验证出bug后，需要设计进行修正，且需要保证修正后的DUT仍然能正常工作。这种测试的目的是捕获可能由于修改而引入的新错误，或者重新激活旧错误。回归测试可以是全面的，也就是说，它涵盖了所有的功能，或者可以是选择性的，只针对某些特定的功能或系统部分。</p>
 <p><strong>测试报告：</strong> 测试报告是对整个验证过程的总结，它提供了关于测试活动的全面视图，包括测试的目标、执行的测试用例、发现的问题和缺陷、测试覆盖率和测试效率等。</p>
 </blockquote></p>
@@ -780,7 +821,7 @@
     </div>
     
   <script src="/mlvp/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
-<script defer src="/mlvp/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 
   </body>

@@ -24,11 +24,11 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/quick-start/installer/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-07-10T14:25:46+08:00" />
+<meta property="article:modified_time" content="2024-08-20T22:51:47+08:00" />
 <meta itemprop="name" content="搭建验证环境">
 <meta itemprop="description" content="安装相关依赖，**下载、构建并安装**对应的工具。">
-<meta itemprop="dateModified" content="2024-07-10T14:25:46+08:00" />
-<meta itemprop="wordCount" content="481">
+<meta itemprop="dateModified" content="2024-08-20T22:51:47+08:00" />
+<meta itemprop="wordCount" content="523">
 <meta itemprop="keywords" content="docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="搭建验证环境"/>
 <meta name="twitter:description" content="安装相关依赖，**下载、构建并安装**对应的工具。"/>
 
@@ -46,6 +46,7 @@
   src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
   integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
   crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/mlvp/css/prism.css"/>
 
     <script>
         var _hmt = _hmt || [];
@@ -66,7 +67,47 @@
         gtag('config', 'G-4Z2ZY6ZE84');
     </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
 
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
   </head>
   <body class="td-page">
     <header>
@@ -94,7 +135,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -118,7 +159,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2bd03f0a0dcad247f6bab88675a76766.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -145,16 +186,20 @@
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsquick-startinstaller-li">
   <a href="/mlvp/docs/quick-start/installer/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startinstaller"><span class="td-sidebar-nav-active-item">搭建验证环境</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-adder-li">
-  <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：加法器</span></a>
+  <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：简单加法器</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-rmg-li">
   <a href="/mlvp/docs/quick-start/eg-rmg/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-rmg"><span class="">案例二：随机数生成器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-callback-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-callback"><span class="">案例三：双端口栈（回调）</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-async-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-async"><span class="">案例四：双端口栈（协程）</span></a>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usage-li">
-  <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">环境使用</span></a>
+  <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">基础工具</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagepicker_usage-li">
-  <a href="/mlvp/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagepicker_usage"><span class="">基础使用</span></a>
+  <a href="/mlvp/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagepicker_usage"><span class="">工具介绍</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagewave-li">
   <a href="/mlvp/docs/env_usage/wave/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagewave"><span class="">波形生成</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemultifile-li">
@@ -185,19 +230,6 @@
   <a href="/mlvp/docs/basic/test_dut/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasictest_dut"><span class="">DUT验证</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasicreport-li">
   <a href="/mlvp/docs/basic/report/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicreport"><span class="">验证报告</span></a>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsadvance_func-li">
-  <a href="/mlvp/docs/advance_func/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsadvance_func"><span class="">高级教程</span></a>
-  <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funccallback-li">
-  <a href="/mlvp/docs/advance_func/callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funccallback"><span class="">回调函数</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funcasync-li">
-  <a href="/mlvp/docs/advance_func/async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funcasync"><span class="">异步编程</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funcmessage-li">
-  <a href="/mlvp/docs/advance_func/message/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funcmessage"><span class="">消息驱动</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_funcmlvp-li">
-  <a href="/mlvp/docs/advance_func/mlvp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_funcmlvp"><span class="">验证框架</span></a>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsadvance_case-li">
@@ -247,6 +279,7 @@
         <li><a href="#下载源码">下载源码</a></li>
         <li><a href="#构建并安装">构建并安装</a></li>
         <li><a href="#安装测试">安装测试</a></li>
+        <li><a href="#安装检测">安装检测</a></li>
         <li><a href="#功能测试">功能测试</a></li>
       </ul>
     </li>
@@ -257,16 +290,16 @@
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Tag Cloud</h5>
       <ul class="taxonomy-terms">
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">27</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">20</span></a></li>
         </ul>
     </div>
   <div class="taxonomy taxonomy-terms-cloud taxo-categories">
       <h5 class="taxonomy-title">Categories</h5>
       <ul class="taxonomy-terms">
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99/" data-taxonomy-term="%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99"><span class="taxonomy-label">学习材料</span><span class="taxonomy-count">3</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">24</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">20</span></a></li>
         </ul>
     </div>
   
@@ -324,52 +357,60 @@
 </span></span><span style="display:flex;"><span>make init
 </span></span></code></pre></div><h3 id="构建并安装">构建并安装</h3>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker
-</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">BUILD_XSPCOMM_SWIG</span><span style="color:#ce5c00;font-weight:bold">=</span>python <span style="color:#8f5902;font-style:italic"># 通过BUILD_XSPCOMM_SWIG指定支持语言</span>
 </span></span><span style="display:flex;"><span>make
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 可通过 make BUILD_XSPCOMM_SWIG=python,java,scala,golang 开启其他语言支持。</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 各语言需要自己的开发环境，需要自行配置，例如javac等</span>
 </span></span><span style="display:flex;"><span>sudo -E make install
 </span></span></code></pre></div><blockquote>
-<p>默认的安装的目标路径是 <code>/usr/local</code>， 二进制文件被置于 <code>/usr/local/bin</code>，模板文件被置于 <code>/usr/local/share/picker</code>。
-安装时会自动安装 <code>xspcomm</code> 基础库，该基础库是用于封装 <code>RTL</code> 模块的基础类型，位于 <code>/usr/local/lib/libxspcomm.so</code>。 <strong>可能需要手动设置编译时的链接目录参数(-L)</strong>
-同时如果开启了python支持，还会安装 <code>xspcomm</code> 的python包，位于 <code>/usr/local/share/picker/python/xspcomm/</code>。
-为了后续生成测试覆盖率html文件，还需要安装lcov(genhtml)。直接使用apt-get安装即可。</p>
+<p>默认的安装的目标路径是 /usr/local， 二进制文件被置于 /usr/local/bin，模板文件被置于 /usr/local/share/picker。
+安装时会自动安装 xspcomm基础库（https://github.com/XS-MLVP/xcomm），该基础库是用于封装 RTL 模块的基础类型，位于 /usr/local/lib/libxspcomm.so。 可能需要手动设置编译时的链接目录参数(-L)
+如果开启了Java等语言支持，还会安装 xspcomm 对应的多语言软件包。</p>
 </blockquote>
 <h3 id="安装测试">安装测试</h3>
 <p>执行命令并检查输出：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>➜  picker git:<span style="color:#ce5c00;font-weight:bold">(</span>master<span style="color:#ce5c00;font-weight:bold">)</span> picker <span style="color:#204a87">export</span>
-</span></span><span style="display:flex;"><span>Export RTL Projects Sources as Software libraries such as C++/Python
-</span></span><span style="display:flex;"><span>Usage: picker <span style="color:#204a87">export</span> <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file
+<blockquote>
+<p>picker export &ndash;help</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Export RTL Projects Sources as Software libraries such as C++/Python Usage: picker
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Positionals:
 </span></span><span style="display:flex;"><span>  file TEXT REQUIRED          DUT .v/.sv <span style="color:#204a87">source</span> file, contain the top module
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Options:
 </span></span><span style="display:flex;"><span>  -h,--help                   Print this <span style="color:#204a87">help</span> message and <span style="color:#204a87">exit</span>
-</span></span><span style="display:flex;"><span>  --fs,--filelist TEXT        DUT .v/.sv <span style="color:#204a87">source</span> files, contain the top module, split by comma.
-</span></span><span style="display:flex;"><span>                              Or use <span style="color:#4e9a06">&#39;*.txt&#39;</span> file  with one RTL file path per line to specify the file list
+</span></span><span style="display:flex;"><span>  --fs,--filelist TEXT        DUT .v/.sv <span style="color:#204a87">source</span> files, contain the top module, 
+</span></span><span style="display:flex;"><span>                              split by comma. Or use <span style="color:#4e9a06">&#39;*.txt&#39;</span> file  with one RTL 
+</span></span><span style="display:flex;"><span>                              file path per line to specify the file list
 </span></span><span style="display:flex;"><span>  --sim TEXT <span style="color:#ce5c00;font-weight:bold">[</span>verilator<span style="color:#ce5c00;font-weight:bold">]</span>      vcs or verilator as simulator, default is verilator
-</span></span><span style="display:flex;"><span>  --lang,--language TEXT <span style="color:#ce5c00;font-weight:bold">[</span>python<span style="color:#ce5c00;font-weight:bold">]</span>
-</span></span><span style="display:flex;"><span>                              Build example project, default is python, choose cpp, java or python
-</span></span><span style="display:flex;"><span>  --sdir,--source_dir TEXT <span style="color:#ce5c00;font-weight:bold">[</span>/usr/local/share/picker/template<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>  --lang,--language TEXT:<span style="color:#ce5c00;font-weight:bold">{</span>python,cpp,java,scala,golang<span style="color:#ce5c00;font-weight:bold">}</span> <span style="color:#ce5c00;font-weight:bold">[</span>python<span style="color:#ce5c00;font-weight:bold">]</span> 
+</span></span><span style="display:flex;"><span>                              Build example project, default is python, choose 
+</span></span><span style="display:flex;"><span>                              cpp, java or python
+</span></span><span style="display:flex;"><span>  --sdir,--source_dir TEXT <span style="color:#ce5c00;font-weight:bold">[</span>/usr/local/share/picker/template<span style="color:#ce5c00;font-weight:bold">]</span> 
 </span></span><span style="display:flex;"><span>                              Template Files Dir, default is <span style="color:#4e9a06">${</span><span style="color:#000">picker_install_path</span><span style="color:#4e9a06">}</span>/../picker/template
-</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT <span style="color:#ce5c00;font-weight:bold">[</span>./picker_out<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT <span style="color:#ce5c00;font-weight:bold">[</span>./picker_out<span style="color:#ce5c00;font-weight:bold">]</span> 
 </span></span><span style="display:flex;"><span>                              Codegen render files to target dir, default is ./picker_out
 </span></span><span style="display:flex;"><span>  --sname,--source_module_name TEXT
-</span></span><span style="display:flex;"><span>                              Pick the module in DUT .v file, default is the last module in the -f marked file
+</span></span><span style="display:flex;"><span>                              Pick the module in DUT .v file, default is the last 
+</span></span><span style="display:flex;"><span>                              module in the --fs marked file
 </span></span><span style="display:flex;"><span>  --tname,--target_module_name TEXT
-</span></span><span style="display:flex;"><span>                              Set the module name and file name of target DUT, default is the same as source. For example, -T top, will generate UTtop.cpp and UTtop.hpp with UTtop class
-</span></span><span style="display:flex;"><span>  --internal TEXT             Exported internal signal config file, default is empty, means no internal pin
-</span></span><span style="display:flex;"><span>  -F,--frequency TEXT <span style="color:#ce5c00;font-weight:bold">[</span>100MHz<span style="color:#ce5c00;font-weight:bold">]</span>
-</span></span><span style="display:flex;"><span>                              Set the frequency of the **only VCS** DUT, default is 100MHz, use Hz, KHz, MHz, GHz as unit
+</span></span><span style="display:flex;"><span>                              Set the module name and file name of target DUT, 
+</span></span><span style="display:flex;"><span>                              default is the same as source. For example, --tname top, 
+</span></span><span style="display:flex;"><span>                              will generate UTtop.cpp and UTtop.hpp with UTtop class
+</span></span><span style="display:flex;"><span>  --internal TEXT             Exported internal signal config file, default is empty, 
+</span></span><span style="display:flex;"><span>                              means no internal pin
+</span></span><span style="display:flex;"><span>  -F,--frequency TEXT <span style="color:#ce5c00;font-weight:bold">[</span>100MHz<span style="color:#ce5c00;font-weight:bold">]</span> 
+</span></span><span style="display:flex;"><span>                              Set the frequency of the **only VCS** DUT, default 
+</span></span><span style="display:flex;"><span>                              is 100MHz, use Hz, KHz, MHz, GHz as unit
 </span></span><span style="display:flex;"><span>  -w,--wave_file_name TEXT    Wave file name, emtpy mean don<span style="color:#4e9a06">&#39;t dump wave
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -c,--coverage               Enable coverage, default is not selected as OFF
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -V,--vflag TEXT             User defined simulator compile args, passthrough. Eg: &#39;</span>-v -x-assign<span style="color:#ce5c00;font-weight:bold">=</span>fast -Wall --trace<span style="color:#4e9a06">&#39; || &#39;</span>-C vcs -cc -f filelist.f<span style="color:#4e9a06">&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. Eg:&#39;</span>-O3 -std<span style="color:#ce5c00;font-weight:bold">=</span>c++17 -I./include<span style="color:#a40000">&#39;</span>
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -V,--vflag TEXT             User defined simulator compile args, passthrough. 
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                              Eg: &#39;</span>-v -x-assign<span style="color:#ce5c00;font-weight:bold">=</span>fast -Wall --trace<span style="color:#4e9a06">&#39; || &#39;</span>-C vcs -cc -f filelist.f<span style="color:#4e9a06">&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. 
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                              Eg:&#39;</span>-O3 -std<span style="color:#ce5c00;font-weight:bold">=</span>c++17 -I./include<span style="color:#a40000">&#39;</span>
 </span></span><span style="display:flex;"><span>  --verbose                   Verbose mode
 </span></span><span style="display:flex;"><span>  -e,--example                Build example project, default is OFF
-</span></span><span style="display:flex;"><span>  --autobuild <span style="color:#ce5c00;font-weight:bold">[</span>1<span style="color:#ce5c00;font-weight:bold">]</span>             Auto build the generated project, default is <span style="color:#204a87">true</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>file is required
-</span></span><span style="display:flex;"><span>Run with --help <span style="color:#204a87;font-weight:bold">for</span> more information.
+</span></span><span style="display:flex;"><span>  --autobuild BOOLEAN <span style="color:#ce5c00;font-weight:bold">[</span>1<span style="color:#ce5c00;font-weight:bold">]</span>     Auto build the generated project, default is <span style="color:#204a87">true</span>
 </span></span></code></pre></div><h4 id="参数解释">参数解释</h4>
 <ul>
 <li><code>[file]</code>: 必需。DUT 的 Verilog 或 SystemVerilog 源文件，包含顶层模块</li>
@@ -391,7 +432,20 @@
 <li><code>--autobuild</code>: 可选。自动构建生成的项目，默认是true。</li>
 <li><code>--help, -h</code>: 可选。打印使用帮助。</li>
 </ul>
-<h3 id="功能测试">功能测试</h3>
+<h3 id="安装检测">安装检测</h3>
+<p>可以通过--check参数进行picker的安装检测，输出能够支持的编程语言，以及对于的依赖库位置。</p>
+<blockquote>
+<p>picker --check</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Version: 0.1.0-develop-e3b38d5
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Exec path: /usr/local/bin/picker
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Template path: /usr/local/share/picker/template
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support    Cpp <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/picker/include&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support   Java <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/picker/java/xspcomm-java.jar&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>Err<span style="color:#ce5c00;font-weight:bold">]</span> Support  Scala <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;scala/xspcomm-scala.jar&#39;</span> fail<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Python <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/picker/python&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Golang <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/picker/golang&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span></code></pre></div><h3 id="功能测试">功能测试</h3>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker <span style="color:#8f5902;font-style:italic"># 进入项目根目录，即git clone的目录</span>
 </span></span><span style="display:flex;"><span>bash example/Adder/release-verilator.sh --lang cpp
 </span></span></code></pre></div><p>程序应当输出<strong>类似</strong>的内容，表示安装成功：</p>
@@ -404,7 +458,7 @@
 </span></span></code></pre></div><p>至此，picker工具安装完成。</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 July 10, 2024: <a href="https://github.com/XS-MLVP/course/commit/a02fa3c6859ec59049db60aa9be1c86d1d155302">fix picker usage (a02fa3c)</a>
+  最后修改 August 20, 2024: <a href="https://github.com/XS-MLVP/course/commit/82e368a4f4624c560044effc1cd7d1004c7dca4f">Update Case 4 (82e368a)</a>
 </div>
 
 </div>
@@ -461,7 +515,7 @@
     </div>
     
   <script src="/mlvp/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
-<script defer src="/mlvp/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 
   </body>
