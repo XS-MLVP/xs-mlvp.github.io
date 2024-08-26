@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.7a38474bc9dd429d125a472297d83139.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.977b9b7b89d5fbb5059fe77bf310df20.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -179,7 +179,7 @@
     
     
 	
-<li>1: <a href="#pg-cd5f02d8062ce0e1861c417988fc8c9e">使用 C&#43;&#43;</a></li>
+<li>1: <a href="#pg-53c158edebe1befb67901d2b20c2f954">验证接口</a></li>
 
 
     
@@ -187,7 +187,7 @@
     
     
 	
-<li>2: <a href="#pg-28fd3cc543c8fa74cf9e1aa32666d139">使用 Java ...</a></li>
+<li>2: <a href="#pg-dcde3218facaa4b5e9e8e4448cdbff30">验证案例</a></li>
 
 
     
@@ -218,175 +218,59 @@
 
 <div class="td-content" style="">
     
-	<h1 id="pg-cd5f02d8062ce0e1861c417988fc8c9e">1 - 使用 C&#43;&#43;</h1>
-    <div class="lead">基于C++封装DUT硬件的运行环境，并编译为动态库。</div>
-	<h2 id="原理介绍">原理介绍</h2>
-<h3 id="基础库">基础库</h3>
-<p>在本章节中，我们将介绍如何使用Picker将RTL代码编译为C++ Class，并编译为动态库。</p>
-<ol>
-<li>
-<p>首先，Picker工具会解析RTL代码，根据指定的 Top Module ，创建一个新的 Module 封装该模块的<strong>输入输出端口</strong>，并导出<code>DPI/API</code>以操作输入端口、读取输出端口。</p>
-<blockquote>
-<p><em>工具通过指定Top Module所在的文件和 Module Name来确定需要封装的模块。此时可以将 Top 理解为软件编程中的main。</em></p>
-</blockquote>
-</li>
-<li>
-<p>其次，Picker工具会使用指定的 <strong>仿真器</strong> 编译RTL代码，并生成一个<strong>DPI库文件</strong>。该库文件内包含模拟运行RTL代码所需要的逻辑（即为<strong>硬件模拟器</strong>）。</p>
-<blockquote>
-<p><em>对于VCS，该库文件为.so（动态库）文件，对于Verilator，该库文件为.a（静态库）文件。</em>
-<em>DPI的含义是 <a href="https://www.chipverify.com/systemverilog/systemverilog-dpi">Direct Programming Interface</a>，可以理解为一种API规范。</em></p>
-</blockquote>
-</li>
-<li>
-<p>接下来，Picker工具会根据配置参数，渲染源代码中定义的基类，生成用于对接仿真器并<strong>隐藏仿真器细节</strong>的基类（wrapper）。然后链接基类与DPI库文件，生成一个 <strong>UT动态库文件</strong>。</p>
-<blockquote>
-<ul>
-<li><em>此时，该<strong>UT库文件</strong>使用了Picker工具模板中提供的统一API，相比于<strong>DPI库文件</strong>中与仿真器强相关的API，UT库文件为仿真器生成的硬件模拟器，提供了<strong>统一的API接口</strong>。</em></li>
-<li><em>截至这一步生成<strong>UT库文件</strong>在不同语言中是<strong>通用</strong>的！如果没有另行说明，其他高级语言均会通过<strong>调用UT动态库</strong>以实现对硬件模拟器的操作。</em></li>
-</ul>
-</blockquote>
-</li>
-<li>
-<p>最后，Picker工具会根据配置参数和解析的RTL代码，生成一段 <strong>C++ Class</strong> 的源码。这段源码即是 RTL 硬件模块在软件中的<strong>定义 (.hpp)</strong> 及<strong>实现 (.cpp)</strong> 。实例化该类即相当于创建了一个硬件模块。</p>
-<blockquote>
-<p><em>该类继承自<strong>基类</strong>，并实现了基类中的纯虚函数，以用软件方式实例化硬件。</em>
-<em>不将<strong>类的实现</strong>这一步也封装进动态库的原因有两点：</em></p>
-<ol>
-<li><em>由于<strong>UT库文件</strong>需要在不同语言中<strong>通用</strong>，而不同语言实现类的方式不同。为了通用性，不将<code>类的实现</code>封装进动态库。</em></li>
-<li><em>为了<strong>便于调试</strong>，提升代码可读性，方便用户进行二次封装和修改。</em></li>
-</ol>
-</blockquote>
-</li>
-</ol>
-<h3 id="生成可执行文件">生成可执行文件</h3>
-<p>在本章节中，我们将介绍如何基于上一章节生成的基础库（包含动态库，类的声明及定义），编写测试用例，生成可执行文件。</p>
-<ol>
-<li>
-<p>首先，用户需要编写测试用例，即实例化上一章节生成的类，并调用类中的方法，以实现对硬件模块的操作。
-详情可以参考<a href="docs/quick-start/examples/rmg/#%E9%85%8D%E7%BD%AE%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81">随机数生成器验证-配置测试代码</a>中实例化及初始化的过程。</p>
-</li>
-<li>
-<p>其次，用户需要根据基础库所应用的<strong>不同仿真器</strong>，应用不同的链接参数以生成可执行文件。对应的参数在<code>template/cpp/cmake/*.cmake</code>中有定义。</p>
-</li>
-<li>
-<p>最终根据配置的链接参数，编译器会链接基础库，生成可执行文件。</p>
-<blockquote>
-<p>以 <a href="docs/quick-start/examples/adder/#%E5%B0%86rtl%E6%9E%84%E5%BB%BA%E4%B8%BAc-class">加法器验证</a> 为例，<code>picker_out_adder/cpp/cmake/*.cmake</code>即是上述表项2所述模板的拷贝。
-<code>vcs.cmake</code>定义了使用VCS仿真器生成的基础库的链接参数，<code>verilator.cmake</code>定义了使用Verilator仿真器生成的基础库的链接参数。</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="使用方案">使用方案</h2>
-<ul>
-<li>参数 <code>--language cpp</code> 或 <code>-l cpp</code> 用于指定生成C++基础库。</li>
-<li>参数 <code>-e</code> 用于生成包含示例项目的可执行文件。</li>
-<li>参数 <code>-v</code> 用于保留生成项目时的中间文件。</li>
-</ul>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#include</span> <span style="color:#8f5902;font-style:italic">&#34;UT_Adder.hpp&#34;</span><span style="color:#8f5902;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int64_t</span> <span style="color:#000">random_int64</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#000">std</span><span style="color:#ce5c00;font-weight:bold">::</span><span style="color:#000">random_device</span> <span style="color:#000">rd</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#000">std</span><span style="color:#ce5c00;font-weight:bold">::</span><span style="color:#000">mt19937_64</span> <span style="color:#000">generator</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">rd</span><span style="color:#000;font-weight:bold">());</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#000">std</span><span style="color:#ce5c00;font-weight:bold">::</span><span style="color:#000">uniform_int_distribution</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int64_t</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">distribution</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">INT64_MIN</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>                                                            <span style="color:#000">INT64_MAX</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">distribution</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">generator</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#if defined(USE_VCS)
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">UTAdder</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">UTAdder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;libDPIAdder.so&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#elif defined(USE_VERILATOR)
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">UTAdder</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">UTAdder</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#endif
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#8f5902;font-style:italic">// dut-&gt;initClock(dut-&gt;clock);
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Initialized UTAdder</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000">input_t</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000">output_t</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">sum</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">cout</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#0000cf;font-weight:bold">114514</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">c</span><span style="color:#ce5c00;font-weight:bold">++</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">input_t</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">output_t</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">random_int64</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">random_int64</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">random_int64</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">auto</span> <span style="color:#000">dut_cal</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000;font-weight:bold">]()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">a</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">b</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">cin</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span>  <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">uint64_t</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">uint64_t</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">auto</span> <span style="color:#000">ref_cal</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000;font-weight:bold">]()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">bool</span> <span style="color:#000">carry</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">+=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">carry</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">carry</span> <span style="color:#ce5c00;font-weight:bold">||</span> <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span>  <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">sum</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">carry</span> <span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">dut_cal</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">ref_cal</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;[cycle %llu] a=0x%lx, b=0x%lx, cin=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;DUT: sum=0x%lx, cout=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;REF: sum=0x%lx, cout=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">Assert</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;sum mismatch&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">delete</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Test Passed, destory UTAdder</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><h3 id="生成波形">生成波形</h3>
-<p>在C++中，dut 的析构函数会自动调用 <code>dut.finalize()</code>，因此只需要在测试结束后 <code>delete dut</code> 即可进行后处理工作（写入波形、覆盖率等文件）。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#include</span> <span style="color:#8f5902;font-style:italic">&#34;UT_Adder.hpp&#34;</span><span style="color:#8f5902;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">UTAdder</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">UTAdder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;libDPIAdder.so&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Initialized UTAdder</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#0000cf;font-weight:bold">114514</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">c</span><span style="color:#ce5c00;font-weight:bold">++</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">auto</span> <span style="color:#000">dut_cal</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000;font-weight:bold">]()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">a</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">*</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">b</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">/</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">cin</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span>  <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">uint64_t</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">uint64_t</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">dut_cal</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;[cycle %llu] a=0x%lx, b=0x%lx, cin=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;DUT: sum=0x%lx, cout=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">delete</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#8f5902;font-style:italic">// automatically call dut.finalize() in ~UTAdder()
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Simulation finished</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div>
+	<h1 id="pg-53c158edebe1befb67901d2b20c2f954">1 - 验证接口</h1>
+    <div class="lead">DUT文件与编程语言都支持的验证接口</div>
+	<h2 id="生成库文件">生成库文件</h2>
+<p>picker可以通过参数<code>--lang</code>指定转换的对应语言（参数已支持cpp、python、java、scala、golang），由于不同编程语言对应的“库”不同，因此生成的库文件有所区别，例如java生成的是jar包，python生成的为文件夹。picker导出对应编程语言的库，需要xcomm的支持，可以通过<code>picker --check</code>查看支持情况：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000">$picker</span> --check
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Version: 0.9.0---dirty
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Exec path: /home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/bin/picker
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Template path: /home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/share/picker/template
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support    Cpp <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/share/picker/include&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>Err<span style="color:#ce5c00;font-weight:bold">]</span> Support   Java <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;java/xspcomm-java.jar&#39;</span> fail<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>Err<span style="color:#ce5c00;font-weight:bold">]</span> Support  Scala <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;scala/xspcomm-scala.jar&#39;</span> fail<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Python <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/share/picker/python&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>Err<span style="color:#ce5c00;font-weight:bold">]</span> Support Golang <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;golang&#39;</span> fail<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span></code></pre></div><p>输出显示success表示支持，fail表示不支持。</p>
+<h3 id="c">C++</h3>
+<p>对于C++语言，picker生成的为so动态链接库，和对应的头文件。例如：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
+</span></span><span style="display:flex;"><span>├── UT_Adder.cpp       <span style="color:#8f5902;font-style:italic"># DUT 文件</span>
+</span></span><span style="display:flex;"><span>├── UT_Adder.hpp       <span style="color:#8f5902;font-style:italic"># DUT 头文件</span>
+</span></span><span style="display:flex;"><span>├── UT_Adder_dpi.hpp   <span style="color:#8f5902;font-style:italic"># DPI 头文件</span>
+</span></span><span style="display:flex;"><span>├── dut_base.hpp       <span style="color:#8f5902;font-style:italic"># DUT base 头文件</span>
+</span></span><span style="display:flex;"><span>├── libDPIAdder.a      <span style="color:#8f5902;font-style:italic"># DPI 静态库</span>
+</span></span><span style="display:flex;"><span>└── libUTAdder.so      <span style="color:#8f5902;font-style:italic"># DUT 动态库</span>
+</span></span></code></pre></div><p>在使用时，设置好LD路径，然后再测试代码中<code>#include UT_Adder.hpp</code></p>
+<h3 id="python">Python</h3>
+<p>Python语言生成的为目录（Python module以目录的方式表示）</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
+</span></span><span style="display:flex;"><span>├── _UT_Adder.so
+</span></span><span style="display:flex;"><span>├── __init__.py
+</span></span><span style="display:flex;"><span>├── libUTAdder.so
+</span></span><span style="display:flex;"><span>└── libUT_Adder.py
+</span></span></code></pre></div><p>设置PYTHONPATH后，可以在test中<code>import UT_Adder</code></p>
+<h3 id="javascala">Java/scala</h3>
+<p>对于Java和scala基于JVM的编程语言，picker生成的为对应的jar包。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
+</span></span><span style="display:flex;"><span>├── UT_Adder-scala.jar
+</span></span><span style="display:flex;"><span>└── UT_Adder-java.jar
+</span></span></code></pre></div><h3 id="go">go</h3>
+<p>go语言生成的为目录（类似python）。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
+</span></span><span style="display:flex;"><span>└── golang
+</span></span><span style="display:flex;"><span>    └── src
+</span></span><span style="display:flex;"><span>        └── UT_Adder
+</span></span><span style="display:flex;"><span>            ├── UT_Adder.go
+</span></span><span style="display:flex;"><span>            ├── UT_Adder.so
+</span></span><span style="display:flex;"><span>            ├── UT_Adder_Wrapper.go
+</span></span><span style="display:flex;"><span>            ├── go.mod
+</span></span><span style="display:flex;"><span>            └── libUTAdder.so
+</span></span></code></pre></div><p>设置GOPATH后，可直接进行import</p>
+<h2 id="验证接口">验证接口</h2>
+<p>DUT验证接口可以参考连接：<a href="https://github.com/XS-MLVP/picker/blob/master/doc/API.zh.md">https://github.com/XS-MLVP/picker/blob/master/doc/API.zh.md</a></p>
+<p>xspcomm库接口请参考连接：<a href="https://github.com/XS-MLVP/xcomm/blob/master/docs/APIs.cn.md">https://github.com/XS-MLVP/xcomm/blob/master/docs/APIs.cn.md</a></p>
+
 </div>
 
 
@@ -401,9 +285,327 @@
 
 <div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-28fd3cc543c8fa74cf9e1aa32666d139">2 - 使用 Java ...</h1>
-    <div class="lead">基于Java封装DUT硬件的运行环境，并打为jar包</div>
-	<p>目前picker支持C++/Python，其他语言例如 Java、Golang、Javascript，Scala 等在 python 接口稳定后跟进。</p>
+	<h1 id="pg-dcde3218facaa4b5e9e8e4448cdbff30">2 - 验证案例</h1>
+    <div class="lead">多语言案例介绍</div>
+	<p>以Adder为例，各语言的验证代码和注释如下：</p>
+
+<div class="highlight">
+    
+    <div style="background-color: #f0f0f0; display: flex; justify-content: flex-end; gap: 5px; padding-right: 5px">
+        
+            <a name="multi-lang-toggle" style="font-size: 12px;" lang='cpp' href="javascript://">Cpp</a>
+        
+            <a name="multi-lang-toggle" style="font-size: 12px;" lang='java' href="javascript://">Java</a>
+        
+            <a name="multi-lang-toggle" style="font-size: 12px;" lang='scala' href="javascript://">Scala</a>
+        
+            <a name="multi-lang-toggle" style="font-size: 12px;" lang='python' href="javascript://">Python</a>
+        
+            <a name="multi-lang-toggle" style="font-size: 12px;" lang='go' href="javascript://">Go</a>
+        
+    </div>
+    
+
+
+
+
+  
+  
+
+
+<pre name="group-lang-code-cpp" class="language-cpp line-numbers" style="display:true;"><code class="language-cpp">#include "UT_Adder.hpp"
+
+int64_t random_int64()
+{
+    static std::random_device rd;
+    static std::mt19937_64 generator(rd());
+    static std::uniform_int_distribution<int64_t> distribution(INT64_MIN,
+                                                               INT64_MAX);
+    return distribution(generator);
+}
+
+int main()
+{
+    UTAdder *dut = new UTAdder();
+    dut->Step(1);
+    printf("Initialized UTAdder\n");
+
+    struct input_t {
+        uint64_t a;
+        uint64_t b;
+        uint64_t cin;
+    };
+
+    struct output_t {
+        uint64_t sum;
+        uint64_t cout;
+    };
+
+    for (int c = 0; c < 114514; c++) {
+        input_t i;
+        output_t o_dut, o_ref;
+
+        i.a   = random_int64();
+        i.b   = random_int64();
+        i.cin = random_int64() & 1;
+
+        auto dut_cal = [&]() {
+            dut->a   = i.a;
+            dut->b   = i.b;
+            dut->cin = i.cin;
+            dut->Step(1);
+            o_dut.sum  = (uint64_t)dut->sum;
+            o_dut.cout = (uint64_t)dut->cout;
+        };
+
+        auto ref_cal = [&]() {
+            uint64_t sum = i.a + i.b;
+            bool carry   = sum < i.a;
+
+            sum += i.cin;
+            carry = carry || sum < i.cin;
+
+            o_ref.sum  = sum;
+            o_ref.cout = carry ;
+        };
+
+        dut_cal();
+        ref_cal();
+        printf("[cycle %lu] a=0x%lx, b=0x%lx, cin=0x%lx\n", dut->xclock.clk, i.a,
+               i.b, i.cin);
+        printf("DUT: sum=0x%lx, cout=0x%lx\n", o_dut.sum, o_dut.cout);
+        printf("REF: sum=0x%lx, cout=0x%lx\n", o_ref.sum, o_ref.cout);
+        Assert(o_dut.sum == o_ref.sum, "sum mismatch");
+    }
+
+    dut->Finish();
+    printf("Test Passed, destory UTAdder\n");
+    return 0;
+}</code></pre>
+
+
+
+
+
+  
+  
+
+
+<pre name="group-lang-code-java" class="language-java line-numbers" style="display:none;"><code class="language-java">package com.ut;
+
+import java.math.BigInteger;
+
+// import the generated UT class
+import com.ut.UT_Adder;
+
+public class example {
+    static public void main(String[] args){
+        UT_Adder adder = new UT_Adder();
+        for(int i=0; i<10000; i++){
+            int N = 1000000;
+            long a = (long) (Math.random() * N);
+            long b = (long) (Math.random() * N);
+            long c = (long) (Math.random() * N) > 50 ? 1 : 0;
+            // set inputs
+            adder.a.Set(a);
+            adder.b.Set(b);
+            adder.cin.Set(c);
+            // step
+            adder.Step();
+            // reference model
+            long sum = a + b;
+            boolean carry = sum < a ? true : false;
+            sum += c;
+            carry = carry || sum < c;
+            // assert
+            assert adder.sum.U().longValue() == sum : "sum mismatch: " + adder.sum.U() + " != " + sum;
+            assert adder.cout.U().intValue() == (carry ? 1 : 0) : "carry mismatch: " + adder.cout.U() + " != " + carry;
+        }
+        System.out.println("Java tests passed");
+        adder.Finish();
+    }
+}</code></pre>
+
+
+
+
+
+  
+  
+
+
+<pre name="group-lang-code-scala" class="language-scala line-numbers" style="display:none;"><code class="language-scala">package com.ut
+
+import java.lang.Math
+import com.ut.UT_Adder
+
+object example {
+    def main(args: Array[String]): Unit = {
+      val adder = new UT_Adder()
+      for (i <- 0 until 10000) {
+        val N = 1000000
+        val a = (Math.random() * N).toLong
+        val b = (Math.random() * N).toLong
+        val c = if ((Math.random() * N).toLong > 50) 1 else 0
+
+        // set inputs
+        adder.a.Set(a)
+        adder.b.Set(b)
+        adder.cin.Set(c)
+
+        // step
+        adder.Step()
+
+        // reference model
+        var sum = a + b
+        var carry = if (sum < a) true else false
+        sum += c
+        carry = carry || (sum < c)
+
+        // assert
+        assert(adder.sum.U().longValue() == sum, s"sum mismatch: ${adder.sum.U()} != $sum")
+        assert(adder.cout.U().intValue() == (if (carry) 1 else 0), s"carry mismatch: ${adder.cout.U()} != $carry")
+        println(s"[cycle ${adder.xclock.getClk().intValue()}] a=${adder.a.U64()}, b=${adder.b.U64()}, cin=${adder.cin.U64()}")
+      }
+      println("Scala tests passed")
+      adder.Finish()
+    }
+}</code></pre>
+
+
+
+
+
+  
+  
+
+
+<pre name="group-lang-code-python" class="language-python line-numbers" style="display:none;"><code class="language-python">from UT_Adder import *
+
+import random
+
+class input_t:
+    def __init__(self, a, b, cin):
+        self.a = a
+        self.b = b
+        self.cin = cin
+
+class output_t:
+    def __init__(self):
+        self.sum = 0
+        self.cout = 0
+
+def random_int():
+    return random.randint(-(2**127), 2**127 - 1) & ((1 << 128) - 1)
+
+def as_uint(x, nbits):
+    return x & ((1 << nbits) - 1)
+
+def main():
+    dut = DUTAdder()  # Assuming USE_VERILATOR
+    
+    print("Initialized UTAdder")
+    
+    for c in range(11451):
+        i = input_t(random_int(), random_int(), random_int() & 1)
+        o_dut, o_ref = output_t(), output_t()
+        
+        def dut_cal():
+            dut.a.value, dut.b.value, dut.cin.value = i.a, i.b, i.cin
+            dut.Step(1)
+            o_dut.sum = dut.sum.value
+            o_dut.cout = dut.cout.value
+        
+        def ref_cal():
+            sum = as_uint( i.a + i.b + i.cin, 128+1)
+            o_ref.sum = as_uint(sum, 128)
+            o_ref.cout = as_uint(sum >> 128, 1)
+        
+        dut_cal()
+        ref_cal()
+        
+        print(f"[cycle {dut.xclock.clk}] a=0x{i.a:x}, b=0x{i.b:x}, cin=0x{i.cin:x}")
+        print(f"DUT: sum=0x{o_dut.sum:x}, cout=0x{o_dut.cout:x}")
+        print(f"REF: sum=0x{o_ref.sum:x}, cout=0x{o_ref.cout:x}")
+        
+        assert o_dut.sum == o_ref.sum, "sum mismatch"
+
+    dut.Finish()
+    
+    print("Test Passed, destroy UTAdder")
+
+if __name__ == "__main__":
+    main()</code></pre>
+
+
+
+
+
+  
+  
+
+
+<pre name="group-lang-code-go" class="language-go line-numbers" style="display:none;"><code class="language-go">package main
+
+import (
+	"fmt"
+    "time"
+    "math/rand"
+    ut "UT_Adder"
+)
+
+func assert(cond bool, msg string) {
+    if !cond {
+        panic(msg)
+    }
+}
+
+func main() {
+    adder := ut.NewUT_Adder()
+    rand.Seed(time.Now().UnixNano())
+    for i := 0; i < 10000; i++ {
+        N := 1000000
+        a := rand.Int63n(int64(N))
+        b := rand.Int63n(int64(N))
+        var c int64
+        if rand.Int63n(int64(N)) > 50 {
+            c = 1
+        } else {
+            c = 0
+        }
+
+        adder.A.Set(a)
+        adder.B.Set(b)
+        adder.Cin.Set(c)
+
+        adder.Step()
+
+        // reflerence model
+        sum := a + b
+        carry := sum < a
+        sum += c
+        carry = carry || sum < c
+
+        // assert
+        assert(adder.Sum.U64() == uint64(sum), fmt.Sprintf("sum mismatch: %d != %d\n", adder.Sum.U64(), uint64(sum)))
+        
+        var carry_bool uint64
+        if carry {
+            carry_bool = 1
+        } else {
+            carry_bool = 0
+        }
+        assert(adder.Cout.U64() == carry_bool, fmt.Sprintf("carry mismatch: %d != %t\n", adder.Cout.U().Int64(), carry))
+    }
+    adder.Finish();
+    fmt.Println("Golang tests passed")
+}</code></pre>
+
+
+
+
+</div>
+
 
 </div>
 
