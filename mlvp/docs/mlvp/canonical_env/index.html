@@ -17,20 +17,64 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
-<title>多文件输入 | 开放验证平台学习资源</title>
-<meta name="description" content="处理多个Verilog源文件">
-<meta property="og:title" content="多文件输入" />
-<meta property="og:description" content="处理多个Verilog源文件" />
+<title>编写规范的验证环境 | 开放验证平台学习资源</title>
+<meta name="description" content="概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。
+验证环境的搭建 旨在完成对待测设计（DUT）的封装，使得验证人员在驱动DUT时，不必面临繁杂的接口信号，而是可以直接使用验证环境中提供的高级接口。如果需要编写参考模型，则参考模型也应是验证环境的一部分。
+测试用例的编写 则是测试人员使用验证环境提供的接口，编写一个个测试用例，对DUT进行功能验证。
+搭建验证环境是一件相当有挑战的事情，当 DUT 极度复杂，其实是在接口信号繁多的情况下，搭建验证环境的难度会更大。此时，若没有一个统一的规范，验证环境的搭建将会变得混乱不堪，一个人编写的验证环境很难被其他人维护。并且当出现新的验证任务与原有验证任务有交集时，因为原有的验证环境缺乏规范，很难将原有的验证环境复用。
+本节将会介绍一个规范的验证环境所应该具备的特性，这将有助于理解 mlvp 验证环境的搭建流程。
+无法复用的验证代码 以一个简单的加法器为例，该加法器拥有两个输入端口 io_a 和 io_b，一个输出端口 io_sum。 在没有意识到验证代码可能会被用于其他验证任务的情况下，我们可能会编写出这样的驱动代码：
+def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) return dut.io_sum.value 上述代码中，我们编写了一个 exec_add 方法，该方法本质上是对加法器加法操作的一次高层封装。拥有 exec_add 方法以后，我们无需再关心如何对加法器的接口信号进行赋值，也无需关心怎样驱动加法器并获取其输出，只需要调用 exec_add 方法即可驱动加法器完成一次加法操作。
+然而，这个驱动函数却有一个很大的弊端，它直接使用了 DUT 的接口信号来与 DUT 进行交互，这也就意味着，这个驱动函数只能用于这个加法器。
+与软件测试不同，在硬件验证中我们每时每刻都能碰到接口结构相同的情况。假设我们拥有另一个具有相同功能的加法器，但其接口信号名称分别是 io_a_0、io_b_0 和 io_sum_0，那么这个驱动函数对这个加法器则直接失效，无法复用。要想驱动，只能重新编写一个新的驱动函数。
+一个加法器尚且如此，倘若我们拿到了一个拥有繁杂接口的 DUT，费尽心思为其编写了驱动代码。当后续发现驱动代码需要迁移至另一个相似结构的接口上时，我们将会面临巨大的工作量。例如出现接口名称改变、部分接口缺少但驱动代码中却有引用，部分接口新增等等一系列的问题。
+出现这种问题的根本原因在于，我们在验证代码中直接对 DUT 的接口信号进行操作，如下图所示，这种做法是不可取的。
+&#43;-----------&#43; &#43;-----------&#43; | |--&amp;gt;| | | Test Code | | DUT | | |&amp;lt;--| | &#43;-----------&#43; &#43;-----------&#43; 将验证代码与DUT进行解耦 为了解决上述问题，我们需要将验证代码与 DUT 进行解耦，使得验证代码不再直接操作 DUT 的接口信号，而是通过一个中间层来与 DUT 进行交互。这个中间层是人为定义的一个接口结构，在 mlvp 中，我们将这个中间层定义为 Bundle，下文也将会使用 Bundle 来代指这个中间层。">
+<meta property="og:title" content="编写规范的验证环境" />
+<meta property="og:description" content="概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。
+验证环境的搭建 旨在完成对待测设计（DUT）的封装，使得验证人员在驱动DUT时，不必面临繁杂的接口信号，而是可以直接使用验证环境中提供的高级接口。如果需要编写参考模型，则参考模型也应是验证环境的一部分。
+测试用例的编写 则是测试人员使用验证环境提供的接口，编写一个个测试用例，对DUT进行功能验证。
+搭建验证环境是一件相当有挑战的事情，当 DUT 极度复杂，其实是在接口信号繁多的情况下，搭建验证环境的难度会更大。此时，若没有一个统一的规范，验证环境的搭建将会变得混乱不堪，一个人编写的验证环境很难被其他人维护。并且当出现新的验证任务与原有验证任务有交集时，因为原有的验证环境缺乏规范，很难将原有的验证环境复用。
+本节将会介绍一个规范的验证环境所应该具备的特性，这将有助于理解 mlvp 验证环境的搭建流程。
+无法复用的验证代码 以一个简单的加法器为例，该加法器拥有两个输入端口 io_a 和 io_b，一个输出端口 io_sum。 在没有意识到验证代码可能会被用于其他验证任务的情况下，我们可能会编写出这样的驱动代码：
+def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) return dut.io_sum.value 上述代码中，我们编写了一个 exec_add 方法，该方法本质上是对加法器加法操作的一次高层封装。拥有 exec_add 方法以后，我们无需再关心如何对加法器的接口信号进行赋值，也无需关心怎样驱动加法器并获取其输出，只需要调用 exec_add 方法即可驱动加法器完成一次加法操作。
+然而，这个驱动函数却有一个很大的弊端，它直接使用了 DUT 的接口信号来与 DUT 进行交互，这也就意味着，这个驱动函数只能用于这个加法器。
+与软件测试不同，在硬件验证中我们每时每刻都能碰到接口结构相同的情况。假设我们拥有另一个具有相同功能的加法器，但其接口信号名称分别是 io_a_0、io_b_0 和 io_sum_0，那么这个驱动函数对这个加法器则直接失效，无法复用。要想驱动，只能重新编写一个新的驱动函数。
+一个加法器尚且如此，倘若我们拿到了一个拥有繁杂接口的 DUT，费尽心思为其编写了驱动代码。当后续发现驱动代码需要迁移至另一个相似结构的接口上时，我们将会面临巨大的工作量。例如出现接口名称改变、部分接口缺少但驱动代码中却有引用，部分接口新增等等一系列的问题。
+出现这种问题的根本原因在于，我们在验证代码中直接对 DUT 的接口信号进行操作，如下图所示，这种做法是不可取的。
+&#43;-----------&#43; &#43;-----------&#43; | |--&gt;| | | Test Code | | DUT | | |&lt;--| | &#43;-----------&#43; &#43;-----------&#43; 将验证代码与DUT进行解耦 为了解决上述问题，我们需要将验证代码与 DUT 进行解耦，使得验证代码不再直接操作 DUT 的接口信号，而是通过一个中间层来与 DUT 进行交互。这个中间层是人为定义的一个接口结构，在 mlvp 中，我们将这个中间层定义为 Bundle，下文也将会使用 Bundle 来代指这个中间层。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/env_usage/multifile/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/canonical_env/" /><meta property="article:section" content="docs" />
 
 <meta property="article:modified_time" content="2024-09-01T20:53:26+08:00" />
-<meta itemprop="name" content="多文件输入">
-<meta itemprop="description" content="处理多个Verilog源文件">
+<meta itemprop="name" content="编写规范的验证环境">
+<meta itemprop="description" content="概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。
+验证环境的搭建 旨在完成对待测设计（DUT）的封装，使得验证人员在驱动DUT时，不必面临繁杂的接口信号，而是可以直接使用验证环境中提供的高级接口。如果需要编写参考模型，则参考模型也应是验证环境的一部分。
+测试用例的编写 则是测试人员使用验证环境提供的接口，编写一个个测试用例，对DUT进行功能验证。
+搭建验证环境是一件相当有挑战的事情，当 DUT 极度复杂，其实是在接口信号繁多的情况下，搭建验证环境的难度会更大。此时，若没有一个统一的规范，验证环境的搭建将会变得混乱不堪，一个人编写的验证环境很难被其他人维护。并且当出现新的验证任务与原有验证任务有交集时，因为原有的验证环境缺乏规范，很难将原有的验证环境复用。
+本节将会介绍一个规范的验证环境所应该具备的特性，这将有助于理解 mlvp 验证环境的搭建流程。
+无法复用的验证代码 以一个简单的加法器为例，该加法器拥有两个输入端口 io_a 和 io_b，一个输出端口 io_sum。 在没有意识到验证代码可能会被用于其他验证任务的情况下，我们可能会编写出这样的驱动代码：
+def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) return dut.io_sum.value 上述代码中，我们编写了一个 exec_add 方法，该方法本质上是对加法器加法操作的一次高层封装。拥有 exec_add 方法以后，我们无需再关心如何对加法器的接口信号进行赋值，也无需关心怎样驱动加法器并获取其输出，只需要调用 exec_add 方法即可驱动加法器完成一次加法操作。
+然而，这个驱动函数却有一个很大的弊端，它直接使用了 DUT 的接口信号来与 DUT 进行交互，这也就意味着，这个驱动函数只能用于这个加法器。
+与软件测试不同，在硬件验证中我们每时每刻都能碰到接口结构相同的情况。假设我们拥有另一个具有相同功能的加法器，但其接口信号名称分别是 io_a_0、io_b_0 和 io_sum_0，那么这个驱动函数对这个加法器则直接失效，无法复用。要想驱动，只能重新编写一个新的驱动函数。
+一个加法器尚且如此，倘若我们拿到了一个拥有繁杂接口的 DUT，费尽心思为其编写了驱动代码。当后续发现驱动代码需要迁移至另一个相似结构的接口上时，我们将会面临巨大的工作量。例如出现接口名称改变、部分接口缺少但驱动代码中却有引用，部分接口新增等等一系列的问题。
+出现这种问题的根本原因在于，我们在验证代码中直接对 DUT 的接口信号进行操作，如下图所示，这种做法是不可取的。
+&#43;-----------&#43; &#43;-----------&#43; | |--&gt;| | | Test Code | | DUT | | |&lt;--| | &#43;-----------&#43; &#43;-----------&#43; 将验证代码与DUT进行解耦 为了解决上述问题，我们需要将验证代码与 DUT 进行解耦，使得验证代码不再直接操作 DUT 的接口信号，而是通过一个中间层来与 DUT 进行交互。这个中间层是人为定义的一个接口结构，在 mlvp 中，我们将这个中间层定义为 Bundle，下文也将会使用 Bundle 来代指这个中间层。">
 <meta itemprop="dateModified" content="2024-09-01T20:53:26+08:00" />
-<meta itemprop="wordCount" content="73">
-<meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="多文件输入"/>
-<meta name="twitter:description" content="处理多个Verilog源文件"/>
+<meta itemprop="wordCount" content="188">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="编写规范的验证环境"/>
+<meta name="twitter:description" content="概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。
+验证环境的搭建 旨在完成对待测设计（DUT）的封装，使得验证人员在驱动DUT时，不必面临繁杂的接口信号，而是可以直接使用验证环境中提供的高级接口。如果需要编写参考模型，则参考模型也应是验证环境的一部分。
+测试用例的编写 则是测试人员使用验证环境提供的接口，编写一个个测试用例，对DUT进行功能验证。
+搭建验证环境是一件相当有挑战的事情，当 DUT 极度复杂，其实是在接口信号繁多的情况下，搭建验证环境的难度会更大。此时，若没有一个统一的规范，验证环境的搭建将会变得混乱不堪，一个人编写的验证环境很难被其他人维护。并且当出现新的验证任务与原有验证任务有交集时，因为原有的验证环境缺乏规范，很难将原有的验证环境复用。
+本节将会介绍一个规范的验证环境所应该具备的特性，这将有助于理解 mlvp 验证环境的搭建流程。
+无法复用的验证代码 以一个简单的加法器为例，该加法器拥有两个输入端口 io_a 和 io_b，一个输出端口 io_sum。 在没有意识到验证代码可能会被用于其他验证任务的情况下，我们可能会编写出这样的驱动代码：
+def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) return dut.io_sum.value 上述代码中，我们编写了一个 exec_add 方法，该方法本质上是对加法器加法操作的一次高层封装。拥有 exec_add 方法以后，我们无需再关心如何对加法器的接口信号进行赋值，也无需关心怎样驱动加法器并获取其输出，只需要调用 exec_add 方法即可驱动加法器完成一次加法操作。
+然而，这个驱动函数却有一个很大的弊端，它直接使用了 DUT 的接口信号来与 DUT 进行交互，这也就意味着，这个驱动函数只能用于这个加法器。
+与软件测试不同，在硬件验证中我们每时每刻都能碰到接口结构相同的情况。假设我们拥有另一个具有相同功能的加法器，但其接口信号名称分别是 io_a_0、io_b_0 和 io_sum_0，那么这个驱动函数对这个加法器则直接失效，无法复用。要想驱动，只能重新编写一个新的驱动函数。
+一个加法器尚且如此，倘若我们拿到了一个拥有繁杂接口的 DUT，费尽心思为其编写了驱动代码。当后续发现驱动代码需要迁移至另一个相似结构的接口上时，我们将会面临巨大的工作量。例如出现接口名称改变、部分接口缺少但驱动代码中却有引用，部分接口新增等等一系列的问题。
+出现这种问题的根本原因在于，我们在验证代码中直接对 DUT 的接口信号进行操作，如下图所示，这种做法是不可取的。
+&#43;-----------&#43; &#43;-----------&#43; | |--&gt;| | | Test Code | | DUT | | |&lt;--| | &#43;-----------&#43; &#43;-----------&#43; 将验证代码与DUT进行解耦 为了解决上述问题，我们需要将验证代码与 DUT 进行解耦，使得验证代码不再直接操作 DUT 的接口信号，而是通过一个中间层来与 DUT 进行交互。这个中间层是人为定义的一个接口结构，在 mlvp 中，我们将这个中间层定义为 Bundle，下文也将会使用 Bundle 来代指这个中间层。"/>
 
 
 
@@ -120,7 +164,7 @@
         <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/mlvp/en/docs/env_usage/multifile/">English</a></li>
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
     </ul>
 </div></li>
       </ul>
@@ -172,7 +216,7 @@
       <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/mlvp/en/docs/env_usage/multifile/">English</a></li>
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
     </ul>
 </div>
     </div>
@@ -195,15 +239,15 @@
   <a href="/mlvp/docs/quick-start/eg-stack-async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-async"><span class="">案例四：双端口栈（协程）</span></a>
 </li>
   </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsenv_usage-li">
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usage-li">
   <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">基础工具</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagepicker_usage-li">
   <a href="/mlvp/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagepicker_usage"><span class="">工具介绍</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagewave-li">
   <a href="/mlvp/docs/env_usage/wave/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagewave"><span class="">波形生成</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsenv_usagemultifile-li">
-  <a href="/mlvp/docs/env_usage/multifile/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemultifile"><span class="td-sidebar-nav-active-item">多文件输入</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemultifile-li">
+  <a href="/mlvp/docs/env_usage/multifile/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemultifile"><span class="">多文件输入</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagecoverage-li">
   <a href="/mlvp/docs/env_usage/coverage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagecoverage"><span class="">覆盖率统计</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usageframeworks-li">
@@ -232,13 +276,13 @@
   <a href="/mlvp/docs/basic/report/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicreport"><span class="">验证报告</span></a>
 </li>
   </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmlvp-li">
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsmlvp-li">
   <a href="/mlvp/docs/mlvp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvp"><span class="">验证框架</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpquick-start-li">
   <a href="/mlvp/docs/mlvp/quick-start/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpquick-start"><span class="">快速开始</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpcanonical_env-li">
-  <a href="/mlvp/docs/mlvp/canonical_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpcanonical_env"><span class="">编写规范的验证环境</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsmlvpcanonical_env-li">
+  <a href="/mlvp/docs/mlvp/canonical_env/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpcanonical_env"><span class="td-sidebar-nav-active-item">编写规范的验证环境</span></a>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsadvance_case-li">
@@ -270,25 +314,22 @@
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
             
 <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/env_usage/multifile.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/env_usage/multifile.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
-  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/env_usage?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e5%a4%9a%e6%96%87%e4%bb%b6%e8%be%93%e5%85%a5" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/mlvp/canonical_env.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/mlvp/canonical_env.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/mlvp?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e7%bc%96%e5%86%99%e8%a7%84%e8%8c%83%e7%9a%84%e9%aa%8c%e8%af%81%e7%8e%af%e5%a2%83" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
   <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
-  <a id="print" href="/mlvp/docs/env_usage/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+  <a id="print" href="/mlvp/docs/mlvp/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
 </div>
 
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#多文件输入输出">多文件输入输出</a>
-      <ul>
-        <li><a href="#文件列表">文件列表</a></li>
-        <li><a href="#应用方式">应用方式</a></li>
-        <li><a href="#注意事项">注意事项</a></li>
-      </ul>
-    </li>
+    <li><a href="#概述">概述</a></li>
+    <li><a href="#无法复用的验证代码">无法复用的验证代码</a></li>
+    <li><a href="#将验证代码与dut进行解耦">将验证代码与DUT进行解耦</a></li>
+    <li><a href="#将-dut-接口进行分类驱动">将 DUT 接口进行分类驱动</a></li>
   </ul>
 </nav>
       </div>
@@ -320,85 +361,66 @@
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/env_usage/">基础工具</a></li>
+    <a href="/mlvp/docs/mlvp/">验证框架</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    多文件输入</li>
+    编写规范的验证环境</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>多文件输入</h1>
-	<div class="lead">处理多个Verilog源文件</div>
+	<h1>编写规范的验证环境</h1>
+	
 	<header class="article-meta">
-		<div class="taxonomy taxonomy-terms-article taxo-tags">
-  <h5 class="taxonomy-title">Tags:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span></a></li>
-    </ul>
-</div>
-<div class="taxonomy taxonomy-terms-article taxo-categories">
-  <h5 class="taxonomy-title">Categories:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span></a></li>
-    </ul>
-</div>
-
+		
   </header>
-	<h2 id="多文件输入输出">多文件输入输出</h2>
-<p>在许多情况中，某文件下的某个模块会例化其他文件下的模块，在这种情况下您可以使用Picker工具的<code>-f</code>选项处理多个verilog源文件。例如，假设您有<code>Cache.sv</code>, <code>CacheStage.sv</code>以及<code>CacheMeta.sv</code>三个源文件：</p>
-<h3 id="文件列表">文件列表</h3>
-<h4 id="cachesv">Cache.sv</h4>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sv" data-lang="sv"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// In 
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">Cache</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">CacheStage</span> <span style="color:#000">s1</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">CacheStage</span> <span style="color:#000">s2</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">CacheStage</span> <span style="color:#000">s3</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">CacheMeta</span> <span style="color:#000">cachemeta</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">endmodule</span>
-</span></span></code></pre></div><h4 id="cachestagesv">CacheStage.sv</h4>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sv" data-lang="sv"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// In CacheStage.sv
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">CacheStage</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">endmodule</span>
-</span></span></code></pre></div><h4 id="cachemetasv">CacheMeta.sv</h4>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sv" data-lang="sv"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// In CacheMeta.sv
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">CacheMeta</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">endmodule</span>
-</span></span></code></pre></div><h3 id="应用方式">应用方式</h3>
-<p>其中，待测模块为Cache，位于<code>Cache.sv</code>中，则您可以通过以下命令生成DUT：</p>
-<h4 id="命令行指定">命令行指定</h4>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> Cache.sv --fs CacheStage.sv,CacheMeta.sv --sname Cache
-</span></span></code></pre></div><h4 id="通过文件列表文件指定">通过文件列表文件指定</h4>
-<p>您也可以通过传入.txt文件的方式来实现多文件输入：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> Cache.sv --fs src.txt --sname Cache
-</span></span></code></pre></div><p>其中<code>src.txt</code>的内容为:</p>
-<pre tabindex="0"><code>CacheStage.sv
-CacheMeta.sv
-</code></pre><h3 id="注意事项">注意事项</h3>
-<ol>
-<li>需要注意的是，使用多文件输入时仍需要指定待测顶层模块所在的文件，例如上文中所示的<code>Cache.sv</code>。</li>
-<li>在使用多文件输入时，Picker会将所有文件都交给仿真器，仿真器同时进行编译，因此需要保证所有文件中的模块名不重复。</li>
-</ol>
+	<h2 id="概述">概述</h2>
+<p>一个验证任务编写代码的主体工作可以大致分为两部分，<strong>验证环境的搭建</strong> 和 <strong>测试用例的编写</strong>。</p>
+<p><strong>验证环境的搭建</strong> 旨在完成对待测设计（DUT）的封装，使得验证人员在驱动DUT时，不必面临繁杂的接口信号，而是可以直接使用验证环境中提供的高级接口。如果需要编写参考模型，则参考模型也应是验证环境的一部分。</p>
+<p><strong>测试用例的编写</strong> 则是测试人员使用验证环境提供的接口，编写一个个测试用例，对DUT进行功能验证。</p>
+<p>搭建验证环境是一件相当有挑战的事情，当 DUT 极度复杂，其实是在接口信号繁多的情况下，搭建验证环境的难度会更大。此时，若没有一个统一的规范，验证环境的搭建将会变得混乱不堪，一个人编写的验证环境很难被其他人维护。并且当出现新的验证任务与原有验证任务有交集时，因为原有的验证环境缺乏规范，很难将原有的验证环境复用。</p>
+<p>本节将会介绍一个规范的验证环境所应该具备的特性，这将有助于理解 mlvp 验证环境的搭建流程。</p>
+<h2 id="无法复用的验证代码">无法复用的验证代码</h2>
+<p>以一个简单的加法器为例，该加法器拥有两个输入端口 <code>io_a</code> 和 <code>io_b</code>，一个输出端口 <code>io_sum</code>。 在没有意识到验证代码可能会被用于其他验证任务的情况下，我们可能会编写出这样的驱动代码：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">exec_add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io_a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">a</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io_b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">b</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io_sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span>
+</span></span></code></pre></div><p>上述代码中，我们编写了一个 <code>exec_add</code> 方法，该方法本质上是对加法器加法操作的一次高层封装。拥有 <code>exec_add</code> 方法以后，我们无需再关心如何对加法器的接口信号进行赋值，也无需关心怎样驱动加法器并获取其输出，只需要调用 <code>exec_add</code> 方法即可驱动加法器完成一次加法操作。</p>
+<p>然而，这个驱动函数却有一个很大的弊端，它直接使用了 DUT 的接口信号来与 DUT 进行交互，这也就意味着，这个驱动函数只能用于这个加法器。</p>
+<p>与软件测试不同，在硬件验证中我们每时每刻都能碰到接口结构相同的情况。假设我们拥有另一个具有相同功能的加法器，但其接口信号名称分别是 <code>io_a_0</code>、<code>io_b_0</code> 和 <code>io_sum_0</code>，那么这个驱动函数对这个加法器则直接失效，无法复用。要想驱动，只能重新编写一个新的驱动函数。</p>
+<p>一个加法器尚且如此，倘若我们拿到了一个拥有繁杂接口的 DUT，费尽心思为其编写了驱动代码。当后续发现驱动代码需要迁移至另一个相似结构的接口上时，我们将会面临巨大的工作量。例如出现接口名称改变、部分接口缺少但驱动代码中却有引用，部分接口新增等等一系列的问题。</p>
+<p>出现这种问题的根本原因在于，我们在验证代码中直接对 DUT 的接口信号进行操作，如下图所示，这种做法是不可取的。</p>
+<pre tabindex="0"><code>+-----------+   +-----------+
+|           |--&gt;|           |
+| Test Code |   |    DUT    |
+|           |&lt;--|           |
++-----------+   +-----------+
+</code></pre><h2 id="将验证代码与dut进行解耦">将验证代码与DUT进行解耦</h2>
+<p>为了解决上述问题，我们需要将验证代码与 DUT 进行解耦，使得验证代码不再直接操作 DUT 的接口信号，而是通过一个中间层来与 DUT 进行交互。这个中间层是人为定义的一个接口结构，在 mlvp 中，我们将这个中间层定义为 <code>Bundle</code>，下文也将会使用 <code>Bundle</code> 来代指这个中间层。</p>
+<p>以上述加法器为例，我们可以定义一个 Bundle 结构，其中包含 <code>a</code>, <code>b</code> 和 <code>sum</code> 三个信号，并让测试代码与这个 Bundle 进行直接交互。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">exec_add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">a</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">b</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span>
+</span></span></code></pre></div><p>此时，在 <code>exec_add</code> 中并没有直接操作 DUT 的接口信号，甚至不知道 DUT 中的接口信号名称是什么，其直接与我们在 Bundle 中定义的接口信号进行交互。</p>
+<p>那如何让 Bundle 中的信号与 DUT 的引脚进行关联呢？只需要添加一个连接操作即可，最简单的连接方法是，我们直接指定 Bundle 中的每一个信号具体与 DUT 的哪一个引脚相连，例如：</p>
+<pre tabindex="0"><code>bundle.a   &lt;-&gt; dut.io_a
+bundle.b   &lt;-&gt; dut.io_b
+bundle.sum &lt;-&gt; dut.io_sum
+</code></pre><p>如果 DUT 的接口信号名称发生了变化，我们只需要修改这个连接过程，例如：</p>
+<pre tabindex="0"><code>bundle.a   &lt;-&gt; dut.io_a_0
+bundle.b   &lt;-&gt; dut.io_b_0
+bundle.sum &lt;-&gt; dut.io_sum_0
+</code></pre><p>这样一来，无论 DUT 的接口如何变化，只要其拥有相同的结构，都可以通过原有的驱动代码来驱动，需要修改的仅仅是连接过程。此时的验证代码与 DUT 的关系如下图所示：</p>
+<pre tabindex="0"><code>+-----------+  +--------+             +-----------+
+|           |-&gt;|        |             |           |
+| Test Code |  | Bundle |-- connect --|    DUT    |
+|           |&lt;-|        |             |           |
++-----------+  +--------+             +-----------+
+</code></pre><p>在 mlvp 中，我们为 <code>Bundle</code> 提供了简洁的定义过程以及大量的连接方法，可极大方便中间层的定义与连接，除此之外，<code>Bundle</code> 还提供了大量的实用功能来帮助验证人员更好的与接口信号进行交互。</p>
+<h2 id="将-dut-接口进行分类驱动">将 DUT 接口进行分类驱动</h2>
 
 	<div class="text-muted mt-5 pt-3 border-top">
   最后修改 September 1, 2024: <a href="https://github.com/XS-MLVP/course/commit/88e22905117b69f31cd5a9816b46a745b289a946">Add &#34;write a canonical validation environment&#34; (88e2290)</a>
