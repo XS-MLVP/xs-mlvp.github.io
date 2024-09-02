@@ -1,0 +1,712 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-cn" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/mlvp/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/mlvp/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/mlvp/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/mlvp/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
+
+<title>如何使用 Bundle | 开放验证平台学习资源</title>
+<meta name="description" content="Bundle 在 mlvp 验证环境中，用于构建 Agent 与 DUT 之间交互的中间层，以保证 Agent 与 DUT 之间的解耦。同时 Bundle 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。
+一个简单的 Bundle 的定义 为了定义一个 Bundle，需要自定义一个新类，并继承 mlvp 中的 Bundle 类。下面是一个简单的 Bundle 的定义示例：
+from mlvp import Bundle, Signals class AdderBundle(Bundle): a, b, sum, cin, cout = Signals(5) 该 Bundle 定义了一个简单的加法器接口，在 AdderBundle 类中，我们定义了五个信号 a, b, sum, cin, cout，这五个信号分别代表了加法器的输入端口 a, b，输出端口 sum，以及进位输入端口 cin 和进位输出端口 cout。
+定义完成后，我们可以通过 AdderBundle 类的实例来访问这些信号，例如：
+adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 adder_bundle.">
+<meta property="og:title" content="如何使用 Bundle" />
+<meta property="og:description" content="Bundle 在 mlvp 验证环境中，用于构建 Agent 与 DUT 之间交互的中间层，以保证 Agent 与 DUT 之间的解耦。同时 Bundle 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。
+一个简单的 Bundle 的定义 为了定义一个 Bundle，需要自定义一个新类，并继承 mlvp 中的 Bundle 类。下面是一个简单的 Bundle 的定义示例：
+from mlvp import Bundle, Signals class AdderBundle(Bundle): a, b, sum, cin, cout = Signals(5) 该 Bundle 定义了一个简单的加法器接口，在 AdderBundle 类中，我们定义了五个信号 a, b, sum, cin, cout，这五个信号分别代表了加法器的输入端口 a, b，输出端口 sum，以及进位输入端口 cin 和进位输出端口 cout。
+定义完成后，我们可以通过 AdderBundle 类的实例来访问这些信号，例如：
+adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 adder_bundle." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/bundle/" /><meta property="article:section" content="docs" />
+
+<meta property="article:modified_time" content="2024-09-02T23:03:23+08:00" />
+<meta itemprop="name" content="如何使用 Bundle">
+<meta itemprop="description" content="Bundle 在 mlvp 验证环境中，用于构建 Agent 与 DUT 之间交互的中间层，以保证 Agent 与 DUT 之间的解耦。同时 Bundle 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。
+一个简单的 Bundle 的定义 为了定义一个 Bundle，需要自定义一个新类，并继承 mlvp 中的 Bundle 类。下面是一个简单的 Bundle 的定义示例：
+from mlvp import Bundle, Signals class AdderBundle(Bundle): a, b, sum, cin, cout = Signals(5) 该 Bundle 定义了一个简单的加法器接口，在 AdderBundle 类中，我们定义了五个信号 a, b, sum, cin, cout，这五个信号分别代表了加法器的输入端口 a, b，输出端口 sum，以及进位输入端口 cin 和进位输出端口 cout。
+定义完成后，我们可以通过 AdderBundle 类的实例来访问这些信号，例如：
+adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 adder_bundle.">
+<meta itemprop="dateModified" content="2024-09-02T23:03:23+08:00" />
+<meta itemprop="wordCount" content="874">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何使用 Bundle"/>
+<meta name="twitter:description" content="Bundle 在 mlvp 验证环境中，用于构建 Agent 与 DUT 之间交互的中间层，以保证 Agent 与 DUT 之间的解耦。同时 Bundle 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。
+一个简单的 Bundle 的定义 为了定义一个 Bundle，需要自定义一个新类，并继承 mlvp 中的 Bundle 类。下面是一个简单的 Bundle 的定义示例：
+from mlvp import Bundle, Signals class AdderBundle(Bundle): a, b, sum, cin, cout = Signals(5) 该 Bundle 定义了一个简单的加法器接口，在 AdderBundle 类中，我们定义了五个信号 a, b, sum, cin, cout，这五个信号分别代表了加法器的输入端口 a, b，输出端口 sum，以及进位输入端口 cin 和进位输出端口 cout。
+定义完成后，我们可以通过 AdderBundle 类的实例来访问这些信号，例如：
+adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 adder_bundle."/>
+
+
+
+
+<link rel="preload" href="/mlvp/scss/main.min.b4b58abc1e222a911c2cd9b9340c4a7470810bf24c7cb4ad38aafd2ddac67022.css" as="style">
+<link href="/mlvp/scss/main.min.b4b58abc1e222a911c2cd9b9340c4a7470810bf24c7cb4ad38aafd2ddac67022.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/mlvp/css/prism.css"/>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/mlvp/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">开放验证平台学习资源</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/mlvp/offline-search-index.2dd1f35a518115a30eb5d339d95d80f1.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/mlvp/offline-search-index.2dd1f35a518115a30eb5d339d95d80f1.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse" id="td-section-nav">
+    <div class="td-sidebar-nav__section nav-item dropdown d-block d-lg-none">
+      <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
+    </ul>
+</div>
+    </div>
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocs-li">
+  <a href="/mlvp/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-mlvpdocs"><span class="">学习资源</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsquick-start-li">
+  <a href="/mlvp/docs/quick-start/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsquick-start"><span class="">快速开始</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-startinstaller-li">
+  <a href="/mlvp/docs/quick-start/installer/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startinstaller"><span class="">搭建验证环境</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-adder-li">
+  <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：简单加法器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-rmg-li">
+  <a href="/mlvp/docs/quick-start/eg-rmg/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-rmg"><span class="">案例二：随机数生成器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-callback-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-callback"><span class="">案例三：双端口栈（回调）</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-async-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-async"><span class="">案例四：双端口栈（协程）</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usage-li">
+  <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">基础工具</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagepicker_usage-li">
+  <a href="/mlvp/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagepicker_usage"><span class="">工具介绍</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagewave-li">
+  <a href="/mlvp/docs/env_usage/wave/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagewave"><span class="">波形生成</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemultifile-li">
+  <a href="/mlvp/docs/env_usage/multifile/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemultifile"><span class="">多文件输入</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagecoverage-li">
+  <a href="/mlvp/docs/env_usage/coverage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagecoverage"><span class="">覆盖率统计</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usageframeworks-li">
+  <a href="/mlvp/docs/env_usage/frameworks/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usageframeworks"><span class="">集成测试框架</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usageframeworkspytest-li">
+  <a href="/mlvp/docs/env_usage/frameworks/pytest/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usageframeworkspytest"><span class="">PyTest</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usageframeworkshypothesis-li">
+  <a href="/mlvp/docs/env_usage/frameworks/hypothesis/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usageframeworkshypothesis"><span class="">Hypothesis</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsbasic-li">
+  <a href="/mlvp/docs/basic/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsbasic"><span class="">验证基础</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasicic_verify-li">
+  <a href="/mlvp/docs/basic/ic_verify/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicic_verify"><span class="">芯片验证</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasicic_base-li">
+  <a href="/mlvp/docs/basic/ic_base/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicic_base"><span class="">数字电路</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasiccreate_dut-li">
+  <a href="/mlvp/docs/basic/create_dut/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasiccreate_dut"><span class="">创建DUT</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasictest_dut-li">
+  <a href="/mlvp/docs/basic/test_dut/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasictest_dut"><span class="">DUT验证</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasicreport-li">
+  <a href="/mlvp/docs/basic/report/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicreport"><span class="">验证报告</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsmlvp-li">
+  <a href="/mlvp/docs/mlvp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvp"><span class="">验证框架</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpquick-start-li">
+  <a href="/mlvp/docs/mlvp/quick-start/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpquick-start"><span class="">快速开始</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpcanonical_env-li">
+  <a href="/mlvp/docs/mlvp/canonical_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpcanonical_env"><span class="">编写规范的验证环境</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsmlvpenv-li">
+  <a href="/mlvp/docs/mlvp/env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvpenv"><span class="">搭建验证环境</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvstart_test-li">
+  <a href="/mlvp/docs/mlvp/env/start_test/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvstart_test"><span class="">如何使用异步环境</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsmlvpenvbundle-li">
+  <a href="/mlvp/docs/mlvp/env/bundle/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvbundle"><span class="td-sidebar-nav-active-item">如何使用 Bundle</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvagent-li">
+  <a href="/mlvp/docs/mlvp/env/agent/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvagent"><span class="">如何编写 Agent</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmlvpapi-li">
+  <a href="/mlvp/docs/mlvp/api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvpapi"><span class="">API 文档</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpapibundle-li">
+  <a href="/mlvp/docs/mlvp/api/bundle/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpapibundle"><span class="">Bundle API</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsadvance_case-li">
+  <a href="/mlvp/docs/advance_case/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsadvance_case"><span class="">高级案例</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_casenutshellcache-li">
+  <a href="/mlvp/docs/advance_case/nutshellcache/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_casenutshellcache"><span class="">完整果壳 Cache 验证</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_casetilelink-li">
+  <a href="/mlvp/docs/advance_case/tilelink/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_casetilelink"><span class="">TileLink 协议</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmulti-lang-li">
+  <a href="/mlvp/docs/multi-lang/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmulti-lang"><span class="">多语言支持</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmulti-langinterface-li">
+  <a href="/mlvp/docs/multi-lang/interface/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmulti-langinterface"><span class="">验证接口</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmulti-langexamples-li">
+  <a href="/mlvp/docs/multi-lang/examples/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmulti-langexamples"><span class="">验证案例</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            
+<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/mlvp/env/bundle.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/mlvp/env/bundle.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/mlvp/env?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e5%a6%82%e4%bd%95%e4%bd%bf%e7%94%a8%20Bundle" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
+  <a id="print" href="/mlvp/docs/mlvp/env/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#一个简单的-bundle-的定义">一个简单的 Bundle 的定义</a></li>
+    <li><a href="#将-dut-绑定到-bundle">将 DUT 绑定到 Bundle</a>
+      <ul>
+        <li><a href="#通过字典进行绑定">通过字典进行绑定</a></li>
+        <li><a href="#通过前缀进行绑定">通过前缀进行绑定</a></li>
+        <li><a href="#通过正则表达式进行绑定">通过正则表达式进行绑定</a></li>
+      </ul>
+    </li>
+    <li><a href="#创建子bundle">创建子Bundle</a></li>
+    <li><a href="#bundle-中的实用操作">Bundle 中的实用操作</a>
+      <ul>
+        <li><a href="#信号访问与赋值">信号访问与赋值</a></li>
+        <li><a href="#消息支持">消息支持</a></li>
+        <li><a href="#异步支持">异步支持</a></li>
+        <li><a href="#信号连接">信号连接</a></li>
+        <li><a href="#dut-信号连接检查">DUT 信号连接检查</a></li>
+        <li><a href="#其他实用操作">其他实用操作</a></li>
+      </ul>
+    </li>
+    <li><a href="#bundle-的自动生成脚本">Bundle 的自动生成脚本</a></li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tag Cloud</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">20</span></a></li>
+        </ul>
+    </div>
+  <div class="taxonomy taxonomy-terms-cloud taxo-categories">
+      <h5 class="taxonomy-title">Categories</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99/" data-taxonomy-term="%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99"><span class="taxonomy-label">学习材料</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">20</span></a></li>
+        </ul>
+    </div>
+  
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/mlvp/docs/">学习资源</a></li>
+  <li class="breadcrumb-item">
+    <a href="/mlvp/docs/mlvp/">验证框架</a></li>
+  <li class="breadcrumb-item">
+    <a href="/mlvp/docs/mlvp/env/">搭建验证环境</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    如何使用 Bundle</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>如何使用 Bundle</h1>
+	
+	<header class="article-meta">
+		
+  </header>
+	<p><code>Bundle</code> 在 mlvp 验证环境中，用于构建 <code>Agent</code> 与 DUT 之间交互的中间层，以保证 <code>Agent</code> 与 DUT 之间的解耦。同时 <code>Bundle</code> 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。</p>
+<h2 id="一个简单的-bundle-的定义">一个简单的 Bundle 的定义</h2>
+<p>为了定义一个 <code>Bundle</code>，需要自定义一个新类，并继承 mlvp 中的 <code>Bundle</code> 类。下面是一个简单的 <code>Bundle</code> 的定义示例：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Signals</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">Signals</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>该 Bundle 定义了一个简单的加法器接口，在 <code>AdderBundle</code> 类中，我们定义了五个信号 <code>a</code>, <code>b</code>, <code>sum</code>, <code>cin</code>, <code>cout</code>，这五个信号分别代表了加法器的输入端口 <code>a</code>, <code>b</code>，输出端口 <code>sum</code>，以及进位输入端口 <code>cin</code> 和进位输出端口 <code>cout</code>。</p>
+<p>定义完成后，我们可以通过 <code>AdderBundle</code> 类的实例来访问这些信号，例如：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h2 id="将-dut-绑定到-bundle">将 DUT 绑定到 Bundle</h2>
+<p>在上述代码中，我们虽然创建了一个 bundle 实例，并对他进行了驱动，但是我们并没有将这个 bundle 与任何 DUT 绑定，也就意味着对这个 bundle 的操作，无法真正影响到 DUT。</p>
+<p>使用 <code>bind</code> 方法，可以将一个 DUT 绑定到 bundle 上。例如我们有一个简单的加法器 DUT，其接口名称与 Bundle 中定义的名称相同。</p>
+<pre tabindex="0"><code>adder = DUTAdder()
+
+adder_bundle = AdderBundle()
+adder_bundle.bind(adder)
+</code></pre><p><code>bind</code> 函数会自动检索 DUT 中所有的接口，并将名称相同的接口进行绑定。绑定完成后，对 bundle 的操作，就会直接影响到 DUT。</p>
+<p>但是，如果 DUT 的接口名称与 Bundle 中定义的名称不同，直接使用 <code>bind</code> 则无法正确绑定。在 Bundle 中，我们提供多种绑定方法，以适应不同的绑定需求。</p>
+<h3 id="通过字典进行绑定">通过字典进行绑定</h3>
+<p>在 <code>bind</code> 函数中，我们可以通过传入一个字典，来指定 DUT 中的接口名称与 Bundle 中的接口名称之间的映射关系。</p>
+<p>假设 Bundle 中的接口名称与 DUT 中的接口名称拥有如下对应关系：</p>
+<pre tabindex="0"><code>a    -&gt; a_in
+b    -&gt; b_in
+sum  -&gt; sum_out
+cin  -&gt; cin_in
+cout -&gt; cout_out
+</code></pre><p>在实例化 <code>bundle</code> 时，我们可以通过 <code>from_dict</code> 方法创建，并传入一个字典，告知 <code>Bundle</code> 以字典的方式进行绑定。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderBundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_dict</span><span style="color:#000;font-weight:bold">({</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;a_in&#39;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;b_in&#39;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;sum&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;sum_out&#39;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;cin&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;cin_in&#39;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;cout&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;cout_out&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bind</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>此时，<code>adder_bundle</code> 可正确绑定至 <code>adder</code>。</p>
+<h3 id="通过前缀进行绑定">通过前缀进行绑定</h3>
+<p>假设 DUT 中的接口名称与 Bundle 中的接口名称拥有如下对应关系：</p>
+<pre tabindex="0"><code>a    -&gt; io_a
+b    -&gt; io_b
+sum  -&gt; io_sum
+cin  -&gt; io_cin
+cout -&gt; io_cout
+</code></pre><p>可以发现，实际 DUT 的接口名称相比于 Bundle 中的接口名称，都多了一个 <code>io_</code> 的前缀。在这种情况下，我们可以通过 <code>from_prefix</code> 方法创建 <code>Bundle</code>，并传入前缀名称，告知 <code>Bundle</code> 以前缀的方式进行绑定。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderBundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_prefix</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;io_&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bind</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h3 id="通过正则表达式进行绑定">通过正则表达式进行绑定</h3>
+<p>在某些情况下，DUT 中的接口名称与 Bundle 中的接口名称之间的对应关系并不是简单的前缀或者字典关系，而是更为复杂的规则。例如，DUT 中的接口名称与 Bundle 中的接口名称之间的对应关系为：</p>
+<pre tabindex="0"><code>a    -&gt; io_a_in
+b    -&gt; io_b_in
+sum  -&gt; io_sum_out
+cin  -&gt; io_cin_in
+cout -&gt; io_cout_out
+</code></pre><p>在这种情况下，我们可以通过传入正则表达式，来告知 <code>Bundle</code> 以正则表达式的方式进行绑定。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderBundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_regex</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">r</span><span style="color:#4e9a06">&#39;io_(.*)_.*&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bind</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>使用正则表达式时，Bundle 会尝试将 DUT 中的接口名称与正则表达式进行匹配，匹配成功的接口，将会读取正则表达式中的所有捕获组，将其连接为一个字符串。再使用这个字符串与 Bundle 中的接口名称进行匹配。</p>
+<p>例如对于上面代码中的正则表达式，<code>io_a_in</code> 会与正则表达式成功匹配，唯一的捕获组捕获到的内容为 <code>a</code>。<code>a</code> 这个名称与 Bundle 中的接口名称 <code>a</code> 匹配，因此 <code>io_a_in</code> 会被正确绑定至 <code>a</code>。</p>
+<h2 id="创建子bundle">创建子Bundle</h2>
+<p>很多时候，我们会需要一个 Bundle 包含一个或多个其他 Bundle 的情况，这时我们可以将其他已经定义好的 Bundle 作为当前 Bundle 的子 Bundle。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Signal</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Signals</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">Signals</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">MultiplierBundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">product</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">Signals</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">ArithmeticBundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">selector</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">Signal</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">adder</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderBundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_prefix</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;add_&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">multiplier</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MultiplierBundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_prefix</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;mul_&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>在上面的代码中，我们定义了一个 <code>ArithmeticBundle</code>，它包含了自己的信号 <code>selector</code>。除此之外它还包含了一个 <code>AdderBundle</code> 和一个 <code>MultiplierBundle</code>，这两个子 Bundle 分别被命名为 <code>adder</code> 和 <code>multiplier</code>。</p>
+<p>当我们需要访问 <code>ArithmeticBundle</code> 中的子 Bundle 时，可以通过 <code>.</code> 运算符来访问：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">arithmetic_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">ArithmeticBundle</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">selector</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">adder</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">adder</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">multiplier</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">3</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">multiplier</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span>
+</span></span></code></pre></div><p>同时，当我们以这种定义方式进行定义后，在最顶层的 Bundle 进行绑定时，会同时将子 Bundle 也绑定到 DUT 上，在定义子 Bundle 时，依然可以使用前文提到的多种绑定方式。</p>
+<p>需要注意的是，子 Bundle 的创建方法去匹配的信号名称，是经过上一次 Bundle 的创建方法进行处理过后的名称。例如在上面的代码中，我们将顶层 Bundle 的匹配方式设置为 <code>from_prefix('io_')</code>，那么在 <code>AdderBundle</code> 中去匹配的信号，是去除了 <code>io_</code> 前缀后的名称。</p>
+<p>同时，字典匹配方法会将信号名称转换为字典映射后的名称传递给子 Bundle 进行匹配，正则表达式匹配方法会将正则表达式捕获到的名称传递给子 Bundle 进行匹配。</p>
+<h2 id="bundle-中的实用操作">Bundle 中的实用操作</h2>
+<h3 id="信号访问与赋值">信号访问与赋值</h3>
+<p><strong>访问信号值</strong></p>
+<p>在 Bundle 中，我们不仅可以通过 <code>.</code> 运算符来访问 Bundle 中的信号，也可以通过 <code>[]</code> 运算符来访问 Bundle 中的信号。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span></code></pre></div><p><strong>访问未连接信号</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">bind</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">unconnected_signal_access</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>在 <code>bind</code> 时，我们可以通过传入 <code>unconnected_signal_access</code> 参数来控制是否允许访问未连接的信号。默认为 <code>True</code>，即允许访问未连接的信号，此时当写入该信号时，该信号不会发生变化，当读取该信号时，会返回 <code>None</code>。 当 <code>unconnected_signal_access</code> 为 <code>False</code> 时，访问未连接的信号会抛出异常。</p>
+<p><strong>同时赋值所有信号</strong></p>
+<p>可以通过 <code>set_all</code> 方法同时将所有输入信号更改为某个值。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">set_all</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p><strong>信号赋值模式更改</strong></p>
+<p>信号赋值模式是 <code>picker</code> 中的概念，用于控制信号的赋值方式，请查阅 <code>picker</code> 文档以了解更多信息。</p>
+<p>Bundle 中支持通过 <code>set_write_mode</code> 来改变整个 Bundle 的赋值模式。</p>
+<p>同时，Bundle 提供了设置的快捷方法：<code>set_write_mode_as_imme</code>, <code>set_write_mode_as_rise</code> 与 <code>set_write_mode_as_fall</code>，分别用于设置 Bundle 的赋值模式为立即赋值、上升沿赋值与下降沿赋值。</p>
+<h3 id="消息支持">消息支持</h3>
+<p><strong>默认消息类型赋值</strong></p>
+<p>mlvp 支持一个默认的消息类型，可以通过 <code>assign</code> 方法将一个字典赋值给 Bundle 中的信号。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">assign</span><span style="color:#000;font-weight:bold">({</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;cin&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
+</span></span></code></pre></div><p>Bundle 将会自动将字典中的值赋值给对应的信号，当需要将未指定的信号赋值成某个默认值时，可以通过 <code>*</code> 来指定默认值：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">assign</span><span style="color:#000;font-weight:bold">({</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;*&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
+</span></span></code></pre></div><p><strong>子Bundle的默认消息赋值支持</strong></p>
+<p>如果希望通过默认消息类型同时赋值子 Bundle 中的信号，可以通过两种方式实现。当 <code>assign</code> 中的 <code>multilevel</code> 参数为 <code>True</code> 时，Bundle 支持多级字典赋值。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">assign</span><span style="color:#000;font-weight:bold">({</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;selector&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;adder&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;*&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;cin&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;multiplier&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">4</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">},</span> <span style="color:#000">multilevel</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>当 <code>multilevel</code> 为 <code>False</code> 时，Bundle 支持通过 <code>.</code> 来指定子 Bundle 的赋值。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">assign</span><span style="color:#000;font-weight:bold">({</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;*&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;selector&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;adder.cin&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;multiplier.a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;multiplier.b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">4</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">},</span> <span style="color:#000">multilevel</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p><strong>默认消息类型读取</strong></p>
+<p>在 Bundle 中可以使用，<code>as_dict</code> 方法将 Bundle 当前的信号值转换为字典。其同样支持两种格式，当 <code>multilevel</code> 为 <code>True</code> 时，返回多级字典；当 <code>multilevel</code> 为 <code>False</code> 时，返回扁平化的字典。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">as_dict</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">multilevel</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;selector&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;adder&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;sum&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;cin&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;cout&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;multiplier&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#39;product&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">as_dict</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">multilevel</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;selector&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;adder.a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;adder.b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;adder.sum&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;adder.cin&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;adder.cout&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;multiplier.a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;multiplier.b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;multiplier.product&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p><strong>自定义消息类型</strong></p>
+<p>在我们自定义的消息结构中，可以执行规则将其赋值给 Bundle 中的信号。</p>
+<p>一种方法是，在自定义消息结构中，实现 <code>as_dict</code> 函数，将自定义消息结构转换为字典，然后通过 <code>assign</code> 方法赋值给 Bundle。</p>
+<p>另一种方法是，在自定义消息结构中，实现 <code>__bundle_assign__</code> 函数，其接收一个 Bundle 实例，将自定义消息结构赋值给 Bundle。实现后，可以通过 <code>assign</code> 方法赋值给 Bundle，Bundle 将会自动调用 <code>__bundle_assign__</code> 函数进行赋值。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">MyMessage</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__bundle_assign__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">my_message</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MyMessage</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">assign</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_message</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>当需要将 Bundle 中的信号值转换为自定义消息结构时，简易在自定义消息结构中实现 <code>from_bundle</code> 的类方法，接收一个 Bundle 实例，返回一个自定义消息结构。在创建自定义消息结构时，可以通过 <code>from_bundle</code> 方法将 Bundle 中的信号值转换为自定义消息结构。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">MyMessage</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@classmethod</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">from_bundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">cls</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">message</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#3465a4">cls</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">message</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">message</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">message</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">message</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">my_message</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MyMessage</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_bundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h3 id="异步支持">异步支持</h3>
+<p>在 Bundle 中，为了方便的接收时钟信息，提供了 <code>step</code> 函数。当 Bundle 连接至 DUT 的任意一个信号时，step 函数会自动同步至 DUT 的时钟信号。</p>
+<p>可以通过 <code>step</code> 函数来完成时钟周期的等待。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">adder_process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">step</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h3 id="信号连接">信号连接</h3>
+<p><strong>信号连接规则</strong></p>
+<p>当定义好 Bundle 实例后，可以调用 <code>all_signals_rule</code> 方法，获取所有信号的连接规则，以帮助用户检查信号的连接规则是否符合预期。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">all_signals_rule</span><span style="color:#000;font-weight:bold">()</span>
+</span></span></code></pre></div><p><strong>信号可连接性检查</strong></p>
+<p><code>detect_connectivity</code> 方法可以检查一个特定的信号名称是否可以连接到该 Bundle 中的某个信号。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">detect_connectivity</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;io_a&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p><code>detect_specific_connectivity</code> 方法可以检查一个特定的信号名称是否可以连接到该 Bundle 中的某个特定的信号。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">detect_specific_connectivity</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;io_a&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>如果需要检测子 Bundle 的信号连接性，可以通过 <code>.</code> 运算符来指定。</p>
+<h3 id="dut-信号连接检查">DUT 信号连接检查</h3>
+<p><strong>未连接信号检查</strong></p>
+<p><code>detect_unconnected_signals</code> 方法可以检查 DUT 中未连接到任何 Bundle 的信号。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">Bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">detect_unconnected_signals</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p><strong>重复连接检查</strong></p>
+<p><code>detect_multiple_connections</code> 方法可以检查 DUT 中同时连接到多个 Bundle 的信号。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">Bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">detect_multiple_connections</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h3 id="其他实用操作">其他实用操作</h3>
+<p><strong>设置 Bundle 名称</strong></p>
+<p>可以通过 <code>set_name</code> 方法设置 Bundle 的名称。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">set_name</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;adder&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>设置名称之后，将会得到更加直观的提示信息。</p>
+<p><strong>获取 Bundle 中所有信号</strong></p>
+<p><code>all_signals</code> 信号会返回一个 generator，其中包含了包括子 Bundle 信号在内的所有信号。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">signal</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">all_signals</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">signal</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h2 id="bundle-的自动生成脚本">Bundle 的自动生成脚本</h2>
+<p>在很多情况下，DUT 的接口可能过于复杂，手动去编写 Bundle 的定义会变得非常繁琐。然而，Bundle 作为中间层，提供一个确切的信号名称定义是必要的。为了解决这个问题，mlvp 提供了一个自动生成 Bundle 的脚本来从 DUT 的接口定义中生成 Bundle 的定义。</p>
+<p>可以在 mlvp 仓库目录下的 <code>scripts</code> 文件夹中找到 <code>bundle_code_gen.py</code> 脚本。该脚本可以通过解析 DUT 实例，以及指定的绑定规则自动生成 Bundle 的定义。</p>
+<p>其中提供了三个函数</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">gen_bundle_code_from_dict</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bundle_name</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">dict</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">dict</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">max_width</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">int</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">120</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">gen_bundle_code_from_prefix</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bundle_name</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">prefix</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">str</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">max_width</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">int</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">120</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">gen_bundle_code_from_regex</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bundle_name</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">regex</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">max_width</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">int</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">120</span><span style="color:#000;font-weight:bold">):</span>
+</span></span></code></pre></div><p>分别用于通过字典、前缀、正则表达式的方式生成 Bundle 的定义。</p>
+<p>使用时，指定 Bundle 的名称，DUT 实例，以及对应的生成规则便可生成 Bundle 的定义，还可以通过 <code>max_width</code> 参数来指定生成的代码的最大宽度。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">bundle_code_gen</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">gen_bundle_code_from_dict</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;AdderBundle&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;io_a&#39;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;io_b&#39;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;sum&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;io_sum&#39;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;cin&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;io_cin&#39;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;cout&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#39;io_cout&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">gen_bundle_code_from_prefix</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;AdderBundle&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;io_&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">gen_bundle_code_from_regex</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;AdderBundle&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">r</span><span style="color:#4e9a06">&#39;io_(.*)&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>生成好的代码可以直接或经过简单的修改后，复制到代码中使用。也可以作为子 Bundle 的定义，应用到其他 Bundle 中。</p>
+
+	<div class="text-muted mt-5 pt-3 border-top">
+  最后修改 September 2, 2024: <a href="https://github.com/XS-MLVP/course/commit/1914db6e37538540a5f525e06f3829caa7aff2ab">Add Bundle code gen doc (1914db6)</a>
+</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
+        <span>&copy; 2024 BOSC 保留所有权利</span>
+        <span class="ms-1"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
+        
+      </div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <script src="/mlvp/js/main.min.dd1c2298430db5cf5953343b107c50aa7736eb4f57cacaf6c72cfa9b0964c422.js" integrity="sha256-3RwimEMNtc9ZUzQ7EHxQqnc2609Xysr2xyz6mwlkxCI=" crossorigin="anonymous"></script>
+<script src='/mlvp/js/prism.js'></script>
+<script src='/mlvp/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
