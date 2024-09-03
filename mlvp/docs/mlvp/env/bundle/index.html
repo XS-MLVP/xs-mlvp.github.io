@@ -32,15 +32,15 @@ adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 a
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/bundle/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-09-02T23:03:23+08:00" />
+<meta property="article:modified_time" content="2024-09-03T20:59:57+08:00" />
 <meta itemprop="name" content="如何使用 Bundle">
 <meta itemprop="description" content="Bundle 在 mlvp 验证环境中，用于构建 Agent 与 DUT 之间交互的中间层，以保证 Agent 与 DUT 之间的解耦。同时 Bundle 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。
 一个简单的 Bundle 的定义 为了定义一个 Bundle，需要自定义一个新类，并继承 mlvp 中的 Bundle 类。下面是一个简单的 Bundle 的定义示例：
 from mlvp import Bundle, Signals class AdderBundle(Bundle): a, b, sum, cin, cout = Signals(5) 该 Bundle 定义了一个简单的加法器接口，在 AdderBundle 类中，我们定义了五个信号 a, b, sum, cin, cout，这五个信号分别代表了加法器的输入端口 a, b，输出端口 sum，以及进位输入端口 cin 和进位输出端口 cout。
 定义完成后，我们可以通过 AdderBundle 类的实例来访问这些信号，例如：
 adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 adder_bundle.">
-<meta itemprop="dateModified" content="2024-09-02T23:03:23+08:00" />
-<meta itemprop="wordCount" content="874">
+<meta itemprop="dateModified" content="2024-09-03T20:59:57+08:00" />
+<meta itemprop="wordCount" content="982">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何使用 Bundle"/>
 <meta name="twitter:description" content="Bundle 在 mlvp 验证环境中，用于构建 Agent 与 DUT 之间交互的中间层，以保证 Agent 与 DUT 之间的解耦。同时 Bundle 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。
 一个简单的 Bundle 的定义 为了定义一个 Bundle，需要自定义一个新类，并继承 mlvp 中的 Bundle 类。下面是一个简单的 Bundle 的定义示例：
@@ -151,7 +151,7 @@ adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 a
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2dd1f35a518115a30eb5d339d95d80f1.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.1ba1ccf765cd57ae3757f09a0bfaeb05.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -175,7 +175,7 @@ adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 a
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2dd1f35a518115a30eb5d339d95d80f1.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.1ba1ccf765cd57ae3757f09a0bfaeb05.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -264,6 +264,10 @@ adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 a
   <a href="/mlvp/docs/mlvp/env/bundle/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvbundle"><span class="td-sidebar-nav-active-item">如何使用 Bundle</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvagent-li">
   <a href="/mlvp/docs/mlvp/env/agent/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvagent"><span class="">如何编写 Agent</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvbuild_env-li">
+  <a href="/mlvp/docs/mlvp/env/build_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvbuild_env"><span class="">如何搭建 Env</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvref_model-li">
+  <a href="/mlvp/docs/mlvp/env/ref_model/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvref_model"><span class="">如何编写参考模型</span></a>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmlvpapi-li">
@@ -329,6 +333,7 @@ adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 a
       <ul>
         <li><a href="#信号访问与赋值">信号访问与赋值</a></li>
         <li><a href="#消息支持">消息支持</a></li>
+        <li><a href="#时序封装">时序封装</a></li>
         <li><a href="#异步支持">异步支持</a></li>
         <li><a href="#信号连接">信号连接</a></li>
         <li><a href="#dut-信号连接检查">DUT 信号连接检查</a></li>
@@ -589,7 +594,37 @@ cout -&gt; io_cout_out
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">message</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#000">my_message</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MyMessage</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_bundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><h3 id="异步支持">异步支持</h3>
+</span></span></code></pre></div><h3 id="时序封装">时序封装</h3>
+<p>Bundle类除了对DUT的引脚进行封装外，还提供了基于数组的时序封装，可以适用于部分简单时序场景。Bundle类提供了<code>process_requests(data_list)</code>函数，他接受一个数组输入，第<code>i</code>个时钟周期，会将<code>data_list[i]</code>对应的数据赋值给引脚。<code>data_list</code>中的数据可以是<code>dict</code>类型，或者<code>callable(cycle, bundle_ins)</code>类型的可调用对象。对于<code>dict</code>类型，特殊<code>key</code>有：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>__funcs__: func<span style="color:#ce5c00;font-weight:bold">(</span>cycle, self<span style="color:#ce5c00;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic"># 可调用对象，可以为函数数组[f1,f2,..]</span>
+</span></span><span style="display:flex;"><span>__condition_func__:  func<span style="color:#ce5c00;font-weight:bold">(</span>cycle, slef, cargs<span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 条件函数，当改函数返回为true时，进行赋值，否则继续推进时钟</span>
+</span></span><span style="display:flex;"><span>__condition_args__:  cargs <span style="color:#8f5902;font-style:italic"># 条件函数需要的参数</span>
+</span></span><span style="display:flex;"><span>__return_bundles__:  bundle <span style="color:#8f5902;font-style:italic"># 需要本次dict赋值时返回的bundle数据，可以是list[bundle]</span>
+</span></span></code></pre></div><p>如果输入的<code>dict</code>中有<code>__return_bundles__</code>，则函数会返回该输入对应的bundle值，例如<code>{&quot;data&quot;: x, &quot;cycle&quot;: y}</code>。以Adder为例，期望第三次加后返回结果：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Adder虽然为存组合逻辑，但此处当时序逻辑使用</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">Signals</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">)</span>             <span style="color:#8f5902;font-style:italic"># 指定引脚</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># init clock</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># dut.InitClock(&#34;clock&#34;)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bind</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>                            <span style="color:#8f5902;font-style:italic"># 绑定到dut</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">add_list</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">data_list</span> <span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">[(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">),(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span><span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">),(</span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">,</span><span style="color:#0000cf;font-weight:bold">6</span><span style="color:#000;font-weight:bold">),(</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#000;font-weight:bold">,</span><span style="color:#0000cf;font-weight:bold">8</span><span style="color:#000;font-weight:bold">)]):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># make input dit</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">data</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#204a87">enumerate</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">data_list</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000">x</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#4e9a06">&#34;a&#34;</span><span style="color:#000;font-weight:bold">:</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;b&#34;</span><span style="color:#000;font-weight:bold">:</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;*&#34;</span><span style="color:#000;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">}</span>             <span style="color:#8f5902;font-style:italic"># 构建budle赋值的dict</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:bold">&gt;=</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000">x</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;__return_bundles__&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#3465a4">self</span>    <span style="color:#8f5902;font-style:italic"># 设置需要返回的bundle</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">process_requests</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">data</span><span style="color:#000;font-weight:bold">)</span>        <span style="color:#8f5902;font-style:italic"># 推动时钟，赋值，返回结果</span>
+</span></span></code></pre></div><p>当调用<code>add_list()</code>后，返回的结果为:</p>
+<pre tabindex="0"><code class="language-pthon" data-lang="pthon">[
+  {&#34;data&#34;: {&#34;a&#34;:5, &#34;b&#34;:6, &#34;cin&#34;: 0, &#34;sum&#34;:11, &#34;cout&#34;: 0}, &#34;cycle&#34;:3},
+  {&#34;data&#34;: {&#34;a&#34;:7, &#34;b&#34;:8, &#34;cin&#34;: 0, &#34;sum&#34;:15, &#34;cout&#34;: 0}, &#34;cycle&#34;:4}
+]
+</code></pre><h3 id="异步支持">异步支持</h3>
 <p>在 Bundle 中，为了方便的接收时钟信息，提供了 <code>step</code> 函数。当 Bundle 连接至 DUT 的任意一个信号时，step 函数会自动同步至 DUT 的时钟信号。</p>
 <p>可以通过 <code>step</code> 函数来完成时钟周期的等待。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">adder_process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#000;font-weight:bold">):</span>
@@ -648,7 +683,7 @@ cout -&gt; io_cout_out
 </span></span></code></pre></div><p>生成好的代码可以直接或经过简单的修改后，复制到代码中使用。也可以作为子 Bundle 的定义，应用到其他 Bundle 中。</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 September 2, 2024: <a href="https://github.com/XS-MLVP/course/commit/1914db6e37538540a5f525e06f3829caa7aff2ab">Add Bundle code gen doc (1914db6)</a>
+  最后修改 September 3, 2024: <a href="https://github.com/XS-MLVP/course/commit/0be4d86a309b1951e193429d26ed29bbb5ff1edf">Add Reference model for function call patterns doc (0be4d86)</a>
 </div>
 
 </div>

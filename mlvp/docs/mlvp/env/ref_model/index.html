@@ -17,36 +17,60 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
-<title>如何编写 Agent | 开放验证平台学习资源</title>
-<meta name="description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
-一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
-初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
-from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
-创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。">
-<meta property="og:title" content="如何编写 Agent" />
-<meta property="og:description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
-一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
-初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
-from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
-创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。" />
+<title>如何编写参考模型 | 开放验证平台学习资源</title>
+<meta name="description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
+参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
+这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。
+函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。
+下面是一个简单的函数调用模式的参考模型的定义示例：
+例如，这是一个简单的加法器参考模型：
+class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。
+需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。
+独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
+我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
+class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&amp;#34;a&amp;#34;] &#43; operands[&amp;#34;b&amp;#34;] await self.">
+<meta property="og:title" content="如何编写参考模型" />
+<meta property="og:description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
+参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
+这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。
+函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。
+下面是一个简单的函数调用模式的参考模型的定义示例：
+例如，这是一个简单的加法器参考模型：
+class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。
+需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。
+独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
+我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
+class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/agent/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/ref_model/" /><meta property="article:section" content="docs" />
 
 <meta property="article:modified_time" content="2024-09-03T20:59:57+08:00" />
-<meta itemprop="name" content="如何编写 Agent">
-<meta itemprop="description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
-一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
-初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
-from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
-创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。">
+<meta itemprop="name" content="如何编写参考模型">
+<meta itemprop="description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
+参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
+这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。
+函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。
+下面是一个简单的函数调用模式的参考模型的定义示例：
+例如，这是一个简单的加法器参考模型：
+class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。
+需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。
+独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
+我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
+class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self.">
 <meta itemprop="dateModified" content="2024-09-03T20:59:57+08:00" />
-<meta itemprop="wordCount" content="242">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何编写 Agent"/>
-<meta name="twitter:description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
-一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
-初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
-from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
-创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。"/>
+<meta itemprop="wordCount" content="277">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何编写参考模型"/>
+<meta name="twitter:description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
+参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
+这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。
+函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。
+下面是一个简单的函数调用模式的参考模型的定义示例：
+例如，这是一个简单的加法器参考模型：
+class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。
+需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。
+独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
+我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
+class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self."/>
 
 
 
@@ -262,12 +286,12 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
   <a href="/mlvp/docs/mlvp/env/start_test/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvstart_test"><span class="">如何使用异步环境</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvbundle-li">
   <a href="/mlvp/docs/mlvp/env/bundle/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvbundle"><span class="">如何使用 Bundle</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsmlvpenvagent-li">
-  <a href="/mlvp/docs/mlvp/env/agent/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvagent"><span class="td-sidebar-nav-active-item">如何编写 Agent</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvagent-li">
+  <a href="/mlvp/docs/mlvp/env/agent/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvagent"><span class="">如何编写 Agent</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvbuild_env-li">
   <a href="/mlvp/docs/mlvp/env/build_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvbuild_env"><span class="">如何搭建 Env</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvref_model-li">
-  <a href="/mlvp/docs/mlvp/env/ref_model/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvref_model"><span class="">如何编写参考模型</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsmlvpenvref_model-li">
+  <a href="/mlvp/docs/mlvp/env/ref_model/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvref_model"><span class="td-sidebar-nav-active-item">如何编写参考模型</span></a>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmlvpapi-li">
@@ -308,10 +332,10 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
             
 <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/mlvp/env/agent.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/mlvp/env/agent.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/mlvp/env/ref_model.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/mlvp/env/ref_model.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
   <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/mlvp/env?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e5%a6%82%e4%bd%95%e7%bc%96%e5%86%99%20Agent" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e5%a6%82%e4%bd%95%e7%bc%96%e5%86%99%e5%8f%82%e8%80%83%e6%a8%a1%e5%9e%8b" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
   <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
   <a id="print" href="/mlvp/docs/mlvp/env/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
@@ -320,9 +344,19 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#初始化-agent">初始化 Agent</a></li>
-    <li><a href="#创建驱动方法">创建驱动方法</a></li>
-    <li><a href="#创建监测方法">创建监测方法</a></li>
+    <li><a href="#参考模型的两种实现方式">参考模型的两种实现方式</a>
+      <ul>
+        <li><a href="#函数调用模式">函数调用模式</a></li>
+        <li><a href="#独立执行流模式">独立执行流模式</a></li>
+      </ul>
+    </li>
+    <li><a href="#如何编写函数调用模式的参考模型">如何编写函数调用模式的参考模型</a>
+      <ul>
+        <li><a href="#驱动函数匹配">驱动函数匹配</a></li>
+        <li><a href="#agent-匹配">Agent 匹配</a></li>
+      </ul>
+    </li>
+    <li><a href="#如何编写独立执行流模式的参考模型">如何编写独立执行流模式的参考模型</a></li>
   </ul>
 </nav>
       </div>
@@ -358,84 +392,115 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/mlvp/env/">搭建验证环境</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    如何编写 Agent</li>
+    如何编写参考模型</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>如何编写 Agent</h1>
+	<h1>如何编写参考模型</h1>
 	
 	<header class="article-meta">
 		
   </header>
-	<p><code>Agent</code> 在 mlvp 验证环境中实现了对一类 <code>Bundle</code> 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。</p>
-<p>一个 <code>Agent</code> 由 <strong>驱动方法(driver_method)</strong> 和 <strong>监测方法(monitor_method)</strong> 组成，其中驱动方法用于主动驱动 <code>Bundle</code> 中的信号，而监测方法用于被动监测 <code>Bundle</code> 中的信号。</p>
-<h2 id="初始化-agent">初始化 Agent</h2>
-<p>为了定义一个 <code>Agent</code>，需要自定义一个新类，并继承 mlvp 中的 <code>Agent</code> 类。下面是一个简单的 <code>Agent</code> 的定义示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+	<p><code>参考模型</code> 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 <code>Env</code> 的接口规范，以便能够附加到 <code>Env</code> 上，由 <code>Env</code> 来完成参考模型的自动同步。</p>
+<h2 id="参考模型的两种实现方式">参考模型的两种实现方式</h2>
+<p>mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 <code>Env</code> 上，并由 <code>Env</code> 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。</p>
+<p>这两种方式分别是 <strong>函数调用模式</strong> 与 <strong>独立执行流模式</strong>，下面将分别介绍这两种方式的具体概念。</p>
+<h3 id="函数调用模式">函数调用模式</h3>
+<p><strong>函数调用模式</strong>即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。</p>
+<p>下面是一个简单的函数调用模式的参考模型的定义示例：</p>
+<p>例如，这是一个简单的加法器参考模型：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderRefModel</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">a</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">b</span>
+</span></span></code></pre></div><p>在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。</p>
+<p>需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。</p>
+<h3 id="独立执行流模式">独立执行流模式</h3>
+<p><strong>独立执行流模式</strong>即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。</p>
+<p>我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Agent</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">step</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">bundle</span>
-</span></span></code></pre></div><p>在 <code>AdderAgent</code> 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 <code>Agent</code> 中传入一个时钟同步函数，以便 <code>Agent</code> 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 <code>bundle.step</code>，即 <code>Bundle</code> 中的时钟同步函数，<code>Bundle</code> 中的 step 与 DUT 中的时钟同步。</p>
-<h2 id="创建驱动方法">创建驱动方法</h2>
-<p>在 <code>Agent</code> 中，驱动方法是一个异步函数，用于主动驱动 <code>Bundle</code> 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 <code>Bundle</code> 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。</p>
-<p>每一个驱动方法都应是一个异步函数，并且使用 <code>@driver_method</code> 装饰器进行修饰，以便 <code>Agent</code> 能够识别该函数为驱动方法。</p>
-<p>下面是一个简单的驱动方法的定义示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_port</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DriverPort</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum_port</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MonitorPort</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Agent</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">step</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">bundle</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">while</span> <span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000">operands</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_port</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87">sum</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">operands</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;a&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">operands</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;b&#34;</span><span style="color:#000;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum_port</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87">sum</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>在这里，我们在参考模型构造函数中定义了两类接口，一类为<strong>驱动接口(DriverPort)</strong>，即代码中的<code>add_port</code>，用于接收外部输入数据；另一类为<strong>监测接口(MonitorPort)</strong>，即代码中的<code>sum_port</code>，用于向外部输出数据。</p>
+<p>定义了这两个接口后，上层代码在给参考模型发送数据时，并不会触发参考模型中的某个函数，而是会将数据发送到 <code>add_port</code> 这个驱动接口中。同时，上层代码也无法主动获取到参考模型的输出数据了。参考模型的输出数据会通过 <code>sum_port</code> 这个监测接口，由参考模型主动输出。</p>
+<p>那么参考模型如何去使用这两个接口呢？在参考模型中，有一个 main 函数，这是参考模型执行的入口，当参考模型创建时, main 函数会被自动调用，并在后台持续运行。在上面代码中 main 函数里，参考模型通过不断重复这一过程：等待 <code>add_port</code> 中的数据、计算结果、将结果输出到 <code>sum_port</code> 中 来实现参考模型的行为。</p>
+<p>参考模型会主动向 <code>add_port</code> 请求数据，如果 <code>add_port</code> 中没有数据，参考模型会等待数据的到来。当数据到来后，参考模型将会进行计算，将计算结果主动的输出到 <code>sum_port</code> 中。它的执行过程是一个独立的执行流，不受外部的主动调用控制。当参考模型变得复杂时，其将会含有众多的驱动接口和监测接口，通过独立执行流的方式，可以更好的去处理结构之间的相互关系，尤其是接口之间存在调用顺序的情况。</p>
+<h2 id="如何编写函数调用模式的参考模型">如何编写函数调用模式的参考模型</h2>
+<h3 id="驱动函数匹配">驱动函数匹配</h3>
+<p>假如 Env 中定义的接口如下：</p>
+<pre tabindex="0"><code>StackEnv
+  - port_agent
+    - @driver_method push
+    - @driver_method pop
+</code></pre><p>那么如果我们想要编写与之对应的参考模型，自然地，我们需要定义这四个驱动函数被调用时参考模型的行为。也就是说为每一个驱动函数编写一个对应的函数，这些函数将会在驱动函数被调用时被框架自动调用。</p>
+<p>如何让参考模型中定义的函数能够与某个驱动函数匹配呢？首先应该使用 <code>@driver_hook</code> 装饰器来表示这个函数是一个驱动函数的匹配函数。接着，为了建立对应关系，我们需要在装饰器中指定其对应的 Agent 和驱动函数的名称。最后，只需要保证函数的参数与驱动函数的参数一致，两个函数便能够建立对应关系。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@driver_hook</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">driver_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;push&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">data</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@driver_method</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">exec_add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">a</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">b</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">cin</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">step</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span>
-</span></span></code></pre></div><p>在 <code>drive</code> 函数中，我们将传入的 <code>a</code>, <code>b</code>, <code>cin</code> 三个参数分别赋值给 <code>Bundle</code> 中的 <code>a</code>, <code>b</code>, <code>cin</code> 信号，并等待一个时钟周期。在时钟周期结束后，我们返回 <code>Bundle</code> 中的 <code>sum</code>, <code>cout</code> 信号值。</p>
-<p>在驱动函数的编写过程中，你可以使用 <a href="/mlvp/docs/mlvp/env/start_test/">如何使用异步环境</a> 中介绍的所有等待时钟信号的同步方法，例如 <code>ClockCycles</code>, <code>Value</code> 等。</p>
-<p>创建完毕后，你可以像调用普通函数一样在驱动代码中调用该驱动方法，例如：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">adder_agent</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">adder_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exec_add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cout</span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><p>被标识为 <code>@driver_method</code> 的函数在调用时拥有诸多特性，这一部分将在编写测试用例中详细介绍。同时，该类函数还会完成参考模型的匹配与自动调用以返回值对比，这一部分将在编写参考模型中详细介绍。</p>
-<h2 id="创建监测方法">创建监测方法</h2>
-<p>监测方法同样需要是一个异步函数，并且使用 <code>@monitor_method</code> 装饰器进行修饰，以便 <code>Agent</code> 能够识别该函数为监测方法。</p>
-<p>一个简单的监测方法的定义示例如下：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@driver_hook</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">driver_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;pop&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">pop</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
+</span></span></code></pre></div><p>此时，驱动函数与参考模型的对应关系已经建立，当 Env 中的某个驱动函数被调用时，参考模型中对应的函数将会被自动调用，并自动对比两者的返回值是否一致。</p>
+<p>mlvp 还提供了以下几种匹配方式，以便更好地匹配驱动函数：</p>
+<p><strong>指定驱动函数路径</strong></p>
+<p>可以通过 &ldquo;.&rdquo; 来指定驱动函数的路径，例如：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@driver_hook</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;port_agent.push&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">data</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Agent</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">step</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">bundle</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@driver_hook</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;port_agent.pop&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">pop</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
+</span></span></code></pre></div><p><strong>使用函数名称匹配驱动函数名称</strong></p>
+<p>如果参考模型中的函数名称与驱动函数名称相同，可以省略 <code>driver_name</code> 参数，例如：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@driver_hook</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">data</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@monitor_method</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">monitor_sum</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">:</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">as_dict</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><p>在 <code>monitor_sum</code> 函数中，我们以 Bundle 中的 sum 信号作为监测对象，当 sum 信号的值大于 0 时，收集 Bundle 生成的默认消息类型，收集到的返回值将会被存储到内部的消息队列中。</p>
-<p>添加 <code>monitor_method</code> 装饰器后，<code>monitor_sum</code> 函数将会被 <code>Agent</code> 自动调用，它会使用 <code>Agent</code> 初始化时提供的时钟同步函数来决定何时调用监测方法。默认情况下，<code>Agent</code> 会在每个时钟周期都调用一次监测方法，如果监测方法有返回值，那么返回值将会被存储到内部的消息队列中。若监测方法的一次调用会经过多个时钟周期，<code>Agent</code> 会等待上一次监测方法调用结束后再次调用监测方法。</p>
-<p>如果编写了类似下面的监测方法：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@monitor_method</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">monitor_sum</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">as_dict</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><p>该监测方法将会在每个周期都往消息队列中添加一个消息。</p>
-<p><strong>获取监测消息</strong></p>
-<p>由于该监测方法被标记为了 <code>@monitor_method</code>，因此该方法将会被 <code>Agent</code> 自动调用，在测试用例中如果按照以下方式直接调用该函数，并不能执行该函数的预期行为。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">adder_agent</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">adder_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">monitor_sum</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><p>相反的，按照上述方式调用监测方法，它将会弹出消息队列中收集到的最早的消息，并返回该消息。如果消息队列为空，该次调用将会等待消息队列中有消息后再返回。</p>
-<p>如果想获取消息队列中的消息数量，可以使用如下方式获取：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">message_count</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">adder_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">monitor_sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">size</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><p>通过创建监测方法，你可以方便地添加一个后台监测任务，监测 <code>Bundle</code> 中的信号值，并在满足条件时收集消息。将函数标记为监测方法后，框架还会为这一方法提供与参考模型的匹配与自动收集对比，这一部分将在编写参考模型中详细介绍。</p>
-<p>通过在 Agent 中编写多个驱动方法和监测方法，便完成了整个 <code>Agent</code> 的编写。</p>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@driver_hook</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">pop</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
+</span></span></code></pre></div><p><strong>使用函数名称同时匹配 Agent 名称与驱动函数名称</strong></p>
+<p>可以在函数名中通过双下划线 &ldquo;__&rdquo; 来同时匹配 Agent 名称与驱动函数名称，例如：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@driver_hook</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">port_agent__push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">data</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@driver_hook</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">port_agent__pop</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
+</span></span></code></pre></div><h3 id="agent-匹配">Agent 匹配</h3>
+<p>除了对 Agent 中每一个驱动函数都编写一个 <code>driver_hook</code> 之外，还可以通过 <code>@agent_hook</code> 装饰器来一次性匹配 Agent 中的所有驱动函数。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@agent_hook</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">port_agent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">driver_name</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">args</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
+</span></span></code></pre></div><p>在这个例子中，<code>port_agent</code> 函数将会匹配 <code>port_agent</code> Agent 中的所有驱动函数，当 Agent 中的任意一个驱动函数被调用时，<code>port_agent</code> 函数将会被自动调用。除了 self 之外，<code>port_agent</code> 函数还需接受且只接受两个参数，第一个参数为驱动函数的名称，第二个参数为驱动函数的参数。</p>
+<p>当某个驱动函数被调用时，driver_name 参数将会传入驱动函数的名称，args 参数将会传入该该驱动函数被调用时的参数，参数将会以字典的形式传入。port_agent 函数可以根据 driver_name 和 args 来决定如何处理这个驱动函数的调用，并将结果返回。此时框架将会使用此函数的返回值与驱动函数的返回值进行对比。</p>
+<p>与驱动函数类似，<code>@agent_hook</code> 装饰器也支持当函数名与 Agent 名称相同时省略 <code>agent_name</code> 参数。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@agent_hook</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">port_agent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">driver_name</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">args</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
+</span></span></code></pre></div><p><strong>agent_hook 与 driver_hook 同时存在</strong></p>
+<p>当 <code>agent_hook</code> 被定义后，理论上无需再定义任何 <code>driver_hook</code> 与 Agent 中的驱动函数进行匹配。但是，如果需要对某个驱动函数进行特殊处理，可以再定义一个 <code>driver_hook</code> 与该驱动函数进行匹配。</p>
+<p>当 <code>agent_hook</code> 与 <code>driver_hook</code> 同时存在时，框架会优先调用 <code>agent_hook</code> 函数，再调用 <code>driver_hook</code> 函数，并将 <code>driver_hook</code> 函数的返回值用于结果的对比。</p>
+<p>当 Env 中所有的驱动函数都能找到对应的 <code>driver_hook</code> 或 <code>agent_hook</code> 时，参考模型便能成功与 Env 建立匹配关系，此时可以直接通过 Env 中的 <code>attach</code> 方法将参考模型附加到 Env 上。</p>
+<h2 id="如何编写独立执行流模式的参考模型">如何编写独立执行流模式的参考模型</h2>
 
 	<div class="text-muted mt-5 pt-3 border-top">
   最后修改 September 3, 2024: <a href="https://github.com/XS-MLVP/course/commit/0be4d86a309b1951e193429d26ed29bbb5ff1edf">Add Reference model for function call patterns doc (0be4d86)</a>

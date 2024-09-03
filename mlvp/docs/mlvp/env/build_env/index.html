@@ -17,20 +17,44 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
-<title>案例二：随机数生成器 | 开放验证平台学习资源</title>
-<meta name="description" content="基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。">
-<meta property="og:title" content="案例二：随机数生成器" />
-<meta property="og:description" content="基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。" />
+<title>如何搭建 Env | 开放验证平台学习资源</title>
+<meta name="description" content="Env 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
+创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。
+创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 mlvp 中的 Env 类。下面是一个简单的 Env 的定义示例：
+from mlvp.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
+可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。
+此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：
+port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env.">
+<meta property="og:title" content="如何搭建 Env" />
+<meta property="og:description" content="Env 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
+创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。
+创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 mlvp 中的 Env 类。下面是一个简单的 Env 的定义示例：
+from mlvp.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
+可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。
+此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：
+port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/build_env/" /><meta property="article:section" content="docs" />
 
 <meta property="article:modified_time" content="2024-09-03T20:59:57+08:00" />
-<meta itemprop="name" content="案例二：随机数生成器">
-<meta itemprop="description" content="基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。">
+<meta itemprop="name" content="如何搭建 Env">
+<meta itemprop="description" content="Env 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
+创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。
+创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 mlvp 中的 Env 类。下面是一个简单的 Env 的定义示例：
+from mlvp.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
+可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。
+此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：
+port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env.">
 <meta itemprop="dateModified" content="2024-09-03T20:59:57+08:00" />
-<meta itemprop="wordCount" content="366">
-<meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="案例二：随机数生成器"/>
-<meta name="twitter:description" content="基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。"/>
+<meta itemprop="wordCount" content="124">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何搭建 Env"/>
+<meta name="twitter:description" content="Env 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
+创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。
+创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 mlvp 中的 Env 类。下面是一个简单的 Env 的定义示例：
+from mlvp.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
+可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。
+此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：
+port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env."/>
 
 
 
@@ -120,7 +144,7 @@
         <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/mlvp/en/docs/quick-start/eg-rmg/">English</a></li>
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
     </ul>
 </div></li>
       </ul>
@@ -172,7 +196,7 @@
       <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/mlvp/en/docs/quick-start/eg-rmg/">English</a></li>
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
     </ul>
 </div>
     </div>
@@ -180,15 +204,15 @@
       <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocs-li">
   <a href="/mlvp/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-mlvpdocs"><span class="">学习资源</span></a>
   <ul class="ul-1">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsquick-start-li">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsquick-start-li">
   <a href="/mlvp/docs/quick-start/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsquick-start"><span class="">快速开始</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-startinstaller-li">
   <a href="/mlvp/docs/quick-start/installer/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startinstaller"><span class="">搭建验证环境</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-adder-li">
   <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：简单加法器</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsquick-starteg-rmg-li">
-  <a href="/mlvp/docs/quick-start/eg-rmg/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-rmg"><span class="td-sidebar-nav-active-item">案例二：随机数生成器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-rmg-li">
+  <a href="/mlvp/docs/quick-start/eg-rmg/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-rmg"><span class="">案例二：随机数生成器</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-callback-li">
   <a href="/mlvp/docs/quick-start/eg-stack-callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-callback"><span class="">案例三：双端口栈（回调）</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-async-li">
@@ -232,14 +256,14 @@
   <a href="/mlvp/docs/basic/report/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicreport"><span class="">验证报告</span></a>
 </li>
   </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmlvp-li">
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsmlvp-li">
   <a href="/mlvp/docs/mlvp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvp"><span class="">验证框架</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpquick-start-li">
   <a href="/mlvp/docs/mlvp/quick-start/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpquick-start"><span class="">快速开始</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpcanonical_env-li">
   <a href="/mlvp/docs/mlvp/canonical_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpcanonical_env"><span class="">编写规范的验证环境</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmlvpenv-li">
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsmlvpenv-li">
   <a href="/mlvp/docs/mlvp/env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvpenv"><span class="">搭建验证环境</span></a>
   <ul class="ul-3 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvstart_test-li">
@@ -248,8 +272,8 @@
   <a href="/mlvp/docs/mlvp/env/bundle/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvbundle"><span class="">如何使用 Bundle</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvagent-li">
   <a href="/mlvp/docs/mlvp/env/agent/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvagent"><span class="">如何编写 Agent</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvbuild_env-li">
-  <a href="/mlvp/docs/mlvp/env/build_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvbuild_env"><span class="">如何搭建 Env</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsmlvpenvbuild_env-li">
+  <a href="/mlvp/docs/mlvp/env/build_env/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvbuild_env"><span class="td-sidebar-nav-active-item">如何搭建 Env</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpenvref_model-li">
   <a href="/mlvp/docs/mlvp/env/ref_model/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvref_model"><span class="">如何编写参考模型</span></a>
 </li>
@@ -292,26 +316,20 @@
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
             
 <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/quick-start/eg-rmg.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/quick-start/eg-rmg.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
-  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/quick-start?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e6%a1%88%e4%be%8b%e4%ba%8c%ef%bc%9a%e9%9a%8f%e6%9c%ba%e6%95%b0%e7%94%9f%e6%88%90%e5%99%a8" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/mlvp/env/build_env.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/mlvp/env/build_env.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/mlvp/env?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e5%a6%82%e4%bd%95%e6%90%ad%e5%bb%ba%20Env" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
   <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
-  <a id="print" href="/mlvp/docs/quick-start/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+  <a id="print" href="/mlvp/docs/mlvp/env/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
 </div>
 
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#rtl源码">RTL源码</a></li>
-    <li><a href="#测试过程">测试过程</a>
-      <ul>
-        <li><a href="#将rtl构建为-python-module">将RTL构建为 Python Module</a></li>
-        <li><a href="#配置测试代码">配置测试代码</a></li>
-        <li><a href="#运行测试程序">运行测试程序</a></li>
-      </ul>
-    </li>
+    <li><a href="#创建-env">创建 Env</a></li>
+    <li><a href="#附加参考模型">附加参考模型</a></li>
   </ul>
 </nav>
       </div>
@@ -343,142 +361,60 @@
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/quick-start/">快速开始</a></li>
+    <a href="/mlvp/docs/mlvp/">验证框架</a></li>
+  <li class="breadcrumb-item">
+    <a href="/mlvp/docs/mlvp/env/">搭建验证环境</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    案例二：随机数生成器</li>
+    如何搭建 Env</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>案例二：随机数生成器</h1>
-	<div class="lead">基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。</div>
+	<h1>如何搭建 Env</h1>
+	
 	<header class="article-meta">
-		<div class="taxonomy taxonomy-terms-article taxo-tags">
-  <h5 class="taxonomy-title">Tags:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span></a></li>
-    </ul>
-</div>
-<div class="taxonomy taxonomy-terms-article taxo-categories">
-  <h5 class="taxonomy-title">Categories:</h5>
-  <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span></a></li>
-    <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span></a></li>
-    </ul>
-</div>
-
+		
   </header>
-	<h2 id="rtl源码">RTL源码</h2>
-<p>在本案例中，我们驱动一个随机数生成器，其源码如下：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">RandomGenerator</span> <span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">reset</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">15</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">seed</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">15</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">random_number</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">15</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">;</span>
+	<p><code>Env</code> 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。</p>
+<p>创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。</p>
+<h2 id="创建-env">创建 Env</h2>
+<p>为了定义一个 <code>Env</code>，需要自定义一个新类，并继承 mlvp 中的 <code>Env</code> 类。下面是一个简单的 <code>Env</code> 的定义示例：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.env</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk</span> <span style="color:#204a87;font-weight:bold">or</span> <span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">reset</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">reset</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">lfsr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">seed</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">end</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#204a87;font-weight:bold">begin</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">lfsr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">14</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">],</span> <span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">15</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">^</span> <span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">14</span><span style="color:#000;font-weight:bold">]};</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">end</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">random_number</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">endmodule</span>
-</span></span></code></pre></div><p>该随机数生成器包含一个 16 位的 LFSR，其输入为一个 16 位的种子数，输出为一个 16 位的随机数。LFSR 的更新规则为：</p>
-<ol>
-<li>将当前的 LFSR 的最高位与次高位异或，称为new_bit。</li>
-<li>将原来的 LFSR 向左平移一位，将 new_bit 放在最低位。</li>
-<li>丢弃最高位。</li>
-</ol>
-<h2 id="测试过程">测试过程</h2>
-<p>在测试过程中，我们将创建一个名为 RandomGenerator 的文件夹，其中包含一个 RandomGenerator.v 文件。该文件内容即为上述的 RTL 源码。</p>
-<h3 id="将rtl构建为-python-module">将RTL构建为 Python Module</h3>
-<h4 id="生成中间文件">生成中间文件</h4>
-<p>进入 RandomGenerator 文件夹，执行如下命令：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> RandomGenerator.v -w RandomGenerator.fst --sname RandomGenerator --tdir picker_out_rmg --lang python -e --sim verilator
-</span></span></code></pre></div><p>该命令的含义是：</p>
-<ol>
-<li>将RandomGenerator.v作为 Top 文件，并将RandomGenerator作为 Top Module，基于 verilator 仿真器生成动态库，生成目标语言为 Python。</li>
-<li>启用波形输出，目标波形文件为RandomGenerator.fst</li>
-<li>包含用于驱动示例项目的文件(-e)，同时codegen完成后不自动编译(-autobuild=false)。</li>
-<li>最终的文件输出路径是 picker_out_rmg</li>
-</ol>
-<p>输出的目录类似<a href="/mlvp/docs/quick-start/eg-adder/#生成中间文件">加法器验证-生成中间文件</a>，这里不再赘述。</p>
-<h4 id="构建中间文件">构建中间文件</h4>
-<p>进入 <code>picker_out_rmg</code> 目录并执行 make 命令，即可生成最终的文件。</p>
-<blockquote>
-<p>备注：其编译过程类似于 <a href="/mlvp/docs/quick-start/eg-adder/#构建中间文件">加法器验证-编译流程</a>，这里不再赘述。</p>
-</blockquote>
-<p>最终目录结果为：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>picker_out_rmg
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst <span style="color:#8f5902;font-style:italic"># 测试的波形文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- UT_RandomGenerator
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst.hier
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- _UT_RandomGenerator.so <span style="color:#8f5902;font-style:italic"># Swig生成的wrapper动态库</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- __init__.py  <span style="color:#8f5902;font-style:italic"># Python Module的初始化文件，也是库的定义文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libDPIRandomGenerator.a <span style="color:#8f5902;font-style:italic"># 仿真器生成的库文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libUTRandomGenerator.so <span style="color:#8f5902;font-style:italic"># 基于dut_base生成的libDPI动态库封装</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- libUT_RandomGenerator.py <span style="color:#8f5902;font-style:italic"># Swig生成的Python Module</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- xspcomm  <span style="color:#8f5902;font-style:italic"># xspcomm基础库，固定文件夹，不需要关注</span>
-</span></span><span style="display:flex;"><span><span style="color:#4e9a06">`</span>-- example.py <span style="color:#8f5902;font-style:italic"># 示例代码</span>
-</span></span></code></pre></div><h3 id="配置测试代码">配置测试代码</h3>
-<blockquote>
-<p>复制以下代码替换 <code>example.py</code> 中的内容。</p>
-</blockquote>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_RandomGenerator</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">DualPortStackEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Env</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">port1_bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">port2_bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 定义参考模型</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">LFSR_16</span><span style="color:#000;font-weight:bold">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">seed</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">seed</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">((</span><span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span> <span style="color:#0000cf;font-weight:bold">16</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port1_agent</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">StackAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">port1_bundle</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port2_agent</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">StackAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">port2_bundle</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>在这个例子中，我们定义了一个 <code>DualPortStackEnv</code> 类，该类中实例化了两个相同的 <code>StackAgent</code>，分别用于驱动两个不同的 <code>Bundle</code>。</p>
+<p>可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。</p>
+<p>此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">port1_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">StackPortBundle</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">port2_bundle</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">StackPortBundle</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">env</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DualPortStackEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">port1_bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">port2_bundle</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">new_bit</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">&gt;&gt;</span> <span style="color:#0000cf;font-weight:bold">15</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">^</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">&gt;&gt;</span> <span style="color:#0000cf;font-weight:bold">14</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#0000cf;font-weight:bold">1</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">((</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">|</span> <span style="color:#000">new_bit</span> <span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">((</span><span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span> <span style="color:#0000cf;font-weight:bold">16</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">__name__</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#4e9a06">&#34;__main__&#34;</span><span style="color:#000;font-weight:bold">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTRandomGenerator</span><span style="color:#000;font-weight:bold">()</span>            <span style="color:#8f5902;font-style:italic"># 创建DUT </span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">InitClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;clk&#34;</span><span style="color:#000;font-weight:bold">)</span>                  <span style="color:#8f5902;font-style:italic"># 指定时钟引脚，初始化时钟</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">seed</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">random</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">randint</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#0000cf;font-weight:bold">16</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>   <span style="color:#8f5902;font-style:italic"># 生成随机种子</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">seed</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">seed</span>                 <span style="color:#8f5902;font-style:italic"># 设置DUT种子</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">ref</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">LFSR_16</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">seed</span><span style="color:#000;font-weight:bold">)</span>                   <span style="color:#8f5902;font-style:italic"># 创建参考模型用于对比</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># reset DUT</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">reset</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>                   <span style="color:#8f5902;font-style:italic"># reset 信号置1</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">()</span>                            <span style="color:#8f5902;font-style:italic"># 推进一个时钟周期（DUTRandomGenerator是时序电路，需要通过Step推进）</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">reset</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>                   <span style="color:#8f5902;font-style:italic"># reset 信号置0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">()</span>                            <span style="color:#8f5902;font-style:italic"># 推进一个时钟周期</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">i</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#204a87">range</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">65536</span><span style="color:#000;font-weight:bold">):</span>                <span style="color:#8f5902;font-style:italic"># 循环65536次</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">()</span>                        <span style="color:#8f5902;font-style:italic"># dut 推进一个时钟周期，生成随机数</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">ref</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">()</span>                        <span style="color:#8f5902;font-style:italic"># ref 推进一个时钟周期，生成随机数</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">random_number</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">ref</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Mismatch&#34;</span>  <span style="color:#8f5902;font-style:italic"># 对比DUT和参考模型生成的随机数</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#34;Cycle </span><span style="color:#4e9a06">{</span><span style="color:#000">i</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">, DUT: </span><span style="color:#4e9a06">{</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">random_number</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#4e9a06">:</span><span style="color:#4e9a06">x</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">, REF: </span><span style="color:#4e9a06">{</span><span style="color:#000">ref</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span><span style="color:#4e9a06">:</span><span style="color:#4e9a06">x</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 打印结果</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 完成测试</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Test Passed&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span>    <span style="color:#8f5902;font-style:italic"># Finish函数会完成波形、覆盖率等文件的写入</span>
-</span></span></code></pre></div><h3 id="运行测试程序">运行测试程序</h3>
-<p>在 <code>picker_out_rmg</code> 目录下执行 <code>python example.py</code> 即可运行测试程序。在运行完成后，若输出 <code>Test Passed</code>，则表示测试通过。完成运行后，会生成波形文件：RandomGenerator.fst，可在bash中通过以下命令进行查看。</p>
-<blockquote>
-<p>gtkwave RandomGenerator.fst</p>
-</blockquote>
-<p>输出示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>···
-</span></span><span style="display:flex;"><span>Cycle 65529, DUT: d9ea, REF: d9ea
-</span></span><span style="display:flex;"><span>Cycle 65530, DUT: b3d4, REF: b3d4
-</span></span><span style="display:flex;"><span>Cycle 65531, DUT: 67a9, REF: 67a9
-</span></span><span style="display:flex;"><span>Cycle 65532, DUT: cf53, REF: cf53
-</span></span><span style="display:flex;"><span>Cycle 65533, DUT: 9ea6, REF: 9ea6
-</span></span><span style="display:flex;"><span>Cycle 65534, DUT: 3d4d, REF: 3d4d
-</span></span><span style="display:flex;"><span>Cycle 65535, DUT: 7a9a, REF: 7a9a
-</span></span><span style="display:flex;"><span>Test Passed, destroy UT_RandomGenerator
-</span></span></code></pre></div>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port1_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port2_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port1_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">pop</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port2_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">pop</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><h2 id="附加参考模型">附加参考模型</h2>
+<p>定义好 Env 后，整个验证环境的接口也就随之确定，例如：</p>
+<pre tabindex="0"><code>DualPortStackEnv
+  - port1_agent
+    - @driver_method push
+    - @driver_method pop
+    - @monitor_method some_monitor
+  - port2_agent
+    - @driver_method push
+    - @driver_method pop
+    - @monitor_method some_monitor
+</code></pre><p>按照此规范编写的参考模型都可以直接附加到 Env 上，由 Env 来完成参考模型的自动同步，方式如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">env</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DualPortStackEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">port1_bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">port2_bundle</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">attach</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><p>一个 Env 可以附加多个参考模型，这些参考模型都将会被 Env 自动同步。</p>
+<p>参考模型的具体编写方式将在编写参考模型一节中详细介绍。</p>
+
 	<div class="text-muted mt-5 pt-3 border-top">
   最后修改 September 3, 2024: <a href="https://github.com/XS-MLVP/course/commit/0be4d86a309b1951e193429d26ed29bbb5ff1edf">Add Reference model for function call patterns doc (0be4d86)</a>
 </div>
