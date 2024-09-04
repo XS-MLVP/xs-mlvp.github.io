@@ -44,7 +44,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/ref_model/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-09-03T20:59:57+08:00" />
+<meta property="article:modified_time" content="2024-09-04T14:51:10+08:00" />
 <meta itemprop="name" content="如何编写参考模型">
 <meta itemprop="description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
 参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
@@ -57,8 +57,8 @@ class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模�
 独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
 我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
 class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self.">
-<meta itemprop="dateModified" content="2024-09-03T20:59:57+08:00" />
-<meta itemprop="wordCount" content="277">
+<meta itemprop="dateModified" content="2024-09-04T14:51:10+08:00" />
+<meta itemprop="wordCount" content="451">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何编写参考模型"/>
 <meta name="twitter:description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
 参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
@@ -175,7 +175,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.1ba1ccf765cd57ae3757f09a0bfaeb05.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.60e04c7fe15c92fccabd0a7e191dc5af.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -199,7 +199,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.1ba1ccf765cd57ae3757f09a0bfaeb05.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.60e04c7fe15c92fccabd0a7e191dc5af.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -294,6 +294,15 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
   <a href="/mlvp/docs/mlvp/env/ref_model/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpenvref_model"><span class="td-sidebar-nav-active-item">如何编写参考模型</span></a>
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmlvpcases-li">
+  <a href="/mlvp/docs/mlvp/cases/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvpcases"><span class="">编写测试用例</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpcasesexecutor-li">
+  <a href="/mlvp/docs/mlvp/cases/executor/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpcasesexecutor"><span class="">如何使用测试环境接口进行驱动</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpcasespytest-li">
+  <a href="/mlvp/docs/mlvp/cases/pytest/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpcasespytest"><span class="">如何使用 Pytest 管理测试用例</span></a>
+</li>
+  </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmlvpapi-li">
   <a href="/mlvp/docs/mlvp/api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvpapi"><span class="">API 文档</span></a>
   <ul class="ul-3 foldable">
@@ -356,7 +365,13 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
         <li><a href="#agent-匹配">Agent 匹配</a></li>
       </ul>
     </li>
-    <li><a href="#如何编写独立执行流模式的参考模型">如何编写独立执行流模式的参考模型</a></li>
+    <li><a href="#如何编写独立执行流模式的参考模型">如何编写独立执行流模式的参考模型</a>
+      <ul>
+        <li><a href="#驱动方法接口匹配">驱动方法接口匹配</a></li>
+        <li><a href="#agent-接口匹配">Agent 接口匹配</a></li>
+      </ul>
+    </li>
+    <li><a href="#监测方法接口匹配">监测方法接口匹配</a></li>
   </ul>
 </nav>
       </div>
@@ -501,9 +516,52 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 <p>当 <code>agent_hook</code> 与 <code>driver_hook</code> 同时存在时，框架会优先调用 <code>agent_hook</code> 函数，再调用 <code>driver_hook</code> 函数，并将 <code>driver_hook</code> 函数的返回值用于结果的对比。</p>
 <p>当 Env 中所有的驱动函数都能找到对应的 <code>driver_hook</code> 或 <code>agent_hook</code> 时，参考模型便能成功与 Env 建立匹配关系，此时可以直接通过 Env 中的 <code>attach</code> 方法将参考模型附加到 Env 上。</p>
 <h2 id="如何编写独立执行流模式的参考模型">如何编写独立执行流模式的参考模型</h2>
+<p>独立执行流模式的参考模型是通过 <code>port</code> 接口的形式来完成数据的输入输出，他可以主动向 <code>port</code> 请求数据，也可以主动向 <code>port</code> 输出数据。在 mlvp 中，我们提供了两种接口来实现这一功能，分别是 <code>DriverPort</code> 和 <code>MonitorPort</code>。</p>
+<p>类似地，我们需要定义一系列的 <code>DriverPort</code> 使其与 Env 中的驱动函数匹配，同时定义一系列的 <code>MonitorPort</code> 使其与 Env 中的监测函数匹配。</p>
+<p>当 Env 中的驱动函数被调用时，调用数据将会被发送到 <code>DriverPort</code> 中，参考模型将会主动获取这些数据，并进行计算。计算结果将会被输出到 <code>MonitorPort</code> 中，当 Env 中的监测函数被调用时，比较器会自动从 <code>MonitorPort</code> 中获取数据，并与 Env 中的监测函数的返回值进行比较。</p>
+<h3 id="驱动方法接口匹配">驱动方法接口匹配</h3>
+<p>为了接收到 Env 中所有的驱动函数的调用，参考模型可以选择为每一个驱动函数编写对应的 <code>DriverPort</code>。可以通过 <code>DriverPort</code> 的参数 <code>agent_name</code> 与 <code>driver_name</code> 来匹配 Env 中的驱动函数。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">push_port</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DriverPort</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">driver_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;push&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">pop_port</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DriverPort</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">driver_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;pop&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>与 <code>driver_hook</code> 类似，也可以使用下面的方式来匹配 Env 中的驱动函数：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 使用 &#34;.&#34; 来指定驱动函数的路径</span>
+</span></span><span style="display:flex;"><span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">push_port</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DriverPort</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;port_agent.push&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 如果参考模型中的变量名称与驱动函数名称相同，可以省略 driver_name 参数</span>
+</span></span><span style="display:flex;"><span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">push</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DriverPort</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 使用变量名称同时匹配 Agent 名称与驱动函数名称，并使用 `__` 分隔</span>
+</span></span><span style="display:flex;"><span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port_agent__push</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DriverPort</span><span style="color:#000;font-weight:bold">()</span>
+</span></span></code></pre></div><h3 id="agent-接口匹配">Agent 接口匹配</h3>
+<p>也可以选择定义 <code>AgentPort</code> 同时匹配一个 Agent 中的所有驱动函数。但与 <code>agent_hook</code> 不同的是，定义了 <code>AgentPort</code> 后，便不能为该 Agent 中的任何驱动函数再定义 <code>DriverPort</code>。所有的驱动函数调用将会被发送到 <code>AgentPort</code> 中。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port_agent</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AgentPort</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>类似的，当变量名称与 Agent 名称相同时，可以省略 <code>agent_name</code> 参数：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port_agent</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AgentPort</span><span style="color:#000;font-weight:bold">()</span>
+</span></span></code></pre></div><h2 id="监测方法接口匹配">监测方法接口匹配</h2>
+<p>为了与 Env 中的监测函数匹配，参考模型需要为每一个监测函数编写对应的 <code>MonitorPort</code>，定义方法与 <code>DriverPort</code> 一致。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">monitor_port</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MonitorPort</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">monitor_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;monitor&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 使用 &#34;.&#34; 来指定监测函数的路径</span>
+</span></span><span style="display:flex;"><span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">monitor_port</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MonitorPort</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;port_agent.monitor&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 如果参考模型中的变量名称与监测函数名称相同，可以省略 monitor_name 参数</span>
+</span></span><span style="display:flex;"><span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">monitor</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MonitorPort</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">agent_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;port_agent&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 使用变量名称同时匹配 Agent 名称与监测函数名称，并使用 `__` 分隔</span>
+</span></span><span style="display:flex;"><span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port_agent__monitor</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MonitorPort</span><span style="color:#000;font-weight:bold">()</span>
+</span></span></code></pre></div><p>MonitorPort 中送入的数据，将会自动与 Env 中的监测函数的返回值进行比较，来完成参考模型的比对工作。</p>
+<p>当参考模型中定义的 <code>DriverPort</code>, <code>AgentPort</code> 和 <code>MonitorPort</code> 能够与 <code>Env</code> 中所有接口匹配时，参考模型便能成功与 <code>Env</code> 建立匹配关系，此时可以直接通过 <code>Env</code> 中的 <code>attach</code> 方法将参考模型附加到 <code>Env</code> 上。</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 September 3, 2024: <a href="https://github.com/XS-MLVP/course/commit/0be4d86a309b1951e193429d26ed29bbb5ff1edf">Add Reference model for function call patterns doc (0be4d86)</a>
+  最后修改 September 4, 2024: <a href="https://github.com/XS-MLVP/course/commit/aaf91270334b9f9c6e7f2f52ff2b5bbb1d9ebcb9">Add executor doc (aaf9127)</a>
 </div>
 
 </div>
