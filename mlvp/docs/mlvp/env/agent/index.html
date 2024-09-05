@@ -32,14 +32,14 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/agent/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-09-04T14:51:10+08:00" />
+<meta property="article:modified_time" content="2024-09-05T20:09:56+08:00" />
 <meta itemprop="name" content="如何编写 Agent">
 <meta itemprop="description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
 一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
 初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
 from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
 创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。">
-<meta itemprop="dateModified" content="2024-09-04T14:51:10+08:00" />
+<meta itemprop="dateModified" content="2024-09-05T20:09:56+08:00" />
 <meta itemprop="wordCount" content="242">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何编写 Agent"/>
 <meta name="twitter:description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
@@ -151,7 +151,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.60e04c7fe15c92fccabd0a7e191dc5af.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.e56db6adab4b69c8e7a7e173dbf3836a.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -175,7 +175,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.60e04c7fe15c92fccabd0a7e191dc5af.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.e56db6adab4b69c8e7a7e173dbf3836a.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -277,8 +277,12 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
   <a href="/mlvp/docs/mlvp/cases/executor/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpcasesexecutor"><span class="">如何使用测试环境接口进行驱动</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpcasespytest-li">
   <a href="/mlvp/docs/mlvp/cases/pytest/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpcasespytest"><span class="">如何使用 Pytest 管理测试用例</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpcasescov-li">
+  <a href="/mlvp/docs/mlvp/cases/cov/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpcasescov"><span class="">如何编写测试点</span></a>
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvpverification-li">
+  <a href="/mlvp/docs/mlvp/verification/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmlvpverification"><span class="">开始新的验证任务</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmlvpapi-li">
   <a href="/mlvp/docs/mlvp/api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvpapi"><span class="">API 文档</span></a>
   <ul class="ul-3 foldable">
@@ -447,7 +451,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
 <p>通过在 Agent 中编写多个驱动方法和监测方法，便完成了整个 <code>Agent</code> 的编写。</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 September 4, 2024: <a href="https://github.com/XS-MLVP/course/commit/aaf91270334b9f9c6e7f2f52ff2b5bbb1d9ebcb9">Add executor doc (aaf9127)</a>
+  最后修改 September 5, 2024: <a href="https://github.com/XS-MLVP/course/commit/bd012f45a518d592ef67748793369af162c88351">Add verification flow (bd012f4)</a>
 </div>
 
 </div>

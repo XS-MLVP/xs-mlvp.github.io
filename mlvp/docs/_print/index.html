@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.60e04c7fe15c92fccabd0a7e191dc5af.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.e56db6adab4b69c8e7a7e173dbf3836a.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -501,6 +501,14 @@
 
     
   
+    
+    
+	
+<li>4.4.3: <a href="#pg-a072beec952896e88e69f09e9e661bc0">如何编写测试点</a></li>
+
+
+    
+  
 
     </ul>
     
@@ -508,7 +516,15 @@
     
     
 	
-<li>4.5: <a href="#pg-c7e9635323f5bcd8850571649a8a42b8">API 文档</a></li>
+<li>4.5: <a href="#pg-218ae6a2d4629a583763e808ab9baf63">开始新的验证任务</a></li>
+
+
+    
+  
+    
+    
+	
+<li>4.6: <a href="#pg-c7e9635323f5bcd8850571649a8a42b8">API 文档</a></li>
 
 
     
@@ -523,7 +539,7 @@
     
     
 	
-<li>4.5.1: <a href="#pg-bd013f36b484950df4c10662b7c51cde">Bundle API</a></li>
+<li>4.6.1: <a href="#pg-bd013f36b484950df4c10662b7c51cde">Bundle API</a></li>
 
 
     
@@ -4347,8 +4363,30 @@ cout -&gt; io_cout_out
 </span></span></code></pre></div><p>例如上述代码中 <code>send_forever</code> 函数是一个无限循环的函数，将 <code>exit</code> 设置为 <code>any</code> 后，Executor 会在 <code>env.agent2.send</code> 函数执行完毕后退出，而不会等待 <code>send_forever</code> 函数执行完毕。</p>
 <p>如果后续需要等待所有任务执行完毕，可以通过等待 <code>exec.wait_all</code> 来实现。</p>
 <h2 id="如何控制参考模型调度">如何控制参考模型调度</h2>
+<p>在 mlvp 中，参考模型的调度是由 mlvp 自动完成的，但在某些情况下需要手动控制参考模型的调度顺序，例如在参考模型中需要调用多个函数，且这些函数之间存在调用顺序的情况。或者是控制参考模型与驱动函数之间的调用顺序。</p>
 <h3 id="参考模型的调度顺序">参考模型的调度顺序</h3>
+<p>在使用 Executor 执行时，可以使用参数 <code>sche_order</code> 来控制参考模型是在驱动函数之前、之后或同时执行。当为 <code>model_first</code> 时，参考模型会在驱动函数之前执行；当为 <code>dut_first</code> 时，驱动函数会在参考模型之前执行；当为 <code>parallel</code> 时，参考模型会与驱动函数同时执行。默认情况下为并行执行。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">env</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">with</span> <span style="color:#000">Executor</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">as</span> <span style="color:#000">exec</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">exec</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port1_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000">sche_order</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;dut_first&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">exec</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port2_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000">sche_order</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;dut_first&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;result&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">exec</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">get_results</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><p>上述代码中，参考模型将会在对应的驱动函数结束之后才会被调用。</p>
 <h3 id="参考模型函数之间的调用顺序">参考模型函数之间的调用顺序</h3>
+<p>当使用函数调用模式编写参考模型时，参考模型中的函数之间可能存在调用顺序相关的一来，例如一个函数在调用之前必须需要另一个函数先被调用。</p>
+<p>这一过程若不使用 Executor 使函数并行执行，很容易得到控制，串行执行的代码中函数的调用顺序即为其执行顺序。</p>
+<p>但如果使用 Executor 并行执行函数，两个参考模型之间的调用顺序就无法保证。mlvp 为此场景提供了 <code>priority</code> 参数，用于指定参考模型函数的调用顺序，数值越小其优先级较高。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Executor</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">env</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">with</span> <span style="color:#000">Executor</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">as</span> <span style="color:#000">exec</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">exec</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port1_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000">priority</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">exec</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">port2_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">push</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000">priority</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;result&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">exec</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">get_results</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><p>例如上述代码中，<code>port2_agent.push</code> 和 <code>port1_agent.push</code> 两个函数会并行执行，其参考模型的调用也将在同一时钟周期内完成。由于我们指定了<code>port2_agent.push</code> 的优先级为 0，<code>port1_agent.push</code> 的优先级为 1，因此在该周期的执行过程中，<code>port2_agent.push</code> 会优先被调用。</p>
+<p>注意，优先级只在同一时钟周期内有效，若两个函数调用跨越了时钟周期，那么时钟周期靠前的函数依然会被优先调用。</p>
 
 </div>
 
@@ -4367,9 +4405,104 @@ cout -&gt; io_cout_out
 	<h1 id="pg-20d016e97daff972eb4b248aee8c24c1">4.4.2 - 如何使用 Pytest 管理测试用例</h1>
     
 	<h2 id="编写测试用例">编写测试用例</h2>
+<p>在 mlvp 中，测试用例是通过 pytest 来管理的。pytest 是一个功能强大的 Python 测试框架，如果你不熟悉 pytest，可以查看 <a href="https://docs.pytest.org/en/latest/">pytest 官方文档</a>。</p>
+<h3 id="编写第一个测试用例">编写第一个测试用例</h3>
+<p>首先，我们需要创建一个测试用例文件，例如 <code>test_adder.py</code>，该文件需要以 <code>test_</code> 开头，或以 <code>_test.py</code> 结尾，以便 pytest 能够识别。接着可以在其中编写我们的第一个测试用例。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># test_adder.py</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_test</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">env</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderEnv</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exec_add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_adder</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_test</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><p>pytest 并不能直接运行协程测试用例，因此我们需要在测试用例中调用 <code>mlvp.run</code> 来运行异步测试用例。</p>
+<p>用例编写完成后，我们可以在终端中运行 pytest。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pytest
+</span></span></code></pre></div><p>pytest 会查找当前目录下所有以 <code>test_</code> 开头或以 <code>_test.py</code> 结尾的文件，并运行其中以 <code>test_</code> 开头的函数，每一个函数被视作一个测试用例。</p>
+<h3 id="运行协程测试用例">运行协程测试用例</h3>
+<p>为了使 pytest 能够直接运行协程测试用例，mlvp 提供了 <code>mlvp_async</code> 标记来标记异步测试用例。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># test_adder.py</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.mark.mlvp_async</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_adder</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">env</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exec_add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>如图所示，我们只需要在测试用例函数上添加 <code>@pytest.mark.mlvp_async</code> 标记，pytest 就能够直接运行协程测试用例。</p>
 <h2 id="生成测试报告">生成测试报告</h2>
+<p>在运行 pytest 时，mlvp 会自动收集测试用例的执行结果，自动统计覆盖率信息，并生成一个验证报告，想要生成该报告，需要在调用 pytest 时添加 <code>--mlvp-report</code> 参数。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pytest --mlvp-report
+</span></span></code></pre></div><p>默认情况下，mlvp 将会为每次运行生成一个默认报告名称，并将报告放至 <code>reports</code> 目录下。可以通过 <code>--report-dir</code> 参数来指定报告的存放目录，通过 <code>--report-name</code> 参数来指定报告的名称。</p>
+<p>但此时，由于 mlvp 无法得知覆盖率文件名称，因此在报告中无法显示覆盖率信息，如果想要在报告中显示覆盖率信息，需要在每个测试用例中传入功能覆盖组及行覆盖率文件的名称。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.mark.mlvp_async</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_adder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">adder</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">waveform_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;adder.fst&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">coverage_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;adder.dat&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">g</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">CovGroup</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Adder&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">env</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exec_add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">adder</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">set_func_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cov_groups</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">set_line_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;adder.dat&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>上述代码中，在创建 DUT 时，我们传入了波形文件和覆盖率文件的名称，使得 DUT 在运行时可以生成指定名称的覆盖率文件。接着我们定义了一个覆盖组，来收集 DUT 的功能覆盖率信息，具体如何使用将在下个文档中介绍。</p>
+<p>接着，调用了 DUT 的 <code>Finish</code> 方法，用于结束波形文件的记录。最终我们通过 <code>set_func_coverage</code> 和 <code>set_line_coverage</code> 函数来设置功能覆盖组及行覆盖率文件信息。</p>
+<p>此时再次运行 pytest 时，mlvp 将会自动收集覆盖率信息，并在报告中显示。</p>
 <h2 id="使用-mlvp-管理资源">使用 mlvp 管理资源</h2>
-<h2 id="创建协程用例">创建协程用例</h2>
+<p>然而，上述过程过于繁琐，并且为了保证每个测试用例之间文件名称不产生冲突，我们需要在每个测试用例中传入不一样的文件名称。并且在测试用例出现异常时，测试用例并不会运行完毕，导致覆盖率文件无法生成。</p>
+<p>因此，mlvp 提供了 <code>mlvp_pre_request</code> Fixture 来管理资源，简化了测试用例的编写。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># test_adder.py</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.mark.mlvp_async</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_adder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_request</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">my_request</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">env</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">AdderEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">env</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exec_add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.fixture</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_request</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">mlvp_pre_request</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">PreRequest</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">mlvp_pre_request</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_cov_groups</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">CovGroup</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Adder&#34;</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">mlvp_pre_request</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">create_dut</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>Fixture 是 pytest 中的概念，例如上述代码中定义了一个名为 <code>my_request</code> 的 Fixture。如果在其他测试用例的输出参数中含有 <code>my_request</code> 参数，pytest 将会自动调用 <code>my_request</code> Fixture，并将其返回值传入测试用例。</p>
+<p>上述代码中自定义了一个 Fixture <code>my_request</code>，并在测试用例中进行使用，这也就意味着资源的管理工作都将会在 Fixture 中完成，测试用例只需要关注测试逻辑即可。<code>my_request</code> 必须使用 mlvp 提供的 <code>mlvp_pre_request</code> Fixture 作为参数，以便进行资源管理，<code>mlvp_pre_request</code> 提供了一系列的方法来管理资源。</p>
+<p>通过 <code>add_cov_gruops</code> 添加覆盖组，mlvp 会自动将其生成至报告中。
+通过 <code>create_dut</code> 创建 DUT 实例，mlvp 会自动管理 DUT 的波形文件和覆盖率文件的生成，并确保文件名称不产生冲突。</p>
+<p>在 <code>my_request</code> 中，可以自定义返回值传入测试用例中。如果想要任意测试用例都可以访问到该 Fixture，可以将 Fixture 定义在 <code>conftest.py</code> 文件中。</p>
+<p>至此，我们实现了测试用例资源管理和逻辑编写的分离，无需在每个测试用例中手动管理资源的创建与释放。</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-a072beec952896e88e69f09e9e661bc0">4.4.3 - 如何编写测试点</h1>
+    
+	<h2 id="验证中的测试点">验证中的测试点</h2>
+<p>在 mlvp 中，<strong>测试点(Cover Point)</strong> 是指对设计的某个功能进行验证的最小单元，<strong>测试组(Cover Croup)</strong> 是一类测试点的集合。</p>
+<p>定义一个测试点，需要指定测试点的名称及测试点的触发条件。例如，可以定义了一个测试点，“当加法器运算结果不为 0 时，结果运算正确”，此时，测试点的触发条件可以为 “加法器的 sum 信号不为零”。</p>
+<p>当测试点的触发条件满足时，测试点被触发，此时，验证报告将会记录下该测试点的触发。并会提升验证的功能覆盖率。当所有测试点都被触发时，验证的功能覆盖率达到 100%。</p>
+<h2 id="如何编写测试点">如何编写测试点</h2>
+<p>编写测试点前，首先需要创建一个测试组，并指定测试组的名称</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.reporter</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">CovGroup</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">g</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">CovGroup</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Adder addition function&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>接着，需要再这个测试组中添加测试点。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># import mlvp.funcov as fc</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># g.add_watch_point(adder.io_cout, {&#34;io_cout is 0&#34;: fc.Eq(0)}, name=&#34;Cout is 0&#34;)</span>
+</span></span></code></pre></div><p>TBD</p>
 
 </div>
 
@@ -4389,7 +4522,62 @@ cout -&gt; io_cout_out
 
 <div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-c7e9635323f5bcd8850571649a8a42b8">4.5 - API 文档</h1>
+	<h1 id="pg-218ae6a2d4629a583763e808ab9baf63">4.5 - 开始新的验证任务</h1>
+    
+	<p>使用 mlvp，你已经可以搭建出一个完整的验证环境，并且方便地去编写测试用例了。然而在实际的业务中，往往无法理解如何开始上手，并最终完成验证任务。实际编写代码后，会遇到无法正确划分 Bundle，无法正确理解 Agent 的高级语义封装，搭建完环境之后不知道做什么等问题。</p>
+<p>在这一节中，将会介绍如何从头开始完成一个新的验证任务，以及如何更好地使用 mlvp 来完成验证任务。</p>
+<h2 id="1-了解待验证设计">1. 了解待验证设计</h2>
+<p>拿到一个新的设计后，往往面对的是几十或数百个输入输出信号，如果直接看这些信号，很可能一头雾水，感觉无从下手。在这时，你必须坚信，输入输出信号都是设计人员来定义的，只要能够理解设计的功能，就能够理解这些信号的含义。</p>
+<p>如果设计人员提供了设计文档，那么你可以阅读设计文档，了解设计的功能，并一步步地将功能与输入输出信号对应起来，并且要清楚地理解输入输出信号的时序，以及如何使用这些信号来驱动设计。一般来说，你还需要阅读设计的源代码，来找寻更细节的接口时序问题。</p>
+<p>当大致了解了 DUT 的功能，并明白如何驱动起 DUT 接口之后，你就可以开始搭建验证环境了。</p>
+<h2 id="2-划分-bundle">2. 划分 Bundle</h2>
+<p>搭建环境的第一件事，就是根据接口的逻辑功能，将其划分为若干个接口集合，我们可以每一个接口集合视作一个 Bundle。划分为的每个 Bundle 都应是独立的，由一个独立的 Agent 来驱动。</p>
+<p>但是，往往实际中的接口是这样的：</p>
+<pre tabindex="0"><code>|---------------------- DUT Bundle -------------------------------|
+
+|------- Bundle 1 ------| |------ Bundle 2 ------| |-- Bundle 3 --|
+
+|-- B1.1 --| |-- B1.2 --| |-- B2.1 --|
+</code></pre><p>那么问题就出现了，例如究竟是应该为 B1.1， B1.2 各自创建一个 Agent，还是应该直接为 Bundle 1 建立一个 Agent 呢？</p>
+<p>这还是取决于接口的逻辑功能，如果需要定义一个独立的请求，这个请求需要对 B1.1 和 B1.2 同时进行操作，那么就应该为 Bundle 1 创建一个 Agent，而不是为 B1.1 和 B1.2 分别创建 Agent。</p>
+<p>即便如此，为 B1.1 和 B1.2 定义 1.2 也是可行的，这增添了 Agent 的划分粒度，但牺牲了操作的连续性，上层代码和参考模型的编写都会变得复杂。因此选择合适的划分粒度是需要对具体业务的权衡。最终的划分，所有的 Agent 加起来应该能覆盖 DUT Bundle 的所有接口。</p>
+<p>实践中，为了方便 DUT 的连接，可以定义一个 <code>DUT</code> Bundle，一次性将所有的接口都连接到这个 Bundle 上，由 Env 将其中的子 Bundle 分发给各个 Agent。</p>
+<h2 id="3-编写-agent">3. 编写 Agent</h2>
+<p>当 Bundle 划分完成后，就可以开始编写 Agent 来驱动这些 Bundle 了，你需要为每个 Bundle 编写一个 Agent。</p>
+<p>首先，可以从驱动方法开始写起，驱动方法实际上是对 Bundle 的一种高级语义封装，因此，高级语义信息应该携带了足以驱动 Bundle 的所有信息。如果 Bundle 中存在一个信号需要数字，但参数中并没有提供与这一信号相关的信息，那么这种高级语义封装就是不完整的。应尽量避免在驱动方法中对某个信号值进行假定，如果对这一信号在 Agent 中进行假定，DUT 的输出将会受到这一假定的影响，可能导致参考模型与 DUT 的行为不一致。</p>
+<p>同时，这一高层封装也决定了参考模型的功能层级，参考模型会直接与高层语义信息进行交互，并不会涉及到底层信号。</p>
+<p>如果参考模型需要用函数调用模式编写，那么应该将 DUT 的输出通过函数返回值来返回。如果参考模型需要用独立执行流模式编写，那么应该编写监测方法，将 DUT 的所有输出转换成高层语义信息，通过监测方法输出。</p>
+<h2 id="4-封装成-env">4. 封装成 Env</h2>
+<p>当所有的 Agent 编写完成后，或者挑选之前已有的Agent，就可以将这些 Agent 封装成 Env 了。</p>
+<p>Env 封装了整个验证环境，并确定了参考模型的编写规范。</p>
+<h2 id="5-编写参考模型">5. 编写参考模型</h2>
+<p>参考模型的编写没有必要在 Env 编写完成之后再开始，可以与 Agent 的编写同时进行，并实时编写一些驱动代码，来检验编写的正确性。当然如果 Agent 的编写特别规范，编写完整 Env 后再编写参考模型也是可行的。</p>
+<p>参考模型最重要的是选择合适的编写模式，函数调用模式和独立执行流模式都是可行的，但在不同的场景下，选择不同的模式会更加方便。</p>
+<h2 id="6-确定功能点及测试点">6. 确定功能点及测试点</h2>
+<p>编写好 Env 以及参考模型后，并不能直接开始编写测试用例，因为此时并没有测试用例的编写方向，盲目的编写测试用例，没有办法让待测设计验证完全。</p>
+<p>首先需要列出功能点及测试点列表。功能点是待测设计支持的所有功能，例如对于一个算术逻辑单元（ALU）来说，功能点的形式可能是“支持加法”，“支持乘法”等。每个功能点需要对应一个或多个测试点，测试点通过将功能划分为不同的测试场景，来验证功能点是否正确。例如对于“支持加法”这个功能点，可能有“当输入都为正数时，加法正确”等测试点。</p>
+<h2 id="7-编写测试用例">7. 编写测试用例</h2>
+<p>当功能点及测试点列表确定后，就可以开始编写测试用例了，一个测试用例需要能够覆盖一个或多个测试点，以验证功能点是否正确。所有的测试用例应该能够覆盖所有的测试点（功能覆盖率100%），以及覆盖所有的设计行（行覆盖率100%），这样一来就能保证验证的完备性。</p>
+<p>如何保证验证的正确性呢？如果采用参考模型比对的方式，当比对失败时，mlvp 会自动抛出异常，使得测试用例失败。如果采用直接比对的方式，应该在测试用例中使用 <code>assert</code> 来编写比对代码，当比对失败时，测试用例也会失败。最终，当所有的测试用例都通过时，意味着功能已验证为正确。</p>
+<p>编写过程中，你需要使用 <code>Env</code> 中提供的接口来驱动 DUT，如果出现了需要多个驱动方法交互的情况，可以使用 <code>Executor</code> 来封装更高层的函数。也就是说驱动方法级的交互，是在测试用例的编写中完成的。</p>
+<h2 id="8-编写验证报告">8. 编写验证报告</h2>
+<p>当行覆盖率和功能覆盖率都达到了 100% 之后，意味着验证已经完成。最终需要编写一个验证报告，来总结验证任务的结果。如果验证出了待测设计的问题，也应在验证报告中详细描述问题的原因。如果行覆盖率或者功能覆盖率没有达到 100%，也应在验证报告中说明原因，报告的格式应该遵循公司内部统一的规范。</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-c7e9635323f5bcd8850571649a8a42b8">4.6 - API 文档</h1>
     
 	
 </div>
@@ -4414,7 +4602,7 @@ cout -&gt; io_cout_out
 
 <div class="td-content" style="">
     
-	<h1 id="pg-bd013f36b484950df4c10662b7c51cde">4.5.1 - Bundle API</h1>
+	<h1 id="pg-bd013f36b484950df4c10662b7c51cde">4.6.1 - Bundle API</h1>
     
 	
 </div>
