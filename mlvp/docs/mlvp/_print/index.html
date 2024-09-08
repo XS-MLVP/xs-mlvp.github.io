@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.6dab79da8b3812efcaff39df22322827.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5289fe1b2d589253021cf36c46386ced.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -1151,7 +1151,7 @@ cout -&gt; io_cout_out
 </span></span><span style="display:flex;"><span><span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">adder_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">monitor_sum</span><span style="color:#000;font-weight:bold">()</span>
 </span></span></code></pre></div><p>相反的，按照上述方式调用监测方法，它将会弹出消息队列中收集到的最早的消息，并返回该消息。如果消息队列为空，该次调用将会等待消息队列中有消息后再返回。</p>
 <p>如果想获取消息队列中的消息数量，可以使用如下方式获取：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">message_count</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">adder_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">monitor_sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">size</span><span style="color:#000;font-weight:bold">()</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">message_count</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">adder_agent</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">monitor_size</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;monitor_sum&#34;</span><span style="color:#000;font-weight:bold">)</span>
 </span></span></code></pre></div><p>通过创建监测方法，你可以方便地添加一个后台监测任务，监测 <code>Bundle</code> 中的信号值，并在满足条件时收集消息。将函数标记为监测方法后，框架还会为这一方法提供与参考模型的匹配与自动收集对比，这一部分将在编写参考模型中详细介绍。</p>
 <p>通过在 Agent 中编写多个驱动方法和监测方法，便完成了整个 <code>Agent</code> 的编写。</p>
 
