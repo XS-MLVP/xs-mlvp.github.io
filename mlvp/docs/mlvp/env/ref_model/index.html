@@ -44,7 +44,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/ref_model/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-09-08T17:37:04+08:00" />
+<meta property="article:modified_time" content="2024-09-12T22:49:38+08:00" />
 <meta itemprop="name" content="如何编写参考模型">
 <meta itemprop="description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
 参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
@@ -57,7 +57,7 @@ class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模�
 独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
 我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
 class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self.">
-<meta itemprop="dateModified" content="2024-09-08T17:37:04+08:00" />
+<meta itemprop="dateModified" content="2024-09-12T22:49:38+08:00" />
 <meta itemprop="wordCount" content="451">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何编写参考模型"/>
 <meta name="twitter:description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
@@ -175,7 +175,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.5289fe1b2d589253021cf36c46386ced.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.b0af30b42085392131ccecf26902e155.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -199,7 +199,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.5289fe1b2d589253021cf36c46386ced.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.b0af30b42085392131ccecf26902e155.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -565,7 +565,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 <p>当参考模型中定义的 <code>DriverPort</code>, <code>AgentPort</code> 和 <code>MonitorPort</code> 能够与 <code>Env</code> 中所有接口匹配时，参考模型便能成功与 <code>Env</code> 建立匹配关系，此时可以直接通过 <code>Env</code> 中的 <code>attach</code> 方法将参考模型附加到 <code>Env</code> 上。</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 September 8, 2024: <a href="https://github.com/XS-MLVP/course/commit/efc205433f49c8354ad46a3320e407f1852b3869">Change interface name (efc2054)</a>
+  最后修改 September 12, 2024: <a href="https://github.com/XS-MLVP/course/commit/4b0984f1e12bb873d34383206f9bef7388878557">Fix typo (4b0984f)</a>
 </div>
 
 </div>
