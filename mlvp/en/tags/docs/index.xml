@@ -110,147 +110,137 @@ In the development and research of system architecture, Linux is the most common
 &lt;blockquote&gt;
 &lt;p&gt;Please ensure that the tools like &lt;code&gt;verible-verilog-format&lt;/code&gt; have been added to the environment variable &lt;code&gt;$PATH&lt;/code&gt;, so they can be called directly from the command line.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;h3 id=&#34;downloading-the-source-code&#34;&gt;Downloading the Source Code&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/XS-MLVP/picker.git
+&lt;h3 id=&#34;source-code-download&#34;&gt;Source Code Download&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/XS-MLVP/picker.git --depth&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make init
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;building-and-installing&#34;&gt;Building and Installing&lt;/h3&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;build-and-install&#34;&gt;Build and Install&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# You can enable other language support via make BUILD_XSPCOMM_SWIG=python,java,scala,golang.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Each language requires its development environment, which needs to be configured separately, such as javac, etc.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# You can enable support for other languages by &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;#   using `make BUILD_XSPCOMM_SWIG=python,java,scala,golang`.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Each language requires its own development environment, &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;#   which needs to be configured separately, such as `javac` for Java.&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo -E make install
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
-&lt;p&gt;The default installation target path is /usr/local, binary files are placed in /usr/local/bin, and template files are located in /usr/local/share/picker.
-The installation will automatically install the xspcomm base library (&lt;a href=&#34;https://github.com/XS-MLVP/xcomm&#34;&gt;https://github.com/XS-MLVP/xcomm&lt;/a&gt; ), which is used to encapsulate basic types of RTL modules, located at /usr/local/lib/libxspcomm.so. You may need to manually set the link directory parameter (-L) during compilation.
-If Java or other language support is enabled, corresponding multi-language packages for xspcomm will also be installed.&lt;/p&gt;
+&lt;p&gt;The default installation path is &lt;code&gt;/usr/local&lt;/code&gt;, with binary files placed in &lt;code&gt;/usr/local/bin&lt;/code&gt; and template files in &lt;code&gt;/usr/local/share/picker&lt;/code&gt;.
+If you need to change the installation directory, you can pass arguments to cmake by specifying ARGS, for example: &lt;code&gt;make ARGS=&amp;quot;-DCMAKE_INSTALL_PREFIX=your_install_dir&amp;quot;&lt;/code&gt;
+The installation will automatically install the &lt;code&gt;xspcomm&lt;/code&gt; base library (&lt;a href=&#34;https://github.com/XS-MLVP/xcomm)&#34;&gt;https://github.com/XS-MLVP/xcomm)&lt;/a&gt;, which is used to encapsulate the basic types of &lt;code&gt;RTL&lt;/code&gt; modules, located at &lt;code&gt;/usr/local/lib/libxspcomm.so&lt;/code&gt;. &lt;strong&gt;You may need to manually set the link directory parameters (-L) during compilation.&lt;/strong&gt;&lt;br&gt;
+If support for languages such as Java is enabled, the corresponding &lt;code&gt;xspcomm&lt;/code&gt; multi-language packages will also be installed.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;h3 id=&#34;installation-test&#34;&gt;Installation Test&lt;/h3&gt;
-&lt;p&gt;Run the command and check the output:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;picker can also be compiled into a wheel file and installed via pip&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;To package picker into a wheel installation package, use the following command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make wheel &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# or BUILD_XSPCOMM_SWIG=python,java,scala,golang make wheel&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;After compilation, the wheel file will be located in the dist directory. You can then install it via pip, for example:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pip install dist/xspcomm-0.0.1-cp311-cp311-linux_x86_64.whl
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pip install dist/picker-0.0.1-cp311-cp311-linux_x86_64.whl
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;After installation, execute the &lt;code&gt;picker&lt;/code&gt; command to except the flow output:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;XDut Generate. 
+Convert DUT(*.v/*.sv) to C++ DUT libs.
+
+Usage: ./build/bin/picker [OPTIONS] [SUBCOMMAND]
+
+Options:
+  -h,--help                   Print this help message and exit
+  -v,--version                Print version
+  --show_default_template_path
+                              Print default template path
+  --show_xcom_lib_location_cpp
+                              Print xspcomm lib and include location
+  --show_xcom_lib_location_java
+                              Print xspcomm-java.jar location
+  --show_xcom_lib_location_scala
+                              Print xspcomm-scala.jar location
+  --show_xcom_lib_location_python
+                              Print python module xspcomm location
+  --show_xcom_lib_location_golang
+                              Print golang module xspcomm location
+  --check                     check install location and supproted languages
+
+Subcommands:
+  export                      Export RTL Projects Sources as Software libraries such as C++/Python
+  pack                        Pack UVM transaction as a UVM agent and Python class
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;installation-test&#34;&gt;Installation Test&lt;/h3&gt;
+&lt;p&gt;picker currently has two subcommands: &lt;code&gt;export&lt;/code&gt; and &lt;code&gt;pack&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;export&lt;/code&gt; subcommand is used to convert RTL designs into &amp;ldquo;libraries&amp;rdquo; corresponding to other high-level programming languages, which can be driven through software.&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;picker export &amp;ndash;help&lt;/p&gt;
+&lt;p&gt;$picker export &amp;ndash;help&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Export RTL Projects Sources as Software libraries such as C++/Python Usage: picker
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OPTIONS&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; file
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Export RTL Projects Sources as Software libraries such as C++/Python
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Usage: picker &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OPTIONS&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; file...
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Positionals:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  file TEXT REQUIRED          DUT .v/.sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; file, contain the top module
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  file TEXT ... REQUIRED      DUT .v/.sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; file, contain the top module
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Options:
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -h,--help                   Print this &lt;span style=&#34;color:#204a87&#34;&gt;help&lt;/span&gt; message and &lt;span style=&#34;color:#204a87&#34;&gt;exit&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --fs,--filelist TEXT        DUT .v/.sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; files, contain the top module, 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              split by comma. Or use &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;*.txt&amp;#39;&lt;/span&gt; file  with one RTL 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              file path per line to specify the file list
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --fs,--filelist TEXT ...    DUT .v/.sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; files, contain the top module, split by comma.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Or use &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;*.txt&amp;#39;&lt;/span&gt; file  with one RTL file path per line to specify the file list
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sim TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;verilator&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;      vcs or verilator as simulator, default is verilator
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --lang,--language TEXT:&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;python,cpp,java,scala,golang&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;python&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Build example project, default is python, choose 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              cpp, java or python
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sdir,--source_dir TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;/usr/local/share/picker/template&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --lang,--language TEXT:&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;python,cpp,java,scala,golang&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;python&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Build example project, default is python, choose cpp, java or python
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sdir,--source_dir TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;/home/yaozhicheng/workspace/picker/template&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Template Files Dir, default is &lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;picker_install_path&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;/../picker/template
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --tdir,--target_dir TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;./picker_out&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --tdir,--target_dir TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;./picker_out&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Codegen render files to target dir, default is ./picker_out
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sname,--source_module_name TEXT
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Pick the module in DUT .v file, default is the last 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              module in the --fs marked file
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sname,--source_module_name TEXT ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Pick the module in DUT .v file, default is the last module in the -f marked file
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --tname,--target_module_name TEXT
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Set the module name and file name of target DUT, 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              default is the same as source. For example, --tname top, 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              will generate UTtop.cpp and UTtop.hpp with UTtop class
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --internal TEXT             Exported internal signal config file, default is empty, 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              means no internal pin
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -F,--frequency TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;100MHz&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Set the frequency of the **only VCS** DUT, default 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              is 100MHz, use Hz, KHz, MHz, GHz as unit
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Set the module name and file name of target DUT, default is the same as source.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              For example, -T top, will generate UTtop.cpp and UTtop.hpp with UTtop class
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --internal TEXT             Exported internal signal config file, default is empty, means no internal pin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -F,--frequency TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;100MHz&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Set the frequency of the **only VCS** DUT, default is 100MHz, use Hz, KHz, MHz, GHz as unit
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -w,--wave_file_name TEXT    Wave file name, emtpy mean don&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;t dump wave
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -c,--coverage               Enable coverage, default is not selected as OFF
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -V,--vflag TEXT             User defined simulator compile args, passthrough. 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  --cp_lib,--copy_xspcomm_lib BOOLEAN [1]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;                              Copy xspcomm lib to generated DUT dir, default is true
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -V,--vflag TEXT             User defined simulator compile args, passthrough.
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;                              Eg: &amp;#39;&lt;/span&gt;-v -x-assign&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;fast -Wall --trace&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39; || &amp;#39;&lt;/span&gt;-C vcs -cc -f filelist.f&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. 
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;                              Eg:&amp;#39;&lt;/span&gt;-O3 -std&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;c++17 -I./include&lt;span style=&#34;color:#a40000&#34;&gt;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. Eg:&amp;#39;&lt;/span&gt;-O3 -std&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;c++17 -I./include&lt;span style=&#34;color:#a40000&#34;&gt;&amp;#39;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --verbose                   Verbose mode
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -e,--example                Build example project, default is OFF
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --autobuild BOOLEAN &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;     Auto build the generated project, default is &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;explanation-of-parameters&#34;&gt;Explanation of Parameters&lt;/h4&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Static Multi-Module Support:&lt;/p&gt;
+&lt;p&gt;When generating the wrapper for &lt;code&gt;dut_top.sv/v&lt;/code&gt;, picker allows specifying multiple module names and their corresponding quantities using the &lt;code&gt;--sname&lt;/code&gt; parameter. For example, if there are modules A and B in the design files &lt;code&gt;a.v&lt;/code&gt; and &lt;code&gt;b.v&lt;/code&gt; respectively, and you need 2 instances of A and 3 instances of B in the generated DUT, and the combined module name is C (if not specified, the default name will be A_B). This can be achieved using the following command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker path/a.v,path/b.v --sname A,2,B,3 --tname C
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Environment Variables:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;[file]&lt;/code&gt;: Required. Verilog or SystemVerilog source file of the DUT, containing the top module.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--filelist, -fs&lt;/code&gt;: Optional. Verilog or SystemVerilog source files of the DUT, separated by commas. Alternatively, you can use a &lt;code&gt;*.txt&lt;/code&gt; file, specifying one RTL file path per line, to define the file list.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--sim&lt;/code&gt;: Optional. Simulator type, can be vcs or verilator, default is verilator.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--language, --lang&lt;/code&gt;: Optional. Language for building the example project, can be cpp or python, default is cpp.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--source_dir, -sdir&lt;/code&gt;: Optional. Template files directory, default is ${mcv_install_path}/../mcv/template.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--target_dir, -tdir&lt;/code&gt;: Optional. Target directory for rendering files, default is ./mcv_out.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--source_module_name, -sname&lt;/code&gt;: Optional. Selects a module in the DUT&amp;rsquo;s Verilog file, default is the last module in the file marked by &amp;ndash;fs.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--target_module_name, -tname&lt;/code&gt;: Optional. Sets the target DUT&amp;rsquo;s module name and file name, default is the same as the source. For example, &amp;ndash;tname top will generate UTtop.cpp and UTtop.hpp with the UTtop class.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--internal&lt;/code&gt;: Optional. Exported internal signal configuration file, default is empty, meaning no internal pin.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--frequency, -F&lt;/code&gt;: Optional. Sets the frequency of the &lt;strong&gt;only VCS&lt;/strong&gt;  DUT, default is 100MHz, using Hz, KHz, MHz, GHz as units.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--wave_file_name, -w&lt;/code&gt;: Optional. Waveform file name, empty means no waveform dump.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--coverage, -c&lt;/code&gt;: Optional. Enables coverage, default is OFF.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--vflag, -V&lt;/code&gt;: Optional. User-defined simulator compile arguments, passthrough. Example: &amp;lsquo;-v -x-assign=fast -Wall &amp;ndash;trace&amp;rsquo; or &amp;lsquo;-f filelist.f&amp;rsquo;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--cflag, -C&lt;/code&gt;: Optional. User-defined gcc/clang compile commands, passthrough. Example: &amp;lsquo;-O3 -std=c++17 -I./include&amp;rsquo;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--verbose, -v&lt;/code&gt;: Optional. Verbose mode, retains intermediate files.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--example, -e&lt;/code&gt;: Optional. Builds the example project, default is OFF.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--autobuild&lt;/code&gt;: Optional. Automatically builds the generated project, default is true.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;--help, -h&lt;/code&gt;: Optional. Prints usage help.&lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;DUMPVARS_OPTION&lt;/code&gt;: Sets the option parameter for &lt;code&gt;$dumpvars&lt;/code&gt;. For example, &lt;code&gt;DUMPVARS_OPTION=&amp;quot;+mda&amp;quot; picker ....&lt;/code&gt; enables array waveform support in VCS.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SIMULATOR_FLAGS&lt;/code&gt;: Parameters passed to the backend simulator. Refer to the documentation of the specific backend simulator for details.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CFLAGS&lt;/code&gt;: Sets the &lt;code&gt;-cflags&lt;/code&gt; parameter for the backend simulator.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3 id=&#34;installation-check&#34;&gt;Installation Check&lt;/h3&gt;
-&lt;p&gt;You can check the Picker installation with the &amp;ndash;check parameter, which will output the supported programming languages and their corresponding dependency locations.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;pack&lt;/code&gt; subcommand is used to convert UVM &lt;code&gt;sequence_item&lt;/code&gt; into other languages and then communicate through TLM (currently supports Python, other languages are under development).&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;picker &amp;ndash;check&lt;/p&gt;
+&lt;p&gt;$picker pack &amp;ndash;help&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Version: 0.1.0-develop-e3b38d5
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Exec path: /usr/local/bin/picker
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Template path: /usr/local/share/picker/template
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support    Cpp &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/usr/local/share/picker/include&amp;#39;&lt;/span&gt; success&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support   Java &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/usr/local/share/picker/java/xspcomm-java.jar&amp;#39;&lt;/span&gt; success&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Err&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support  Scala &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;scala/xspcomm-scala.jar&amp;#39;&lt;/span&gt; fail&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support Python &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/usr/local/share/picker/python&amp;#39;&lt;/span&gt; success&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support Golang &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/usr/local/share/picker/golang&amp;#39;&lt;/span&gt; success&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;functionality-test&#34;&gt;Functionality Test&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Enter the project root directory, i.e., the directory where git clone was executed&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bash example/Adder/release-verilator.sh --lang cpp
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The program should output &lt;strong&gt;similar&lt;/strong&gt;  content, indicating a successful installation:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;cycle 114515&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0xa9c430d2942bd554, &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0xe26feda874dac8b7, &lt;span style=&#34;color:#000&#34;&gt;cin&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x0
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DUT: &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x8c341e7b09069e0b, &lt;span style=&#34;color:#000&#34;&gt;cout&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;REF: &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x8c341e7b09069e0b, &lt;span style=&#34;color:#000&#34;&gt;cout&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Test Passed, destroy UTAdder
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;At this point, the Picker tool installation is complete.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Pack uvm transaction as a uvm agent and python class
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Usage: picker pack &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OPTIONS&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; file...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Positionals:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  file TEXT ... REQUIRED      Sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; file, contain the transaction define
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Options:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -h,--help                   Print this &lt;span style=&#34;color:#204a87&#34;&gt;help&lt;/span&gt; message and &lt;span style=&#34;color:#204a87&#34;&gt;exit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -e,--example                Generate example project based on transaction, default is OFF
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -c,--force                  Force delete folder when the code has already generated by picker
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -r,--rename TEXT ...        Rename transaction name in picker generate code
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;test-examples&#34;&gt;Test Examples&lt;/h3&gt;
+&lt;p&gt;After picker compilation, execute the following commands in the picker directory to test the examples:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;bash example/Adder/release-verilator.sh --lang cpp
+bash example/Adder/release-verilator.sh --lang python
+
+# Default enable cpp and python
+#  for other languages support：make BUILD_XSPCOMM_SWIG=python,java,scala,golang
+bash example/Adder/release-verilator.sh --lang java
+bash example/Adder/release-verilator.sh --lang scala
+bash example/Adder/release-verilator.sh --lang golang
+
+bash example/RandomGenerator/release-verilator.sh --lang cpp
+bash example/RandomGenerator/release-verilator.sh --lang python
+bash example/RandomGenerator/release-verilator.sh --lang java
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;more-documents&#34;&gt;More Documents&lt;/h3&gt;
+&lt;p&gt;For guidance on chip verification with picker, please refer to: &lt;a href=&#34;https://open-verify.cc/mlvp/en/docs/&#34;&gt;https://open-verify.cc/mlvp/en/docs/&lt;/a&gt;&lt;/p&gt;
 
       </description>
     </item>

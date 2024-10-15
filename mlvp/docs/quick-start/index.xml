@@ -37,7 +37,7 @@
 &lt;p&gt;请注意，请确保&lt;code&gt;verible-verilog-format&lt;/code&gt;等工具的路径已经添加到环境变量&lt;code&gt;$PATH&lt;/code&gt;中，可以直接命令行调用。&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h3 id=&#34;下载源码&#34;&gt;下载源码&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/XS-MLVP/picker.git
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/XS-MLVP/picker.git --depth&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make init
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;构建并安装&#34;&gt;构建并安装&lt;/h3&gt;
@@ -47,100 +47,152 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 各语言需要自己的开发环境，需要自行配置，例如javac等&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo -E make install
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
-&lt;p&gt;默认的安装的目标路径是 /usr/local， 二进制文件被置于 /usr/local/bin，模板文件被置于 /usr/local/share/picker。
-安装时会自动安装 xspcomm基础库（https://github.com/XS-MLVP/xcomm），该基础库是用于封装 RTL 模块的基础类型，位于 /usr/local/lib/libxspcomm.so。 可能需要手动设置编译时的链接目录参数(-L)
-如果开启了Java等语言支持，还会安装 xspcomm 对应的多语言软件包。&lt;/p&gt;
+&lt;p&gt;默认的安装的目标路径是 &lt;code&gt;/usr/local&lt;/code&gt;， 二进制文件被置于 &lt;code&gt;/usr/local/bin&lt;/code&gt;，模板文件被置于 &lt;code&gt;/usr/local/share/picker&lt;/code&gt;。
+如果需要修改安装目录，可以通过指定ARGS给cmake传递参数，例如&lt;code&gt;make ARGS=&amp;quot;-DCMAKE_INSTALL_PREFIX=your_instal_dir&amp;quot;&lt;/code&gt;
+安装时会自动安装 &lt;code&gt;xspcomm&lt;/code&gt;基础库（&lt;a href=&#34;https://github.com/XS-MLVP/xcomm&#34;&gt;https://github.com/XS-MLVP/xcomm&lt;/a&gt;），该基础库是用于封装 &lt;code&gt;RTL&lt;/code&gt; 模块的基础类型，位于 &lt;code&gt;/usr/local/lib/libxspcomm.so&lt;/code&gt;。 &lt;strong&gt;可能需要手动设置编译时的链接目录参数(-L)&lt;/strong&gt;&lt;br&gt;
+如果开启了Java等语言支持，还会安装 &lt;code&gt;xspcomm&lt;/code&gt; 对应的多语言软件包。&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;h3 id=&#34;安装测试&#34;&gt;安装测试&lt;/h3&gt;
-&lt;p&gt;执行命令并检查输出：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;picker也可以编译为wheel文件，通过pip安装&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;通过以下命令把picker打包成wheel安装包：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make wheel &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# or BUILD_XSPCOMM_SWIG=python,java,scala,golang make wheel&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;编译完成后，wheel文件位于dist目录，然后通过pip安装，例如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pip install dist/xspcomm-0.0.1-cp311-cp311-linux_x86_64.whl
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pip install dist/picker-0.0.1-cp311-cp311-linux_x86_64.whl
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安装完成后，执行&lt;code&gt;picker&lt;/code&gt;命令可以得到以下输出:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;XDut Generate. 
+Convert DUT(*.v/*.sv) to C++ DUT libs.
+
+Usage: ./build/bin/picker [OPTIONS] [SUBCOMMAND]
+
+Options:
+  -h,--help                   Print this help message and exit
+  -v,--version                Print version
+  --show_default_template_path
+                              Print default template path
+  --show_xcom_lib_location_cpp
+                              Print xspcomm lib and include location
+  --show_xcom_lib_location_java
+                              Print xspcomm-java.jar location
+  --show_xcom_lib_location_scala
+                              Print xspcomm-scala.jar location
+  --show_xcom_lib_location_python
+                              Print python module xspcomm location
+  --show_xcom_lib_location_golang
+                              Print golang module xspcomm location
+  --check                     check install location and supproted languages
+
+Subcommands:
+  export                      Export RTL Projects Sources as Software libraries such as C++/Python
+  pack                        Pack UVM transaction as a UVM agent and Python class
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;安装测试&#34;&gt;安装测试&lt;/h3&gt;
+&lt;p&gt;当前picker有export和pack两个子命令。&lt;/p&gt;
+&lt;p&gt;export 子命令用于将RTL设计转换成其他高级编程语言对应的“库”，可以通过软件的方式进行驱动。&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;picker export &amp;ndash;help&lt;/p&gt;
+&lt;p&gt;$picker export &amp;ndash;help&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Export RTL Projects Sources as Software libraries such as C++/Python Usage: picker
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OPTIONS&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; file
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Export RTL Projects Sources as Software libraries such as C++/Python
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Usage: picker &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OPTIONS&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; file...
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Positionals:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  file TEXT REQUIRED          DUT .v/.sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; file, contain the top module
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  file TEXT ... REQUIRED      DUT .v/.sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; file, contain the top module
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Options:
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -h,--help                   Print this &lt;span style=&#34;color:#204a87&#34;&gt;help&lt;/span&gt; message and &lt;span style=&#34;color:#204a87&#34;&gt;exit&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --fs,--filelist TEXT        DUT .v/.sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; files, contain the top module, 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              split by comma. Or use &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;*.txt&amp;#39;&lt;/span&gt; file  with one RTL 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              file path per line to specify the file list
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --fs,--filelist TEXT ...    DUT .v/.sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; files, contain the top module, split by comma.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Or use &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;*.txt&amp;#39;&lt;/span&gt; file  with one RTL file path per line to specify the file list
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sim TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;verilator&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;      vcs or verilator as simulator, default is verilator
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --lang,--language TEXT:&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;python,cpp,java,scala,golang&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;python&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Build example project, default is python, choose 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              cpp, java or python
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sdir,--source_dir TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;/usr/local/share/picker/template&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Template Files Dir, default is &lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;picker_install_path&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;/../picker/template
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --tdir,--target_dir TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;./picker_out&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Codegen render files to target dir, default is ./picker_out
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sname,--source_module_name TEXT
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Pick the module in DUT .v file, default is the last 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              module in the --fs marked file
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --lang,--language TEXT:&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;python,cpp,java,scala,golang&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;python&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Build example project, default is python, choose cpp, java or python
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sdir,--source_dir TEXT    Template Files Dir, default is &lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;picker_install_path&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;/../picker/template
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --tdir,--target_dir TEXT    Codegen render files to target dir, default is ./picker_out
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --sname,--source_module_name TEXT ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Pick the module in DUT .v file, default is the last module in the -f marked file
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --tname,--target_module_name TEXT
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Set the module name and file name of target DUT, 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              default is the same as source. For example, --tname top, 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              will generate UTtop.cpp and UTtop.hpp with UTtop class
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --internal TEXT             Exported internal signal config file, default is empty, 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              means no internal pin
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -F,--frequency TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;100MHz&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Set the frequency of the **only VCS** DUT, default 
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              is 100MHz, use Hz, KHz, MHz, GHz as unit
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Set the module name and file name of target DUT, default is the same as source.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              For example, -T top, will generate UTtop.cpp and UTtop.hpp with UTtop class
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --internal TEXT             Exported internal signal config file, default is empty, means no internal pin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -F,--frequency TEXT &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;100MHz&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              Set the frequency of the **only VCS** DUT, default is 100MHz, use Hz, KHz, MHz, GHz as unit
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -w,--wave_file_name TEXT    Wave file name, emtpy mean don&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;t dump wave
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -c,--coverage               Enable coverage, default is not selected as OFF
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -V,--vflag TEXT             User defined simulator compile args, passthrough. 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  --cp_lib,--copy_xspcomm_lib BOOLEAN [1]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;                              Copy xspcomm lib to generated DUT dir, default is true
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -V,--vflag TEXT             User defined simulator compile args, passthrough.
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;                              Eg: &amp;#39;&lt;/span&gt;-v -x-assign&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;fast -Wall --trace&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39; || &amp;#39;&lt;/span&gt;-C vcs -cc -f filelist.f&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. 
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;                              Eg:&amp;#39;&lt;/span&gt;-O3 -std&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;c++17 -I./include&lt;span style=&#34;color:#a40000&#34;&gt;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. Eg:&amp;#39;&lt;/span&gt;-O3 -std&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;c++17 -I./include&lt;span style=&#34;color:#a40000&#34;&gt;&amp;#39;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --verbose                   Verbose mode
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -e,--example                Build example project, default is OFF
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --autobuild BOOLEAN &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;     Auto build the generated project, default is &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;参数解释&#34;&gt;参数解释&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;[file]&lt;/code&gt;: 必需。DUT 的 Verilog 或 SystemVerilog 源文件，包含顶层模块。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--filelist, -fs&lt;/code&gt;: 可选。DUT 的 Verilog 或 SystemVerilog 源文件，逗号分隔。也可以使用 &lt;code&gt;*.txt&lt;/code&gt; 文件，每行指定一个 RTL 文件路径，来指定文件列表。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--sim&lt;/code&gt;: 可选。模拟器类型，可以是 vcs 或 verilator，默认是 verilator。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--language, --lang&lt;/code&gt;: 可选。构建示例项目的语言，可以是 cpp 或 python，默认是 cpp。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--source_dir, -sdir&lt;/code&gt;: 可选。模板文件目录，默认是 ${mcv_install_path}/../mcv/template。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--target_dir, -tdir&lt;/code&gt;: 可选。渲染文件的目标目录，默认是 ./mcv_out。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--source_module_name, -sname&lt;/code&gt;: 可选。在 DUT 的 Verilog 文件中选择模块，默认是  标记的文件中的最后一个模块。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--target_module_name, -tname&lt;/code&gt;: 可选。设置目标 DUT 的模块名和文件名，默认与源相同。例如，-T top 将生成 UTtop.cpp 和 UTtop.hpp，并包含 UTtop 类。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--internal&lt;/code&gt;: 可选。导出的内部信号配置文件，默认为空，表示没有内部引脚。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--frequency, -F&lt;/code&gt;: 可选。设置 仅 VCS DUT 的频率，默认是 100MHz，可以使用 Hz、KHz、MHz、GHz 作为单位。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--wave_file_name, -w&lt;/code&gt;: 可选。波形文件名，为空表示不导出波形。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--coverage, -c&lt;/code&gt;: 可选。打开之后在测试完成后生成.dat的覆盖率数据。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--vflag, -V&lt;/code&gt;: 可选。用户定义的模拟器编译参数，透传。例如：&amp;rsquo;-v -x-assign=fast -Wall &amp;ndash;trace&amp;rsquo; 或 &amp;lsquo;-f filelist.f&amp;rsquo;。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--cflag, -C&lt;/code&gt;: 可选。用户定义的 gcc/clang 编译参数，透传。例如：&amp;rsquo;-O3 -std=c++17 -I./include&amp;rsquo;。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--verbose, -v&lt;/code&gt;: 可选。详细模式，保留生成的中间文件。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--example, -e&lt;/code&gt;: 可选。构建示例项目，默认是 OFF。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--autobuild&lt;/code&gt;: 可选。自动构建生成的项目，默认是true。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--help, -h&lt;/code&gt;: 可选。打印使用帮助。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;安装检测&#34;&gt;安装检测&lt;/h3&gt;
-&lt;p&gt;可以通过--check参数进行picker的安装检测，输出能够支持的编程语言，以及对于的依赖库位置。&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;pack子命令用于将UVM中的 sequence_item 转换为其他语言，然后通过TLM进行通信（目前支持Python，其他语言在开发中）&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;picker --check&lt;/p&gt;
+&lt;p&gt;$picker pack &amp;ndash;help&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Version: 0.1.0-develop-e3b38d5
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Exec path: /usr/local/bin/picker
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Template path: /usr/local/share/picker/template
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support    Cpp &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/usr/local/share/picker/include&amp;#39;&lt;/span&gt; success&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support   Java &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/usr/local/share/picker/java/xspcomm-java.jar&amp;#39;&lt;/span&gt; success&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Err&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support  Scala &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;scala/xspcomm-scala.jar&amp;#39;&lt;/span&gt; fail&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support Python &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/usr/local/share/picker/python&amp;#39;&lt;/span&gt; success&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OK &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; Support Golang &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;find: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/usr/local/share/picker/golang&amp;#39;&lt;/span&gt; success&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;功能测试&#34;&gt;功能测试&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; picker &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 进入项目根目录，即git clone的目录&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bash example/Adder/release-verilator.sh --lang cpp
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;程序应当输出&lt;strong&gt;类似&lt;/strong&gt;的内容，表示安装成功：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;cycle 114515&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0xa9c430d2942bd554, &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0xe26feda874dac8b7, &lt;span style=&#34;color:#000&#34;&gt;cin&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x0
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DUT: &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x8c341e7b09069e0b, &lt;span style=&#34;color:#000&#34;&gt;cout&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;REF: &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x8c341e7b09069e0b, &lt;span style=&#34;color:#000&#34;&gt;cout&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;0x1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Test Passed, destory UTAdder
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;至此，picker工具安装完成。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Pack uvm transaction as a uvm agent and python class
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Usage: picker pack &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;OPTIONS&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; file...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Positionals:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  file TEXT ... REQUIRED      Sv &lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; file, contain the transaction define
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Options:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -h,--help                   Print this &lt;span style=&#34;color:#204a87&#34;&gt;help&lt;/span&gt; message and &lt;span style=&#34;color:#204a87&#34;&gt;exit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -e,--example                Generate example project based on transaction, default is OFF
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -c,--force                  Force delete folder when the code has already generated by picker
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -r,--rename TEXT ...        Rename transaction name in picker generate code
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;参数解释&#34;&gt;参数解释&lt;/h4&gt;
+&lt;h5 id=&#34;export&#34;&gt;export:&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;file TEXT ... REQUIRED&lt;/code&gt;：必须。位置参数，DUT.v/.sv 源文件，包含顶层模块&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-h,--help&lt;/code&gt;: 可选。打印此帮助信息并退出&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--fs,--filelist TEXT ...&lt;/code&gt;: 可选。DUT .v/.sv 源文件，包含顶层模块，逗号分隔。或使用 &amp;lsquo;*.txt&amp;rsquo; 文件，每行指定一个 RTL 文件路径来指定文件列表&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--sim TEXT [verilator]&lt;/code&gt;: 可选。使用 vcs 或 verilator 作为模拟器，默认是 verilator&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--lang,--language TEXT:{python,cpp,java,scala,golang} [python]&lt;/code&gt;: 可选。构建示例项目，默认是 python，可选择 cpp、java 或 python&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--sdir,--source_dir TEXT&lt;/code&gt;: 可选。模板文件目录，默认是 ${picker_install_path}/../picker/template&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--tdir,--target_dir TEXT&lt;/code&gt;: 可选。代码生成渲染文件的目标目录，默认是 ./picker_out&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--sname,--source_module_name TEXT ...&lt;/code&gt;: 可选。在 DUT .v 文件中选择模块，默认是 -f 标记的文件中的最后一个模块&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--tname,--target_module_name TEXT&lt;/code&gt;: 可选。设置目标 DUT 的模块名和文件名，默认与源相同。例如，-T top 将生成 UTtop.cpp 和 UTtop.hpp，并包含 UTtop 类&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--internal TEXT&lt;/code&gt;: 可选。导出的内部信号配置文件，默认为空，表示没有内部引脚&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-F,--frequency TEXT [100MHz]&lt;/code&gt;: 可选。设置 &lt;strong&gt;仅 VCS&lt;/strong&gt; DUT 的频率，默认是 100MHz，可以使用 Hz、KHz、MHz、GHz 作为单位&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-w,--wave_file_name TEXT&lt;/code&gt;: 可选。波形文件名，空表示不导出波形&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-c,--coverage&lt;/code&gt;: 可选。启用覆盖率，默认不选择为 OFF&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--cp_lib,--copy_xspcomm_lib BOOLEAN [1]&lt;/code&gt;: 可选。将 xspcomm 库复制到生成的 DUT 目录，默认是 true&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-V,--vflag TEXT&lt;/code&gt;: 可选。用户定义的模拟器编译参数，透传。例如：&amp;rsquo;-v -x-assign=fast -Wall &amp;ndash;trace&amp;rsquo; 或 &amp;lsquo;-C vcs -cc -f filelist.f&amp;rsquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-C,--cflag TEXT&lt;/code&gt;: 可选。用户定义的 gcc/clang 编译命令，透传。例如：&amp;rsquo;-O3 -std=c++17 -I./include&amp;rsquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--verbose&lt;/code&gt;: 可选。详细模式&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-e,--example&lt;/code&gt;: 可选。构建示例项目，默认是 OFF&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--autobuild BOOLEAN [1]&lt;/code&gt;: 可选。自动构建生成的项目，默认是 true&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;静态多模块支持：&lt;/p&gt;
+&lt;p&gt;picker在生成dut_top.sv/v的封装时，可以通过&lt;code&gt;--sname&lt;/code&gt;参数指定多个模块名称和对应的数量。例如在a.v和b.v设计文件中分别有模块A和B，需要DUT中有2个A，3个B，生成的模块名称为C（若不指定，默认名称为A_B），则可执行如下命令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;picker path/a.v,path/b.v --sname A,2,B,3 --tname C
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;环境变量：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;DUMPVARS_OPTION&lt;/code&gt;: 设置&lt;code&gt;$dumpvars&lt;/code&gt;的option参数。例如&lt;code&gt;DUMPVARS_OPTION=&amp;quot;+mda&amp;quot; picker ....&lt;/code&gt; 开启vcs中数组波形的支持。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SIMULATOR_FLAGS&lt;/code&gt;: 传递给后端仿真器的参数。具体可参考所使用的后端仿真器文档。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CFLAGS&lt;/code&gt;: 设置后端仿真器的&lt;code&gt;-cflags&lt;/code&gt;参数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id=&#34;pack&#34;&gt;pack:&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;file&lt;/code&gt;: 必需。待解析的UVM transaction文件&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--example, -e&lt;/code&gt;: 可选。根据UVM的transaction生成示例项目。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--force， -c&lt;/code&gt;: 可选。若已存在picker根据当前transaction解析出的文件，通过该命令可强制删除该文件，并重新生成&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--rename, -r&lt;/code&gt;: 可选。配置生成文件以及生成的agent的名称，默认为transaction名。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;测试examples&#34;&gt;测试Examples&lt;/h3&gt;
+&lt;p&gt;编译完成后，在picker目录执行以下命令，进行测试：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;bash example/Adder/release-verilator.sh --lang cpp
+bash example/Adder/release-verilator.sh --lang python
+
+# 默认仅开启 cpp 和 Python 支持
+#   支持其他语言编译命令为：make BUILD_XSPCOMM_SWIG=python,java,scala,golang
+bash example/Adder/release-verilator.sh --lang java
+bash example/Adder/release-verilator.sh --lang scala
+bash example/Adder/release-verilator.sh --lang golang
+
+bash example/RandomGenerator/release-verilator.sh --lang cpp
+bash example/RandomGenerator/release-verilator.sh --lang python
+bash example/RandomGenerator/release-verilator.sh --lang java
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;参考材料&#34;&gt;参考材料&lt;/h3&gt;
+&lt;p&gt;如何基于picker进行芯片验证，可参考：&lt;a href=&#34;https://open-verify.cc/mlvp/docs/&#34;&gt;https://open-verify.cc/mlvp/docs/&lt;/a&gt;&lt;/p&gt;
 
       </description>
     </item>

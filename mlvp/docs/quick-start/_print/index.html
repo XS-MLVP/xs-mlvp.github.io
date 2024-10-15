@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.f59f3b4ec8868b69294f891409ea2166.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.352cc0418f8993bd6adceea82e7cf34e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -290,7 +290,7 @@
 <p>请注意，请确保<code>verible-verilog-format</code>等工具的路径已经添加到环境变量<code>$PATH</code>中，可以直接命令行调用。</p>
 </blockquote>
 <h3 id="下载源码">下载源码</h3>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/picker.git
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/picker.git --depth<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">1</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker
 </span></span><span style="display:flex;"><span>make init
 </span></span></code></pre></div><h3 id="构建并安装">构建并安装</h3>
@@ -300,100 +300,152 @@
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 各语言需要自己的开发环境，需要自行配置，例如javac等</span>
 </span></span><span style="display:flex;"><span>sudo -E make install
 </span></span></code></pre></div><blockquote>
-<p>默认的安装的目标路径是 /usr/local， 二进制文件被置于 /usr/local/bin，模板文件被置于 /usr/local/share/picker。
-安装时会自动安装 xspcomm基础库（https://github.com/XS-MLVP/xcomm），该基础库是用于封装 RTL 模块的基础类型，位于 /usr/local/lib/libxspcomm.so。 可能需要手动设置编译时的链接目录参数(-L)
-如果开启了Java等语言支持，还会安装 xspcomm 对应的多语言软件包。</p>
+<p>默认的安装的目标路径是 <code>/usr/local</code>， 二进制文件被置于 <code>/usr/local/bin</code>，模板文件被置于 <code>/usr/local/share/picker</code>。
+如果需要修改安装目录，可以通过指定ARGS给cmake传递参数，例如<code>make ARGS=&quot;-DCMAKE_INSTALL_PREFIX=your_instal_dir&quot;</code>
+安装时会自动安装 <code>xspcomm</code>基础库（<a href="https://github.com/XS-MLVP/xcomm">https://github.com/XS-MLVP/xcomm</a>），该基础库是用于封装 <code>RTL</code> 模块的基础类型，位于 <code>/usr/local/lib/libxspcomm.so</code>。 <strong>可能需要手动设置编译时的链接目录参数(-L)</strong><br>
+如果开启了Java等语言支持，还会安装 <code>xspcomm</code> 对应的多语言软件包。</p>
 </blockquote>
-<h3 id="安装测试">安装测试</h3>
-<p>执行命令并检查输出：</p>
+<p><strong>picker也可以编译为wheel文件，通过pip安装</strong></p>
+<p>通过以下命令把picker打包成wheel安装包：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make wheel <span style="color:#8f5902;font-style:italic"># or BUILD_XSPCOMM_SWIG=python,java,scala,golang make wheel</span>
+</span></span></code></pre></div><p>编译完成后，wheel文件位于dist目录，然后通过pip安装，例如：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pip install dist/xspcomm-0.0.1-cp311-cp311-linux_x86_64.whl
+</span></span><span style="display:flex;"><span>pip install dist/picker-0.0.1-cp311-cp311-linux_x86_64.whl
+</span></span></code></pre></div><p>安装完成后，执行<code>picker</code>命令可以得到以下输出:</p>
+<pre tabindex="0"><code>XDut Generate. 
+Convert DUT(*.v/*.sv) to C++ DUT libs.
+
+Usage: ./build/bin/picker [OPTIONS] [SUBCOMMAND]
+
+Options:
+  -h,--help                   Print this help message and exit
+  -v,--version                Print version
+  --show_default_template_path
+                              Print default template path
+  --show_xcom_lib_location_cpp
+                              Print xspcomm lib and include location
+  --show_xcom_lib_location_java
+                              Print xspcomm-java.jar location
+  --show_xcom_lib_location_scala
+                              Print xspcomm-scala.jar location
+  --show_xcom_lib_location_python
+                              Print python module xspcomm location
+  --show_xcom_lib_location_golang
+                              Print golang module xspcomm location
+  --check                     check install location and supproted languages
+
+Subcommands:
+  export                      Export RTL Projects Sources as Software libraries such as C++/Python
+  pack                        Pack UVM transaction as a UVM agent and Python class
+</code></pre><h3 id="安装测试">安装测试</h3>
+<p>当前picker有export和pack两个子命令。</p>
+<p>export 子命令用于将RTL设计转换成其他高级编程语言对应的“库”，可以通过软件的方式进行驱动。</p>
 <blockquote>
-<p>picker export &ndash;help</p>
+<p>$picker export &ndash;help</p>
 </blockquote>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Export RTL Projects Sources as Software libraries such as C++/Python Usage: picker
-</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Export RTL Projects Sources as Software libraries such as C++/Python
+</span></span><span style="display:flex;"><span>Usage: picker <span style="color:#204a87">export</span> <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file...
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Positionals:
-</span></span><span style="display:flex;"><span>  file TEXT REQUIRED          DUT .v/.sv <span style="color:#204a87">source</span> file, contain the top module
+</span></span><span style="display:flex;"><span>  file TEXT ... REQUIRED      DUT .v/.sv <span style="color:#204a87">source</span> file, contain the top module
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Options:
 </span></span><span style="display:flex;"><span>  -h,--help                   Print this <span style="color:#204a87">help</span> message and <span style="color:#204a87">exit</span>
-</span></span><span style="display:flex;"><span>  --fs,--filelist TEXT        DUT .v/.sv <span style="color:#204a87">source</span> files, contain the top module, 
-</span></span><span style="display:flex;"><span>                              split by comma. Or use <span style="color:#4e9a06">&#39;*.txt&#39;</span> file  with one RTL 
-</span></span><span style="display:flex;"><span>                              file path per line to specify the file list
+</span></span><span style="display:flex;"><span>  --fs,--filelist TEXT ...    DUT .v/.sv <span style="color:#204a87">source</span> files, contain the top module, split by comma.
+</span></span><span style="display:flex;"><span>                              Or use <span style="color:#4e9a06">&#39;*.txt&#39;</span> file  with one RTL file path per line to specify the file list
 </span></span><span style="display:flex;"><span>  --sim TEXT <span style="color:#ce5c00;font-weight:bold">[</span>verilator<span style="color:#ce5c00;font-weight:bold">]</span>      vcs or verilator as simulator, default is verilator
-</span></span><span style="display:flex;"><span>  --lang,--language TEXT:<span style="color:#ce5c00;font-weight:bold">{</span>python,cpp,java,scala,golang<span style="color:#ce5c00;font-weight:bold">}</span> <span style="color:#ce5c00;font-weight:bold">[</span>python<span style="color:#ce5c00;font-weight:bold">]</span> 
-</span></span><span style="display:flex;"><span>                              Build example project, default is python, choose 
-</span></span><span style="display:flex;"><span>                              cpp, java or python
-</span></span><span style="display:flex;"><span>  --sdir,--source_dir TEXT <span style="color:#ce5c00;font-weight:bold">[</span>/usr/local/share/picker/template<span style="color:#ce5c00;font-weight:bold">]</span> 
-</span></span><span style="display:flex;"><span>                              Template Files Dir, default is <span style="color:#4e9a06">${</span><span style="color:#000">picker_install_path</span><span style="color:#4e9a06">}</span>/../picker/template
-</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT <span style="color:#ce5c00;font-weight:bold">[</span>./picker_out<span style="color:#ce5c00;font-weight:bold">]</span> 
-</span></span><span style="display:flex;"><span>                              Codegen render files to target dir, default is ./picker_out
-</span></span><span style="display:flex;"><span>  --sname,--source_module_name TEXT
-</span></span><span style="display:flex;"><span>                              Pick the module in DUT .v file, default is the last 
-</span></span><span style="display:flex;"><span>                              module in the --fs marked file
+</span></span><span style="display:flex;"><span>  --lang,--language TEXT:<span style="color:#ce5c00;font-weight:bold">{</span>python,cpp,java,scala,golang<span style="color:#ce5c00;font-weight:bold">}</span> <span style="color:#ce5c00;font-weight:bold">[</span>python<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>                              Build example project, default is python, choose cpp, java or python
+</span></span><span style="display:flex;"><span>  --sdir,--source_dir TEXT    Template Files Dir, default is <span style="color:#4e9a06">${</span><span style="color:#000">picker_install_path</span><span style="color:#4e9a06">}</span>/../picker/template
+</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT    Codegen render files to target dir, default is ./picker_out
+</span></span><span style="display:flex;"><span>  --sname,--source_module_name TEXT ...
+</span></span><span style="display:flex;"><span>                              Pick the module in DUT .v file, default is the last module in the -f marked file
 </span></span><span style="display:flex;"><span>  --tname,--target_module_name TEXT
-</span></span><span style="display:flex;"><span>                              Set the module name and file name of target DUT, 
-</span></span><span style="display:flex;"><span>                              default is the same as source. For example, --tname top, 
-</span></span><span style="display:flex;"><span>                              will generate UTtop.cpp and UTtop.hpp with UTtop class
-</span></span><span style="display:flex;"><span>  --internal TEXT             Exported internal signal config file, default is empty, 
-</span></span><span style="display:flex;"><span>                              means no internal pin
-</span></span><span style="display:flex;"><span>  -F,--frequency TEXT <span style="color:#ce5c00;font-weight:bold">[</span>100MHz<span style="color:#ce5c00;font-weight:bold">]</span> 
-</span></span><span style="display:flex;"><span>                              Set the frequency of the **only VCS** DUT, default 
-</span></span><span style="display:flex;"><span>                              is 100MHz, use Hz, KHz, MHz, GHz as unit
+</span></span><span style="display:flex;"><span>                              Set the module name and file name of target DUT, default is the same as source.
+</span></span><span style="display:flex;"><span>                              For example, -T top, will generate UTtop.cpp and UTtop.hpp with UTtop class
+</span></span><span style="display:flex;"><span>  --internal TEXT             Exported internal signal config file, default is empty, means no internal pin
+</span></span><span style="display:flex;"><span>  -F,--frequency TEXT <span style="color:#ce5c00;font-weight:bold">[</span>100MHz<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>                              Set the frequency of the **only VCS** DUT, default is 100MHz, use Hz, KHz, MHz, GHz as unit
 </span></span><span style="display:flex;"><span>  -w,--wave_file_name TEXT    Wave file name, emtpy mean don<span style="color:#4e9a06">&#39;t dump wave
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -c,--coverage               Enable coverage, default is not selected as OFF
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -V,--vflag TEXT             User defined simulator compile args, passthrough. 
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  --cp_lib,--copy_xspcomm_lib BOOLEAN [1]
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                              Copy xspcomm lib to generated DUT dir, default is true
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -V,--vflag TEXT             User defined simulator compile args, passthrough.
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                              Eg: &#39;</span>-v -x-assign<span style="color:#ce5c00;font-weight:bold">=</span>fast -Wall --trace<span style="color:#4e9a06">&#39; || &#39;</span>-C vcs -cc -f filelist.f<span style="color:#4e9a06">&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. 
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                              Eg:&#39;</span>-O3 -std<span style="color:#ce5c00;font-weight:bold">=</span>c++17 -I./include<span style="color:#a40000">&#39;</span>
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. Eg:&#39;</span>-O3 -std<span style="color:#ce5c00;font-weight:bold">=</span>c++17 -I./include<span style="color:#a40000">&#39;</span>
 </span></span><span style="display:flex;"><span>  --verbose                   Verbose mode
 </span></span><span style="display:flex;"><span>  -e,--example                Build example project, default is OFF
 </span></span><span style="display:flex;"><span>  --autobuild BOOLEAN <span style="color:#ce5c00;font-weight:bold">[</span>1<span style="color:#ce5c00;font-weight:bold">]</span>     Auto build the generated project, default is <span style="color:#204a87">true</span>
-</span></span></code></pre></div><h4 id="参数解释">参数解释</h4>
-<ul>
-<li><code>[file]</code>: 必需。DUT 的 Verilog 或 SystemVerilog 源文件，包含顶层模块。</li>
-<li><code>--filelist, -fs</code>: 可选。DUT 的 Verilog 或 SystemVerilog 源文件，逗号分隔。也可以使用 <code>*.txt</code> 文件，每行指定一个 RTL 文件路径，来指定文件列表。</li>
-<li><code>--sim</code>: 可选。模拟器类型，可以是 vcs 或 verilator，默认是 verilator。</li>
-<li><code>--language, --lang</code>: 可选。构建示例项目的语言，可以是 cpp 或 python，默认是 cpp。</li>
-<li><code>--source_dir, -sdir</code>: 可选。模板文件目录，默认是 ${mcv_install_path}/../mcv/template。</li>
-<li><code>--target_dir, -tdir</code>: 可选。渲染文件的目标目录，默认是 ./mcv_out。</li>
-<li><code>--source_module_name, -sname</code>: 可选。在 DUT 的 Verilog 文件中选择模块，默认是  标记的文件中的最后一个模块。</li>
-<li><code>--target_module_name, -tname</code>: 可选。设置目标 DUT 的模块名和文件名，默认与源相同。例如，-T top 将生成 UTtop.cpp 和 UTtop.hpp，并包含 UTtop 类。</li>
-<li><code>--internal</code>: 可选。导出的内部信号配置文件，默认为空，表示没有内部引脚。</li>
-<li><code>--frequency, -F</code>: 可选。设置 仅 VCS DUT 的频率，默认是 100MHz，可以使用 Hz、KHz、MHz、GHz 作为单位。</li>
-<li><code>--wave_file_name, -w</code>: 可选。波形文件名，为空表示不导出波形。</li>
-<li><code>--coverage, -c</code>: 可选。打开之后在测试完成后生成.dat的覆盖率数据。</li>
-<li><code>--vflag, -V</code>: 可选。用户定义的模拟器编译参数，透传。例如：&rsquo;-v -x-assign=fast -Wall &ndash;trace&rsquo; 或 &lsquo;-f filelist.f&rsquo;。</li>
-<li><code>--cflag, -C</code>: 可选。用户定义的 gcc/clang 编译参数，透传。例如：&rsquo;-O3 -std=c++17 -I./include&rsquo;。</li>
-<li><code>--verbose, -v</code>: 可选。详细模式，保留生成的中间文件。</li>
-<li><code>--example, -e</code>: 可选。构建示例项目，默认是 OFF。</li>
-<li><code>--autobuild</code>: 可选。自动构建生成的项目，默认是true。</li>
-<li><code>--help, -h</code>: 可选。打印使用帮助。</li>
-</ul>
-<h3 id="安装检测">安装检测</h3>
-<p>可以通过--check参数进行picker的安装检测，输出能够支持的编程语言，以及对于的依赖库位置。</p>
+</span></span></code></pre></div><p>pack子命令用于将UVM中的 sequence_item 转换为其他语言，然后通过TLM进行通信（目前支持Python，其他语言在开发中）</p>
 <blockquote>
-<p>picker --check</p>
+<p>$picker pack &ndash;help</p>
 </blockquote>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Version: 0.1.0-develop-e3b38d5
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Exec path: /usr/local/bin/picker
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Template path: /usr/local/share/picker/template
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support    Cpp <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/picker/include&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support   Java <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/picker/java/xspcomm-java.jar&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>Err<span style="color:#ce5c00;font-weight:bold">]</span> Support  Scala <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;scala/xspcomm-scala.jar&#39;</span> fail<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Python <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/picker/python&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Golang <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/picker/golang&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span></code></pre></div><h3 id="功能测试">功能测试</h3>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker <span style="color:#8f5902;font-style:italic"># 进入项目根目录，即git clone的目录</span>
-</span></span><span style="display:flex;"><span>bash example/Adder/release-verilator.sh --lang cpp
-</span></span></code></pre></div><p>程序应当输出<strong>类似</strong>的内容，表示安装成功：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>...
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>cycle 114515<span style="color:#ce5c00;font-weight:bold">]</span> <span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">=</span>0xa9c430d2942bd554, <span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">=</span>0xe26feda874dac8b7, <span style="color:#000">cin</span><span style="color:#ce5c00;font-weight:bold">=</span>0x0
-</span></span><span style="display:flex;"><span>DUT: <span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">=</span>0x8c341e7b09069e0b, <span style="color:#000">cout</span><span style="color:#ce5c00;font-weight:bold">=</span>0x1
-</span></span><span style="display:flex;"><span>REF: <span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">=</span>0x8c341e7b09069e0b, <span style="color:#000">cout</span><span style="color:#ce5c00;font-weight:bold">=</span>0x1
-</span></span><span style="display:flex;"><span>Test Passed, destory UTAdder
-</span></span><span style="display:flex;"><span>...
-</span></span></code></pre></div><p>至此，picker工具安装完成。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Pack uvm transaction as a uvm agent and python class
+</span></span><span style="display:flex;"><span>Usage: picker pack <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Positionals:
+</span></span><span style="display:flex;"><span>  file TEXT ... REQUIRED      Sv <span style="color:#204a87">source</span> file, contain the transaction define
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Options:
+</span></span><span style="display:flex;"><span>  -h,--help                   Print this <span style="color:#204a87">help</span> message and <span style="color:#204a87">exit</span>
+</span></span><span style="display:flex;"><span>  -e,--example                Generate example project based on transaction, default is OFF
+</span></span><span style="display:flex;"><span>  -c,--force                  Force delete folder when the code has already generated by picker
+</span></span><span style="display:flex;"><span>  -r,--rename TEXT ...        Rename transaction name in picker generate code
+</span></span></code></pre></div><h4 id="参数解释">参数解释</h4>
+<h5 id="export">export:</h5>
+<ul>
+<li><code>file TEXT ... REQUIRED</code>：必须。位置参数，DUT.v/.sv 源文件，包含顶层模块</li>
+<li><code>-h,--help</code>: 可选。打印此帮助信息并退出</li>
+<li><code>--fs,--filelist TEXT ...</code>: 可选。DUT .v/.sv 源文件，包含顶层模块，逗号分隔。或使用 &lsquo;*.txt&rsquo; 文件，每行指定一个 RTL 文件路径来指定文件列表</li>
+<li><code>--sim TEXT [verilator]</code>: 可选。使用 vcs 或 verilator 作为模拟器，默认是 verilator</li>
+<li><code>--lang,--language TEXT:{python,cpp,java,scala,golang} [python]</code>: 可选。构建示例项目，默认是 python，可选择 cpp、java 或 python</li>
+<li><code>--sdir,--source_dir TEXT</code>: 可选。模板文件目录，默认是 ${picker_install_path}/../picker/template</li>
+<li><code>--tdir,--target_dir TEXT</code>: 可选。代码生成渲染文件的目标目录，默认是 ./picker_out</li>
+<li><code>--sname,--source_module_name TEXT ...</code>: 可选。在 DUT .v 文件中选择模块，默认是 -f 标记的文件中的最后一个模块</li>
+<li><code>--tname,--target_module_name TEXT</code>: 可选。设置目标 DUT 的模块名和文件名，默认与源相同。例如，-T top 将生成 UTtop.cpp 和 UTtop.hpp，并包含 UTtop 类</li>
+<li><code>--internal TEXT</code>: 可选。导出的内部信号配置文件，默认为空，表示没有内部引脚</li>
+<li><code>-F,--frequency TEXT [100MHz]</code>: 可选。设置 <strong>仅 VCS</strong> DUT 的频率，默认是 100MHz，可以使用 Hz、KHz、MHz、GHz 作为单位</li>
+<li><code>-w,--wave_file_name TEXT</code>: 可选。波形文件名，空表示不导出波形</li>
+<li><code>-c,--coverage</code>: 可选。启用覆盖率，默认不选择为 OFF</li>
+<li><code>--cp_lib,--copy_xspcomm_lib BOOLEAN [1]</code>: 可选。将 xspcomm 库复制到生成的 DUT 目录，默认是 true</li>
+<li><code>-V,--vflag TEXT</code>: 可选。用户定义的模拟器编译参数，透传。例如：&rsquo;-v -x-assign=fast -Wall &ndash;trace&rsquo; 或 &lsquo;-C vcs -cc -f filelist.f&rsquo;</li>
+<li><code>-C,--cflag TEXT</code>: 可选。用户定义的 gcc/clang 编译命令，透传。例如：&rsquo;-O3 -std=c++17 -I./include&rsquo;</li>
+<li><code>--verbose</code>: 可选。详细模式</li>
+<li><code>-e,--example</code>: 可选。构建示例项目，默认是 OFF</li>
+<li><code>--autobuild BOOLEAN [1]</code>: 可选。自动构建生成的项目，默认是 true</li>
+</ul>
+<p>静态多模块支持：</p>
+<p>picker在生成dut_top.sv/v的封装时，可以通过<code>--sname</code>参数指定多个模块名称和对应的数量。例如在a.v和b.v设计文件中分别有模块A和B，需要DUT中有2个A，3个B，生成的模块名称为C（若不指定，默认名称为A_B），则可执行如下命令：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker path/a.v,path/b.v --sname A,2,B,3 --tname C
+</span></span></code></pre></div><p>环境变量：</p>
+<ul>
+<li><code>DUMPVARS_OPTION</code>: 设置<code>$dumpvars</code>的option参数。例如<code>DUMPVARS_OPTION=&quot;+mda&quot; picker ....</code> 开启vcs中数组波形的支持。</li>
+<li><code>SIMULATOR_FLAGS</code>: 传递给后端仿真器的参数。具体可参考所使用的后端仿真器文档。</li>
+<li><code>CFLAGS</code>: 设置后端仿真器的<code>-cflags</code>参数。</li>
+</ul>
+<h5 id="pack">pack:</h5>
+<ul>
+<li><code>file</code>: 必需。待解析的UVM transaction文件</li>
+<li><code>--example, -e</code>: 可选。根据UVM的transaction生成示例项目。</li>
+<li><code>--force， -c</code>: 可选。若已存在picker根据当前transaction解析出的文件，通过该命令可强制删除该文件，并重新生成</li>
+<li><code>--rename, -r</code>: 可选。配置生成文件以及生成的agent的名称，默认为transaction名。</li>
+</ul>
+<h3 id="测试examples">测试Examples</h3>
+<p>编译完成后，在picker目录执行以下命令，进行测试：</p>
+<pre tabindex="0"><code>bash example/Adder/release-verilator.sh --lang cpp
+bash example/Adder/release-verilator.sh --lang python
+
+# 默认仅开启 cpp 和 Python 支持
+#   支持其他语言编译命令为：make BUILD_XSPCOMM_SWIG=python,java,scala,golang
+bash example/Adder/release-verilator.sh --lang java
+bash example/Adder/release-verilator.sh --lang scala
+bash example/Adder/release-verilator.sh --lang golang
+
+bash example/RandomGenerator/release-verilator.sh --lang cpp
+bash example/RandomGenerator/release-verilator.sh --lang python
+bash example/RandomGenerator/release-verilator.sh --lang java
+</code></pre><h3 id="参考材料">参考材料</h3>
+<p>如何基于picker进行芯片验证，可参考：<a href="https://open-verify.cc/mlvp/docs/">https://open-verify.cc/mlvp/docs/</a></p>
 
 </div>
 
