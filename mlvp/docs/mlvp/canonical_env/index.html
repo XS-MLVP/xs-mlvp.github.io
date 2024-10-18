@@ -46,7 +46,7 @@ def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) retur
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/canonical_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-10-15T08:31:55+08:00" />
+<meta property="article:modified_time" content="2024-10-17T12:09:59-07:00" />
 <meta itemprop="name" content="编写规范的验证环境">
 <meta itemprop="description" content="概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。
 验证环境的搭建 旨在完成对待测设计（DUT）的封装，使得验证人员在驱动DUT时，不必面临繁杂的接口信号，而是可以直接使用验证环境中提供的高级接口。如果需要编写参考模型，则参考模型也应是验证环境的一部分。
@@ -60,7 +60,7 @@ def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) retur
 一个加法器尚且如此，倘若我们拿到了一个拥有繁杂接口的 DUT，费尽心思为其编写了驱动代码。当后续发现驱动代码需要迁移至另一个相似结构的接口上时，我们将会面临巨大的工作量。例如出现接口名称改变、部分接口缺少但驱动代码中却有引用，部分接口新增等等一系列的问题。
 出现这种问题的根本原因在于，我们在验证代码中直接对 DUT 的接口信号进行操作，如下图所示，这种做法是不可取的。
 &#43;-----------&#43; &#43;-----------&#43; | |--&gt;| | | Test Code | | DUT | | |&lt;--| | &#43;-----------&#43; &#43;-----------&#43; 将验证代码与DUT进行解耦 为了解决上述问题，我们需要将验证代码与 DUT 进行解耦，使得验证代码不再直接操作 DUT 的接口信号，而是通过一个中间层来与 DUT 进行交互。这个中间层是人为定义的一个接口结构，在 mlvp 中，我们将这个中间层定义为 Bundle，下文也将会使用 Bundle 来代指这个中间层。">
-<meta itemprop="dateModified" content="2024-10-15T08:31:55+08:00" />
+<meta itemprop="dateModified" content="2024-10-17T12:09:59-07:00" />
 <meta itemprop="wordCount" content="614">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="编写规范的验证环境"/>
 <meta name="twitter:description" content="概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。
@@ -179,7 +179,7 @@ def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) retur
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.352cc0418f8993bd6adceea82e7cf34e.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.c8004d045309cc4c116e3778e84604f4.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -203,7 +203,7 @@ def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) retur
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.352cc0418f8993bd6adceea82e7cf34e.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.c8004d045309cc4c116e3778e84604f4.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -584,7 +584,7 @@ bundle.sum &lt;-&gt; dut.io_sum_0
 <p>这是 mlvp 中验证环境的搭建思想，mlvp 中提供了大量的功能，来帮助你建立起这样一个规范的验证环境。同时，它提供了测试用例的管理方法，使得测试用例更易于编写和管理。</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 October 15, 2024: <a href="https://github.com/XS-MLVP/course/commit/2f180de444e4ae2b8f1ac2ddb880a052d6a5c6d7">update picker install document (2f180de)</a>
+  最后修改 October 17, 2024: <a href="https://github.com/XS-MLVP/course/commit/8509ed5912b81102c4d026193474cbc502d610df">Merge branch &#39;master&#39; of github.com:XS-MLVP/course (8509ed5)</a>
 </div>
 
 </div>
