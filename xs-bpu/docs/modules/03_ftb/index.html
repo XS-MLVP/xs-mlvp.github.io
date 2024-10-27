@@ -28,12 +28,12 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/03_ftb/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-09-13T15:15:11+08:00" />
+<meta property="article:modified_time" content="2024-10-27T22:28:13+08:00" />
 <meta itemprop="name" content="FTB 分支预测器">
 <meta itemprop="description" content="FTB 简介 FTB 是香山 BPU 的第三个子预测器，它也能一并获取到 uFTB 和 TAGE-SC 的输出。在 FTB 的输入接口中，s1 通道含有 uFTB 的基础预测结果，s2 通道和 s3 通道中仅有 br_taken_mask 一组信号被 TAGE-SC 填充，并无 FTB 项生成的基础预测结果。FTB 的工作便是为 s2 和 s3 通道提供基础预测结果。
 FTB 在功能和结构上都与 uFTB 类似，其主要区别就是 FTB 能够容纳更多的 FTB 项，并且 FTB 的预测结果是在 s2 与 s3 通道输出。正是由于容量大，其读出的速度上会比 uFTB 慢，无法被放置在第一周期产生预测结果，但大容量也使它能够获得更加精准的预测结果。
 uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测结果。 FTB 预测器的本质是一个较大容量的存储器，其会根据当前预测的 PC 读出对应的 FTB 项，并在 s2 阶段产出预测结果。与此同时该 FTB 项还会被再保存一个周期，生成 s3 阶段预测结果。生成结果需要注意的点是要考虑到上一预测器输入的 br_taken_mask 字段，避免在生成时丢失。 根据更新请求，更新存储中的 FTB 项。 FTB 存储结构 FTB 预测器中 FTB 项被放置在了一个专门的存储结构中，叫做 FTBBank ，在进一步查看 FTBBank 的结构之前，我们先来看一下 FTBBank 是怎样使用的。">
-<meta itemprop="dateModified" content="2024-09-13T15:15:11+08:00" />
+<meta itemprop="dateModified" content="2024-10-27T22:28:13+08:00" />
 <meta itemprop="wordCount" content="956">
 <meta itemprop="keywords" content="子预测器,FTB," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTB 分支预测器"/>
 <meta name="twitter:description" content="FTB 简介 FTB 是香山 BPU 的第三个子预测器，它也能一并获取到 uFTB 和 TAGE-SC 的输出。在 FTB 的输入接口中，s1 通道含有 uFTB 的基础预测结果，s2 通道和 s3 通道中仅有 br_taken_mask 一组信号被 TAGE-SC 填充，并无 FTB 项生成的基础预测结果。FTB 的工作便是为 s2 和 s3 通道提供基础预测结果。
@@ -102,7 +102,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.9a322fb3537625c5eff18b3087c8c1a8.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -126,7 +126,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.9a322fb3537625c5eff18b3087c8c1a8.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -271,7 +271,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2/" data-taxonomy-term="%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2"><span class="taxonomy-label">分支折叠历史</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B"><span class="taxonomy-label">分支预测</span><span class="taxonomy-count">2</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%9D%97/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%9D%97"><span class="taxonomy-label">分支预测块</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%8F%96%E5%80%BC%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq/" data-taxonomy-term="%E5%8F%96%E5%80%BC%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq"><span class="taxonomy-label">取值目标队列（FTQ）</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%8F%96%E6%8C%87%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq/" data-taxonomy-term="%E5%8F%96%E6%8C%87%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq"><span class="taxonomy-label">取指目标队列（FTQ）</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8/" data-taxonomy-term="%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8"><span class="taxonomy-label">子预测器</span><span class="taxonomy-count">8</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82/" data-taxonomy-term="%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82"><span class="taxonomy-label">更新请求</span><span class="taxonomy-count">2</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6/" data-taxonomy-term="%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6"><span class="taxonomy-label">流水线控制</span><span class="taxonomy-count">2</span></a></li>
@@ -1605,7 +1605,7 @@ uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 13, 2024: <a href="https://github.com/XS-MLVP/course/commit/431c050a04075a266125263afcc2bb6d27303593">Update the picture of BPU Top. (431c050)</a>
+  最后修改 October 27, 2024: <a href="https://github.com/XS-MLVP/course/commit/e95831ca6014e8bbc52e0ad3dcec2ddd0f1248bd">Fix typo (e95831c)</a>
 </div>
 
 </div>

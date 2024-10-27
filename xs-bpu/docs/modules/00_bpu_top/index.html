@@ -38,7 +38,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/xs-bpu/docs/modules/00_bpu_top/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-09-13T15:15:11+08:00" />
+<meta property="article:modified_time" content="2024-10-27T22:28:13+08:00" />
 <meta itemprop="name" content="BPU 顶层模块">
 <meta itemprop="description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
 生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。
@@ -48,7 +48,7 @@ npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全�
 val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
 npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
 s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。">
-<meta itemprop="dateModified" content="2024-09-13T15:15:11+08:00" />
+<meta itemprop="dateModified" content="2024-10-27T22:28:13+08:00" />
 <meta itemprop="wordCount" content="633">
 <meta itemprop="keywords" content="香山,BPU 顶层,全局分支历史,分支折叠历史,流水线控制," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="BPU 顶层模块"/>
 <meta name="twitter:description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
@@ -122,7 +122,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.9a322fb3537625c5eff18b3087c8c1a8.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -146,7 +146,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.9a322fb3537625c5eff18b3087c8c1a8.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -292,7 +292,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2/" data-taxonomy-term="%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2"><span class="taxonomy-label">分支折叠历史</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B"><span class="taxonomy-label">分支预测</span><span class="taxonomy-count">2</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%9D%97/" data-taxonomy-term="%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%9D%97"><span class="taxonomy-label">分支预测块</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%8F%96%E5%80%BC%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq/" data-taxonomy-term="%E5%8F%96%E5%80%BC%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq"><span class="taxonomy-label">取值目标队列（FTQ）</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%8F%96%E6%8C%87%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq/" data-taxonomy-term="%E5%8F%96%E6%8C%87%E7%9B%AE%E6%A0%87%E9%98%9F%E5%88%97ftq"><span class="taxonomy-label">取指目标队列（FTQ）</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8/" data-taxonomy-term="%E5%AD%90%E9%A2%84%E6%B5%8B%E5%99%A8"><span class="taxonomy-label">子预测器</span><span class="taxonomy-count">8</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82/" data-taxonomy-term="%E6%9B%B4%E6%96%B0%E8%AF%B7%E6%B1%82"><span class="taxonomy-label">更新请求</span><span class="taxonomy-count">2</span></a></li>
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/xs-bpu/tags/%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6/" data-taxonomy-term="%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6"><span class="taxonomy-label">流水线控制</span><span class="taxonomy-count">2</span></a></li>
@@ -544,7 +544,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
 <p>所以在重定向恢复时，不仅需要将重定向接口中的信息恢复，还需要将这条预测错误的指令的执行情况也更新到历史中去。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 13, 2024: <a href="https://github.com/XS-MLVP/course/commit/431c050a04075a266125263afcc2bb6d27303593">Update the picture of BPU Top. (431c050)</a>
+  最后修改 October 27, 2024: <a href="https://github.com/XS-MLVP/course/commit/e95831ca6014e8bbc52e0ad3dcec2ddd0f1248bd">Fix typo (e95831c)</a>
 </div>
 
 </div>
