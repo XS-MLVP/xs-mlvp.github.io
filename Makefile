@@ -5,5 +5,5 @@ sync:
 	@ls|grep -v "CNAME\|Makefile"|xargs rm -rf
 	@cp -r ../mlvp-portal/public/* ./
 	@git add .
-	@git commit -m build`date +%Y%m%d%H%M%S`
+	@git commit -m build`date +%Y%m%d%H%M%S` || echo "nothing to commit, skip"
 	@git push
