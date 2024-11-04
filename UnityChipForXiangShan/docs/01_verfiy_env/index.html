@@ -21,7 +21,7 @@
 <meta name="description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和mlvp，环境需求如下：
 Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 mlvp。可通过pip3 install mlvp@git&#43;https://github.com/XS-MLVP/mlvp安装最新版本。 环境配置完成后，clone仓库：
 git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
-cd UnityChipForXiangShan make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 # 可通过target指定版本 make rtl target=2024092701/openxiangshan-kmh-97e37a2237-24092701.tar.gz 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
+cd UnityChipForXiangShan make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
 # 调用scripts目录中的Makefile.build_ut_&amp;lt;name&amp;gt;，创建待验证的Python版DUT make dut target=&amp;lt;name&amp;gt; # 例如： make dut target=backend_ctrlblock_decode # 调用scripts目录中所有的Makefile.build_ut_*文件，创建所有DUT。 make dut_all 以make dut target=backend_ctrlblock_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
 dut/ ├── __init__.py ├── decodestage ├── predecode └── rvcexpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
@@ -30,7 +30,7 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() ">
 <meta property="og:description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和mlvp，环境需求如下：
 Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 mlvp。可通过pip3 install mlvp@git&#43;https://github.com/XS-MLVP/mlvp安装最新版本。 环境配置完成后，clone仓库：
 git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
-cd UnityChipForXiangShan make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 # 可通过target指定版本 make rtl target=2024092701/openxiangshan-kmh-97e37a2237-24092701.tar.gz 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
+cd UnityChipForXiangShan make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
 # 调用scripts目录中的Makefile.build_ut_&lt;name&gt;，创建待验证的Python版DUT make dut target=&lt;name&gt; # 例如： make dut target=backend_ctrlblock_decode # 调用scripts目录中所有的Makefile.build_ut_*文件，创建所有DUT。 make dut_all 以make dut target=backend_ctrlblock_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
 dut/ ├── __init__.py ├── decodestage ├── predecode └── rvcexpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
@@ -38,23 +38,23 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/01_verfiy_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-11-01T20:27:34+08:00" />
+<meta property="article:modified_time" content="2024-11-04T18:05:19+08:00" />
 <meta itemprop="name" content="准备验证环境">
 <meta itemprop="description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和mlvp，环境需求如下：
 Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 mlvp。可通过pip3 install mlvp@git&#43;https://github.com/XS-MLVP/mlvp安装最新版本。 环境配置完成后，clone仓库：
 git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
-cd UnityChipForXiangShan make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 # 可通过target指定版本 make rtl target=2024092701/openxiangshan-kmh-97e37a2237-24092701.tar.gz 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
+cd UnityChipForXiangShan make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
 # 调用scripts目录中的Makefile.build_ut_&lt;name&gt;，创建待验证的Python版DUT make dut target=&lt;name&gt; # 例如： make dut target=backend_ctrlblock_decode # 调用scripts目录中所有的Makefile.build_ut_*文件，创建所有DUT。 make dut_all 以make dut target=backend_ctrlblock_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
 dut/ ├── __init__.py ├── decodestage ├── predecode └── rvcexpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
 from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() ">
-<meta itemprop="dateModified" content="2024-11-01T20:27:34+08:00" />
-<meta itemprop="wordCount" content="62">
+<meta itemprop="dateModified" content="2024-11-04T18:05:19+08:00" />
+<meta itemprop="wordCount" content="57">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="准备验证环境"/>
 <meta name="twitter:description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和mlvp，环境需求如下：
 Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 mlvp。可通过pip3 install mlvp@git&#43;https://github.com/XS-MLVP/mlvp安装最新版本。 环境配置完成后，clone仓库：
 git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
-cd UnityChipForXiangShan make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 # 可通过target指定版本 make rtl target=2024092701/openxiangshan-kmh-97e37a2237-24092701.tar.gz 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
+cd UnityChipForXiangShan make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
 # 调用scripts目录中的Makefile.build_ut_&lt;name&gt;，创建待验证的Python版DUT make dut target=&lt;name&gt; # 例如： make dut target=backend_ctrlblock_decode # 调用scripts目录中所有的Makefile.build_ut_*文件，创建所有DUT。 make dut_all 以make dut target=backend_ctrlblock_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
 dut/ ├── __init__.py ├── decodestage ├── predecode └── rvcexpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
@@ -163,7 +163,7 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.332d2a234eef93e9eb5368be07002141.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b54ecefad27caf8c876d4ecd7cc5fa88.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -187,7 +187,7 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.332d2a234eef93e9eb5368be07002141.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b54ecefad27caf8c876d4ecd7cc5fa88.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -290,8 +290,6 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
 <p>默认从仓库<a href="https://github.com/XS-MLVP/UnityChipXiangShanRTLs">https://github.com/XS-MLVP/UnityChipXiangShanRTLs</a>中下载。用户也可以自行按照XiangShan文档编译生成RTL。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> UnityChipForXiangShan
 </span></span><span style="display:flex;"><span>make rtl    <span style="color:#8f5902;font-style:italic"># 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 可通过target指定版本</span>
-</span></span><span style="display:flex;"><span>make rtl <span style="color:#000">target</span><span style="color:#ce5c00;font-weight:bold">=</span>2024092701/openxiangshan-kmh-97e37a2237-24092701.tar.gz
 </span></span></code></pre></div><p>所有RTL下载包请在<a href="https://github.com/XS-MLVP/UnityChipXiangShanRTLs">UnityChipXiangShanRTLs</a>中查看。</p>
 <h4 id="编译dut">编译DUT</h4>
 <p>该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。</p>
@@ -312,7 +310,7 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTPreDecode</span><span style="color:#000;font-weight:bold">()</span>
 </span></span></code></pre></div>
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 November 1, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/dafc7688d2a4ef1c04649c68760b62324b0b8956">refine (dafc768)</a>
+  最后修改 November 4, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/1b5bf66edba2ddf2b0b0318f081438885aa73870">fix typo (1b5bf66)</a>
 </div>
 
 </div>
