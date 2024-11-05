@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b54ecefad27caf8c876d4ecd7cc5fa88.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.7348bb5abcc91e55d9ead869884b2ca7.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -349,29 +349,27 @@
 	<h1 id="pg-e819c695f47dc3893fee99c05230ff78">2 - 准备验证环境</h1>
     
 	<h4 id="基础环境需求">基础环境需求</h4>
-<p>本项目基于<code>Python</code>编程语言进行UT验证，采用的工具和测试框架为<a href="https://github.com/XS-MLVP/picker">picker</a>和<a href="https://github.com/XS-MLVP/mlvp">mlvp</a>，环境需求如下：</p>
+<p>本项目基于<code>Python</code>编程语言进行UT验证，采用的工具和测试框架为<a href="https://github.com/XS-MLVP/toffee">toffee</a>和<a href="https://github.com/XS-MLVP/mlvp">mlvp</a>，环境需求如下：</p>
 <ol>
 <li>Linux操作系统。建议WSL2下安装Ubuntu22.04。</li>
 <li>Python。建议Python3.11。</li>
 <li>picker。按照<a href="https://open-verify.cc/mlvp/docs/quick-start/installer/">快速开始</a>中的提示安装最新版本。</li>
-<li>mlvp。可通过<code>pip3 install mlvp@git+https://github.com/XS-MLVP/mlvp</code>安装最新版本。</li>
 </ol>
 <p>环境配置完成后，clone仓库：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> UnityChipForXiangShan
+</span></span><span style="display:flex;"><span>pip3 install -r requirements.txt <span style="color:#8f5902;font-style:italic"># 安装python依赖</span>
 </span></span></code></pre></div><h4 id="下载rtl代码">下载RTL代码：</h4>
 <p>默认从仓库<a href="https://github.com/XS-MLVP/UnityChipXiangShanRTLs">https://github.com/XS-MLVP/UnityChipXiangShanRTLs</a>中下载。用户也可以自行按照XiangShan文档编译生成RTL。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> UnityChipForXiangShan
-</span></span><span style="display:flex;"><span>make rtl    <span style="color:#8f5902;font-style:italic"># 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make rtl    <span style="color:#8f5902;font-style:italic"># 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接</span>
 </span></span></code></pre></div><p>所有RTL下载包请在<a href="https://github.com/XS-MLVP/UnityChipXiangShanRTLs">UnityChipXiangShanRTLs</a>中查看。</p>
 <h4 id="编译dut">编译DUT</h4>
 <p>该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 调用scripts目录中的Makefile.build_ut_&lt;name&gt;，创建待验证的Python版DUT</span>
-</span></span><span style="display:flex;"><span>make dut <span style="color:#000">target</span><span style="color:#ce5c00;font-weight:bold">=</span>&lt;name&gt;
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT</span>
+</span></span><span style="display:flex;"><span>make dut <span style="color:#000">DUTS</span><span style="color:#ce5c00;font-weight:bold">=</span>&lt;name&gt;  <span style="color:#8f5902;font-style:italic"># DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT</span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 例如：</span>
-</span></span><span style="display:flex;"><span>make dut <span style="color:#000">target</span><span style="color:#ce5c00;font-weight:bold">=</span>backend_ctrlblock_decode
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 调用scripts目录中所有的Makefile.build_ut_*文件，创建所有DUT。</span>
-</span></span><span style="display:flex;"><span>make dut_all
-</span></span></code></pre></div><p>以<code>make dut target=backend_ctrlblock_decode</code>为例，命令执行完成后，会在dut目录下生成对应的Python包：</p>
+</span></span><span style="display:flex;"><span>make dut <span style="color:#000">DUTS</span><span style="color:#ce5c00;font-weight:bold">=</span>backend_ctrlblock_decode
+</span></span></code></pre></div><p>以<code>make dut DUTS=backend_ctrlblock_decode</code>为例，命令执行完成后，会在dut目录下生成对应的Python包：</p>
 <pre tabindex="0"><code>dut/
 ├── __init__.py
 ├── decodestage
@@ -397,14 +395,13 @@
     
 	<h1 id="pg-a5fd55875e0540351befe9b3a6e05b98">3 - 运行测试</h1>
     
-	<p>本项目基于mlvp验证框架进行验证（mlvp基于Pytest测试框架）。运算测试时，测试框架自动搜索所有以<code>test_*.py</code>文件，并自动执行其中所有以<code>test_</code>开头的测试用例（Test Case）。</p>
+	<p>本项目基于toffee验证框架进行验证（toffee基于Pytest测试框架）。运算测试时，测试框架自动搜索所有以<code>test_*.py</code>文件，并自动执行其中所有以<code>test_</code>开头的测试用例（Test Case）。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 执行所有ut_*目录中的test case</span>
 </span></span><span style="display:flex;"><span>make test_all
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 执行指定目录下的test case</span>
 </span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">target</span><span style="color:#ce5c00;font-weight:bold">=</span>&lt;dir&gt;
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 例如：</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 执行ut_backend/ut_decode目录中所有的test case</span>
-</span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">target</span><span style="color:#ce5c00;font-weight:bold">=</span>ut_backend/ut_decode
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 例如执行ut_backend/ctrl_block/decode目录中所有的test case</span>
+</span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">target</span><span style="color:#ce5c00;font-weight:bold">=</span>ut_backend/ctrl_block/decode
 </span></span></code></pre></div><p>运行完成后，在out目录会生成html版本的测试报告，可通过浏览器直接打开查看（VS Code IDE建议安装<code>Open In Default Browser</code>插件）。</p>
 
 </div>
@@ -425,9 +422,9 @@
     
 	<p>添加一个全新的DUT测试用例，需要完成以下三部分内容：</p>
 <ol>
-<li><strong>添加编译脚本</strong>： 在<code>scripts</code>目录下编写对应的<code>rtl</code>到<code>python</code>的编译<code>Makefile</code>文件（例如Makefile.build_ut_<strong>backend_ctrlblock_decode</strong>，必须以<code>Makefile.build_ut_</code>开头）以及对应的目录（目录中包含必要的输入文件，例如<code>rtl</code>的<code>filelist</code>，需要导出的内部信号等）。</li>
+<li><strong>添加编译脚本</strong>： 在<code>scripts</code>目录下编写对应的<code>rtl</code>到<code>python</code>的编译<code>python</code>文件（例如build_ut_<strong>backend_ctrlblock_decode</strong>.py，必须以<code>build_ut_</code>开头）以及对应的目录（目录中包含必要的输入文件，例如<code>rtl</code>的<code>filelist</code>，需要导出的内部信号等）。所添加的python文件需要实现两个函数：<code>build(cfg): bool</code> 和 <code>line_coverage_files(cfg): list[str]</code>。<code>build</code>函数用来编译DUT，<code>line_coverage_files</code>用来指定该DUT需要查看哪些文件的行覆盖率。</li>
 <li><strong>添加测试用例</strong>： 在对应的<code>ut_*</code>目录中创建对应的<code>python</code>模块（例如<code>ut_backend/ctrl_block/decode</code>）,在该模块中需要包含以<code>test_*.py</code>的测试用例。用例的目录结构请按照<a href="https://open-verify.cc/UnityChipForXiangShan/">昆明湖层级架构图</a>进行添加，以确保收集测试结果时能与层级图对应。测试用例的编写方法请参考<a href="https://docs.pytest.org/en/stable/">Pytest官方文档</a>。</li>
-<li><strong>添加依赖模块</strong>： 如果有需要的话，可以在<code>tools、comm</code>等模块中添加该DUT测试需要的基础工具。如果该工具不够通用请添加到对应的<code>ut_</code>模块中，且不能以<code>test_</code>前缀进行命名（例如参考模型可以是<code>ut_backend/ctrl_block/decode/reference.py</code>）</li>
+<li><strong>添加依赖模块</strong>： 如果有需要的话，可以在<code>tools、comm</code>等模块中添加该DUT测试需要的基础工具。如果该工具不够通用请添加到对应的<code>ut_</code>模块中，且不能以<code>test_</code>前缀进行命名（例如参考模型可以是<code>ut_backend/ctrl_block/decode/reference.py</code>）。</li>
 </ol>
 <p>如果是在已有的DUT测试中增加内容，按原有目录结构添加即可。</p>
 <p>*目录或文件名称需要合理，能通过其命名知晓其具体含义。</p>
@@ -540,6 +537,14 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file-name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;%{host}-%{pid}-%{time}.log&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 文件日志输出级别</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file-level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 测试结果配置（该数据用于填充documents中的统计图等，原始数据来源于toffee-test生成的report）</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic">#  运行完测试后，可通过 `make doc` 查看结果</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">doc-result</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 目标DUT的组织结构配置</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">dutree</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;dutree/xiangshan-kmh.yaml&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 结果写入路径</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">save-path</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;../documents/static/data/ut_data_progress.json&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span></code></pre></div>
 </div>
 
