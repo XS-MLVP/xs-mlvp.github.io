@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.3009d63a12ea79171a4c652de129e804.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eb852440e594e053769fda5ca07da673.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -156,7 +156,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.3009d63a12ea79171a4c652de129e804.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eb852440e594e053769fda5ca07da673.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -191,6 +191,10 @@
   <a href="/UnityChipForXiangShan/docs/05_report_bug/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs05_report_bug"><span class="">如何提交Bug</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs06_join_us-li">
   <a href="/UnityChipForXiangShan/docs/06_join_us/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs06_join_us"><span class="">如何参与本项目</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs08_pr_template-li">
+  <a href="/UnityChipForXiangShan/docs/08_pr_template/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs08_pr_template"><span class="">PR模板</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs07_constraint-li">
+  <a href="/UnityChipForXiangShan/docs/07_constraint/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs07_constraint"><span class="">基本规范</span></a>
 </li>
   </ul>
 </li>
@@ -232,39 +236,78 @@
 	<header class="article-meta">
 		
   </header>
-	<div id="meta_chart" style="width: 100%;height:400px;"></div>
-<script src="../js/echarts.min.js"></script>
+	<script src="../js/echarts.min.js"></script>
 <script src="../js/chart_meta.js"></script>
+<script>
+function update_charts(data_url){
+    show_meta_chart("meta_chart", data_url)
+    updateDUTestStatus(data_url)
+}
+</script>
+<div id="meta_chart" style="width: 100%;height:400px;"></div>
+<div style="text-align: center; width: 100%;">
+
+<label>当前版本：</label>
+<select id="indexurlSelect" onchange="updateLink()" style="border: 0px">
+    
+    
+    
+    
+    
+</select>
+<a id="indexgoLink" href="#" target=“_blank“>查看测试报告</a>
+
+<script>
+function updateLink() {
+    var select = document.getElementById("indexurlSelect");
+    var goLink = document.getElementById("indexgoLink");
+    var url = select.options[select.selectedIndex].getAttribute("data-url");
+    goLink.href = url;
+    
+    window["update_charts"](url + "/ut_data_progress.json");
+    
+}
+document.addEventListener('DOMContentLoaded', function() {
+    updateLink()
+});
+</script>
+
+</div>
+<br>
 <p>香山昆明湖架构各个模块验证情况如上图中所示。总统计数据如下：</p>
 <table>
     <ol>
     <tr>
-        <td><li>总测试用例数（Total Cases）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_cases_toal">-</em></li></td>
+        <td>总测试用例数（Total Cases）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_toal">-</em></td>
+        <td>测试用例通过数（Passed Cases）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_pass">-</em></td>
+        <td>测试用例通过率（Passed Rate）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_prate">-</em></td>
     </tr>
     <tr>
-        <td><li>测试用例通过数（Passed Cases）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_cases_pass">-</em></li></td>
+        <td>测试用例未过数（Failed Cases）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_fail">-</em></td>
+        <td>测试用例跳过数（Skipped Cases）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_skip">-</em></td>
+        <td>测试用例跳过率（Skip Rate）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_srate">-</em></td>
     </tr>
     <tr>
-        <td><li>测试用例未过数（Failed Cases）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_cases_fail">-</em></li></td>
+        <td>总功能覆盖点数（Function Coverage）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_function_total">-</em></td>
+        <td>覆盖点已覆盖数（Covered Functions）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_function_cover">-</em></td>
+        <td>覆盖点已覆盖率（Covered Rate）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_function_rate">-</em></td>
     </tr>
     <tr>
-        <td><li>测试用例跳过数（Skipped Cases）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_cases_skip">-</em></li></td>
-    </tr>
-    <tr>
-        <td><li>总功能覆盖点数（Function Coverage）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_function_total">-</em></li></td>
-    </tr>
-    <tr>
-        <td><li>覆盖点已覆盖数（Coverage Functions）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_function_cover">-</em></li></td>
-    </tr>
-    <tr>
-        <td><li>总代码行覆盖率（Line Coverage Rate）</td>
-        <td  style="text-align: right;"><em id="em_id_report_line_coverage">-</em></li></td>
+        <td>总代码行覆盖率（Total Lines）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_line_total">-</em></td>
+        <td>总代码行覆盖数（Covered Lines）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_line_cover">-</em></td>
+        <td>总代码行覆盖率（Covered Rate）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_line_rate">-</em></td>
     </tr>
     </ol>
 </table>
@@ -278,8 +321,275 @@
 <li><strong><a href="https://github.com/XS-MLVP/UnityChipForXiangShan/labels/task">正在进行的任务列表</a></strong></li>
 <li><strong><a href="https://github.com/XS-MLVP/UnityChipForXiangShan/labels/taskdone">已完成的任务列表</a></strong></li>
 </ul>
-<p>注：本项目中的统计信息根据commit等数据自动更新，参与者可以提交issue（写明任务内容，预计完成时间等）同步正在进行的任务。</p>
+<br>
 <div style="text-align: center; width: 100%;">
+<h4 id="testmap">香山昆明湖DUT验证进展</h4>
+</div>
+<br>
+
+<style>
+.div-dut-test-report {
+    all:none;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+}
+.div-dut-test-report tbody {
+    --bs-table-striped-bg: white;
+}
+.div-dut-test-report .td-name {
+    text-align: left;
+}
+.div-dut-test-report .td-index {
+    text-align: center;
+}
+.div-dut-test-report table {
+    width: 90%;
+    margin: 0 auto;
+}
+.div-dut-test-report td {
+    text-align: right;
+}
+.div-dut-test-report th {
+    text-align: right;
+}
+.div-dut-test-report tr {
+    border-bottom: 1px solid #ddd;
+}
+.em-red {
+    color: yellow;
+    font-weight: bold;
+    background-color: rgb(247, 36, 152);
+    border-radius: 2px;
+}
+.em-orange {
+    color: white;
+    font-weight: bold;
+    background-color: orange;
+    border-radius: 2px;
+}
+.em-green {
+    font-weight: bold;
+    color: yellow;
+    background-color: green;
+    border-radius: 2px;
+}
+.modal-linecov {
+    display: none;  
+    position: absolute;  
+    z-index: 1;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    position: absolute;
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+</style>
+
+<div id="line-file-modal" class="modal-linecov">
+    <div class="modal-content" id="linecov-text">
+    </div>
+</div>
+
+<div class="div-dut-test-report">
+<table id="dut-test-items" align="center" class="td-initial">
+</table>
+</div>
+
+<script>
+function closeLineCovModal() {
+    $("#line-file-modal").hide();
+}
+
+$(window).click(function(event) {
+    var modal = $("#line-file-modal");
+    if (! modal.is(":hidden")) {
+        if (! $(event.target).closest(".modal-content").length){
+            closeLineCovModal();
+        }
+    }
+});
+
+function updateDUTestStatus(data_url){
+    $.getJSON(data_url, function (data) {
+        $("#dut-test-items").html(
+"            <tbody align=\"center\">\
+    <tr>\
+        <th class=\"td-index\">Index</th>\
+        <th class=\"td-name\">Name</th>\
+        <th>Document</th>\
+        <th>&nbsp;&nbsp;Cases</th>\
+        <th>&nbsp;&nbsp;&nbsp;Fail</th>\
+        <th>&nbsp;&nbsp;&nbsp;SKip</th>\
+        <th>CsRate (%)</th>\
+        <th>Checks\
+        <th>Fail\
+        <th>CkRate (%)</th>\
+        <th>Lines</th>\
+        <th>CvRate (%)</th>\
+    </tr>\
+  </tbody>");
+        var prefix = data.tree.meta.paths;
+        var index = 1;
+        function calcRateColor(rate){
+            var color = "";
+            if(rate < data.config.rate_low){
+                color = "red";
+            } else if(rate < data.config.rate_middle){
+                color = "orange";
+            } else if(rate > data.config.rate_high){
+                color = "green";
+            }
+            return "<em class=\"em-"+color+"\">" + rate + "</em>";
+        }
+        function calcRate(a, b){
+            if(b === 0){
+                return 0;
+            }
+            return calcRateColor((a / b * 100).toFixed(2));
+        }
+        function redItem(item){
+            if (item > 0) {
+                return "<em class=\"em-red\">" + item + "</em>";
+            }
+            return item;
+        }
+        function getDocUrl(url){
+            if(url){
+                return "<a href=\"" + url + "\" target=\"_blank\">Detail</a>";
+            }
+            return "-";
+        }
+        function getLinFileUrl(paths){
+            var txt = ""
+            var meta = data.extend[paths]
+            if (!meta) return txt;
+            meta.target_line_coverage_files.forEach(f=> {
+                var url = null;
+                if(!f.includes("not found")){
+                    meta.matched_line_coverage_files.forEach(u=> {
+                        if(u[0].includes(f)){
+                            var base_url = data_url.split("/").slice(0, -1).join("/");
+                            txt += "<li><a href=\"" + base_url + u[0] + "\" target=\"_blank\">" + f + "</a> <em style=\"float: right;\"> ("
+                                +u[1]+"/"+u[2]+")<em> </li>";
+                        }else{
+                            console.log("not found: " + f + " in " + u);
+                        }
+                    });
+                }else{
+                    txt += "<li>" + f + "</li>";
+                }
+            });
+            return $("#linecov-text").html(txt);
+        }
+        function openLineCovModal(event, paths) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeLineCovModal();
+            getLinFileUrl(paths);
+            var modal = $("#line-file-modal")
+            var text = $("#linecov-text")
+            modal.css({
+                left: event.pageX - text.width()/2 + "px",
+                top: event.pageY - text.height()/2 + "px"
+            });
+            modal.show();
+        }
+        window.openLineCovModal = openLineCovModal;
+        function getLineCovUrl(paths, hints, total){
+            var text = hints + "/" + total;
+            if(total > 0){
+                return "<a href=\"\" onclick=\"openLineCovModal(event, '" + paths + "')\">" + text + "</a>";
+            }
+            return text;
+        }
+        function getCaseUrl(paths, pass, total){
+            if (total < 1){
+                return "0/0";
+            }
+            var url = data_url.split("/").slice(0, -1).join("/") + "?";
+            var K = "K=details,file,,,span," + paths.split("/").slice(2, -1).join("/");
+            return "<a href=\""+ url + K +"\" target=\"_blank\">" + pass + "/" + total + "</a>";
+        }
+        function getCaseFailSkipUrl(paths, fail, skip){
+            if (fail < 1){
+                if(skip){
+                    return "0"
+                }
+                return redItem(fail);
+            }
+            var url = data_url.split("/").slice(0, -1).join("/") + "?";
+            var key = skip ? "skipped" : "failed";
+            var K = "K=details,file,span,"+key+",span," + paths.split("/").slice(2, -1).join("/");
+            var text = skip? fail: redItem(fail);
+            return "<a href=\""+ url + K +"\" target=\"_blank\">" + text + "</a>";
+        }
+        function getFuncovUrl(paths, cover, total){
+            if (total < 1){
+                return "0/0";
+            }
+            var group_name = paths.split("/").slice(2, -1).join(".")
+            var url = data_url.split("/").slice(0, -1).join("/") + "?";
+            var K_case = "ShowFunCov=1&K=li,group_name,,,span," + group_name + "&K=ul,group_name,,,span,"+ group_name;
+            return "<a href=\""+ url + K_case +"\" target=\"_blank\">" + cover + "/" + total + "</a>";
+        }
+        function getFuncovFailUrl(paths, cover, total){
+            if (total == cover || total < 1){
+                return "0";
+            }
+            var group_name = paths.split("/").slice(2, -1).join(".")
+            var url = data_url.split("/").slice(0, -1).join("/") + "?";
+            var K_case = "ShowFunCov=1&K=li,group_name,,,span," + group_name + "&K=ul,group_name,,,span,"+ group_name;
+            var K_fail = K_case + "&K=li,point_name,,,span,Failed&K=ul,grou_name,,,ul,failed";
+            return "<a href=\""+ url + K_fail +"\" target=\"_blank\">" + redItem(total - cover) + "</a>";
+        }
+        function traverse(node) {
+            if (!node.children || node.children.length === 0) {
+                var meta = node.meta
+                $("#dut-test-items").html($("#dut-test-items").html() + 
+                    "<tr><td class=\"td-index\">" + index + "</td>" +
+                    "<td class=\"td-name\">" + meta.paths.replace(prefix + "/",
+                        "").replaceAll("/", ".") + "</td>" +
+                    "<td>" + getDocUrl(meta.doc_url) + "</td>" +
+                    "<td>" + getCaseUrl(meta.paths, meta.cases.pass, meta.cases.total) + "</td>" +
+                    "<td>" + getCaseFailSkipUrl(meta.paths, meta.cases.fail, false) + "</td>" +
+                    "<td>" + getCaseFailSkipUrl(meta.paths, meta.cases.skip, true) + "</td>" +
+                    "<td>" + calcRate(meta.cases.pass, meta.cases.total) + "</td>" +
+                    "<td>" + getFuncovUrl(meta.paths, meta.functions.cover, meta.functions.total) + "</td>" +
+                    "<td>" + getFuncovFailUrl(meta.paths, meta.functions.cover, meta.functions.total) + "</td>" +
+                    "<td>" + calcRate(meta.functions.cover, meta.functions.total) + "</td>" +
+                    "<td>" + getLineCovUrl(meta.paths, meta.lines.cover, meta.lines.total) + "</td>" +
+                    "<td>" + calcRate(meta.lines.cover, meta.lines.total) + "</td>" +
+                    "</tr>"
+                );
+                index++;
+            } else {
+                $.each(node.children, function(index, child) {
+                    traverse(child);
+                });
+            }
+        }
+        traverse(data.tree);
+    });
+}
+</script>
+
+<div style="text-align: center; width: 100%;">
+<br>
+注：本项目中的统计信息根据commit等数据自动更新，参与者可以提交issue（写明任务内容，预计完成时间等）同步正在进行的任务。<br>
 数据自动更新日期：<em id="em_id_report_date">1970-01-01 00:00:00</em>
 </div>
 
@@ -350,10 +660,26 @@
                 <p></p>
             </div>
         
+            
+            <div class="entry">
+                <h5>
+                    <a href="/UnityChipForXiangShan/docs/08_pr_template/">PR模板</a>
+                </h5>
+                <p></p>
+            </div>
+        
+            
+            <div class="entry">
+                <h5>
+                    <a href="/UnityChipForXiangShan/docs/07_constraint/">基本规范</a>
+                </h5>
+                <p></p>
+            </div>
+        
     
 </div>
 <div class="text-muted mt-5 pt-3 border-top">
-  最后修改 November 6, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/aec03768dd579c8954b800c4fd4b1aa5f1c8c9de">add config section (aec0376)</a>
+  最后修改 November 18, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/2ab8af372783e285bf061b4fe38bc0c6b223ec4e">picker: use the latest version (241118) (2ab8af3)</a>
 </div>
 </div>
 

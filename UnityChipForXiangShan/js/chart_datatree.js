@@ -141,11 +141,12 @@ function show_datatree_chart(chart_id, data_url) {
     window.addEventListener('resize', function () {
       utChart.resize();
     });
+
+    // set em data
+    $("#em_id_report_dut_total").text(graph_data["tree"]["value"])
+    $("#em_id_report_dut_min_light").text(graph_data["config"]["default_light_min"])
+    $("#em_id_report_dut_lighted").text(graph_data["tree"]["meta"]["light_count"])
+    $("#em_id_report_dut_lighted_no").text(graph_data["tree"]["value"] - graph_data["tree"]["meta"]["light_count"])
   });
   option && utChart.setOption(option);
 }
-
-
-document.addEventListener('DOMContentLoaded', function() {
-  show_datatree_chart("datatree_chart", "../../data/ut_data_progress.json");
-});

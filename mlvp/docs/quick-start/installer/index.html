@@ -24,11 +24,11 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/quick-start/installer/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-10-25T17:43:26+08:00" />
+<meta property="article:modified_time" content="2024-11-19T09:40:49+08:00" />
 <meta itemprop="name" content="搭建验证环境">
 <meta itemprop="description" content="安装相关依赖，**下载、构建并安装**对应的工具。">
-<meta itemprop="dateModified" content="2024-10-25T17:43:26+08:00" />
-<meta itemprop="wordCount" content="728">
+<meta itemprop="dateModified" content="2024-11-19T09:40:49+08:00" />
+<meta itemprop="wordCount" content="745">
 <meta itemprop="keywords" content="docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="搭建验证环境"/>
 <meta name="twitter:description" content="安装相关依赖，**下载、构建并安装**对应的工具。"/>
 
@@ -135,7 +135,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.3d7629ee21b54d51d9eca06c40874360.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.40c2fb7d9a0ab213e01b64685255a73f.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -159,7 +159,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.3d7629ee21b54d51d9eca06c40874360.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.40c2fb7d9a0ab213e01b64685255a73f.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -463,12 +463,13 @@ Subcommands:
 </span></span><span style="display:flex;"><span>  --lang,--language TEXT:<span style="color:#ce5c00;font-weight:bold">{</span>python,cpp,java,scala,golang<span style="color:#ce5c00;font-weight:bold">}</span> <span style="color:#ce5c00;font-weight:bold">[</span>python<span style="color:#ce5c00;font-weight:bold">]</span>
 </span></span><span style="display:flex;"><span>                              Build example project, default is python, choose cpp, java or python
 </span></span><span style="display:flex;"><span>  --sdir,--source_dir TEXT    Template Files Dir, default is <span style="color:#4e9a06">${</span><span style="color:#000">picker_install_path</span><span style="color:#4e9a06">}</span>/../picker/template
-</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT    Codegen render files to target dir, default is ./picker_out
 </span></span><span style="display:flex;"><span>  --sname,--source_module_name TEXT ...
 </span></span><span style="display:flex;"><span>                              Pick the module in DUT .v file, default is the last module in the -f marked file
 </span></span><span style="display:flex;"><span>  --tname,--target_module_name TEXT
 </span></span><span style="display:flex;"><span>                              Set the module name and file name of target DUT, default is the same as source.
 </span></span><span style="display:flex;"><span>                              For example, -T top, will generate UTtop.cpp and UTtop.hpp with UTtop class
+</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT    Target directory to store all the results. If it ends with <span style="color:#4e9a06">&#39;/&#39;</span> or is empty,
+</span></span><span style="display:flex;"><span>                              the directory name will be the same as the target module name
 </span></span><span style="display:flex;"><span>  --internal TEXT             Exported internal signal config file, default is empty, means no internal pin
 </span></span><span style="display:flex;"><span>  -F,--frequency TEXT <span style="color:#ce5c00;font-weight:bold">[</span>100MHz<span style="color:#ce5c00;font-weight:bold">]</span>
 </span></span><span style="display:flex;"><span>                              Set the frequency of the **only VCS** DUT, default is 100MHz, use Hz, KHz, MHz, GHz as unit
@@ -506,9 +507,9 @@ Subcommands:
 <li><code>--sim TEXT [verilator]</code>: 可选。使用 vcs 或 verilator 作为模拟器，默认是 verilator</li>
 <li><code>--lang,--language TEXT:{python,cpp,java,scala,golang} [python]</code>: 可选。构建示例项目，默认是 python，可选择 cpp、java 或 python</li>
 <li><code>--sdir,--source_dir TEXT</code>: 可选。模板文件目录，默认是 ${picker_install_path}/../picker/template</li>
-<li><code>--tdir,--target_dir TEXT</code>: 可选。代码生成渲染文件的目标目录，默认是 ./picker_out</li>
 <li><code>--sname,--source_module_name TEXT ...</code>: 可选。在 DUT .v 文件中选择模块，默认是 -f 标记的文件中的最后一个模块</li>
 <li><code>--tname,--target_module_name TEXT</code>: 可选。设置目标 DUT 的模块名和文件名，默认与源相同。例如，-T top 将生成 UTtop.cpp 和 UTtop.hpp，并包含 UTtop 类</li>
+<li><code>--tdir,--target_dir TEXT</code>: 可选。代码生成渲染文件的目标目录，默认为DUT的模块名。如果该参数以&rsquo;/&lsquo;结尾，则在该参数指定的目录中创建以DUT模块名的子目录。</li>
 <li><code>--internal TEXT</code>: 可选。导出的内部信号配置文件，默认为空，表示没有内部引脚</li>
 <li><code>-F,--frequency TEXT [100MHz]</code>: 可选。设置 <strong>仅 VCS</strong> DUT 的频率，默认是 100MHz，可以使用 Hz、KHz、MHz、GHz 作为单位</li>
 <li><code>-w,--wave_file_name TEXT</code>: 可选。波形文件名，空表示不导出波形</li>
@@ -554,7 +555,7 @@ bash example/RandomGenerator/release-verilator.sh --lang java
 <p>如何基于picker进行芯片验证，可参考：<a href="https://open-verify.cc/mlvp/docs/">https://open-verify.cc/mlvp/docs/</a></p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 October 25, 2024: <a href="https://github.com/XS-MLVP/course/commit/afc760a7701e7322ac8cc4c7adf0a993d5ba0897">add funcov desc (afc760a)</a>
+  最后修改 November 19, 2024: <a href="https://github.com/XS-MLVP/course/commit/e90640b567fe459c3f123abc1e32153a489d88ca">update (e90640b)</a>
 </div>
 
 </div>

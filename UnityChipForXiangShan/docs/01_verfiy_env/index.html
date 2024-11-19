@@ -23,7 +23,7 @@ Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11�
 git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
 make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
-# 调用scripts目录中的build_ut_&amp;lt;name&amp;gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&amp;lt;name&amp;gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &amp;#34;*&amp;#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrlblock_decode 以make dut DUTS=backend_ctrlblock_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
+# 调用scripts目录中的build_ut_&amp;lt;name&amp;gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&amp;lt;name&amp;gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &amp;#34;*&amp;#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
 dut/ ├── __init__.py ├── decodestage ├── predecode └── rvcexpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
 from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() ">
 <meta property="og:title" content="准备验证环境" />
@@ -32,23 +32,23 @@ Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11�
 git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
 make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
-# 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrlblock_decode 以make dut DUTS=backend_ctrlblock_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
+# 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
 dut/ ├── __init__.py ├── decodestage ├── predecode └── rvcexpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
 from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/01_verfiy_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-11-06T17:57:58+08:00" />
+<meta property="article:modified_time" content="2024-11-18T18:34:55+08:00" />
 <meta itemprop="name" content="准备验证环境">
 <meta itemprop="description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为toffee和mlvp，环境需求如下：
 Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 环境配置完成后，clone仓库：
 git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
 make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
-# 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrlblock_decode 以make dut DUTS=backend_ctrlblock_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
+# 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
 dut/ ├── __init__.py ├── decodestage ├── predecode └── rvcexpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
 from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() ">
-<meta itemprop="dateModified" content="2024-11-06T17:57:58+08:00" />
+<meta itemprop="dateModified" content="2024-11-18T18:34:55+08:00" />
 <meta itemprop="wordCount" content="59">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="准备验证环境"/>
 <meta name="twitter:description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为toffee和mlvp，环境需求如下：
@@ -56,7 +56,7 @@ Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11�
 git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
 make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
-# 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrlblock_decode 以make dut DUTS=backend_ctrlblock_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
+# 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
 dut/ ├── __init__.py ├── decodestage ├── predecode └── rvcexpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
 from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
 
@@ -163,7 +163,7 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.3009d63a12ea79171a4c652de129e804.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eb852440e594e053769fda5ca07da673.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -187,7 +187,7 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.3009d63a12ea79171a4c652de129e804.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eb852440e594e053769fda5ca07da673.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -222,6 +222,10 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
   <a href="/UnityChipForXiangShan/docs/05_report_bug/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs05_report_bug"><span class="">如何提交Bug</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs06_join_us-li">
   <a href="/UnityChipForXiangShan/docs/06_join_us/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs06_join_us"><span class="">如何参与本项目</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs08_pr_template-li">
+  <a href="/UnityChipForXiangShan/docs/08_pr_template/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs08_pr_template"><span class="">PR模板</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs07_constraint-li">
+  <a href="/UnityChipForXiangShan/docs/07_constraint/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs07_constraint"><span class="">基本规范</span></a>
 </li>
   </ul>
 </li>
@@ -296,8 +300,8 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT</span>
 </span></span><span style="display:flex;"><span>make dut <span style="color:#000">DUTS</span><span style="color:#ce5c00;font-weight:bold">=</span>&lt;name&gt;  <span style="color:#8f5902;font-style:italic"># DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT</span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 例如：</span>
-</span></span><span style="display:flex;"><span>make dut <span style="color:#000">DUTS</span><span style="color:#ce5c00;font-weight:bold">=</span>backend_ctrlblock_decode
-</span></span></code></pre></div><p>以<code>make dut DUTS=backend_ctrlblock_decode</code>为例，命令执行完成后，会在dut目录下生成对应的Python包：</p>
+</span></span><span style="display:flex;"><span>make dut <span style="color:#000">DUTS</span><span style="color:#ce5c00;font-weight:bold">=</span>backend_ctrl_block_decode
+</span></span></code></pre></div><p>以<code>make dut DUTS=backend_ctrl_block_decode</code>为例，命令执行完成后，会在dut目录下生成对应的Python包：</p>
 <pre tabindex="0"><code>dut/
 ├── __init__.py
 ├── decodestage
@@ -308,7 +312,7 @@ from dut.predecode.UT_PreDecode import DUTPreDecode dut = DUTPreDecode() "/>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTPreDecode</span><span style="color:#000;font-weight:bold">()</span>
 </span></span></code></pre></div>
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 November 6, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/aec03768dd579c8954b800c4fd4b1aa5f1c8c9de">add config section (aec0376)</a>
+  最后修改 November 18, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/2ab8af372783e285bf061b4fe38bc0c6b223ec4e">picker: use the latest version (241118) (2ab8af3)</a>
 </div>
 
 </div>

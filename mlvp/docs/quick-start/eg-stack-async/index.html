@@ -24,11 +24,11 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-async/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-10-25T17:43:26+08:00" />
+<meta property="article:modified_time" content="2024-11-19T09:40:49+08:00" />
 <meta itemprop="name" content="案例四：双端口栈（协程）">
 <meta itemprop="description" content="双端口栈是一个拥有两个端口的栈，每个端口都支持push和pop操作。本案例以双端口栈为例，展示如何使用协程驱动DUT">
-<meta itemprop="dateModified" content="2024-10-25T17:43:26+08:00" />
-<meta itemprop="wordCount" content="436">
+<meta itemprop="dateModified" content="2024-11-19T09:40:49+08:00" />
+<meta itemprop="wordCount" content="434">
 <meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="案例四：双端口栈（协程）"/>
 <meta name="twitter:description" content="双端口栈是一个拥有两个端口的栈，每个端口都支持push和pop操作。本案例以双端口栈为例，展示如何使用协程驱动DUT"/>
 
@@ -135,7 +135,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.3d7629ee21b54d51d9eca06c40874360.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.40c2fb7d9a0ab213e01b64685255a73f.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -159,7 +159,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.3d7629ee21b54d51d9eca06c40874360.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.40c2fb7d9a0ab213e01b64685255a73f.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -394,7 +394,7 @@
 <p>对于硬件验证中的并行执行来说，这种特性正是我们所需要的，我们可以创建多个协程，来完成验证中的多个驱动任务。我们可以将时钟的执行当做事件，在每个协程中等待这个事件，当时钟信号到来时，事件循环会唤醒所有等待的协程，使其继续执行，直到他们等待下一个时钟信号。</p>
 <p>我们用 Python 中的 <code>asyncio</code> 来实现对协程的支持：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">asyncio</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">name</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">i</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#204a87">range</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">10</span><span style="color:#000;font-weight:bold">):</span>
@@ -417,7 +417,7 @@
 <p>下面是我们提供的一个简单的使用协程驱动的验证代码：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">asyncio</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">enum</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Enum</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackModel</span><span style="color:#000;font-weight:bold">:</span>
@@ -522,7 +522,7 @@
 <p><code>send_req</code> 和 <code>receive_resp</code> 函数的实现逻辑类似，只需要将对应的输入输出信号设置为对应的值，然后等待对应的信号变为有效即可，可以完全根据端口的执行顺序来编写。</p>
 <p>类似地，我们使用 <code>StackModel</code> 类来模拟栈的行为，在 <code>commit_push</code> 和 <code>commit_pop</code> 函数中分别模拟了 PUSH 和 POP 操作，并在 POP 操作中进行了数据的比较。</p>
 <h3 id="运行测试">运行测试</h3>
-<p>将上述代码复制到 <code>example.py</code> 中，然后执行以下命令：</p>
+<p>在picker_out_dual_port_stack文件夹中创建<code>example.py</code>将上述代码复制到其中，然后执行以下命令：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker_out_dual_port_stack
 </span></span><span style="display:flex;"><span>python3 example.py
 </span></span></code></pre></div><p>可直接运行本案例的测试代码，你将会看到类似如下的输出：</p>
@@ -556,7 +556,7 @@
 <p>在这时候，你就需要一套协程编写的规范以及验证代码的设计模式，来帮助你更好地编写基于协程的验证代码。因此，我们提供了 mlvp 库，它提供了一套基于协程的验证代码设计模式，你可以通过使用 mlvp 来更好地编写验证代码，你可以在<a href="https://github.com/XS-MLVP/mlvp">这里</a>去进一步了解 mlvp。</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 October 25, 2024: <a href="https://github.com/XS-MLVP/course/commit/afc760a7701e7322ac8cc4c7adf0a993d5ba0897">add funcov desc (afc760a)</a>
+  最后修改 November 19, 2024: <a href="https://github.com/XS-MLVP/course/commit/e90640b567fe459c3f123abc1e32153a489d88ca">update (e90640b)</a>
 </div>
 
 </div>

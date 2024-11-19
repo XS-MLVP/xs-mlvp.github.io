@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.3d7629ee21b54d51d9eca06c40874360.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.40c2fb7d9a0ab213e01b64685255a73f.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -357,12 +357,13 @@ Subcommands:
 </span></span><span style="display:flex;"><span>  --lang,--language TEXT:<span style="color:#ce5c00;font-weight:bold">{</span>python,cpp,java,scala,golang<span style="color:#ce5c00;font-weight:bold">}</span> <span style="color:#ce5c00;font-weight:bold">[</span>python<span style="color:#ce5c00;font-weight:bold">]</span>
 </span></span><span style="display:flex;"><span>                              Build example project, default is python, choose cpp, java or python
 </span></span><span style="display:flex;"><span>  --sdir,--source_dir TEXT    Template Files Dir, default is <span style="color:#4e9a06">${</span><span style="color:#000">picker_install_path</span><span style="color:#4e9a06">}</span>/../picker/template
-</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT    Codegen render files to target dir, default is ./picker_out
 </span></span><span style="display:flex;"><span>  --sname,--source_module_name TEXT ...
 </span></span><span style="display:flex;"><span>                              Pick the module in DUT .v file, default is the last module in the -f marked file
 </span></span><span style="display:flex;"><span>  --tname,--target_module_name TEXT
 </span></span><span style="display:flex;"><span>                              Set the module name and file name of target DUT, default is the same as source.
 </span></span><span style="display:flex;"><span>                              For example, -T top, will generate UTtop.cpp and UTtop.hpp with UTtop class
+</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT    Target directory to store all the results. If it ends with <span style="color:#4e9a06">&#39;/&#39;</span> or is empty,
+</span></span><span style="display:flex;"><span>                              the directory name will be the same as the target module name
 </span></span><span style="display:flex;"><span>  --internal TEXT             Exported internal signal config file, default is empty, means no internal pin
 </span></span><span style="display:flex;"><span>  -F,--frequency TEXT <span style="color:#ce5c00;font-weight:bold">[</span>100MHz<span style="color:#ce5c00;font-weight:bold">]</span>
 </span></span><span style="display:flex;"><span>                              Set the frequency of the **only VCS** DUT, default is 100MHz, use Hz, KHz, MHz, GHz as unit
@@ -400,9 +401,9 @@ Subcommands:
 <li><code>--sim TEXT [verilator]</code>: 可选。使用 vcs 或 verilator 作为模拟器，默认是 verilator</li>
 <li><code>--lang,--language TEXT:{python,cpp,java,scala,golang} [python]</code>: 可选。构建示例项目，默认是 python，可选择 cpp、java 或 python</li>
 <li><code>--sdir,--source_dir TEXT</code>: 可选。模板文件目录，默认是 ${picker_install_path}/../picker/template</li>
-<li><code>--tdir,--target_dir TEXT</code>: 可选。代码生成渲染文件的目标目录，默认是 ./picker_out</li>
 <li><code>--sname,--source_module_name TEXT ...</code>: 可选。在 DUT .v 文件中选择模块，默认是 -f 标记的文件中的最后一个模块</li>
 <li><code>--tname,--target_module_name TEXT</code>: 可选。设置目标 DUT 的模块名和文件名，默认与源相同。例如，-T top 将生成 UTtop.cpp 和 UTtop.hpp，并包含 UTtop 类</li>
+<li><code>--tdir,--target_dir TEXT</code>: 可选。代码生成渲染文件的目标目录，默认为DUT的模块名。如果该参数以&rsquo;/&lsquo;结尾，则在该参数指定的目录中创建以DUT模块名的子目录。</li>
 <li><code>--internal TEXT</code>: 可选。导出的内部信号配置文件，默认为空，表示没有内部引脚</li>
 <li><code>-F,--frequency TEXT [100MHz]</code>: 可选。设置 <strong>仅 VCS</strong> DUT 的频率，默认是 100MHz，可以使用 Hz、KHz、MHz、GHz 作为单位</li>
 <li><code>-w,--wave_file_name TEXT</code>: 可选。波形文件名，空表示不导出波形</li>
@@ -486,8 +487,9 @@ bash example/RandomGenerator/release-verilator.sh --lang java
 <h3 id="将rtl导出为-python-module">将RTL导出为 Python Module</h3>
 <h4 id="生成中间文件">生成中间文件</h4>
 <p>进入 Adder 文件夹，执行如下命令：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> Adder.v -w Adder.fst --sname Adder --tdir picker_out_adder --lang python -e --sim verilator
-</span></span></code></pre></div><p>该命令的含义是：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> Adder.v -w Adder.fst --sname Adder --tdir picker_out_adder/ --lang python -e --sim verilator
+</span></span></code></pre></div><p>*注：&ndash;tdir 指定的是目标构建目录，如果该参数值为空或者以“/”结尾，picker则会自动以DUT的目标模块名创建构建目录。例如 <code>--tdir picker_out_adder</code>指定了当前目录下的picker_out_adder为构建目录，而参数<code>--tdir picker_out_adder/</code>则指定picker在当前目录picker_out_adder中创建Adder目录作为目标构建目录。</p>
+<p>该命令的含义是：</p>
 <ol>
 <li>将 Adder.v 作为 Top 文件，并将 Adder 作为 Top Module，基于 verilator 仿真器生成动态库，生成目标语言为 Python。</li>
 <li>启用波形输出，目标波形文件为Adder.fst。</li>
@@ -496,40 +498,41 @@ bash example/RandomGenerator/release-verilator.sh --lang java
 </ol>
 <p>在使用该命令时，还有部分命令行参数没有使用，这些命令将在后续的章节中介绍。</p>
 <p>输出的目录结构如下，<strong>请注意这部分均为中间文件</strong>，不能直接使用：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker_out_adder
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- Adder.v <span style="color:#8f5902;font-style:italic"># 原始的RTL源码</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- Adder_top.sv <span style="color:#8f5902;font-style:italic"># 生成的Adder_top顶层封装，使用DPI驱动Adder模块的inputs和outputs</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- Adder_top.v <span style="color:#8f5902;font-style:italic"># 生成的Adder_top顶层封装，因为Verdi不支持导入SV源码使用，因此需要生成一个Verilog版本</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- CMakeLists.txt <span style="color:#8f5902;font-style:italic"># 用于调用仿真器编译基本的cpp class并将其打包成有裸DPI函数二进制动态库(libDPIAdder.so)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- Makefile <span style="color:#8f5902;font-style:italic"># 生成的Makefile，用于调用CMakeLists.txt，并让用户可以通过make命令编译出libAdder.so，并手动调整Makefile的配置参数。或者编译示例项目</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- cmake <span style="color:#8f5902;font-style:italic"># 生成的cmake文件夹，用于调用不同仿真器编译RTL代码</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- vcs.cmake
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- verilator.cmake
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- cpp <span style="color:#8f5902;font-style:italic"># CPP example目录，包含示例代码</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- CMakeLists.txt <span style="color:#8f5902;font-style:italic"># 用于将libDPIAdder.so使用基础数据类型封装为一个可直接操作的类（libUTAdder.so），而非裸DPI函数。</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- Makefile
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- cmake
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- vcs.cmake
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- verilator.cmake
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- dut.cpp <span style="color:#8f5902;font-style:italic"># 生成的cpp UT封装，包含了对libDPIAdder.so的调用，及UTAdder类的声明及实现</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- dut.hpp <span style="color:#8f5902;font-style:italic"># 头文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- example.cpp <span style="color:#8f5902;font-style:italic"># 调用UTAdder类的示例代码</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- dut_base.cpp <span style="color:#8f5902;font-style:italic"># 用于调用与驱动不同仿真器编译结果的基类，通过继承封装为统一的类，用于隐藏所有仿真器相关的代码细节。</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- dut_base.hpp
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- filelist.f <span style="color:#8f5902;font-style:italic"># 多文件项目使用的其他文件列表，请查看 -f 参数的介绍。本案例中为空</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- mk
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- cpp.mk <span style="color:#8f5902;font-style:italic"># 用于控制以cpp为目标语言时的Makefile，包含控制编译示例项目（-e，example）的逻辑</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- python.mk <span style="color:#8f5902;font-style:italic"># 同上，目标语言是python</span>
-</span></span><span style="display:flex;"><span><span style="color:#4e9a06">`</span>-- python
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- CMakeLists.txt
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- Makefile
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- cmake
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker_out_adder/
+</span></span><span style="display:flex;"><span>└── Adder
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- Adder.v <span style="color:#8f5902;font-style:italic"># 原始的RTL源码</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- Adder_top.sv <span style="color:#8f5902;font-style:italic"># 生成的Adder_top顶层封装，使用DPI驱动Adder模块的inputs和outputs</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- Adder_top.v <span style="color:#8f5902;font-style:italic"># 生成的Adder_top顶层封装，因为Verdi不支持导入SV源码使用，因此需要生成一个Verilog版本</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- CMakeLists.txt <span style="color:#8f5902;font-style:italic"># 用于调用仿真器编译基本的cpp class并将其打包成有裸DPI函数二进制动态库(libDPIAdder.so)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- Makefile <span style="color:#8f5902;font-style:italic"># 生成的Makefile，用于调用CMakeLists.txt，并让用户可以通过make命令编译出libAdder.so，并手动调整Makefile的配置参数。或者编译示例项目</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- cmake <span style="color:#8f5902;font-style:italic"># 生成的cmake文件夹，用于调用不同仿真器编译RTL代码</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- vcs.cmake
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- verilator.cmake
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- dut.i <span style="color:#8f5902;font-style:italic"># SWIG配置文件，用于将libDPIAdder.so的基类与函数声明，依据规则用swig导出到python，提供python调用的能力</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">`</span>-- dut.py <span style="color:#8f5902;font-style:italic"># 生成的python UT封装，包含了对libDPIAdder.so的调用，及UTAdder类的声明及实现，等价于 libUTAdder.so</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- cpp <span style="color:#8f5902;font-style:italic"># CPP example目录，包含示例代码</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- CMakeLists.txt <span style="color:#8f5902;font-style:italic"># 用于将libDPIAdder.so使用基础数据类型封装为一个可直接操作的类（libUTAdder.so），而非裸DPI函数。</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- Makefile
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- cmake
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- vcs.cmake
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- verilator.cmake
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- dut.cpp <span style="color:#8f5902;font-style:italic"># 生成的cpp UT封装，包含了对libDPIAdder.so的调用，及UTAdder类的声明及实现</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- dut.hpp <span style="color:#8f5902;font-style:italic"># 头文件</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- example.cpp <span style="color:#8f5902;font-style:italic"># 调用UTAdder类的示例代码</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- dut_base.cpp <span style="color:#8f5902;font-style:italic"># 用于调用与驱动不同仿真器编译结果的基类，通过继承封装为统一的类，用于隐藏所有仿真器相关的代码细节。</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- dut_base.hpp
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- filelist.f <span style="color:#8f5902;font-style:italic"># 多文件项目使用的其他文件列表，请查看 -f 参数的介绍。本案例中为空</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- mk
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- cpp.mk <span style="color:#8f5902;font-style:italic"># 用于控制以cpp为目标语言时的Makefile，包含控制编译示例项目（-e，example）的逻辑</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- python.mk <span style="color:#8f5902;font-style:italic"># 同上，目标语言是python</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">`</span>-- python
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">|</span>-- CMakeLists.txt
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">|</span>-- Makefile
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">|</span>-- cmake
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- vcs.cmake
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- verilator.cmake
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">|</span>-- dut.i <span style="color:#8f5902;font-style:italic"># SWIG配置文件，用于将libDPIAdder.so的基类与函数声明，依据规则用swig导出到python，提供python调用的能力</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">`</span>-- dut.py <span style="color:#8f5902;font-style:italic"># 生成的python UT封装，包含了对libDPIAdder.so的调用，及UTAdder类的声明及实现，等价于 libUTAdder.so</span>
 </span></span></code></pre></div><h4 id="构建中间文件">构建中间文件</h4>
-<p>进入 <code>picker_out_adder</code> 目录并执行 <code>make</code> 命令，即可生成最终的文件。</p>
+<p>进入 <code>picker_out_adder/Adder</code> 目录并执行 <code>make</code> 命令，即可生成最终的文件。</p>
 <blockquote>
 <p>由 <code>Makefile</code> 定义的自动编译过程流如下：</p>
 <ol>
@@ -540,23 +543,20 @@ bash example/RandomGenerator/release-verilator.sh --lang java
 </ol>
 </blockquote>
 <p>最终目录结果为：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>.
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- Adder.fst <span style="color:#8f5902;font-style:italic"># 测试的波形文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- UT_Adder
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- Adder.fst.hier
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- _UT_Adder.so <span style="color:#8f5902;font-style:italic"># Swig生成的wrapper动态库</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- __init__.py <span style="color:#8f5902;font-style:italic"># Python Module的初始化文件，也是库的定义文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libDPIAdder.a <span style="color:#8f5902;font-style:italic"># 仿真器生成的库文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libUTAdder.so <span style="color:#8f5902;font-style:italic"># 基于dut_base生成的libDPI动态库封装</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- libUT_Adder.py <span style="color:#8f5902;font-style:italic"># Swig生成的Python Module</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- xspcomm <span style="color:#8f5902;font-style:italic"># xspcomm基础库，固定文件夹，不需要关注</span>
-</span></span><span style="display:flex;"><span><span style="color:#4e9a06">`</span>-- example.py <span style="color:#8f5902;font-style:italic"># 示例代码</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker_out_adder/
+</span></span><span style="display:flex;"><span>└── Adder
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- _UT_Adder.so <span style="color:#8f5902;font-style:italic"># Swig生成的wrapper动态库</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- __init__.py <span style="color:#8f5902;font-style:italic"># Python Module的初始化文件，也是库的定义文件</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- libDPIAdder.a <span style="color:#8f5902;font-style:italic"># 仿真器生成的库文件</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- libUTAdder.so <span style="color:#8f5902;font-style:italic"># 基于dut_base生成的libDPI动态库封装</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- libUT_Adder.py <span style="color:#8f5902;font-style:italic"># Swig生成的Python Module</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">`</span>-- xspcomm <span style="color:#8f5902;font-style:italic"># xspcomm基础库，固定文件夹，不需要关注</span>
 </span></span></code></pre></div><h3 id="配置测试代码">配置测试代码</h3>
 <blockquote>
-<p>通过以下python测试代码替换 <code>example.py</code> 中的内容。</p>
+<p>在picker_out_adder中添加 <code>example.py</code>：</p>
 </blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 生成无符号随机数</span>
@@ -656,7 +656,7 @@ Test Passed
 <h3 id="将rtl构建为-python-module">将RTL构建为 Python Module</h3>
 <h4 id="生成中间文件">生成中间文件</h4>
 <p>进入 RandomGenerator 文件夹，执行如下命令：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> RandomGenerator.v -w RandomGenerator.fst --sname RandomGenerator --tdir picker_out_rmg --lang python -e --sim verilator
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> RandomGenerator.v -w RandomGenerator.fst --sname RandomGenerator --tdir picker_out_rmg/ --lang python -e --sim verilator
 </span></span></code></pre></div><p>该命令的含义是：</p>
 <ol>
 <li>将RandomGenerator.v作为 Top 文件，并将RandomGenerator作为 Top Module，基于 verilator 仿真器生成动态库，生成目标语言为 Python。</li>
@@ -672,21 +672,22 @@ Test Passed
 </blockquote>
 <p>最终目录结果为：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>picker_out_rmg
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst <span style="color:#8f5902;font-style:italic"># 测试的波形文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- UT_RandomGenerator
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst.hier
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- _UT_RandomGenerator.so <span style="color:#8f5902;font-style:italic"># Swig生成的wrapper动态库</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- __init__.py  <span style="color:#8f5902;font-style:italic"># Python Module的初始化文件，也是库的定义文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libDPIRandomGenerator.a <span style="color:#8f5902;font-style:italic"># 仿真器生成的库文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libUTRandomGenerator.so <span style="color:#8f5902;font-style:italic"># 基于dut_base生成的libDPI动态库封装</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- libUT_RandomGenerator.py <span style="color:#8f5902;font-style:italic"># Swig生成的Python Module</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- xspcomm  <span style="color:#8f5902;font-style:italic"># xspcomm基础库，固定文件夹，不需要关注</span>
-</span></span><span style="display:flex;"><span><span style="color:#4e9a06">`</span>-- example.py <span style="color:#8f5902;font-style:italic"># 示例代码</span>
+</span></span><span style="display:flex;"><span>└── RandomGenerator
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst <span style="color:#8f5902;font-style:italic"># 测试的波形文件</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- UT_RandomGenerator
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst.hier
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- _UT_RandomGenerator.so <span style="color:#8f5902;font-style:italic"># Swig生成的wrapper动态库</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- __init__.py  <span style="color:#8f5902;font-style:italic"># Python Module的初始化文件，也是库的定义文件</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libDPIRandomGenerator.a <span style="color:#8f5902;font-style:italic"># 仿真器生成的库文件</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libUTRandomGenerator.so <span style="color:#8f5902;font-style:italic"># 基于dut_base生成的libDPI动态库封装</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- libUT_RandomGenerator.py <span style="color:#8f5902;font-style:italic"># Swig生成的Python Module</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- xspcomm  <span style="color:#8f5902;font-style:italic"># xspcomm基础库，固定文件夹，不需要关注</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">`</span>-- example.py <span style="color:#8f5902;font-style:italic"># 示例代码</span>
 </span></span></code></pre></div><h3 id="配置测试代码">配置测试代码</h3>
 <blockquote>
-<p>复制以下代码替换 <code>example.py</code> 中的内容。</p>
+<p>在picker_out_rmg中创建 <code>example.py</code>：</p>
 </blockquote>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_RandomGenerator</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">RandomGenerator</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 定义参考模型</span>
@@ -894,20 +895,16 @@ Test Passed
 <h2 id="构建驱动环境">构建驱动环境</h2>
 <p>与案例一和案例二类似，在对双端口栈进行测试之前，我们首先需要利用 Picker 工具将 RTL 代码构建为 Python Module。在构建完成后，我们将通过 Python 脚本驱动 RTL 代码进行测试。</p>
 <p>首先，创建名为 <code>dual_port_stack.v</code> 的文件，并将上述的 RTL 代码复制到该文件中，接着在相同文件夹下执行以下命令：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">true</span> dual_port_stack.v -w dual_port_stack.fst --sname dual_port_stack --tdir picker_out_dual_port_stack --lang python -e --sim verilator
-</span></span></code></pre></div><p>生成好的驱动环境位于 <code>picker_out_dual_port_stack</code> 文件夹中, 其中 <code>UT_dual_port_stack</code> 为生成的 Python Module，<code>example.py</code> 为测试脚本。</p>
-<p>可以通过以下命令运行测试脚本：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker_out_dual_port_stack
-</span></span><span style="display:flex;"><span>python3 example.py
-</span></span></code></pre></div><p>若运行过程中无错误发生，则代表环境被正确构建。</p>
-<h2 id="利用协程驱动-dut">利用协程驱动 DUT</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">true</span> dual_port_stack.v -w dual_port_stack.fst --sname dual_port_stack --tdir picker_out_dual_port_stack/ --lang python -e --sim verilator
+</span></span></code></pre></div><p>生成好的驱动环境位于 <code>picker_out_dual_port_stack</code> 文件夹中, 其中 <code>dual_port_stack</code> 为生成的 Python Module。</p>
+<p>若自动编译运行过程中无错误发生，则代表环境被正确构建。</p>
 <h2 id="利用回调函数驱动-dut">利用回调函数驱动 DUT</h2>
 <p>在本案例中，为了测试双端口栈的功能，我们需要对其进行驱动。但你可能很快就会发现，仅仅使用案例一和案例二中的方法很难对双端口栈进行驱动。因为在此前的测试中，DUT只有一条执行逻辑，给DUT输入数据后等待DUT输出即可。</p>
 <p>但双端口栈却不同，它的两个端口是两个独立的执行逻辑，在驱动中，这两个端口可能处于完全不同的状态，例如端口0在等待DUT返回数据时，端口1有可能正在发送新的请求。这种情况下，使用简单的串行执行逻辑将很难对DUT进行驱动。</p>
 <p>因此我们在本案例中我们将以双端口栈为例，介绍一种基于回调函数的驱动方法，来完成此类DUT的驱动。</p>
 <h3 id="回调函数简介">回调函数简介</h3>
 <p>回调函数是一种常见的编程技术，它允许我们将一个函数传入，并等待某个条件满足后被调用。构建产生的 Python Module 中，我们提供了向内部执行环境注册回调函数的接口 <code>StepRis</code>，使用方法如下:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">DUTdual_port_stack</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">DUTdual_port_stack</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">callback</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cycles</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#34;The current clock cycle is </span><span style="color:#4e9a06">{</span><span style="color:#000">cycles</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">)</span>
@@ -923,7 +920,7 @@ Test Passed
 <p>通过回调函数的形式来完成一条完整的执行逻辑，通常我们会使用状态机的模式进行编写。每调用一次回调函数，就会引起状态机内部的状态变化，多次调用回调函数，就会完成一次完整的执行逻辑。</p>
 <p>下面是一个基于回调函数驱动的双端口栈的示例代码：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">enum</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Enum</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackModel</span><span style="color:#000;font-weight:bold">:</span>
@@ -1064,7 +1061,7 @@ Test Passed
 </li>
 </ul>
 <h3 id="运行测试">运行测试</h3>
-<p>将上述代码复制到 <code>example.py</code> 中，然后执行以下命令：</p>
+<p>在picker_out_dual_port_stack中创建<code>exmaple.py</code>文件，将上述代码复制到其中，然后执行以下命令：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker_out_dual_port_stack
 </span></span><span style="display:flex;"><span>python3 example.py
 </span></span></code></pre></div><p>可直接运行本案例的测试代码，你将会看到类似如下的输出：</p>
@@ -1120,7 +1117,7 @@ Test Passed
 <p>对于硬件验证中的并行执行来说，这种特性正是我们所需要的，我们可以创建多个协程，来完成验证中的多个驱动任务。我们可以将时钟的执行当做事件，在每个协程中等待这个事件，当时钟信号到来时，事件循环会唤醒所有等待的协程，使其继续执行，直到他们等待下一个时钟信号。</p>
 <p>我们用 Python 中的 <code>asyncio</code> 来实现对协程的支持：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">asyncio</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">name</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">i</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#204a87">range</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">10</span><span style="color:#000;font-weight:bold">):</span>
@@ -1143,7 +1140,7 @@ Test Passed
 <p>下面是我们提供的一个简单的使用协程驱动的验证代码：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">asyncio</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">enum</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Enum</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackModel</span><span style="color:#000;font-weight:bold">:</span>
@@ -1248,7 +1245,7 @@ Test Passed
 <p><code>send_req</code> 和 <code>receive_resp</code> 函数的实现逻辑类似，只需要将对应的输入输出信号设置为对应的值，然后等待对应的信号变为有效即可，可以完全根据端口的执行顺序来编写。</p>
 <p>类似地，我们使用 <code>StackModel</code> 类来模拟栈的行为，在 <code>commit_push</code> 和 <code>commit_pop</code> 函数中分别模拟了 PUSH 和 POP 操作，并在 POP 操作中进行了数据的比较。</p>
 <h3 id="运行测试">运行测试</h3>
-<p>将上述代码复制到 <code>example.py</code> 中，然后执行以下命令：</p>
+<p>在picker_out_dual_port_stack文件夹中创建<code>example.py</code>将上述代码复制到其中，然后执行以下命令：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker_out_dual_port_stack
 </span></span><span style="display:flex;"><span>python3 example.py
 </span></span></code></pre></div><p>可直接运行本案例的测试代码，你将会看到类似如下的输出：</p>

@@ -23,12 +23,46 @@
       <description>
         
         
-        &lt;div id=&#34;datatree_chart&#34; style=&#34;width: 90%;height:800px;&#34;&gt;&lt;/div&gt;
-&lt;script src=&#34;../../js/echarts.min.js&#34;&gt;&lt;/script&gt;
+        &lt;script src=&#34;../../js/echarts.min.js&#34;&gt;&lt;/script&gt;
 &lt;script src=&#34;../../js/chart_datatree.js&#34;&gt;&lt;/script&gt;
+&lt;script&gt;
+function update_dut_charts(data_url){
+    show_datatree_chart(&#34;datatree_chart&#34;, data_url)
+}
+&lt;/script&gt;
 &lt;br&gt;
-&lt;p&gt;上图共有&lt;em&gt;75&lt;/em&gt;个模块，默认情况下模块为灰色，当模块中的测试用例数大于10时，该模块被完全点亮。目前已经完全点亮的模块为&lt;em&gt;x&lt;/em&gt;个，点亮中的模块有&lt;em&gt;y&lt;/em&gt;个，待点亮的模块有&lt;em&gt;z&lt;/em&gt;个。&lt;/p&gt;
-&lt;h4 id=&#34;通用处理器模块介绍&#34;&gt;通用处理器模块介绍&lt;/h4&gt;
+&lt;div id=&#34;datatree_chart&#34; style=&#34;width: 90%;height:800px;&#34;&gt;&lt;/div&gt;
+&lt;div style=&#34;text-align: center; width: 100%;&#34;&gt;
+
+&lt;label&gt;当前版本：&lt;/label&gt;
+&lt;select id=&#34;duturlSelect&#34; onchange=&#34;updateLink()&#34; style=&#34;border: 0px&#34;&gt;
+    
+    
+    
+    
+    
+&lt;/select&gt;
+&lt;a id=&#34;dutgoLink&#34; href=&#34;#&#34; target=“_blank“&gt;查看测试报告&lt;/a&gt;
+
+&lt;script&gt;
+function updateLink() {
+    var select = document.getElementById(&#34;duturlSelect&#34;);
+    var goLink = document.getElementById(&#34;dutgoLink&#34;);
+    var url = select.options[select.selectedIndex].getAttribute(&#34;data-url&#34;);
+    goLink.href = url;
+    
+    window[&#34;update_dut_charts&#34;](url + &#34;/ut_data_progress.json&#34;);
+    
+}
+document.addEventListener(&#39;DOMContentLoaded&#39;, function() {
+    updateLink()
+});
+&lt;/script&gt;
+
+&lt;/div&gt;
+&lt;br&gt;
+&lt;p&gt;上图共有&lt;em id=&#34;em_id_report_dut_total&#34;&gt;-&lt;/em&gt;个模块，默认情况下模块为灰色，当模块中的测试用例数大于&lt;em id=&#34;em_id_report_dut_min_light&#34;&gt;-&lt;/em&gt;时，该模块被完全点亮。目前已经完全点亮的模块为&lt;em  id=&#34;em_id_report_dut_lighted&#34;&gt;-&lt;/em&gt;个，待点亮的模块有&lt;em  id=&#34;em_id_report_dut_lighted_no&#34;&gt;-&lt;/em&gt;个。&lt;/p&gt;
+&lt;h4 id=&#34;通用处理器模块简介&#34;&gt;通用处理器模块简介&lt;/h4&gt;
 &lt;p&gt;高性能处理器是现代计算设备的核心，它们通常由三个主要部分组成：前端、后端和访存系统。这些部分协同工作，以确保处理器能够高效地执行复杂的计算任务。&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -42,32 +76,6 @@
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;高性能处理器的设计需要在这三个部分之间找到平衡，以实现最佳的性能。这通常涉及到复杂的微架构设计，以及对处理器流水线的优化。&lt;/p&gt;
-&lt;h5 id=&#34;香山昆明湖ut划分&#34;&gt;香山昆明湖UT划分&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;前端&lt;/strong&gt;：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;BPU
-&lt;ul&gt;
-&lt;li&gt;RAS
-&lt;ul&gt;
-&lt;li&gt;XX&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;后端&lt;/strong&gt;：&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;访存&lt;/strong&gt;：&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;其他&lt;/strong&gt;：&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
 
       </description>
     </item>
@@ -101,8 +109,8 @@
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 调用scripts目录中的build_ut_&amp;lt;name&amp;gt;.py中的build方法，创建待验证的Python版DUT&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make dut &lt;span style=&#34;color:#000&#34;&gt;DUTS&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&amp;lt;name&amp;gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &amp;#34;*&amp;#34;，编译所有DUT&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 例如：&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make dut &lt;span style=&#34;color:#000&#34;&gt;DUTS&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;backend_ctrlblock_decode
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;以&lt;code&gt;make dut DUTS=backend_ctrlblock_decode&lt;/code&gt;为例，命令执行完成后，会在dut目录下生成对应的Python包：&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;make dut &lt;span style=&#34;color:#000&#34;&gt;DUTS&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;backend_ctrl_block_decode
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;以&lt;code&gt;make dut DUTS=backend_ctrl_block_decode&lt;/code&gt;为例，命令执行完成后，会在dut目录下生成对应的Python包：&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;dut/
 ├── __init__.py
 ├── decodestage
@@ -148,8 +156,9 @@
         &lt;p&gt;添加一个全新的DUT测试用例，需要完成以下三部分内容：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;strong&gt;添加编译脚本&lt;/strong&gt;： 在&lt;code&gt;scripts&lt;/code&gt;目录下编写对应的&lt;code&gt;rtl&lt;/code&gt;到&lt;code&gt;python&lt;/code&gt;的编译&lt;code&gt;python&lt;/code&gt;文件（例如build_ut_&lt;strong&gt;backend_ctrlblock_decode&lt;/strong&gt;.py，必须以&lt;code&gt;build_ut_&lt;/code&gt;开头）以及对应的目录（目录中包含必要的输入文件，例如&lt;code&gt;rtl&lt;/code&gt;的&lt;code&gt;filelist&lt;/code&gt;，需要导出的内部信号等）。所添加的python文件需要实现两个函数：&lt;code&gt;build(cfg): bool&lt;/code&gt; 和 &lt;code&gt;line_coverage_files(cfg): list[str]&lt;/code&gt;。&lt;code&gt;build&lt;/code&gt;函数用来编译DUT，&lt;code&gt;line_coverage_files&lt;/code&gt;用来指定该DUT需要查看哪些文件的行覆盖率。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;添加测试用例&lt;/strong&gt;： 在对应的&lt;code&gt;ut_*&lt;/code&gt;目录中创建对应的&lt;code&gt;python&lt;/code&gt;模块（例如&lt;code&gt;ut_backend/ctrl_block/decode&lt;/code&gt;）,在该模块中需要包含以&lt;code&gt;test_*.py&lt;/code&gt;的测试用例。用例的目录结构请按照&lt;a href=&#34;https://open-verify.cc/UnityChipForXiangShan/&#34;&gt;昆明湖层级架构图&lt;/a&gt;进行添加，以确保收集测试结果时能与层级图对应。测试用例的编写方法请参考&lt;a href=&#34;https://docs.pytest.org/en/stable/&#34;&gt;Pytest官方文档&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;添加测试用例&lt;/strong&gt;： 在对应的&lt;code&gt;ut_*&lt;/code&gt;目录中创建对应的&lt;code&gt;python&lt;/code&gt;模块（例如&lt;code&gt;ut_backend/ctrl_block/decode&lt;/code&gt;）,在该模块中需要包含以&lt;code&gt;test_*.py&lt;/code&gt;的测试用例。需要添加的DUT可参考&lt;a href=&#34;https://xs-mlvp.github.io/UnityChipForXiangShan/UnityChipForXiangShan/docs/#testmap&#34;&gt;香山昆明湖DUT验证进展&lt;/a&gt;或者&lt;code&gt;configs/dutree/xiangshan-kmh.yaml&lt;/code&gt;中的层级进行添加，以确保收集测试结果时能与层级图对应。测试用例的编写方法请参考&lt;a href=&#34;https://docs.pytest.org/en/stable/&#34;&gt;Pytest官方文档&lt;/a&gt;。如果添加的信息在配置文件中未列出，可自行修改配置文件。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;添加依赖模块&lt;/strong&gt;： 如果有需要的话，可以在&lt;code&gt;tools、comm&lt;/code&gt;等模块中添加该DUT测试需要的基础工具。如果该工具不够通用请添加到对应的&lt;code&gt;ut_&lt;/code&gt;模块中，且不能以&lt;code&gt;test_&lt;/code&gt;前缀进行命名（例如参考模型可以是&lt;code&gt;ut_backend/ctrl_block/decode/reference.py&lt;/code&gt;）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;添加说明&lt;/strong&gt;: 在添加的模块顶层文件夹中，添加&lt;code&gt;README.md&lt;/code&gt;说明。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;如果是在已有的DUT测试中增加内容，按原有目录结构添加即可。&lt;/p&gt;
 &lt;p&gt;*目录或文件名称需要合理，能通过其命名知晓其具体含义。&lt;/p&gt;
@@ -270,7 +279,8 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;dutree&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;dutree/xiangshan-kmh.yaml&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 结果写入路径&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;save-path&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;../documents/static/data/ut_data_progress.json&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可在上述配置文件中添加自定义参数。&lt;/p&gt;
+
       </description>
     </item>
     
@@ -336,6 +346,138 @@
 &lt;p&gt;*请在issue中对bug进行详细描述，方便加速确认&lt;/p&gt;
 &lt;p&gt;万众一芯QQ交流群：&lt;/p&gt;
 &lt;image src=&#34;600480230.jpg&#34; alter=&#34;600480230&#34; width=300px /&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: PR模板</title>
+      <link>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/08_pr_template/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/08_pr_template/</guid>
+      <description>
+        
+        
+        &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Description
+
+Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.
+
+Fixes # (issue)
+
+## Type of change
+
+Please delete options that are not relevant.
+
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] This change requires a documentation update
+
+# How Has This Been Tested?
+
+Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
+
+- [ ] Test A
+- [x] Test B
+
+**Test Configuration**:
+* Firmware version:
+* Hardware:
+* Toolchain:
+* SDK:
+
+# Checklist:
+
+- [ ] My code follows the style guidelines of this project
+- [ ] I have performed a self-review of my code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published in downstream modules
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;展示效果如下：&lt;/p&gt;
+&lt;h1 id=&#34;description&#34;&gt;Description&lt;/h1&gt;
+&lt;p&gt;Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.&lt;/p&gt;
+&lt;p&gt;Fixes # (issue)&lt;/p&gt;
+&lt;h2 id=&#34;type-of-change&#34;&gt;Type of change&lt;/h2&gt;
+&lt;p&gt;Please delete options that are not relevant.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Bug fix (non-breaking change which fixes an issue)&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; New feature (non-breaking change which adds functionality)&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Breaking change (fix or feature that would cause existing functionality to not work as expected)&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; This change requires a documentation update&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;how-has-this-been-tested&#34;&gt;How Has This Been Tested?&lt;/h1&gt;
+&lt;p&gt;Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Test A&lt;/li&gt;
+&lt;li&gt;&lt;input checked=&#34;&#34; disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Test B&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Test Configuration&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Firmware version:&lt;/li&gt;
+&lt;li&gt;Hardware:&lt;/li&gt;
+&lt;li&gt;Toolchain:&lt;/li&gt;
+&lt;li&gt;SDK:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;checklist&#34;&gt;Checklist:&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; My code follows the style guidelines of this project&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; I have performed a self-review of my code&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; I have commented my code, particularly in hard-to-understand areas&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; I have made corresponding changes to the documentation&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; My changes generate no new warnings&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; I have added tests that prove my fix is effective or that my feature works&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; New and existing unit tests pass locally with my changes&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Any dependent changes have been merged and published in downstream modules&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 基本规范</title>
+      <link>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/07_constraint/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/07_constraint/</guid>
+      <description>
+        
+        
+        &lt;p&gt;为了方便将所有人的贡献集合在一起，需要在编码、环境、文档编写等方面采用相同的“规范”。&lt;/p&gt;
+&lt;h3 id=&#34;环境要求&#34;&gt;环境要求&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;python：&lt;/strong&gt; 在python编码过程中，尽可能的采用标准库，采用兼容Python3大部分版本的通用语法（尽可能的在Python3.6 - Python3.12中通用），不要使用过旧或者过新的语法。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;操作系统：&lt;/strong&gt; 建议Ubuntu 22.04，windows下，建议使用WSL2环境。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;hugo&lt;/strong&gt; 建议版本 0.124.1（版本过旧不支持软连接）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;少依赖&lt;/strong&gt; 尽可能少的使用第三方C++/C库&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;picker&lt;/strong&gt; 建议使用wheel安装picker工具和xspcomm库&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;测试用例&#34;&gt;测试用例&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;代码风格&lt;/strong&gt; 建议采用 &lt;a href=&#34;https://peps.python.org/pep-0008/&#34;&gt;PEP 8 规范&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;build脚本&lt;/strong&gt; 需要按DUT的命名结构进行规范命名，不然无法正确收集验证结果。例如&lt;code&gt;backend.ctrl_block.decode&lt;/code&gt;UT在scripts目录中对应的build文件名称应该为&lt;code&gt;build_ut_backend_ctrl_block_decode.py&lt;/code&gt;(以固定前缀&lt;code&gt;build_ut_&lt;/code&gt;开始，点&lt;code&gt;.&lt;/code&gt;用下划线&lt;code&gt;_&lt;/code&gt;进行替换)。在脚本中实现 &lt;code&gt;build(cfg) -&amp;gt; bool&lt;/code&gt; 和 &lt;code&gt;line_coverage_files(cfg) -&amp;gt; list[str]&lt;/code&gt; 方法。&lt;code&gt;build&lt;/code&gt;用于编译DUT为&lt;code&gt;python&lt;/code&gt;模块，&lt;code&gt;line_coverage_files&lt;/code&gt;方法用于返回需要统计的代码行覆盖率文件。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;用例标签&lt;/strong&gt; 如果用例无法做到版本通用，需要用&lt;code&gt;pytest.mark.toffee_tags&lt;/code&gt;标记支持的版本。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;用例抽象&lt;/strong&gt; 编写的测试用例输入不能出现DUT的具体引脚等强耦合内容，只能调用基于DUT之上的函数封装。例如对于加法器 adder，需要把dut的目标功能封装为 &lt;code&gt;dut_wrapper.add(a: int, b: int) -&amp;gt; int, bool&lt;/code&gt;，在test_case中仅仅调用 &lt;code&gt;sum, c = add(a, b)&lt;/code&gt;进行测试。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;覆盖抽象&lt;/strong&gt; 在编写功能覆盖率时，其检查点函数的输入也不能有DUT引脚。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;环境抽象&lt;/strong&gt; 对于一个验证，通常分为2部分：Test Case 和 Env （用例以外的都统一称为Env，它包含DUT、驱动、监控等），其中Env需要提供对外的功能抽象接口，不能对外呈现出太多细节。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;测试说明&lt;/strong&gt; 在每个DUT的验证环境中，需要通过&lt;code&gt;README.md&lt;/code&gt;对该环境进行说明，例如需要对Env提供给Case的接口进行说明，目录结构说明等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;pr编写&#34;&gt;PR编写&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;标题&lt;/strong&gt; 简洁明了，能概括PR的主要内容。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;详细描述&lt;/strong&gt; 详细说明PR的目的，修改的内容以及相关背景信息。入解决已有的问题需要给出链接（例如Issue）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;关联问题&lt;/strong&gt; 在描述中关联相关问题，例如 &lt;code&gt;Fixes #123&lt;/code&gt;，以便在合并PR时关闭关联问题。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;测试&lt;/strong&gt; 需要进行测试，并对测试结果进行描述&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;文档&lt;/strong&gt; PR涉及到的文档需要同步修改&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;分解&lt;/strong&gt; 当PR涉及到的修改很多时，需要判断是否拆分成多个PR&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;检查清单&lt;/strong&gt; 检查编译是否通过、代码风格是否合理、是否测试通过、是否有必要的注释等&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;模板&lt;/strong&gt; 以及提供的PR模块请&lt;a href=&#34;https://xs-mlvp.github.io/UnityChipForXiangShan/UnityChipForXiangShan/docs/08_pr_template/&#34;&gt;参考链接&lt;/a&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;issue编写&#34;&gt;ISSUE编写&lt;/h3&gt;
+&lt;p&gt;要求同上&lt;/p&gt;
 
       </description>
     </item>

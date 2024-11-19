@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.3009d63a12ea79171a4c652de129e804.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eb852440e594e053769fda5ca07da673.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -232,44 +232,99 @@
 
     
   
+    
+    
+	
+<li>8: <a href="#pg-62dcfc0be5f5fa110870b0ea2bf0f852">PR模板</a></li>
+
+
+    
+  
+    
+    
+	
+<li>9: <a href="#pg-7ef3641a2859e2434321b1d9fa9d21e7">基本规范</a></li>
+
+
+    
+  
 
     </ul>
 
 
 <div class="content">
-      <div id="meta_chart" style="width: 100%;height:400px;"></div>
-<script src="../js/echarts.min.js"></script>
+      <script src="../js/echarts.min.js"></script>
 <script src="../js/chart_meta.js"></script>
+<script>
+function update_charts(data_url){
+    show_meta_chart("meta_chart", data_url)
+    updateDUTestStatus(data_url)
+}
+</script>
+<div id="meta_chart" style="width: 100%;height:400px;"></div>
+<div style="text-align: center; width: 100%;">
+
+<label>当前版本：</label>
+<select id="indexurlSelect" onchange="updateLink()" style="border: 0px">
+    
+    
+    
+    
+    
+</select>
+<a id="indexgoLink" href="#" target=“_blank“>查看测试报告</a>
+
+<script>
+function updateLink() {
+    var select = document.getElementById("indexurlSelect");
+    var goLink = document.getElementById("indexgoLink");
+    var url = select.options[select.selectedIndex].getAttribute("data-url");
+    goLink.href = url;
+    
+    window["update_charts"](url + "/ut_data_progress.json");
+    
+}
+document.addEventListener('DOMContentLoaded', function() {
+    updateLink()
+});
+</script>
+
+</div>
+<br>
 <p>香山昆明湖架构各个模块验证情况如上图中所示。总统计数据如下：</p>
 <table>
     <ol>
     <tr>
-        <td><li>总测试用例数（Total Cases）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_cases_toal">-</em></li></td>
+        <td>总测试用例数（Total Cases）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_toal">-</em></td>
+        <td>测试用例通过数（Passed Cases）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_pass">-</em></td>
+        <td>测试用例通过率（Passed Rate）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_prate">-</em></td>
     </tr>
     <tr>
-        <td><li>测试用例通过数（Passed Cases）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_cases_pass">-</em></li></td>
+        <td>测试用例未过数（Failed Cases）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_fail">-</em></td>
+        <td>测试用例跳过数（Skipped Cases）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_skip">-</em></td>
+        <td>测试用例跳过率（Skip Rate）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_cases_srate">-</em></td>
     </tr>
     <tr>
-        <td><li>测试用例未过数（Failed Cases）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_cases_fail">-</em></li></td>
+        <td>总功能覆盖点数（Function Coverage）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_function_total">-</em></td>
+        <td>覆盖点已覆盖数（Covered Functions）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_function_cover">-</em></td>
+        <td>覆盖点已覆盖率（Covered Rate）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_function_rate">-</em></td>
     </tr>
     <tr>
-        <td><li>测试用例跳过数（Skipped Cases）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_cases_skip">-</em></li></td>
-    </tr>
-    <tr>
-        <td><li>总功能覆盖点数（Function Coverage）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_function_total">-</em></li></td>
-    </tr>
-    <tr>
-        <td><li>覆盖点已覆盖数（Coverage Functions）</td>
-        <td  style="text-align: right; font-weight: bold;"><em id="em_id_report_function_cover">-</em></li></td>
-    </tr>
-    <tr>
-        <td><li>总代码行覆盖率（Line Coverage Rate）</td>
-        <td  style="text-align: right;"><em id="em_id_report_line_coverage">-</em></li></td>
+        <td>总代码行覆盖率（Total Lines）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_line_total">-</em></td>
+        <td>总代码行覆盖数（Covered Lines）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_line_cover">-</em></td>
+        <td>总代码行覆盖率（Covered Rate）：</td>
+        <td  style="text-align: left; font-weight: bold;"><em id="em_id_report_line_rate">-</em></td>
     </tr>
     </ol>
 </table>
@@ -283,8 +338,275 @@
 <li><strong><a href="https://github.com/XS-MLVP/UnityChipForXiangShan/labels/task">正在进行的任务列表</a></strong></li>
 <li><strong><a href="https://github.com/XS-MLVP/UnityChipForXiangShan/labels/taskdone">已完成的任务列表</a></strong></li>
 </ul>
-<p>注：本项目中的统计信息根据commit等数据自动更新，参与者可以提交issue（写明任务内容，预计完成时间等）同步正在进行的任务。</p>
+<br>
 <div style="text-align: center; width: 100%;">
+<h4 id="testmap">香山昆明湖DUT验证进展</h4>
+</div>
+<br>
+
+<style>
+.div-dut-test-report {
+    all:none;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+}
+.div-dut-test-report tbody {
+    --bs-table-striped-bg: white;
+}
+.div-dut-test-report .td-name {
+    text-align: left;
+}
+.div-dut-test-report .td-index {
+    text-align: center;
+}
+.div-dut-test-report table {
+    width: 90%;
+    margin: 0 auto;
+}
+.div-dut-test-report td {
+    text-align: right;
+}
+.div-dut-test-report th {
+    text-align: right;
+}
+.div-dut-test-report tr {
+    border-bottom: 1px solid #ddd;
+}
+.em-red {
+    color: yellow;
+    font-weight: bold;
+    background-color: rgb(247, 36, 152);
+    border-radius: 2px;
+}
+.em-orange {
+    color: white;
+    font-weight: bold;
+    background-color: orange;
+    border-radius: 2px;
+}
+.em-green {
+    font-weight: bold;
+    color: yellow;
+    background-color: green;
+    border-radius: 2px;
+}
+.modal-linecov {
+    display: none;  
+    position: absolute;  
+    z-index: 1;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    position: absolute;
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+</style>
+
+<div id="line-file-modal" class="modal-linecov">
+    <div class="modal-content" id="linecov-text">
+    </div>
+</div>
+
+<div class="div-dut-test-report">
+<table id="dut-test-items" align="center" class="td-initial">
+</table>
+</div>
+
+<script>
+function closeLineCovModal() {
+    $("#line-file-modal").hide();
+}
+
+$(window).click(function(event) {
+    var modal = $("#line-file-modal");
+    if (! modal.is(":hidden")) {
+        if (! $(event.target).closest(".modal-content").length){
+            closeLineCovModal();
+        }
+    }
+});
+
+function updateDUTestStatus(data_url){
+    $.getJSON(data_url, function (data) {
+        $("#dut-test-items").html(
+"            <tbody align=\"center\">\
+    <tr>\
+        <th class=\"td-index\">Index</th>\
+        <th class=\"td-name\">Name</th>\
+        <th>Document</th>\
+        <th>&nbsp;&nbsp;Cases</th>\
+        <th>&nbsp;&nbsp;&nbsp;Fail</th>\
+        <th>&nbsp;&nbsp;&nbsp;SKip</th>\
+        <th>CsRate (%)</th>\
+        <th>Checks\
+        <th>Fail\
+        <th>CkRate (%)</th>\
+        <th>Lines</th>\
+        <th>CvRate (%)</th>\
+    </tr>\
+  </tbody>");
+        var prefix = data.tree.meta.paths;
+        var index = 1;
+        function calcRateColor(rate){
+            var color = "";
+            if(rate < data.config.rate_low){
+                color = "red";
+            } else if(rate < data.config.rate_middle){
+                color = "orange";
+            } else if(rate > data.config.rate_high){
+                color = "green";
+            }
+            return "<em class=\"em-"+color+"\">" + rate + "</em>";
+        }
+        function calcRate(a, b){
+            if(b === 0){
+                return 0;
+            }
+            return calcRateColor((a / b * 100).toFixed(2));
+        }
+        function redItem(item){
+            if (item > 0) {
+                return "<em class=\"em-red\">" + item + "</em>";
+            }
+            return item;
+        }
+        function getDocUrl(url){
+            if(url){
+                return "<a href=\"" + url + "\" target=\"_blank\">Detail</a>";
+            }
+            return "-";
+        }
+        function getLinFileUrl(paths){
+            var txt = ""
+            var meta = data.extend[paths]
+            if (!meta) return txt;
+            meta.target_line_coverage_files.forEach(f=> {
+                var url = null;
+                if(!f.includes("not found")){
+                    meta.matched_line_coverage_files.forEach(u=> {
+                        if(u[0].includes(f)){
+                            var base_url = data_url.split("/").slice(0, -1).join("/");
+                            txt += "<li><a href=\"" + base_url + u[0] + "\" target=\"_blank\">" + f + "</a> <em style=\"float: right;\"> ("
+                                +u[1]+"/"+u[2]+")<em> </li>";
+                        }else{
+                            console.log("not found: " + f + " in " + u);
+                        }
+                    });
+                }else{
+                    txt += "<li>" + f + "</li>";
+                }
+            });
+            return $("#linecov-text").html(txt);
+        }
+        function openLineCovModal(event, paths) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeLineCovModal();
+            getLinFileUrl(paths);
+            var modal = $("#line-file-modal")
+            var text = $("#linecov-text")
+            modal.css({
+                left: event.pageX - text.width()/2 + "px",
+                top: event.pageY - text.height()/2 + "px"
+            });
+            modal.show();
+        }
+        window.openLineCovModal = openLineCovModal;
+        function getLineCovUrl(paths, hints, total){
+            var text = hints + "/" + total;
+            if(total > 0){
+                return "<a href=\"\" onclick=\"openLineCovModal(event, '" + paths + "')\">" + text + "</a>";
+            }
+            return text;
+        }
+        function getCaseUrl(paths, pass, total){
+            if (total < 1){
+                return "0/0";
+            }
+            var url = data_url.split("/").slice(0, -1).join("/") + "?";
+            var K = "K=details,file,,,span," + paths.split("/").slice(2, -1).join("/");
+            return "<a href=\""+ url + K +"\" target=\"_blank\">" + pass + "/" + total + "</a>";
+        }
+        function getCaseFailSkipUrl(paths, fail, skip){
+            if (fail < 1){
+                if(skip){
+                    return "0"
+                }
+                return redItem(fail);
+            }
+            var url = data_url.split("/").slice(0, -1).join("/") + "?";
+            var key = skip ? "skipped" : "failed";
+            var K = "K=details,file,span,"+key+",span," + paths.split("/").slice(2, -1).join("/");
+            var text = skip? fail: redItem(fail);
+            return "<a href=\""+ url + K +"\" target=\"_blank\">" + text + "</a>";
+        }
+        function getFuncovUrl(paths, cover, total){
+            if (total < 1){
+                return "0/0";
+            }
+            var group_name = paths.split("/").slice(2, -1).join(".")
+            var url = data_url.split("/").slice(0, -1).join("/") + "?";
+            var K_case = "ShowFunCov=1&K=li,group_name,,,span," + group_name + "&K=ul,group_name,,,span,"+ group_name;
+            return "<a href=\""+ url + K_case +"\" target=\"_blank\">" + cover + "/" + total + "</a>";
+        }
+        function getFuncovFailUrl(paths, cover, total){
+            if (total == cover || total < 1){
+                return "0";
+            }
+            var group_name = paths.split("/").slice(2, -1).join(".")
+            var url = data_url.split("/").slice(0, -1).join("/") + "?";
+            var K_case = "ShowFunCov=1&K=li,group_name,,,span," + group_name + "&K=ul,group_name,,,span,"+ group_name;
+            var K_fail = K_case + "&K=li,point_name,,,span,Failed&K=ul,grou_name,,,ul,failed";
+            return "<a href=\""+ url + K_fail +"\" target=\"_blank\">" + redItem(total - cover) + "</a>";
+        }
+        function traverse(node) {
+            if (!node.children || node.children.length === 0) {
+                var meta = node.meta
+                $("#dut-test-items").html($("#dut-test-items").html() + 
+                    "<tr><td class=\"td-index\">" + index + "</td>" +
+                    "<td class=\"td-name\">" + meta.paths.replace(prefix + "/",
+                        "").replaceAll("/", ".") + "</td>" +
+                    "<td>" + getDocUrl(meta.doc_url) + "</td>" +
+                    "<td>" + getCaseUrl(meta.paths, meta.cases.pass, meta.cases.total) + "</td>" +
+                    "<td>" + getCaseFailSkipUrl(meta.paths, meta.cases.fail, false) + "</td>" +
+                    "<td>" + getCaseFailSkipUrl(meta.paths, meta.cases.skip, true) + "</td>" +
+                    "<td>" + calcRate(meta.cases.pass, meta.cases.total) + "</td>" +
+                    "<td>" + getFuncovUrl(meta.paths, meta.functions.cover, meta.functions.total) + "</td>" +
+                    "<td>" + getFuncovFailUrl(meta.paths, meta.functions.cover, meta.functions.total) + "</td>" +
+                    "<td>" + calcRate(meta.functions.cover, meta.functions.total) + "</td>" +
+                    "<td>" + getLineCovUrl(meta.paths, meta.lines.cover, meta.lines.total) + "</td>" +
+                    "<td>" + calcRate(meta.lines.cover, meta.lines.total) + "</td>" +
+                    "</tr>"
+                );
+                index++;
+            } else {
+                $.each(node.children, function(index, child) {
+                    traverse(child);
+                });
+            }
+        }
+        traverse(data.tree);
+    });
+}
+</script>
+
+<div style="text-align: center; width: 100%;">
+<br>
+注：本项目中的统计信息根据commit等数据自动更新，参与者可以提交issue（写明任务内容，预计完成时间等）同步正在进行的任务。<br>
 数据自动更新日期：<em id="em_id_report_date">1970-01-01 00:00:00</em>
 </div>
 
@@ -310,12 +632,46 @@
     
 	<h1 id="pg-0dcba8abab46333b47bb5f2e2beb4acc">1 - 目标验证单元</h1>
     
-	<div id="datatree_chart" style="width: 90%;height:800px;"></div>
-<script src="../../js/echarts.min.js"></script>
+	<script src="../../js/echarts.min.js"></script>
 <script src="../../js/chart_datatree.js"></script>
+<script>
+function update_dut_charts(data_url){
+    show_datatree_chart("datatree_chart", data_url)
+}
+</script>
 <br>
-<p>上图共有<em>75</em>个模块，默认情况下模块为灰色，当模块中的测试用例数大于10时，该模块被完全点亮。目前已经完全点亮的模块为<em>x</em>个，点亮中的模块有<em>y</em>个，待点亮的模块有<em>z</em>个。</p>
-<h4 id="通用处理器模块介绍">通用处理器模块介绍</h4>
+<div id="datatree_chart" style="width: 90%;height:800px;"></div>
+<div style="text-align: center; width: 100%;">
+
+<label>当前版本：</label>
+<select id="duturlSelect" onchange="updateLink()" style="border: 0px">
+    
+    
+    
+    
+    
+</select>
+<a id="dutgoLink" href="#" target=“_blank“>查看测试报告</a>
+
+<script>
+function updateLink() {
+    var select = document.getElementById("duturlSelect");
+    var goLink = document.getElementById("dutgoLink");
+    var url = select.options[select.selectedIndex].getAttribute("data-url");
+    goLink.href = url;
+    
+    window["update_dut_charts"](url + "/ut_data_progress.json");
+    
+}
+document.addEventListener('DOMContentLoaded', function() {
+    updateLink()
+});
+</script>
+
+</div>
+<br>
+<p>上图共有<em id="em_id_report_dut_total">-</em>个模块，默认情况下模块为灰色，当模块中的测试用例数大于<em id="em_id_report_dut_min_light">-</em>时，该模块被完全点亮。目前已经完全点亮的模块为<em  id="em_id_report_dut_lighted">-</em>个，待点亮的模块有<em  id="em_id_report_dut_lighted_no">-</em>个。</p>
+<h4 id="通用处理器模块简介">通用处理器模块简介</h4>
 <p>高性能处理器是现代计算设备的核心，它们通常由三个主要部分组成：前端、后端和访存系统。这些部分协同工作，以确保处理器能够高效地执行复杂的计算任务。</p>
 <ul>
 <li>
@@ -329,32 +685,6 @@
 </li>
 </ul>
 <p>高性能处理器的设计需要在这三个部分之间找到平衡，以实现最佳的性能。这通常涉及到复杂的微架构设计，以及对处理器流水线的优化。</p>
-<h5 id="香山昆明湖ut划分">香山昆明湖UT划分</h5>
-<ul>
-<li>
-<p><strong>前端</strong>：</p>
-<ul>
-<li>BPU
-<ul>
-<li>RAS
-<ul>
-<li>XX</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>
-<p><strong>后端</strong>：</p>
-</li>
-<li>
-<p><strong>访存</strong>：</p>
-</li>
-<li>
-<p><strong>其他</strong>：</p>
-</li>
-</ul>
 
 </div>
 
@@ -392,8 +722,8 @@
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT</span>
 </span></span><span style="display:flex;"><span>make dut <span style="color:#000">DUTS</span><span style="color:#ce5c00;font-weight:bold">=</span>&lt;name&gt;  <span style="color:#8f5902;font-style:italic"># DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT</span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 例如：</span>
-</span></span><span style="display:flex;"><span>make dut <span style="color:#000">DUTS</span><span style="color:#ce5c00;font-weight:bold">=</span>backend_ctrlblock_decode
-</span></span></code></pre></div><p>以<code>make dut DUTS=backend_ctrlblock_decode</code>为例，命令执行完成后，会在dut目录下生成对应的Python包：</p>
+</span></span><span style="display:flex;"><span>make dut <span style="color:#000">DUTS</span><span style="color:#ce5c00;font-weight:bold">=</span>backend_ctrl_block_decode
+</span></span></code></pre></div><p>以<code>make dut DUTS=backend_ctrl_block_decode</code>为例，命令执行完成后，会在dut目录下生成对应的Python包：</p>
 <pre tabindex="0"><code>dut/
 ├── __init__.py
 ├── decodestage
@@ -447,8 +777,9 @@
 	<p>添加一个全新的DUT测试用例，需要完成以下三部分内容：</p>
 <ol>
 <li><strong>添加编译脚本</strong>： 在<code>scripts</code>目录下编写对应的<code>rtl</code>到<code>python</code>的编译<code>python</code>文件（例如build_ut_<strong>backend_ctrlblock_decode</strong>.py，必须以<code>build_ut_</code>开头）以及对应的目录（目录中包含必要的输入文件，例如<code>rtl</code>的<code>filelist</code>，需要导出的内部信号等）。所添加的python文件需要实现两个函数：<code>build(cfg): bool</code> 和 <code>line_coverage_files(cfg): list[str]</code>。<code>build</code>函数用来编译DUT，<code>line_coverage_files</code>用来指定该DUT需要查看哪些文件的行覆盖率。</li>
-<li><strong>添加测试用例</strong>： 在对应的<code>ut_*</code>目录中创建对应的<code>python</code>模块（例如<code>ut_backend/ctrl_block/decode</code>）,在该模块中需要包含以<code>test_*.py</code>的测试用例。用例的目录结构请按照<a href="https://open-verify.cc/UnityChipForXiangShan/">昆明湖层级架构图</a>进行添加，以确保收集测试结果时能与层级图对应。测试用例的编写方法请参考<a href="https://docs.pytest.org/en/stable/">Pytest官方文档</a>。</li>
+<li><strong>添加测试用例</strong>： 在对应的<code>ut_*</code>目录中创建对应的<code>python</code>模块（例如<code>ut_backend/ctrl_block/decode</code>）,在该模块中需要包含以<code>test_*.py</code>的测试用例。需要添加的DUT可参考<a href="/UnityChipForXiangShan/docs/#testmap">香山昆明湖DUT验证进展</a>或者<code>configs/dutree/xiangshan-kmh.yaml</code>中的层级进行添加，以确保收集测试结果时能与层级图对应。测试用例的编写方法请参考<a href="https://docs.pytest.org/en/stable/">Pytest官方文档</a>。如果添加的信息在配置文件中未列出，可自行修改配置文件。</li>
 <li><strong>添加依赖模块</strong>： 如果有需要的话，可以在<code>tools、comm</code>等模块中添加该DUT测试需要的基础工具。如果该工具不够通用请添加到对应的<code>ut_</code>模块中，且不能以<code>test_</code>前缀进行命名（例如参考模型可以是<code>ut_backend/ctrl_block/decode/reference.py</code>）。</li>
+<li><strong>添加说明</strong>: 在添加的模块顶层文件夹中，添加<code>README.md</code>说明。</li>
 </ol>
 <p>如果是在已有的DUT测试中增加内容，按原有目录结构添加即可。</p>
 <p>*目录或文件名称需要合理，能通过其命名知晓其具体含义。</p>
@@ -569,7 +900,8 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">dutree</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;dutree/xiangshan-kmh.yaml&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 结果写入路径</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">save-path</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;../documents/static/data/ut_data_progress.json&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span></code></pre></div>
+</span></span></span></code></pre></div><p>可在上述配置文件中添加自定义参数。</p>
+
 </div>
 
 
@@ -647,6 +979,146 @@
 <p>*请在issue中对bug进行详细描述，方便加速确认</p>
 <p>万众一芯QQ交流群：</p>
 <image src="600480230.jpg" alter="600480230" width=300px />
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-62dcfc0be5f5fa110870b0ea2bf0f852">8 - PR模板</h1>
+    
+	<pre tabindex="0"><code># Description
+
+Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.
+
+Fixes # (issue)
+
+## Type of change
+
+Please delete options that are not relevant.
+
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] This change requires a documentation update
+
+# How Has This Been Tested?
+
+Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
+
+- [ ] Test A
+- [x] Test B
+
+**Test Configuration**:
+* Firmware version:
+* Hardware:
+* Toolchain:
+* SDK:
+
+# Checklist:
+
+- [ ] My code follows the style guidelines of this project
+- [ ] I have performed a self-review of my code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published in downstream modules
+</code></pre><p>展示效果如下：</p>
+<h1 id="description">Description</h1>
+<p>Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.</p>
+<p>Fixes # (issue)</p>
+<h2 id="type-of-change">Type of change</h2>
+<p>Please delete options that are not relevant.</p>
+<ul>
+<li><input disabled="" type="checkbox"> Bug fix (non-breaking change which fixes an issue)</li>
+<li><input disabled="" type="checkbox"> New feature (non-breaking change which adds functionality)</li>
+<li><input disabled="" type="checkbox"> Breaking change (fix or feature that would cause existing functionality to not work as expected)</li>
+<li><input disabled="" type="checkbox"> This change requires a documentation update</li>
+</ul>
+<h1 id="how-has-this-been-tested">How Has This Been Tested?</h1>
+<p>Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration</p>
+<ul>
+<li><input disabled="" type="checkbox"> Test A</li>
+<li><input checked="" disabled="" type="checkbox"> Test B</li>
+</ul>
+<p><strong>Test Configuration</strong>:</p>
+<ul>
+<li>Firmware version:</li>
+<li>Hardware:</li>
+<li>Toolchain:</li>
+<li>SDK:</li>
+</ul>
+<h1 id="checklist">Checklist:</h1>
+<ul>
+<li><input disabled="" type="checkbox"> My code follows the style guidelines of this project</li>
+<li><input disabled="" type="checkbox"> I have performed a self-review of my code</li>
+<li><input disabled="" type="checkbox"> I have commented my code, particularly in hard-to-understand areas</li>
+<li><input disabled="" type="checkbox"> I have made corresponding changes to the documentation</li>
+<li><input disabled="" type="checkbox"> My changes generate no new warnings</li>
+<li><input disabled="" type="checkbox"> I have added tests that prove my fix is effective or that my feature works</li>
+<li><input disabled="" type="checkbox"> New and existing unit tests pass locally with my changes</li>
+<li><input disabled="" type="checkbox"> Any dependent changes have been merged and published in downstream modules</li>
+</ul>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-7ef3641a2859e2434321b1d9fa9d21e7">9 - 基本规范</h1>
+    
+	<p>为了方便将所有人的贡献集合在一起，需要在编码、环境、文档编写等方面采用相同的“规范”。</p>
+<h3 id="环境要求">环境要求</h3>
+<ul>
+<li><strong>python：</strong> 在python编码过程中，尽可能的采用标准库，采用兼容Python3大部分版本的通用语法（尽可能的在Python3.6 - Python3.12中通用），不要使用过旧或者过新的语法。</li>
+<li><strong>操作系统：</strong> 建议Ubuntu 22.04，windows下，建议使用WSL2环境。</li>
+<li><strong>hugo</strong> 建议版本 0.124.1（版本过旧不支持软连接）</li>
+<li><strong>少依赖</strong> 尽可能少的使用第三方C++/C库</li>
+<li><strong>picker</strong> 建议使用wheel安装picker工具和xspcomm库</li>
+</ul>
+<h3 id="测试用例">测试用例</h3>
+<ul>
+<li><strong>代码风格</strong> 建议采用 <a href="https://peps.python.org/pep-0008/">PEP 8 规范</a></li>
+<li><strong>build脚本</strong> 需要按DUT的命名结构进行规范命名，不然无法正确收集验证结果。例如<code>backend.ctrl_block.decode</code>UT在scripts目录中对应的build文件名称应该为<code>build_ut_backend_ctrl_block_decode.py</code>(以固定前缀<code>build_ut_</code>开始，点<code>.</code>用下划线<code>_</code>进行替换)。在脚本中实现 <code>build(cfg) -&gt; bool</code> 和 <code>line_coverage_files(cfg) -&gt; list[str]</code> 方法。<code>build</code>用于编译DUT为<code>python</code>模块，<code>line_coverage_files</code>方法用于返回需要统计的代码行覆盖率文件。</li>
+<li><strong>用例标签</strong> 如果用例无法做到版本通用，需要用<code>pytest.mark.toffee_tags</code>标记支持的版本。</li>
+<li><strong>用例抽象</strong> 编写的测试用例输入不能出现DUT的具体引脚等强耦合内容，只能调用基于DUT之上的函数封装。例如对于加法器 adder，需要把dut的目标功能封装为 <code>dut_wrapper.add(a: int, b: int) -&gt; int, bool</code>，在test_case中仅仅调用 <code>sum, c = add(a, b)</code>进行测试。</li>
+<li><strong>覆盖抽象</strong> 在编写功能覆盖率时，其检查点函数的输入也不能有DUT引脚。</li>
+<li><strong>环境抽象</strong> 对于一个验证，通常分为2部分：Test Case 和 Env （用例以外的都统一称为Env，它包含DUT、驱动、监控等），其中Env需要提供对外的功能抽象接口，不能对外呈现出太多细节。</li>
+<li><strong>测试说明</strong> 在每个DUT的验证环境中，需要通过<code>README.md</code>对该环境进行说明，例如需要对Env提供给Case的接口进行说明，目录结构说明等。</li>
+</ul>
+<h3 id="pr编写">PR编写</h3>
+<ul>
+<li><strong>标题</strong> 简洁明了，能概括PR的主要内容。</li>
+<li><strong>详细描述</strong> 详细说明PR的目的，修改的内容以及相关背景信息。入解决已有的问题需要给出链接（例如Issue）。</li>
+<li><strong>关联问题</strong> 在描述中关联相关问题，例如 <code>Fixes #123</code>，以便在合并PR时关闭关联问题。</li>
+<li><strong>测试</strong> 需要进行测试，并对测试结果进行描述</li>
+<li><strong>文档</strong> PR涉及到的文档需要同步修改</li>
+<li><strong>分解</strong> 当PR涉及到的修改很多时，需要判断是否拆分成多个PR</li>
+<li><strong>检查清单</strong> 检查编译是否通过、代码风格是否合理、是否测试通过、是否有必要的注释等</li>
+<li><strong>模板</strong> 以及提供的PR模块请<a href="/UnityChipForXiangShan/docs/08_pr_template/">参考链接</a>。</li>
+</ul>
+<h3 id="issue编写">ISSUE编写</h3>
+<p>要求同上</p>
 
 </div>
 
