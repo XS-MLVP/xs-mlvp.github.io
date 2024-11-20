@@ -17,40 +17,24 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
-<title>如何提交文档 | 万众一芯之香山处理器</title>
-<meta name="description" content="本项目的DUT文档Fork了香山官方文档：https://docs.xiangshan.cc ， 原始仓库地址为：https://github.com/OpenXiangShan/XiangShan-doc。采用的文档格式为makedocs。
-万众一芯Fork后的仓库地址为：
-https://github.com/XS-MLVP/XiangShan-doc
-服务地址为：
-https://open-verify.cc/xiangshan-docs/
-文档贡献提交 首先For上述万众一芯对应的文档仓库。 修改或者添加贡献内容，建议一次commit包含足量修改或者新内容。 本地检查是否显示正常。 提交PR。在PR中描述清楚主要贡献。 PR审核通过后合并至仓库。 本项目中的PR定期向香山官方仓库提交PR，您的贡献可在相关git中查看。">
-<meta property="og:title" content="如何提交文档" />
-<meta property="og:description" content="本项目的DUT文档Fork了香山官方文档：https://docs.xiangshan.cc ， 原始仓库地址为：https://github.com/OpenXiangShan/XiangShan-doc。采用的文档格式为makedocs。
-万众一芯Fork后的仓库地址为：
-https://github.com/XS-MLVP/XiangShan-doc
-服务地址为：
-https://open-verify.cc/xiangshan-docs/
-文档贡献提交 首先For上述万众一芯对应的文档仓库。 修改或者添加贡献内容，建议一次commit包含足量修改或者新内容。 本地检查是否显示正常。 提交PR。在PR中描述清楚主要贡献。 PR审核通过后合并至仓库。 本项目中的PR定期向香山官方仓库提交PR，您的贡献可在相关git中查看。" />
+<title>基本规范 | 万众一芯之香山处理器</title>
+<meta name="description" content="为了方便将所有人的贡献集合在一起，需要在编码、环境、文档编写等方面采用相同的“规范”。
+环境要求 python： 在python编码过程中，尽可能的采用标准库，采用兼容Python3大部分版本的通用语法（尽可能的在Python3.6 - Python3.12中通用），不要使用过旧或者过新的语法。 操作系统： 建议Ubuntu 22.04，windows下，建议使用WSL2环境。 hugo 建议版本 0.124.1（版本过旧不支持软连接） 少依赖 尽可能少的使用第三方C&#43;&#43;/C库 picker 建议使用wheel安装picker工具和xspcomm库 测试用例 代码风格 建议采用 PEP 8 规范 build脚本 需要按DUT的命名结构进行规范命名，不然无法正确收集验证结果。例如backend.ctrl_block.decodeUT在scripts目录中对应的build文件名称应该为build_ut_backend_ctrl_block_decode.py(以固定前缀build_ut_开始，点.用下划线_进行替换)。在脚本中实现 build(cfg) -&amp;gt; bool 和 line_coverage_files(cfg) -&amp;gt; list[str] 方法。build用于编译DUT为python模块，line_coverage_files方法用于返回需要统计的代码行覆盖率文件。 用例标签 如果用例无法做到版本通用，需要用pytest.mark.toffee_tags标记支持的版本。 用例抽象 编写的测试用例输入不能出现DUT的具体引脚等强耦合内容，只能调用基于DUT之上的函数封装。例如对于加法器 adder，需要把dut的目标功能封装为 dut_wrapper.add(a: int, b: int) -&amp;gt; int, bool，在test_case中仅仅调用 sum, c = add(a, b)进行测试。 覆盖抽象 在编写功能覆盖率时，其检查点函数的输入也不能有DUT引脚。 环境抽象 对于一个验证，通常分为2部分：Test Case 和 Env （用例以外的都统一称为Env，它包含DUT、驱动、监控等），其中Env需要提供对外的功能抽象接口，不能对外呈现出太多细节。 测试说明 在每个DUT的验证环境中，需要通过README.md对该环境进行说明，例如需要对Env提供给Case的接口进行说明，目录结构说明等。 PR编写 标题 简洁明了，能概括PR的主要内容。 详细描述 详细说明PR的目的，修改的内容以及相关背景信息。入解决已有的问题需要给出链接（例如Issue）。 关联问题 在描述中关联相关问题，例如 Fixes #123，以便在合并PR时关闭关联问题。 测试 需要进行测试，并对测试结果进行描述 文档 PR涉及到的文档需要同步修改 分解 当PR涉及到的修改很多时，需要判断是否拆分成多个PR 检查清单 检查编译是否通过、代码风格是否合理、是否测试通过、是否有必要的注释等 模板 以及提供的PR模块请参考链接。 ISSUE编写 要求同上">
+<meta property="og:title" content="基本规范" />
+<meta property="og:description" content="为了方便将所有人的贡献集合在一起，需要在编码、环境、文档编写等方面采用相同的“规范”。
+环境要求 python： 在python编码过程中，尽可能的采用标准库，采用兼容Python3大部分版本的通用语法（尽可能的在Python3.6 - Python3.12中通用），不要使用过旧或者过新的语法。 操作系统： 建议Ubuntu 22.04，windows下，建议使用WSL2环境。 hugo 建议版本 0.124.1（版本过旧不支持软连接） 少依赖 尽可能少的使用第三方C&#43;&#43;/C库 picker 建议使用wheel安装picker工具和xspcomm库 测试用例 代码风格 建议采用 PEP 8 规范 build脚本 需要按DUT的命名结构进行规范命名，不然无法正确收集验证结果。例如backend.ctrl_block.decodeUT在scripts目录中对应的build文件名称应该为build_ut_backend_ctrl_block_decode.py(以固定前缀build_ut_开始，点.用下划线_进行替换)。在脚本中实现 build(cfg) -&gt; bool 和 line_coverage_files(cfg) -&gt; list[str] 方法。build用于编译DUT为python模块，line_coverage_files方法用于返回需要统计的代码行覆盖率文件。 用例标签 如果用例无法做到版本通用，需要用pytest.mark.toffee_tags标记支持的版本。 用例抽象 编写的测试用例输入不能出现DUT的具体引脚等强耦合内容，只能调用基于DUT之上的函数封装。例如对于加法器 adder，需要把dut的目标功能封装为 dut_wrapper.add(a: int, b: int) -&gt; int, bool，在test_case中仅仅调用 sum, c = add(a, b)进行测试。 覆盖抽象 在编写功能覆盖率时，其检查点函数的输入也不能有DUT引脚。 环境抽象 对于一个验证，通常分为2部分：Test Case 和 Env （用例以外的都统一称为Env，它包含DUT、驱动、监控等），其中Env需要提供对外的功能抽象接口，不能对外呈现出太多细节。 测试说明 在每个DUT的验证环境中，需要通过README.md对该环境进行说明，例如需要对Env提供给Case的接口进行说明，目录结构说明等。 PR编写 标题 简洁明了，能概括PR的主要内容。 详细描述 详细说明PR的目的，修改的内容以及相关背景信息。入解决已有的问题需要给出链接（例如Issue）。 关联问题 在描述中关联相关问题，例如 Fixes #123，以便在合并PR时关闭关联问题。 测试 需要进行测试，并对测试结果进行描述 文档 PR涉及到的文档需要同步修改 分解 当PR涉及到的修改很多时，需要判断是否拆分成多个PR 检查清单 检查编译是否通过、代码风格是否合理、是否测试通过、是否有必要的注释等 模板 以及提供的PR模块请参考链接。 ISSUE编写 要求同上" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/04_add_doc/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/99_constraint/" /><meta property="article:section" content="docs" />
 
 <meta property="article:modified_time" content="2024-11-20T17:48:45+08:00" />
-<meta itemprop="name" content="如何提交文档">
-<meta itemprop="description" content="本项目的DUT文档Fork了香山官方文档：https://docs.xiangshan.cc ， 原始仓库地址为：https://github.com/OpenXiangShan/XiangShan-doc。采用的文档格式为makedocs。
-万众一芯Fork后的仓库地址为：
-https://github.com/XS-MLVP/XiangShan-doc
-服务地址为：
-https://open-verify.cc/xiangshan-docs/
-文档贡献提交 首先For上述万众一芯对应的文档仓库。 修改或者添加贡献内容，建议一次commit包含足量修改或者新内容。 本地检查是否显示正常。 提交PR。在PR中描述清楚主要贡献。 PR审核通过后合并至仓库。 本项目中的PR定期向香山官方仓库提交PR，您的贡献可在相关git中查看。">
+<meta itemprop="name" content="基本规范">
+<meta itemprop="description" content="为了方便将所有人的贡献集合在一起，需要在编码、环境、文档编写等方面采用相同的“规范”。
+环境要求 python： 在python编码过程中，尽可能的采用标准库，采用兼容Python3大部分版本的通用语法（尽可能的在Python3.6 - Python3.12中通用），不要使用过旧或者过新的语法。 操作系统： 建议Ubuntu 22.04，windows下，建议使用WSL2环境。 hugo 建议版本 0.124.1（版本过旧不支持软连接） 少依赖 尽可能少的使用第三方C&#43;&#43;/C库 picker 建议使用wheel安装picker工具和xspcomm库 测试用例 代码风格 建议采用 PEP 8 规范 build脚本 需要按DUT的命名结构进行规范命名，不然无法正确收集验证结果。例如backend.ctrl_block.decodeUT在scripts目录中对应的build文件名称应该为build_ut_backend_ctrl_block_decode.py(以固定前缀build_ut_开始，点.用下划线_进行替换)。在脚本中实现 build(cfg) -&gt; bool 和 line_coverage_files(cfg) -&gt; list[str] 方法。build用于编译DUT为python模块，line_coverage_files方法用于返回需要统计的代码行覆盖率文件。 用例标签 如果用例无法做到版本通用，需要用pytest.mark.toffee_tags标记支持的版本。 用例抽象 编写的测试用例输入不能出现DUT的具体引脚等强耦合内容，只能调用基于DUT之上的函数封装。例如对于加法器 adder，需要把dut的目标功能封装为 dut_wrapper.add(a: int, b: int) -&gt; int, bool，在test_case中仅仅调用 sum, c = add(a, b)进行测试。 覆盖抽象 在编写功能覆盖率时，其检查点函数的输入也不能有DUT引脚。 环境抽象 对于一个验证，通常分为2部分：Test Case 和 Env （用例以外的都统一称为Env，它包含DUT、驱动、监控等），其中Env需要提供对外的功能抽象接口，不能对外呈现出太多细节。 测试说明 在每个DUT的验证环境中，需要通过README.md对该环境进行说明，例如需要对Env提供给Case的接口进行说明，目录结构说明等。 PR编写 标题 简洁明了，能概括PR的主要内容。 详细描述 详细说明PR的目的，修改的内容以及相关背景信息。入解决已有的问题需要给出链接（例如Issue）。 关联问题 在描述中关联相关问题，例如 Fixes #123，以便在合并PR时关闭关联问题。 测试 需要进行测试，并对测试结果进行描述 文档 PR涉及到的文档需要同步修改 分解 当PR涉及到的修改很多时，需要判断是否拆分成多个PR 检查清单 检查编译是否通过、代码风格是否合理、是否测试通过、是否有必要的注释等 模板 以及提供的PR模块请参考链接。 ISSUE编写 要求同上">
 <meta itemprop="dateModified" content="2024-11-20T17:48:45+08:00" />
-<meta itemprop="wordCount" content="14">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何提交文档"/>
-<meta name="twitter:description" content="本项目的DUT文档Fork了香山官方文档：https://docs.xiangshan.cc ， 原始仓库地址为：https://github.com/OpenXiangShan/XiangShan-doc。采用的文档格式为makedocs。
-万众一芯Fork后的仓库地址为：
-https://github.com/XS-MLVP/XiangShan-doc
-服务地址为：
-https://open-verify.cc/xiangshan-docs/
-文档贡献提交 首先For上述万众一芯对应的文档仓库。 修改或者添加贡献内容，建议一次commit包含足量修改或者新内容。 本地检查是否显示正常。 提交PR。在PR中描述清楚主要贡献。 PR审核通过后合并至仓库。 本项目中的PR定期向香山官方仓库提交PR，您的贡献可在相关git中查看。"/>
+<meta itemprop="wordCount" content="80">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="基本规范"/>
+<meta name="twitter:description" content="为了方便将所有人的贡献集合在一起，需要在编码、环境、文档编写等方面采用相同的“规范”。
+环境要求 python： 在python编码过程中，尽可能的采用标准库，采用兼容Python3大部分版本的通用语法（尽可能的在Python3.6 - Python3.12中通用），不要使用过旧或者过新的语法。 操作系统： 建议Ubuntu 22.04，windows下，建议使用WSL2环境。 hugo 建议版本 0.124.1（版本过旧不支持软连接） 少依赖 尽可能少的使用第三方C&#43;&#43;/C库 picker 建议使用wheel安装picker工具和xspcomm库 测试用例 代码风格 建议采用 PEP 8 规范 build脚本 需要按DUT的命名结构进行规范命名，不然无法正确收集验证结果。例如backend.ctrl_block.decodeUT在scripts目录中对应的build文件名称应该为build_ut_backend_ctrl_block_decode.py(以固定前缀build_ut_开始，点.用下划线_进行替换)。在脚本中实现 build(cfg) -&gt; bool 和 line_coverage_files(cfg) -&gt; list[str] 方法。build用于编译DUT为python模块，line_coverage_files方法用于返回需要统计的代码行覆盖率文件。 用例标签 如果用例无法做到版本通用，需要用pytest.mark.toffee_tags标记支持的版本。 用例抽象 编写的测试用例输入不能出现DUT的具体引脚等强耦合内容，只能调用基于DUT之上的函数封装。例如对于加法器 adder，需要把dut的目标功能封装为 dut_wrapper.add(a: int, b: int) -&gt; int, bool，在test_case中仅仅调用 sum, c = add(a, b)进行测试。 覆盖抽象 在编写功能覆盖率时，其检查点函数的输入也不能有DUT引脚。 环境抽象 对于一个验证，通常分为2部分：Test Case 和 Env （用例以外的都统一称为Env，它包含DUT、驱动、监控等），其中Env需要提供对外的功能抽象接口，不能对外呈现出太多细节。 测试说明 在每个DUT的验证环境中，需要通过README.md对该环境进行说明，例如需要对Env提供给Case的接口进行说明，目录结构说明等。 PR编写 标题 简洁明了，能概括PR的主要内容。 详细描述 详细说明PR的目的，修改的内容以及相关背景信息。入解决已有的问题需要给出链接（例如Issue）。 关联问题 在描述中关联相关问题，例如 Fixes #123，以便在合并PR时关闭关联问题。 测试 需要进行测试，并对测试结果进行描述 文档 PR涉及到的文档需要同步修改 分解 当PR涉及到的修改很多时，需要判断是否拆分成多个PR 检查清单 检查编译是否通过、代码风格是否合理、是否测试通过、是否有必要的注释等 模板 以及提供的PR模块请参考链接。 ISSUE编写 要求同上"/>
 
 
 
@@ -221,8 +205,8 @@ https://open-verify.cc/xiangshan-docs/
   <a href="/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test05_cover_func"><span class="">功能覆盖率</span></a>
 </li>
   </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs04_add_doc-li">
-  <a href="/UnityChipForXiangShan/docs/04_add_doc/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs04_add_doc"><span class="td-sidebar-nav-active-item">如何提交文档</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs04_add_doc-li">
+  <a href="/UnityChipForXiangShan/docs/04_add_doc/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs04_add_doc"><span class="">如何提交文档</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs05_report_bug-li">
   <a href="/UnityChipForXiangShan/docs/05_report_bug/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs05_report_bug"><span class="">如何提交Bug</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs06_join_us-li">
@@ -233,8 +217,8 @@ https://open-verify.cc/xiangshan-docs/
   <a href="/UnityChipForXiangShan/docs/09_template_issue/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs09_template_issue"><span class="">模板-ISSUE</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs10_template_ut_readme-li">
   <a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-ReadMe</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs99_constraint-li">
-  <a href="/UnityChipForXiangShan/docs/99_constraint/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_constraint"><span class="">基本规范</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs99_constraint-li">
+  <a href="/UnityChipForXiangShan/docs/99_constraint/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_constraint"><span class="td-sidebar-nav-active-item">基本规范</span></a>
 </li>
   </ul>
 </li>
@@ -246,10 +230,10 @@ https://open-verify.cc/xiangshan-docs/
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
             
 <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/04_add_doc.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/04_add_doc.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/99_constraint.md" class="td-page-meta--view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/99_constraint.md" class="td-page-meta--edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
   <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=%e5%a6%82%e4%bd%95%e6%8f%90%e4%ba%a4%e6%96%87%e6%a1%a3" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=%e5%9f%ba%e6%9c%ac%e8%a7%84%e8%8c%83" class="td-page-meta--issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
   <a href="https://github.com/XS-MLVP/UnityChipForXiangShan//issues/new" class="td-page-meta--project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
   <a id="print" href="/UnityChipForXiangShan/docs/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
@@ -260,7 +244,10 @@ https://open-verify.cc/xiangshan-docs/
   <ul>
     <li>
       <ul>
-        <li></li>
+        <li><a href="#环境要求">环境要求</a></li>
+        <li><a href="#测试用例">测试用例</a></li>
+        <li><a href="#pr编写">PR编写</a></li>
+        <li><a href="#issue编写">ISSUE编写</a></li>
       </ul>
     </li>
   </ul>
@@ -279,31 +266,48 @@ https://open-verify.cc/xiangshan-docs/
   <li class="breadcrumb-item">
     <a href="/UnityChipForXiangShan/docs/">进度概述</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    如何提交文档</li>
+    基本规范</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>如何提交文档</h1>
+	<h1>基本规范</h1>
 	
 	<header class="article-meta">
 		
   </header>
-	<p>本项目的DUT文档Fork了香山官方文档：<a href="https://docs.xiangshan.cc">https://docs.xiangshan.cc</a> ，
-原始仓库地址为：<a href="https://github.com/OpenXiangShan/XiangShan-doc">https://github.com/OpenXiangShan/XiangShan-doc</a>。采用的文档格式为<a href="https://www.mkdocs.org/">makedocs</a>。</p>
-<p>万众一芯Fork后的仓库地址为：</p>
-<p><a href="https://github.com/XS-MLVP/XiangShan-doc">https://github.com/XS-MLVP/XiangShan-doc</a></p>
-<p>服务地址为：</p>
-<p><a href="https://open-verify.cc/xiangshan-docs/">https://open-verify.cc/xiangshan-docs/</a></p>
-<h4 id="文档贡献提交">文档贡献提交</h4>
-<ol>
-<li>首先For上述万众一芯对应的文档仓库。</li>
-<li>修改或者添加贡献内容，建议一次commit包含足量修改或者新内容。</li>
-<li>本地检查是否显示正常。</li>
-<li>提交PR。在PR中描述清楚主要贡献。</li>
-<li>PR审核通过后合并至仓库。</li>
-</ol>
-<p>本项目中的PR定期向香山官方仓库提交PR，您的贡献可在相关git中查看。</p>
+	<p>为了方便将所有人的贡献集合在一起，需要在编码、环境、文档编写等方面采用相同的“规范”。</p>
+<h3 id="环境要求">环境要求</h3>
+<ul>
+<li><strong>python：</strong> 在python编码过程中，尽可能的采用标准库，采用兼容Python3大部分版本的通用语法（尽可能的在Python3.6 - Python3.12中通用），不要使用过旧或者过新的语法。</li>
+<li><strong>操作系统：</strong> 建议Ubuntu 22.04，windows下，建议使用WSL2环境。</li>
+<li><strong>hugo</strong> 建议版本 0.124.1（版本过旧不支持软连接）</li>
+<li><strong>少依赖</strong> 尽可能少的使用第三方C++/C库</li>
+<li><strong>picker</strong> 建议使用wheel安装picker工具和xspcomm库</li>
+</ul>
+<h3 id="测试用例">测试用例</h3>
+<ul>
+<li><strong>代码风格</strong> 建议采用 <a href="https://peps.python.org/pep-0008/">PEP 8 规范</a></li>
+<li><strong>build脚本</strong> 需要按DUT的命名结构进行规范命名，不然无法正确收集验证结果。例如<code>backend.ctrl_block.decode</code>UT在scripts目录中对应的build文件名称应该为<code>build_ut_backend_ctrl_block_decode.py</code>(以固定前缀<code>build_ut_</code>开始，点<code>.</code>用下划线<code>_</code>进行替换)。在脚本中实现 <code>build(cfg) -&gt; bool</code> 和 <code>line_coverage_files(cfg) -&gt; list[str]</code> 方法。<code>build</code>用于编译DUT为<code>python</code>模块，<code>line_coverage_files</code>方法用于返回需要统计的代码行覆盖率文件。</li>
+<li><strong>用例标签</strong> 如果用例无法做到版本通用，需要用<code>pytest.mark.toffee_tags</code>标记支持的版本。</li>
+<li><strong>用例抽象</strong> 编写的测试用例输入不能出现DUT的具体引脚等强耦合内容，只能调用基于DUT之上的函数封装。例如对于加法器 adder，需要把dut的目标功能封装为 <code>dut_wrapper.add(a: int, b: int) -&gt; int, bool</code>，在test_case中仅仅调用 <code>sum, c = add(a, b)</code>进行测试。</li>
+<li><strong>覆盖抽象</strong> 在编写功能覆盖率时，其检查点函数的输入也不能有DUT引脚。</li>
+<li><strong>环境抽象</strong> 对于一个验证，通常分为2部分：Test Case 和 Env （用例以外的都统一称为Env，它包含DUT、驱动、监控等），其中Env需要提供对外的功能抽象接口，不能对外呈现出太多细节。</li>
+<li><strong>测试说明</strong> 在每个DUT的验证环境中，需要通过<code>README.md</code>对该环境进行说明，例如需要对Env提供给Case的接口进行说明，目录结构说明等。</li>
+</ul>
+<h3 id="pr编写">PR编写</h3>
+<ul>
+<li><strong>标题</strong> 简洁明了，能概括PR的主要内容。</li>
+<li><strong>详细描述</strong> 详细说明PR的目的，修改的内容以及相关背景信息。入解决已有的问题需要给出链接（例如Issue）。</li>
+<li><strong>关联问题</strong> 在描述中关联相关问题，例如 <code>Fixes #123</code>，以便在合并PR时关闭关联问题。</li>
+<li><strong>测试</strong> 需要进行测试，并对测试结果进行描述</li>
+<li><strong>文档</strong> PR涉及到的文档需要同步修改</li>
+<li><strong>分解</strong> 当PR涉及到的修改很多时，需要判断是否拆分成多个PR</li>
+<li><strong>检查清单</strong> 检查编译是否通过、代码风格是否合理、是否测试通过、是否有必要的注释等</li>
+<li><strong>模板</strong> 以及提供的PR模块请<a href="08_pr_template/">参考链接</a>。</li>
+</ul>
+<h3 id="issue编写">ISSUE编写</h3>
+<p>要求同上</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
   最后修改 November 20, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/532a16f9cd9b504b93d8e88c2ad9e25daa9da99b">doc: update (532a16f)</a>
