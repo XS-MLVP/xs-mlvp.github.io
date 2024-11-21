@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d6c992714c6a8a729fc162be2f33baa9.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1255159a098caedb05b8a785799ba410.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -226,7 +226,7 @@
     
     
 	
-<li>4.2: <a href="#pg-53f38485d7ee0ef1d06f36fbe61bda5b">构建环境</a></li>
+<li>4.2: <a href="#pg-53f38485d7ee0ef1d06f36fbe61bda5b">构建测试环境</a></li>
 
 
     
@@ -302,7 +302,7 @@
     
     
 	
-<li>10: <a href="#pg-68658f28e70d830f706f538c1d44b165">模板-UT-ReadMe</a></li>
+<li>10: <a href="#pg-68658f28e70d830f706f538c1d44b165">模板-UT-README</a></li>
 
 
     
@@ -310,7 +310,23 @@
     
     
 	
-<li>11: <a href="#pg-e36ed0a73555b7b11eed503ae9dda44b">基本规范</a></li>
+<li>11: <a href="#pg-ba1b1b28f133d5958626bcc45b07e6a8">常用API</a></li>
+
+
+    
+  
+    
+    
+	
+<li>12: <a href="#pg-61b9bbd017b1d8dc9c62b134fb89c39e">其他</a></li>
+
+
+    
+  
+    
+    
+	
+<li>13: <a href="#pg-e36ed0a73555b7b11eed503ae9dda44b">必要规范</a></li>
 
 
     
@@ -345,7 +361,11 @@ function update_charts(data_url){
 function updateLink() {
     var select = document.getElementById("indexurlSelect");
     var goLink = document.getElementById("indexgoLink");
-    var url = select.options[select.selectedIndex].getAttribute("data-url");
+    var opt = select.options[select.selectedIndex];
+    if(!opt){
+        return
+    }
+    var url = opt.getAttribute("data-url");
     goLink.href = url;
     
     window["update_charts"](url + "/ut_data_progress.json");
@@ -724,7 +744,11 @@ function update_dut_charts(data_url){
 function updateLink() {
     var select = document.getElementById("duturlSelect");
     var goLink = document.getElementById("dutgoLink");
-    var url = select.options[select.selectedIndex].getAttribute("data-url");
+    var opt = select.options[select.selectedIndex];
+    if(!opt){
+        return
+    }
+    var url = opt.getAttribute("data-url");
     goLink.href = url;
     
     window["update_dut_charts"](url + "/ut_data_progress.json");
@@ -821,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
 	<h1 id="pg-a5fd55875e0540351befe9b3a6e05b98">3 - 运行测试</h1>
     
-	<p>本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有以<code>test_*.py</code>文件，并自动执行其中所有以<code>test_</code>开头的测试用例（Test Case）。</p>
+	<p>本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有<code>test_*.py</code>文件，并自动执行其中所有以<code>test_</code>开头的测试用例（Test Case）。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 执行所有ut_*目录中的test case</span>
 </span></span><span style="display:flex;"><span>make test_all
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 执行指定目录下的test case</span>
@@ -831,7 +855,14 @@ document.addEventListener('DOMContentLoaded', function() {
 </span></span></code></pre></div><p>可通过<code>args</code>参数传递Pytest的运行参数，例如启动x-dist插件的多核功能：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">args</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;-n 4&#34;</span>     <span style="color:#8f5902;font-style:italic"># 启用 4 个进程</span>
 </span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">args</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;-n auto&#34;</span>  <span style="color:#8f5902;font-style:italic"># 让框架自动选择启用多少个进程</span>
-</span></span></code></pre></div><p>运行完成后，在out目录会生成html版本的测试报告，可通过浏览器直接打开查看（VS Code IDE建议安装<code>Open In Default Browser</code>插件）。</p>
+</span></span></code></pre></div><p>*注：x-dist可以在多节点上并发运行测试，可参考其<a href="https://pytest-xdist.readthedocs.io/en/stable/remote.html">文档</a></p>
+<p>运行完成后，默认在<code>out/report</code>目录会生成html版本的测试报告，其 html 文件可通过浏览器直接打开查看（VS Code IDE建议安装<code>Open In Default Browser</code>插件）。</p>
+<p>运行测试主要完成以下三部分内容：</p>
+<ol>
+<li>按要求运行Test Case，可通过<code>cfg.tests</code>中的选项进行配置</li>
+<li>统计测试结果，输出测试报告。有toffee-report自动生成 (总测试报告，所有Test的结果合并在一起)</li>
+<li>根据需要（<code>cfg.doc_result.disable = True</code>）在测试报告上进行进一步数据统计</li>
+</ol>
 
 </div>
 
@@ -851,131 +882,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
 	<p>添加一个全新的DUT测试用例，需要完成以下三部分内容：</p>
 <ol>
-<li><strong>添加编译脚本</strong>： 在<code>scripts</code>目录下编写对应的<code>rtl</code>到<code>python</code>的编译<code>python</code>文件（例如build_ut_<strong>backend_ctrlblock_decode</strong>.py，必须以<code>build_ut_</code>开头）以及对应的目录（目录中包含必要的输入文件，例如<code>rtl</code>的<code>filelist</code>，需要导出的内部信号等）。所添加的python文件需要实现两个函数：<code>build(cfg): bool</code> 和 <code>line_coverage_files(cfg): list[str]</code>。<code>build</code>函数用来编译DUT，<code>line_coverage_files</code>用来指定该DUT需要查看哪些文件的行覆盖率。</li>
-<li><strong>添加依赖模块</strong>： 如果有需要的话，可以在<code>tools、comm</code>等模块中添加该DUT测试需要的基础工具。如果该工具不够通用请添加到对应的<code>ut_</code>模块中，且不能以<code>test_</code>前缀进行命名（例如参考模型可以是<code>ut_backend/ctrl_block/decode/reference.py</code>）。</li>
-<li><strong>添加测试用例</strong>： 在对应的<code>ut_*</code>目录中创建对应的<code>python</code>模块（例如<code>ut_backend/ctrl_block/decode</code>）,在该模块中需要包含以<code>test_*.py</code>的测试用例。需要添加的DUT可参考<a href="/UnityChipForXiangShan/docs/#testmap">香山昆明湖DUT验证进展</a>或者<code>configs/dutree/xiangshan-kmh.yaml</code>中的层级进行添加，以确保收集测试结果时能与层级图对应。测试用例的编写方法请参考<a href="https://docs.pytest.org/en/stable/">Pytest官方文档</a>。如果添加的信息在配置文件中未列出，可自行修改配置文件。</li>
-<li><strong>添加说明</strong>: 在添加的模块顶层文件夹中，添加<code>README.md</code>说明。</li>
+<li><strong>添加编译脚本</strong>： 在<code>scripts</code>目录下编写对应的<code>rtl</code>到<code>python</code>的编译<code>python</code>文件。</li>
+<li><strong>构建测试环境</strong>： 在目录中创建目标测试UT目录（例如<code>ut_backend/ctrl_block/decode</code>）。如果有需要的话，可以在<code>tools、comm</code>等模块中添加该DUT测试需要的基础工具。</li>
+<li><strong>添加测试用例</strong>： 在测试UT目录，按<a href="https://docs.pytest.org/en/stable/">PyTest规范</a>添加测试用例。</li>
 </ol>
 <p>如果是在已有的DUT测试中增加内容，按原有目录结构添加即可。</p>
-<p>*目录或文件名称需要合理，能通过其命名知晓其具体含义。</p>
 <p>如何通过picker和toffee库进行Python芯片验证，请参考：<a href="https://open-verify.cc/mlvp/docs">https://open-verify.cc/mlvp/docs</a></p>
-<h3 id="测试用例管理">测试用例管理</h3>
-<p>测试用例和目标RTL版本紧密相关，如果RTL发生变化，之前的测试用例不一定适用。此外，不同场景下有不通需求，例如开始测试时，不运行耗时太长的用例等。因此需要对用例进行管理，让用户能在在特定场景下跳过某些用例。为了实现该目标，我们需要通过<code>pytest.mark.toffee_tags</code>对于每个用例进行tag和version标记。然后在配置文件中设置需要跳过哪些tag或者只运行哪些tag的测试。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.mark.toffee_tags</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;my_tag&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;version1 &lt; version13&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_case_1</span><span style="color:#000;font-weight:bold">():</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
-</span></span></code></pre></div><p>例如上述<code>test_case_1</code>被标记上了标签<code>my_tag</code>，支持版本设置为<code>version1</code>到<code>version13</code>。因此可以在配置文件中指定<code>test.skip-tags=[&quot;my_tag&quot;]</code>，来表示运行过程中跳过该用例。预定义标签，请在comm/constants.py中查看。具体配置说明请参考<a href="/UnityChipForXiangShan/docs/03_add_test/#配置文件说明">配置文件说明</a>。</p>
-<p><code>pytest.mark.toffee_tags</code>的参数说明如下：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.mark.toffee_tags</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">tag</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Optional</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87">list</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">]</span>     <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[]</span>    <span style="color:#8f5902;font-style:italic"># 用例标签</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">version</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Optional</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87">list</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[],</span>   <span style="color:#8f5902;font-style:italic"># 用例rtl版本需求</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">skip</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">callable</span>               <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">None</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#8f5902;font-style:italic"># 自定义是否调过该用例，skip(tag, version, item): (skip, reason)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><p><code>toffee_tags</code>函数的参数<code>tag</code>支持<code>str</code>和<code>list[str]</code>类型。<code>version</code>参数也可以是<code>str</code>和<code>list[str]</code>类型，当为<code>list</code>类型时，进行精确匹配，如果为<code>str</code>则匹配规则如下：</p>
+<p>在测试时还需要关心以下内容：</p>
 <ol>
-<li><code>name-number1 &lt; namer-number2:</code> 表示版本需要在<code>number1</code>和<code>number2</code>之间（包含边界，<code>number</code>表示数字，也可以为小数，eg <code>1.11</code>）</li>
-<li><code>name-number1+</code>：表示<code>number1</code>版本以及以后的版本</li>
-<li><code>name-number1-</code>：表示<code>number1</code>版本以及以前的版本</li>
+<li><strong>UT模块说明</strong>: 在添加的模块顶层文件夹中，添加<code>README.md</code>说明，具体格式和要求请参考<a href="/UnityChipForXiangShan/">模板</a>。</li>
+<li><strong>代码覆盖率</strong>：代码覆盖率是芯片验证的重要指标，一般需需要覆盖目标DUT的所有代码。</li>
+<li><strong>功能覆盖率</strong>：功能覆盖率即目标功能验证完成了多少，一般需要达到100%。</li>
 </ol>
-<p>如果不存在上述情况，且有<code>*</code>或者<code>?</code>表示通配符类型。其他情况为精确匹配。</p>
-<p>可以通过<code>@pytest.mark.toffee_tags</code>可以为每个用例添加标签，也可以在模块中定义如下变量，实现对整个模块的所有测试用例添加标签。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">toffee_tags_default_tag</span>     <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[]</span>   <span style="color:#8f5902;font-style:italic"># 对应 tag 参数</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">toffee_tags_default_version</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[]</span>   <span style="color:#8f5902;font-style:italic"># 对应 version 参数</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">toffee_tags_default_skip</span>    <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">None</span> <span style="color:#8f5902;font-style:italic"># 对应 skip 参数</span>
-</span></span></code></pre></div><h3 id="仓库目录说明">仓库目录说明</h3>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UnityChipForXiangShan
-</span></span><span style="display:flex;"><span>├── LICENSE            <span style="color:#8f5902;font-style:italic"># 开源协议</span>
-</span></span><span style="display:flex;"><span>├── Makefile           <span style="color:#8f5902;font-style:italic"># Makefile主文件</span>
-</span></span><span style="display:flex;"><span>├── README.en.md       <span style="color:#8f5902;font-style:italic"># 英文readme</span>
-</span></span><span style="display:flex;"><span>├── README.zh.md       <span style="color:#8f5902;font-style:italic"># 中文readme</span>
-</span></span><span style="display:flex;"><span>├── __init__.py        <span style="color:#8f5902;font-style:italic"># Python模块文件，可以把整个UnityChipForXiangShan当成一个模块进行import</span>
-</span></span><span style="display:flex;"><span>├── comm               <span style="color:#8f5902;font-style:italic"># 公用组件：日志，函数，配置等</span>
-</span></span><span style="display:flex;"><span>├── configs            <span style="color:#8f5902;font-style:italic"># 配置文件目录</span>
-</span></span><span style="display:flex;"><span>├── documents          <span style="color:#8f5902;font-style:italic"># 文档</span>
-</span></span><span style="display:flex;"><span>├── dut                <span style="color:#8f5902;font-style:italic"># dut生成目录</span>
-</span></span><span style="display:flex;"><span>├── out                <span style="color:#8f5902;font-style:italic"># log，report等生成目录</span>
-</span></span><span style="display:flex;"><span>├── requirements.txt   <span style="color:#8f5902;font-style:italic"># python依赖</span>
-</span></span><span style="display:flex;"><span>├── rtl                <span style="color:#8f5902;font-style:italic"># rtl缓存</span>
-</span></span><span style="display:flex;"><span>├── run.py             <span style="color:#8f5902;font-style:italic"># 主python入口文件</span>
-</span></span><span style="display:flex;"><span>├── scripts            <span style="color:#8f5902;font-style:italic"># dut编译脚本</span>
-</span></span><span style="display:flex;"><span>├── tools              <span style="color:#8f5902;font-style:italic"># 公共工具模块</span>
-</span></span><span style="display:flex;"><span>├── ut_backend         <span style="color:#8f5902;font-style:italic"># 后端测试用例</span>
-</span></span><span style="display:flex;"><span>├── ut_frontend        <span style="color:#8f5902;font-style:italic"># 前端测试用例</span>
-</span></span><span style="display:flex;"><span>├── ut_mem_block       <span style="color:#8f5902;font-style:italic"># 访存测试用例</span>
-</span></span><span style="display:flex;"><span>└── ut_misc            <span style="color:#8f5902;font-style:italic"># 其他测试用例</span>
-</span></span></code></pre></div><h3 id="配置文件说明">配置文件说明</h3>
-<p>默认配置与说明如下：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 默认配置文件</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 配置加载顺序: _default.yaml -&gt; 用户指定的 *.yaml -&gt; 命令行参数 eg: log.term-level=&#39;debug&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># RTL 配置</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">rtl</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># RLT下载地址，从该地址获取所有*.gz.tar文件当成目标RTL</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">base-url</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">https://&lt;your_rtl_download_address&gt;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 需要下载的RTL版本 eg: openxiangshan-kmh-97e37a2237-24092701</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">latest</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 需要存储RTL的目录，相对于当前配置文件的路径</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">cache-dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;../rtl&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 测试用例配置（tag和case支持通配符）</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">test</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 跳过标签，所有带有该标签的测试用例都会被跳过</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">skip-tags</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;LONG_TIME_RUN&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 目标标签，只有带有该标签的测试用例才会被执行（skip-tags会覆盖run-tags）</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">run-tags</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 跳过的测试用例，所有带有该名字（或者模块名）的测试用例都会被跳过。</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">skip-cases</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 目标测试用例，只有带有该名字（或者模块名）的测试用例才会被执行（skip-cases会覆盖run-cases）。</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">run-cases</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 跳过异常，所有抛出该异常的测试用例都会被跳过</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">skip-exceptions</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 输出配置</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">output</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 输出目录，相对于当前配置文件的路径</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">out-dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;../out&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 测试报告配置</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">report</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 报告生成目录，相对于output.out-dir</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">report-dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;report&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 报告名称，支持变量替换：%{host} 主机名，%{pid} 进程ID，%{time} 当前时间</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">report-name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;%{host}-%{pid}-%{time}/index.html&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 报告内容</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">information</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># 报告标题</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">title</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;XiangShan KMH Test Report&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># 报告用户信息</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">user</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;User&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">email</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;User@example.email.com&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># 目标行覆盖率 eg: 90 表示 90%</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">line_grate</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">99</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># 其他需要展示的信息，key为标题，value为内容</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">meta</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">Version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.0&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 日志配置</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">log</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 根输出级别</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">root-level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;debug&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 终端输出级别</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">term-level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 文件日志输出级别</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file-dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;log&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 文件日志名称，支持变量替换：%{host} 主机名，%{pid} 进程ID，%{time} 当前时间</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file-name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;%{host}-%{pid}-%{time}.log&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 文件日志输出级别</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file-level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 测试结果配置（该数据用于填充documents中的统计图等，原始数据来源于toffee-test生成的report）</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic">#  运行完测试后，可通过 `make doc` 查看结果</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">doc-result</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 目标DUT的组织结构配置</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">dutree</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;dutree/xiangshan-kmh.yaml&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 结果写入路径</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">save-path</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;../documents/static/data/ut_data_progress.json&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span></code></pre></div><p>可在上述配置文件中添加自定义参数。</p>
+<p>在后续的文档中，我们以decode模块为例，详细说明上述过程。</p>
+<p>*注：目录或文件名称需要合理，能通过其命名知晓其具体含义。</p>
 
 </div>
 
@@ -1001,7 +921,84 @@ document.addEventListener('DOMContentLoaded', function() {
     
 	<h1 id="pg-dbf9b443ff7a2ae1b419d7f271fac95a">4.1 - 添加编译脚本</h1>
     
-	
+	<h2 id="脚本目标">脚本目标</h2>
+<p>该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。</p>
+<h2 id="创建过程">创建过程</h2>
+<h3 id="确定文件名称">确定文件名称</h3>
+<p>在<a href="/UnityChipForXiangShan/">香山昆明湖DUT验证进展</a>中选择需要验证的UT，如果没有或者进一步细化，可通过编辑<code>config/dutree/xiangshan=lmh.yaml</code>自行添加。</p>
+<p>脚本文件的命名格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>scripts/build_ut_&lt;顶层模块&gt;_&lt;下层模块名&gt;<span style="color:#ce5c00;font-weight:bold">[</span>...<span style="color:#ce5c00;font-weight:bold">]</span>.&lt;目标模块名&gt;.py
+</span></span></code></pre></div><p>目前本项目内置了4个顶层模块：</p>
+<ol>
+<li>ut_frontend 前端</li>
+<li>ut_backend 后端</li>
+<li>ut_mem_block 访存</li>
+<li>ut_misc 其他</li>
+</ol>
+<p>其中的子模块没有<code>ut_</code>前缀（顶层目录有该前缀是为了和其他目录区分开）。</p>
+<p>例如验证目标DUT为：<code>backend.ctrl_block.decode</code>，需要创建的脚本名称为 <code>build_ut_backend_ctrl_block_decode.py</code>。</p>
+<h3 id="编写-buildcfg---bool-函数">编写 build(cfg) -&gt; bool 函数</h3>
+<p>build函数定义如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">build</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#204a87">bool</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;&#34;&#34;编译DUT
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Args:
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Return:
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        返回 True 或者 False，表明该函数是否完成预期目标
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    &#34;&#34;&#34;</span>
+</span></span></code></pre></div><p>build在make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以<code>build_ut_backend_ctrl_block_decode.py</code>为例，主要完成了RTL检查、DUT检查、RTL编译、disasm依赖编译等工作：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">build</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#204a87">bool</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># import 相关依赖</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee_test.markers</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">match_version</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">comm</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">is_all_file_exist</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">get_rtl_dir</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">exe_cmd</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">get_root_dir</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 检查RTL版本（version参数为空，表示所有版本都支持）</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#204a87;font-weight:bold">not</span> <span style="color:#000">match_version</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">rtl</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">version</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000;font-weight:bold">[]):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">warning</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;backend_ctrlblock_decode: </span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#34;Unsupported RTL version </span><span style="color:#4e9a06">{</span><span style="color:#000">cfg</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">rtl</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">version</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">False</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 检查在当前RTL中，目标文件是否存在</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">f</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">is_all_file_exist</span><span style="color:#000;font-weight:bold">([</span><span style="color:#4e9a06">&#34;rtl/RVCExpander.sv&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;rtl/PreDecode.sv&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;rtl/DecodeStage.sv&#34;</span><span style="color:#000;font-weight:bold">],</span> <span style="color:#000">get_rtl_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">f</span> <span style="color:#204a87;font-weight:bold">is</span> <span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#34;File </span><span style="color:#4e9a06">{</span><span style="color:#000">f</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06"> not found&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 如果dut中不存在RVCExpander/PreDecode/DecodeStage，则调用picker进行Python打包</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#204a87;font-weight:bold">not</span> <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">path</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exists</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;dut/RVCExpander&#34;</span><span style="color:#000;font-weight:bold">)):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">info</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Exporting RVCExpander.sv&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">out</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">exe_cmd</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#39;picker export --cp_lib false </span><span style="color:#4e9a06">{</span><span style="color:#000">get_rtl_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;rtl/RVCExpander.sv&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cfg</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>                                                              <span style="color:#4e9a06">}</span><span style="color:#4e9a06"> --lang python --tdir </span><span style="color:#4e9a06">{</span><span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;dut&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">/ -w rvc.fst -c&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Failed to export RVCExpander.sv: </span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">out</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#204a87;font-weight:bold">not</span> <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">path</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exists</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;dut/PreDecode&#34;</span><span style="color:#000;font-weight:bold">)):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">info</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Exporting PreDecode.sv&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">exe_cmd</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#39;picker export --cp_lib false </span><span style="color:#4e9a06">{</span><span style="color:#000">get_rtl_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;rtl/PreDecode.sv&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cfg</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>                                                          <span style="color:#4e9a06">}</span><span style="color:#4e9a06"> --lang python --tdir </span><span style="color:#4e9a06">{</span><span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;dut&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">/ -w predecode.fst -c&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Failed to export PreDecode.sv&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#204a87;font-weight:bold">not</span> <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">path</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exists</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;dut/DecodeStage&#34;</span><span style="color:#000;font-weight:bold">)):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">info</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Exporting DecodeStage.sv&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">exe_cmd</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#39;picker export --cp_lib false </span><span style="color:#4e9a06">{</span><span style="color:#000">get_rtl_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;rtl/DecodeStage.sv&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cfg</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>                                                          <span style="color:#4e9a06">}</span><span style="color:#4e9a06"> --fs </span><span style="color:#4e9a06">{</span>
+</span></span><span style="display:flex;"><span>                                                            <span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;scripts/backend_ctrlblock_decode/rtl_files.f&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>                                                            <span style="color:#4e9a06">}</span><span style="color:#4e9a06"> --lang python --tdir </span><span style="color:#4e9a06">{</span><span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;dut&#34;</span><span style="color:#000;font-weight:bold">)</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">/ -w decode.fst -c&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Failed to export DecodeStage.sv&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 如果tools中不存在disasm/build，则需要编译disasm</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#204a87;font-weight:bold">not</span> <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">path</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exists</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;tools/disasm/build&#34;</span><span style="color:#000;font-weight:bold">)):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">info</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Building disasm&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">exe_cmd</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;make -C </span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;tools/disasm&#34;</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Failed to build disasm&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 编译成功</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">True</span>
+</span></span></code></pre></div><p>picker的使用方式请参考其<a href="/UnityChipForXiangShan/">使用文档</a></p>
+<p>在<code>scripts</code>目录中可以创建子目录保存UT验证需要的文件，例如decode模块创建了<code>scripts/backend_ctrlblock_decode</code>目录，其中的<code>rtl_file.f</code>用来指定输入的RTL文件，<code>line_coverage.ignore</code>用来保存需要忽略的代码行统计。自定义目录的命名需要合理，且能通过名字判断其所属模块和文件。</p>
+<h3 id="编写-line_coverage_filescfg---liststr-函数">编写 line_coverage_files(cfg) -&gt; list[str] 函数</h3>
+<p>line_coverage_files函数的定义如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">line_coverage_files</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#204a87">list</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">]:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;&#34;&#34;指定需要覆盖的文件
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Args:
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Return:
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        返回统计代码行覆盖率的目标RTL文件名
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    &#34;&#34;&#34;</span>
+</span></span></code></pre></div><p>在<code>build_ut_backend_ctrl_block_decode.py</code>文件中，<code>line_coverage_files</code>函数的定义如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">line_coverage_files</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;PreDecode.v&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;DecodeStage.v&#34;</span><span style="color:#000;font-weight:bold">]</span>
+</span></span></code></pre></div><p>标识该模块关注的是对<code>PreDecode.v</code>, <code>DecodeStage.v</code>文件的覆盖。如果不开启测试结果后处理(<code>cfg.doc_result.disable = False</code>)，上述函数则不会被调用。</p>
+
 </div>
 
 
@@ -1016,9 +1013,101 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-53f38485d7ee0ef1d06f36fbe61bda5b">4.2 - 构建环境</h1>
+	<h1 id="pg-53f38485d7ee0ef1d06f36fbe61bda5b">4.2 - 构建测试环境</h1>
     
-	
+	<h2 id="确定目录结构">确定目录结构</h2>
+<p>单元测试所在的目录位置的层级结构应该与名称一致，例如<code>backend.ctrl_block.decode</code>应当位于<code>ut_backend/ctrl_block/decode</code>目录，且每层目录都需要有<code>__init__.py</code>，便于通过Python进行import。模块（例如<code>decode</code>）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。</p>
+<h2 id="编写测试环境">编写测试环境</h2>
+<p>在UT验证模块的测试环境中，目标是完成以下工作：</p>
+<ol>
+<li>对DUT进行功能封装，提供稳定测试API</li>
+<li>定义功能覆盖率</li>
+<li>定义必要fixture提供给测试用例</li>
+<li>在合理时刻统计覆盖率</li>
+</ol>
+<p>以decode环境中的RVCExpander为例（<code>ut_backend/ctrl_block/decode/env/decode_wrapper.py</code>）：</p>
+<h4 id="1-dut封装">1. DUT封装</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">RVCExpander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cover_group</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#000">kwargs</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cover_group</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">cover_group</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTRVCExpander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#000">kwargs</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 创建DUT</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io_in</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">AsImmWrite</span><span style="color:#000;font-weight:bold">()</span>         <span style="color:#8f5902;font-style:italic"># DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_prefix</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;io_&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 通过 Bundle 关联引脚</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bind</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>                 <span style="color:#8f5902;font-style:italic"># 把 Bunldle 与 DUT 进行绑定</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">expand</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">instr</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;in&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">instr</span>         <span style="color:#8f5902;font-style:italic"># 给DUT引脚赋值</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">RefreshComb</span><span style="color:#000;font-weight:bold">()</span>              <span style="color:#8f5902;font-style:italic"># 推动组合电路</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cover_group</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sample</span><span style="color:#000;font-weight:bold">()</span>           <span style="color:#8f5902;font-style:italic"># 调用sample对功能覆盖率进行统计</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;out_bits&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;ill&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span>  <span style="color:#8f5902;font-style:italic"># 返回结果 和 是否是非法指令</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">stat</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>                         <span style="color:#8f5902;font-style:italic"># 获取当前状态</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#4e9a06">&#34;instr&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;in&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span>         <span style="color:#8f5902;font-style:italic"># 输入指令</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#4e9a06">&#34;decode&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;out_bits&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span>  <span style="color:#8f5902;font-style:italic"># 返回展开结果</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#4e9a06">&#34;ilegal&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;ill&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>  <span style="color:#8f5902;font-style:italic"># 输入是否非法</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>在上述例子中，<code>class RVCExpander</code>对<code>DUTRVCExpander</code>进行了封装，对外提供了两个API：</p>
+<ul>
+<li>expand(instr: int) -&gt; (int, int) ：该函数用于接受输入指令 instr 进行解码，返回（结果，非法指令标记）。如果非法指令标记不为0，者说明输入指令非法。</li>
+<li>stat() -&gt; dict(instr, decode, ilegal)：该函数用于返回当前的状态，其中包含当前的输入指令，解码结果以及非法指令标记。</li>
+</ul>
+<p>上述API屏蔽了DUT的引脚，对外程序通用功能。</p>
+<h4 id="2-定义功能覆盖率">2. 定义功能覆盖率</h4>
+<p>尽可能的在Env中定义好功能覆盖率，如果有必要也可以在测试用例中定义覆盖率。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee.funcov</span> <span style="color:#204a87;font-weight:bold">as</span> <span style="color:#000">fc</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">init_rvc_expander_funcov</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">g</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">fc</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">CovGroup</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;&#34;&#34;Add watch points to the RVCExpander module to collect function coverage information&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 1. Add point RVC_EXPAND_RET to check expander return value:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">#    - bin ERROR. The instruction is not illegal</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">#    - bin SUCCE. The instruction is not expanded</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">g</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_watch_point</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;ERROR&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">stat</span><span style="color:#000;font-weight:bold">()[</span><span style="color:#4e9a06">&#34;ilegal&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;SUCCE&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">stat</span><span style="color:#000;font-weight:bold">()[</span><span style="color:#4e9a06">&#34;ilegal&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>                          <span style="color:#000;font-weight:bold">},</span> <span style="color:#000">name</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;RVC_EXPAND_RET&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
+</span></span></code></pre></div><p>在上述代码中添加了名为<code>RVC_EXPAND_RET</code>的功能检查点来检查<code>RVCExpander</code>模块是否具有返回非法指令的能力。需要满足<code>ERROR</code>和<code>SUCCE</code>两个条件，即<code>stat()</code>中的<code>ileage</code>需要有<code>True</code>也需要有<code>False</code>值。toffee中覆盖率的使用方法请参考其<a href="/UnityChipForXiangShan/">使用文档</a>。</p>
+<h4 id="3-定义必要fixture">3. 定义必要fixture</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">version_check</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_version_checker</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;openxiangshan-kmh-*&#34;</span><span style="color:#000;font-weight:bold">)</span>     <span style="color:#8f5902;font-style:italic"># 指定满足要的RTL版本</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.fixture</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">rvc_expander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">version_check</span><span style="color:#000;font-weight:bold">()</span>                                            <span style="color:#8f5902;font-style:italic"># 进行版本检查</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">fname</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">request</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">node</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">name</span>                                  <span style="color:#8f5902;font-style:italic"># 获取调用该fixture的测试用例</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">wave_file</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_out_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;decoder/rvc_expander_</span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">.fst&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#000">fname</span><span style="color:#000;font-weight:bold">)</span>     <span style="color:#8f5902;font-style:italic"># 设置波形文件路径</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">coverage_file</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_out_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;decoder/rvc_expander_</span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">.dat&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#000">fname</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 设置代码覆盖率文件路径</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">coverage_dir</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">path</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dirname</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">makedirs</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">coverage_dir</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">exist_ok</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>                           <span style="color:#8f5902;font-style:italic"># 目标目录不正在则创建目录</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">expander</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">RVCExpander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">g</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">coverage_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">waveform_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">wave_file</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 创建RVCExpander</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">init_rvc_expander_funcov</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">g</span><span style="color:#000;font-weight:bold">)</span>                              <span style="color:#8f5902;font-style:italic"># 初始化功能检查点</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">yield</span> <span style="color:#000">expander</span>                                                     <span style="color:#8f5902;font-style:italic"># 返回创建好的 RVCExpander 给 Test Case</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">expander</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span>                                              <span style="color:#8f5902;font-style:italic"># Tests Case运行完成后，结束DUT</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">set_line_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">)</span>                          <span style="color:#8f5902;font-style:italic"># 把生成的代码覆盖率文件告诉 toffee-report</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">set_func_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">g</span><span style="color:#000;font-weight:bold">)</span>                                      <span style="color:#8f5902;font-style:italic"># 把生成的功能覆盖率数据告诉 toffee-report</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">g</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">clear</span><span style="color:#000;font-weight:bold">()</span>                                                          <span style="color:#8f5902;font-style:italic"># 清空功能覆盖统计</span>
+</span></span></code></pre></div><p>上述fixture完成了以下功能：</p>
+<ol>
+<li>进行RTL版本检查，如果不满足<code>&quot;openxiangshan-kmh-*&quot;</code>要求，则跳过调用改fixture的测试用例</li>
+<li>创建DUT，并指定了波形，代码行覆盖率文件路径（路径中含有调用该fixure的用例名称：fname）</li>
+<li>调用<code>init_rvc_expander_funcov</code>添加功能覆盖点</li>
+<li>结束DUT，处理代码行覆盖率和功能覆盖率（发往toffee-report进行处理）</li>
+<li>清空功能覆盖率</li>
+</ol>
+<p>*注：在PyTest中，执行测试用例<code>test_A(rvc_expander, ....)</code>前，会自动调用并执行<code>rvc_expander(request)</code>中<code>yield</code>关键字前的部分，然后通过<code>yield</code>返回<code>rvc_expander</code>调用<code>test_A</code>用例，用例执行完成后，再继续执行<code>fixture</code>中<code>yield</code>关键字之后的部分。</p>
+<h4 id="env编写要求">Env编写要求：</h4>
+<ul>
+<li>需要进行RTL版本检查</li>
+<li>Env提供的API需要和引脚、时序无关</li>
+<li>Env提供的API需要稳定，不能随意进行接口/返回值修改</li>
+<li>需要定义必要的fixture</li>
+<li>需要初始化功能检查点（功能检查点可以独立成一个模块）</li>
+<li>需要进行覆盖率统计</li>
+<li>需要有说明文档</li>
+</ul>
+
 </div>
 
 
@@ -1035,7 +1124,34 @@ document.addEventListener('DOMContentLoaded', function() {
     
 	<h1 id="pg-4cd74e2d3f7d9b1031b77dd328511afa">4.3 - 添加测试用例</h1>
     
-	
+	<h2 id="命名要求">命名要求</h2>
+<p>所有测试用例文件请以<code>test_*.py</code>的方式进行命名，<code>*</code>用测试目标替换。所有测试用例也需要以<code>test_</code>前缀开头。用例名称需要具有明确意义。</p>
+<p>命名举例如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_a</span><span style="color:#000;font-weight:bold">():</span> <span style="color:#8f5902;font-style:italic"># 不合理，无法通过a判断测试目标</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_rvc_expand_16bit_full</span><span style="color:#000;font-weight:bold">():</span> <span style="color:#8f5902;font-style:italic"># 合理，可以通过用例名称大体知道测试内容</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">pass</span>
+</span></span></code></pre></div><h2 id="使用assert">使用Assert</h2>
+<p>在每个测试用例中，都需要通过 assert 来判断本测试是否通过。</p>
+<h2 id="编写注释">编写注释</h2>
+<p>每个测试用例都需要添加必要的说明和注释，需要满足<a href="/UnityChipForXiangShan/">Python注释规范</a>。</p>
+<p>测试用例说明参考格式：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">&gt;</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">type_a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">type_b</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;&#34;&#34;Test abstract
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Args:
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        a (type_a): description of arg a.
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        b (type_b): description of arg b.
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Detailed test description here (if need).
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
+</span></span></code></pre></div><h2 id="用例管理">用例管理</h2>
+<p>为了方便测试用例管理，可通过toffee-test提供的<code>@pytest.mark.toffee_tags</code>标签功能，请参考<a href="/UnityChipForXiangShan/">此处</a>。</p>
+<h2 id="检查点反标">检查点反标</h2>
+<p>TBD</p>
+
 </div>
 
 
@@ -1052,7 +1168,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
 	<h1 id="pg-c6c51e44e9add2a2d66a22a310fc796b">4.4 - 代码覆盖率</h1>
     
-	
+	<h2 id="什么是代码覆盖率">什么是代码覆盖率</h2>
+<p>TBD</p>
+<h2 id="本项目中相关涉及位置">本项目中相关涉及位置</h2>
+<p>TBD</p>
+<h4 id="1-build-script">1. build script</h4>
+<p>TBD</p>
+<h4 id="1-env中的fixture">1. Env中的fixture</h4>
+<p>TBD</p>
+<h2 id="忽略统计指定代码">忽略统计指定代码</h2>
+<p>TBD</p>
+<h2 id="查看统计结果">查看统计结果</h2>
+<p>TBD</p>
+
 </div>
 
 
@@ -1069,7 +1197,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
 	<h1 id="pg-f2938880e10d36d978ade908698b9760">4.5 - 功能覆盖率</h1>
     
-	
+	<h2 id="什么是功能覆盖率">什么是功能覆盖率</h2>
+<p>TBD</p>
+<h2 id="本项目中相关涉及位置">本项目中相关涉及位置</h2>
+<p>TBD</p>
+<h2 id="指定group名称">指定Group名称</h2>
+<p>TBD</p>
+<h2 id="自定义检查点">自定义检查点</h2>
+<p>TBD</p>
+
 </div>
 
 
@@ -1090,21 +1226,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
 	<h1 id="pg-1bfc0fae4cdf7da8cab3c7d420e0fe5a">5 - 如何提交文档</h1>
     
-	<p>本项目的DUT文档Fork了香山官方文档：<a href="https://docs.xiangshan.cc">https://docs.xiangshan.cc</a> ，
-原始仓库地址为：<a href="https://github.com/OpenXiangShan/XiangShan-doc">https://github.com/OpenXiangShan/XiangShan-doc</a>。采用的文档格式为<a href="https://www.mkdocs.org/">makedocs</a>。</p>
-<p>万众一芯Fork后的仓库地址为：</p>
-<p><a href="https://github.com/XS-MLVP/XiangShan-doc">https://github.com/XS-MLVP/XiangShan-doc</a></p>
-<p>服务地址为：</p>
-<p><a href="https://open-verify.cc/xiangshan-docs/">https://open-verify.cc/xiangshan-docs/</a></p>
-<h4 id="文档贡献提交">文档贡献提交</h4>
-<ol>
-<li>首先For上述万众一芯对应的文档仓库。</li>
-<li>修改或者添加贡献内容，建议一次commit包含足量修改或者新内容。</li>
-<li>本地检查是否显示正常。</li>
-<li>提交PR。在PR中描述清楚主要贡献。</li>
-<li>PR审核通过后合并至仓库。</li>
-</ol>
-<p>本项目中的PR定期向香山官方仓库提交PR，您的贡献可在相关git中查看。</p>
+	<p>TBD</p>
 
 </div>
 
@@ -1122,7 +1244,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
 	<h1 id="pg-4df77c8c7ab580f535926b93bdc32a64">6 - 如何提交Bug</h1>
     
-	
+	<p>TBD</p>
+
 </div>
 
 
@@ -1264,7 +1387,8 @@ Please also list any relevant details for your test configuration</p>
     
 	<h1 id="pg-4efe7d3d46d7929f2a2b248110be165b">9 - 模板-ISSUE</h1>
     
-	
+	<p>TBD</p>
+
 </div>
 
 
@@ -1279,9 +1403,10 @@ Please also list any relevant details for your test configuration</p>
 
 <div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-68658f28e70d830f706f538c1d44b165">10 - 模板-UT-ReadMe</h1>
+	<h1 id="pg-68658f28e70d830f706f538c1d44b165">10 - 模板-UT-README</h1>
     
-	
+	<p>TBD</p>
+
 </div>
 
 
@@ -1296,7 +1421,188 @@ Please also list any relevant details for your test configuration</p>
 
 <div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-e36ed0a73555b7b11eed503ae9dda44b">11 - 基本规范</h1>
+	<h1 id="pg-ba1b1b28f133d5958626bcc45b07e6a8">11 - 常用API</h1>
+    
+	<p>TBD</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-61b9bbd017b1d8dc9c62b134fb89c39e">12 - 其他</h1>
+    
+	<h2 id="测试用例管理">测试用例管理</h2>
+<p>如果测试用例和目标RTL版本紧密相关，RTL发生变化，之前的测试用例不一定适用。此外，不同场景下有不同需求，例如验证测试环境时，不运行耗时太长的用例等。因此需要对用例进行管理，让用户能在在特定场景下跳过某些用例。为了实现该目标，我们需要通过<code>pytest.mark.toffee_tags</code>对于每个用例进行tag和version标记。然后在配置文件中设置需要跳过哪些tag或者只运行哪些tag的测试。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.mark.toffee_tags</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;my_tag&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;version1 &lt; version13&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_case_1</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
+</span></span></code></pre></div><p>例如上述<code>test_case_1</code>被标记上了标签<code>my_tag</code>，支持版本设置为<code>version1</code>到<code>version13</code>。因此可以在配置文件中指定<code>test.skip-tags=[&quot;my_tag&quot;]</code>，来表示运行过程中跳过该用例。</p>
+<p><code>pytest.mark.toffee_tags</code>的参数说明如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.mark.toffee_tags</span><span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">tag</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Optional</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87">list</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">]</span>     <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[]</span>    <span style="color:#8f5902;font-style:italic"># 用例标签</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">version</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Optional</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87">list</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[],</span>   <span style="color:#8f5902;font-style:italic"># 用例rtl版本需求</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">skip</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">callable</span>               <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">None</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#8f5902;font-style:italic"># 自定义是否调过该用例，skip(tag, version, item): (skip, reason)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p><code>toffee_tags</code>函数的参数<code>tag</code>支持<code>str</code>和<code>list[str]</code>类型。<code>version</code>参数也可以是<code>str</code>和<code>list[str]</code>类型，当为<code>list</code>类型时，进行精确匹配，如果为<code>str</code>则匹配规则如下：</p>
+<ol>
+<li><code>name-number1 &lt; namer-number2:</code> 表示版本需要在<code>number1</code>和<code>number2</code>之间（包含边界，<code>number</code>表示数字，也可以为小数，eg <code>1.11</code>）</li>
+<li><code>name-number1+</code>：表示<code>number1</code>版本以及以后的版本</li>
+<li><code>name-number1-</code>：表示<code>number1</code>版本以及以前的版本</li>
+</ol>
+<p>如果不存在上述情况，且有<code>*</code>或者<code>?</code>表示通配符类型。其他情况为精确匹配。</p>
+<p>预定义标签，可以在comm/constants.py中查看，例如：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Predefined tags for test cases</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_LONG_TIME_RUN</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;LONG_TIME_RUN&#34;</span>  <span style="color:#8f5902;font-style:italic"># 运行时间长</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_SMOKE</span>         <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;SMOKE&#34;</span>          <span style="color:#8f5902;font-style:italic"># 冒烟测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_RARELY_USED</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;RARELY_USED&#34;</span>    <span style="color:#8f5902;font-style:italic"># 非常少用</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_REGRESSION</span>    <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;REGRESSION&#34;</span>     <span style="color:#8f5902;font-style:italic"># 回归测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_PERFORMANCE</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;PERFORMANCE&#34;</span>    <span style="color:#8f5902;font-style:italic"># 性能测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_STABILITY</span>     <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;STABILITY&#34;</span>      <span style="color:#8f5902;font-style:italic"># 稳定测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_SECURITY</span>      <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;SECURITY&#34;</span>       <span style="color:#8f5902;font-style:italic"># 安全测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_COMPATIBILITY</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;COMPATIBILITY&#34;</span>  <span style="color:#8f5902;font-style:italic"># 兼容测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_OTHER</span>         <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;OTHER&#34;</span>          <span style="color:#8f5902;font-style:italic"># 其他</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_CI</span>            <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;CI&#34;</span>             <span style="color:#8f5902;font-style:italic"># 集成测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_DEBUG</span>         <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;DEBUG&#34;</span>          <span style="color:#8f5902;font-style:italic"># 测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">TAG_DEMO</span>          <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;DEMO&#34;</span>           <span style="color:#8f5902;font-style:italic"># demo</span>
+</span></span></code></pre></div><p>在默认配置中(<code>config/_default.yaml</code>)，会过滤掉：<code>LONG_TIME_RUN</code>、<code>REGRESSION</code>、<code>RARELY_USED</code>、<code>CI</code> 标记的测试。</p>
+<p>可以通过<code>@pytest.mark.toffee_tags</code>可以为每个用例添加标签，也可以在模块中定义如下变量，实现对整个模块的所有测试用例添加标签。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">toffee_tags_default_tag</span>     <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[]</span>   <span style="color:#8f5902;font-style:italic"># 对应 tag 参数</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee_tags_default_version</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[]</span>   <span style="color:#8f5902;font-style:italic"># 对应 version 参数</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee_tags_default_skip</span>    <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">None</span> <span style="color:#8f5902;font-style:italic"># 对应 skip 参数</span>
+</span></span></code></pre></div><p>*注：本环境中的版本号会自动过滤掉git标记，例如下载的RTL名称为<code>openxiangshan-kmh-97e37a2237-24092701.tar.gz</code>，则其版本号在本项目中为：<code>openxiangshan-kmh-24092701</code>, 可通过<code>cfg.rtl.version</code>或者<code>comm.get_config().rtl.version</code>获得。</p>
+<h2 id="版本检查">版本检查</h2>
+<p>除了可以用标签<code>toffee_tags</code>自动检查版本外，还可以通过<code>get_version_checker</code>主动进行检查。一个单元测试通常由测试环境（Test Env）和测试用例组成（Test Case），Env对RTL引脚和功能进行封装，然后向Case提供稳定API，因此在Env中需要进行RTL版本判断，判断是否需要跳过使用本环境的所有测试用例。例如在Env中：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">...</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">comm</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">get_version_checker</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">version_check</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_version_checker</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;openxiangshan-kmh-*&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 获取RTL版本检查器，同toffee_tags中的veriosn参数</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.fixture</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_fixture</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">version_check</span><span style="color:#000;font-weight:bold">()</span>                                        <span style="color:#8f5902;font-style:italic"># 在 fixture 中主动检查</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">....</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">yield</span> <span style="color:#000">dut</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
+</span></span></code></pre></div><p>在上述例子中，Env在名称为<code>my_fixture</code>的<a href="https://docs.pytest.org/en/stable/explanation/fixtures.html">fixture</a>中主动进行了版本检查。因此，在测试用例每次调用它时都会进行版本检查，如果检查不满足要求，则会跳过该用例的执行。</p>
+<h2 id="仓库目录说明">仓库目录说明</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UnityChipForXiangShan
+</span></span><span style="display:flex;"><span>├── LICENSE            <span style="color:#8f5902;font-style:italic"># 开源协议</span>
+</span></span><span style="display:flex;"><span>├── Makefile           <span style="color:#8f5902;font-style:italic"># Makefile主文件</span>
+</span></span><span style="display:flex;"><span>├── README.en.md       <span style="color:#8f5902;font-style:italic"># 英文readme</span>
+</span></span><span style="display:flex;"><span>├── README.zh.md       <span style="color:#8f5902;font-style:italic"># 中文readme</span>
+</span></span><span style="display:flex;"><span>├── __init__.py        <span style="color:#8f5902;font-style:italic"># Python模块文件，可以把整个UnityChipForXiangShan当成一个模块进行import</span>
+</span></span><span style="display:flex;"><span>├── pytest.ini         <span style="color:#8f5902;font-style:italic"># PyTest 配置文件</span>
+</span></span><span style="display:flex;"><span>├── comm               <span style="color:#8f5902;font-style:italic"># 公用组件：日志，函数，配置等</span>
+</span></span><span style="display:flex;"><span>├── configs            <span style="color:#8f5902;font-style:italic"># 配置文件目录</span>
+</span></span><span style="display:flex;"><span>├── documents          <span style="color:#8f5902;font-style:italic"># 文档</span>
+</span></span><span style="display:flex;"><span>├── dut                <span style="color:#8f5902;font-style:italic"># dut生成目录</span>
+</span></span><span style="display:flex;"><span>├── out                <span style="color:#8f5902;font-style:italic"># log，report等生成目录</span>
+</span></span><span style="display:flex;"><span>├── requirements.txt   <span style="color:#8f5902;font-style:italic"># python依赖</span>
+</span></span><span style="display:flex;"><span>├── rtl                <span style="color:#8f5902;font-style:italic"># rtl缓存</span>
+</span></span><span style="display:flex;"><span>├── run.py             <span style="color:#8f5902;font-style:italic"># 主python入口文件</span>
+</span></span><span style="display:flex;"><span>├── scripts            <span style="color:#8f5902;font-style:italic"># dut编译脚本</span>
+</span></span><span style="display:flex;"><span>├── tools              <span style="color:#8f5902;font-style:italic"># 公共工具模块</span>
+</span></span><span style="display:flex;"><span>├── ut_backend         <span style="color:#8f5902;font-style:italic"># 后端测试用例</span>
+</span></span><span style="display:flex;"><span>├── ut_frontend        <span style="color:#8f5902;font-style:italic"># 前端测试用例</span>
+</span></span><span style="display:flex;"><span>├── ut_mem_block       <span style="color:#8f5902;font-style:italic"># 访存测试用例</span>
+</span></span><span style="display:flex;"><span>└── ut_misc            <span style="color:#8f5902;font-style:italic"># 其他测试用例</span>
+</span></span></code></pre></div><h2 id="配置文件说明">配置文件说明</h2>
+<p>默认配置与说明如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 默认配置文件</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 配置加载顺序: _default.yaml -&gt; 用户指定的 *.yaml -&gt; 命令行参数 eg: log.term-level=&#39;debug&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># RTL 配置</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">rtl</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># RLT下载地址，从该地址获取所有*.gz.tar文件当成目标RTL</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">base-url</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">https://&lt;your_rtl_download_address&gt;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 需要下载的RTL版本 eg: openxiangshan-kmh-97e37a2237-24092701</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">latest</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 需要存储RTL的目录，相对于当前配置文件的路径</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">cache-dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;../rtl&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 测试用例配置（tag和case支持通配符）</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">test</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 跳过标签，所有带有该标签的测试用例都会被跳过</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">skip-tags</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;LONG_TIME_RUN&#34;</span><span style="color:#000;font-weight:bold">,</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;RARELY_USED&#34;</span><span style="color:#000;font-weight:bold">,</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;REGRESSION&#34;</span><span style="color:#000;font-weight:bold">,</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;CI&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 目标标签，只有带有该标签的测试用例才会被执行（skip-tags会覆盖run-tags）</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">run-tags</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 跳过的测试用例，所有带有该名字（或者模块名）的测试用例都会被跳过。</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">skip-cases</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 目标测试用例，只有带有该名字（或者模块名）的测试用例才会被执行（skip-cases会覆盖run-cases）。</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">run-cases</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 跳过异常，所有抛出该异常的测试用例都会被跳过</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">skip-exceptions</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 输出配置</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">output</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 输出目录，相对于当前配置文件的路径</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">out-dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;../out&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 测试报告配置</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">report</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 报告生成目录，相对于output.out-dir</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">report-dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;report&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 报告名称，支持变量替换：%{host} 主机名，%{pid} 进程ID，%{time} 当前时间</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">report-name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;%{host}-%{pid}-%{time}/index.html&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 报告内容</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">information</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># 报告标题</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">title</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;XiangShan KMH Test Report&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># 报告用户信息</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">user</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;User&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">email</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;User@example.email.com&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># 目标行覆盖率 eg: 90 表示 90%</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">line_grate</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">99</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># 其他需要展示的信息，key为标题，value为内容</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">meta</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">Version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.0&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 日志配置</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">log</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 根输出级别</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">root-level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;debug&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 终端输出级别</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">term-level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 文件日志输出级别</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file-dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;log&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 文件日志名称，支持变量替换：%{host} 主机名，%{pid} 进程ID，%{time} 当前时间</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file-name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;%{host}-%{pid}-%{time}.log&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 文件日志输出级别</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file-level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># 测试结果配置（该数据用于填充documents中的统计图等，原始数据来源于toffee-test生成的report）</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic">#  运行完测试后，可通过 `make doc` 查看结果</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">doc-result</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 是否开测试结果后处理</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">disable</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">False</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 目标DUT的组织结构配置</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">dutree</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;%{root}/configs/dutree/xiangshan-kmh.yaml&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 结果名称，将会保存到输出的report目录</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">result-name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;ut_data_progress.json&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 创建的测试报告的软连接到 hugo</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">report-link</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;%{root}/documents/static/data/reports&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><p>可在上述配置文件中添加自定义参数，通过<code>cfg = comm.get_config()</code>获取全局配置信息，然后通过<code>cfg.your_key</code>进行访问。<code>cfg</code>信息为只读信息，默认情况下不能进行修改。</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-e36ed0a73555b7b11eed503ae9dda44b">13 - 必要规范</h1>
     
 	<p>为了方便将所有人的贡献集合在一起，需要在编码、环境、文档编写等方面采用相同的“规范”。</p>
 <h3 id="环境要求">环境要求</h3>

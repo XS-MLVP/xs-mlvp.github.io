@@ -18,27 +18,39 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>运行测试 | 万众一芯之香山处理器</title>
-<meta name="description" content="本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有以test_*.py文件，并自动执行其中所有以test_开头的测试用例（Test Case）。
+<meta name="description" content="本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有test_*.py文件，并自动执行其中所有以test_开头的测试用例（Test Case）。
 # 执行所有ut_*目录中的test case make test_all # 执行指定目录下的test case make test target=&amp;lt;dir&amp;gt; # 例如执行ut_backend/ctrl_block/decode目录中所有的test case make test target=ut_backend/ctrl_block/decode 可通过args参数传递Pytest的运行参数，例如启动x-dist插件的多核功能：
-make test args=&amp;#34;-n 4&amp;#34; # 启用 4 个进程 make test args=&amp;#34;-n auto&amp;#34; # 让框架自动选择启用多少个进程 运行完成后，在out目录会生成html版本的测试报告，可通过浏览器直接打开查看（VS Code IDE建议安装Open In Default Browser插件）。">
+make test args=&amp;#34;-n 4&amp;#34; # 启用 4 个进程 make test args=&amp;#34;-n auto&amp;#34; # 让框架自动选择启用多少个进程 *注：x-dist可以在多节点上并发运行测试，可参考其文档
+运行完成后，默认在out/report目录会生成html版本的测试报告，其 html 文件可通过浏览器直接打开查看（VS Code IDE建议安装Open In Default Browser插件）。
+运行测试主要完成以下三部分内容：
+按要求运行Test Case，可通过cfg.tests中的选项进行配置 统计测试结果，输出测试报告。有toffee-report自动生成 (总测试报告，所有Test的结果合并在一起) 根据需要（cfg.doc_result.disable = True）在测试报告上进行进一步数据统计 ">
 <meta property="og:title" content="运行测试" />
-<meta property="og:description" content="本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有以test_*.py文件，并自动执行其中所有以test_开头的测试用例（Test Case）。
+<meta property="og:description" content="本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有test_*.py文件，并自动执行其中所有以test_开头的测试用例（Test Case）。
 # 执行所有ut_*目录中的test case make test_all # 执行指定目录下的test case make test target=&lt;dir&gt; # 例如执行ut_backend/ctrl_block/decode目录中所有的test case make test target=ut_backend/ctrl_block/decode 可通过args参数传递Pytest的运行参数，例如启动x-dist插件的多核功能：
-make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#34; # 让框架自动选择启用多少个进程 运行完成后，在out目录会生成html版本的测试报告，可通过浏览器直接打开查看（VS Code IDE建议安装Open In Default Browser插件）。" />
+make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#34; # 让框架自动选择启用多少个进程 *注：x-dist可以在多节点上并发运行测试，可参考其文档
+运行完成后，默认在out/report目录会生成html版本的测试报告，其 html 文件可通过浏览器直接打开查看（VS Code IDE建议安装Open In Default Browser插件）。
+运行测试主要完成以下三部分内容：
+按要求运行Test Case，可通过cfg.tests中的选项进行配置 统计测试结果，输出测试报告。有toffee-report自动生成 (总测试报告，所有Test的结果合并在一起) 根据需要（cfg.doc_result.disable = True）在测试报告上进行进一步数据统计 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/02_run_test/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-11-20T17:48:45+08:00" />
+<meta property="article:modified_time" content="2024-11-21T18:25:05+08:00" />
 <meta itemprop="name" content="运行测试">
-<meta itemprop="description" content="本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有以test_*.py文件，并自动执行其中所有以test_开头的测试用例（Test Case）。
+<meta itemprop="description" content="本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有test_*.py文件，并自动执行其中所有以test_开头的测试用例（Test Case）。
 # 执行所有ut_*目录中的test case make test_all # 执行指定目录下的test case make test target=&lt;dir&gt; # 例如执行ut_backend/ctrl_block/decode目录中所有的test case make test target=ut_backend/ctrl_block/decode 可通过args参数传递Pytest的运行参数，例如启动x-dist插件的多核功能：
-make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#34; # 让框架自动选择启用多少个进程 运行完成后，在out目录会生成html版本的测试报告，可通过浏览器直接打开查看（VS Code IDE建议安装Open In Default Browser插件）。">
-<meta itemprop="dateModified" content="2024-11-20T17:48:45+08:00" />
-<meta itemprop="wordCount" content="40">
+make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#34; # 让框架自动选择启用多少个进程 *注：x-dist可以在多节点上并发运行测试，可参考其文档
+运行完成后，默认在out/report目录会生成html版本的测试报告，其 html 文件可通过浏览器直接打开查看（VS Code IDE建议安装Open In Default Browser插件）。
+运行测试主要完成以下三部分内容：
+按要求运行Test Case，可通过cfg.tests中的选项进行配置 统计测试结果，输出测试报告。有toffee-report自动生成 (总测试报告，所有Test的结果合并在一起) 根据需要（cfg.doc_result.disable = True）在测试报告上进行进一步数据统计 ">
+<meta itemprop="dateModified" content="2024-11-21T18:25:05+08:00" />
+<meta itemprop="wordCount" content="51">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="运行测试"/>
-<meta name="twitter:description" content="本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有以test_*.py文件，并自动执行其中所有以test_开头的测试用例（Test Case）。
+<meta name="twitter:description" content="本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有test_*.py文件，并自动执行其中所有以test_开头的测试用例（Test Case）。
 # 执行所有ut_*目录中的test case make test_all # 执行指定目录下的test case make test target=&lt;dir&gt; # 例如执行ut_backend/ctrl_block/decode目录中所有的test case make test target=ut_backend/ctrl_block/decode 可通过args参数传递Pytest的运行参数，例如启动x-dist插件的多核功能：
-make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#34; # 让框架自动选择启用多少个进程 运行完成后，在out目录会生成html版本的测试报告，可通过浏览器直接打开查看（VS Code IDE建议安装Open In Default Browser插件）。"/>
+make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#34; # 让框架自动选择启用多少个进程 *注：x-dist可以在多节点上并发运行测试，可参考其文档
+运行完成后，默认在out/report目录会生成html版本的测试报告，其 html 文件可通过浏览器直接打开查看（VS Code IDE建议安装Open In Default Browser插件）。
+运行测试主要完成以下三部分内容：
+按要求运行Test Case，可通过cfg.tests中的选项进行配置 统计测试结果，输出测试报告。有toffee-report自动生成 (总测试报告，所有Test的结果合并在一起) 根据需要（cfg.doc_result.disable = True）在测试报告上进行进一步数据统计 "/>
 
 
 
@@ -143,7 +155,7 @@ make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d6c992714c6a8a729fc162be2f33baa9.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1255159a098caedb05b8a785799ba410.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -167,7 +179,7 @@ make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d6c992714c6a8a729fc162be2f33baa9.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1255159a098caedb05b8a785799ba410.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -200,7 +212,7 @@ make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test01_build_script-li">
   <a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test01_build_script"><span class="">添加编译脚本</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test02_build_env-li">
-  <a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test02_build_env"><span class="">构建环境</span></a>
+  <a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test02_build_env"><span class="">构建测试环境</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test03_add_test-li">
   <a href="/UnityChipForXiangShan/docs/03_add_test/03_add_test/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test03_add_test"><span class="">添加测试用例</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test04_cover_line-li">
@@ -220,9 +232,13 @@ make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs09_template_issue-li">
   <a href="/UnityChipForXiangShan/docs/09_template_issue/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs09_template_issue"><span class="">模板-ISSUE</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs10_template_ut_readme-li">
-  <a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-ReadMe</span></a>
+  <a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-README</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs97_api-li">
+  <a href="/UnityChipForXiangShan/docs/97_api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs97_api"><span class="">常用API</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_others-li">
+  <a href="/UnityChipForXiangShan/docs/98_others/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_others"><span class="">其他</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs99_constraint-li">
-  <a href="/UnityChipForXiangShan/docs/99_constraint/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_constraint"><span class="">基本规范</span></a>
+  <a href="/UnityChipForXiangShan/docs/99_constraint/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_constraint"><span class="">必要规范</span></a>
 </li>
   </ul>
 </li>
@@ -266,7 +282,7 @@ make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#
 	<header class="article-meta">
 		
   </header>
-	<p>本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有以<code>test_*.py</code>文件，并自动执行其中所有以<code>test_</code>开头的测试用例（Test Case）。</p>
+	<p>本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有<code>test_*.py</code>文件，并自动执行其中所有以<code>test_</code>开头的测试用例（Test Case）。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 执行所有ut_*目录中的test case</span>
 </span></span><span style="display:flex;"><span>make test_all
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 执行指定目录下的test case</span>
@@ -276,10 +292,17 @@ make test args=&#34;-n 4&#34; # 启用 4 个进程 make test args=&#34;-n auto&#
 </span></span></code></pre></div><p>可通过<code>args</code>参数传递Pytest的运行参数，例如启动x-dist插件的多核功能：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">args</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;-n 4&#34;</span>     <span style="color:#8f5902;font-style:italic"># 启用 4 个进程</span>
 </span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">args</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;-n auto&#34;</span>  <span style="color:#8f5902;font-style:italic"># 让框架自动选择启用多少个进程</span>
-</span></span></code></pre></div><p>运行完成后，在out目录会生成html版本的测试报告，可通过浏览器直接打开查看（VS Code IDE建议安装<code>Open In Default Browser</code>插件）。</p>
+</span></span></code></pre></div><p>*注：x-dist可以在多节点上并发运行测试，可参考其<a href="https://pytest-xdist.readthedocs.io/en/stable/remote.html">文档</a></p>
+<p>运行完成后，默认在<code>out/report</code>目录会生成html版本的测试报告，其 html 文件可通过浏览器直接打开查看（VS Code IDE建议安装<code>Open In Default Browser</code>插件）。</p>
+<p>运行测试主要完成以下三部分内容：</p>
+<ol>
+<li>按要求运行Test Case，可通过<code>cfg.tests</code>中的选项进行配置</li>
+<li>统计测试结果，输出测试报告。有toffee-report自动生成 (总测试报告，所有Test的结果合并在一起)</li>
+<li>根据需要（<code>cfg.doc_result.disable = True</code>）在测试报告上进行进一步数据统计</li>
+</ol>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 November 20, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/532a16f9cd9b504b93d8e88c2ad9e25daa9da99b">doc: update (532a16f)</a>
+  最后修改 November 21, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/cb7f1f70983a49645e3b27c8a429ab3adf2068ad">decode: mark fcov in env (cb7f1f7)</a>
 </div>
 
 </div>

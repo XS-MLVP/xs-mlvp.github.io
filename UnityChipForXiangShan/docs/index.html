@@ -132,7 +132,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d6c992714c6a8a729fc162be2f33baa9.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1255159a098caedb05b8a785799ba410.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -156,7 +156,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d6c992714c6a8a729fc162be2f33baa9.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1255159a098caedb05b8a785799ba410.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -189,7 +189,7 @@
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test01_build_script-li">
   <a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test01_build_script"><span class="">添加编译脚本</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test02_build_env-li">
-  <a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test02_build_env"><span class="">构建环境</span></a>
+  <a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test02_build_env"><span class="">构建测试环境</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test03_add_test-li">
   <a href="/UnityChipForXiangShan/docs/03_add_test/03_add_test/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test03_add_test"><span class="">添加测试用例</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test04_cover_line-li">
@@ -209,9 +209,13 @@
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs09_template_issue-li">
   <a href="/UnityChipForXiangShan/docs/09_template_issue/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs09_template_issue"><span class="">模板-ISSUE</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs10_template_ut_readme-li">
-  <a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-ReadMe</span></a>
+  <a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-README</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs97_api-li">
+  <a href="/UnityChipForXiangShan/docs/97_api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs97_api"><span class="">常用API</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_others-li">
+  <a href="/UnityChipForXiangShan/docs/98_others/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_others"><span class="">其他</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs99_constraint-li">
-  <a href="/UnityChipForXiangShan/docs/99_constraint/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_constraint"><span class="">基本规范</span></a>
+  <a href="/UnityChipForXiangShan/docs/99_constraint/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_constraint"><span class="">必要规范</span></a>
 </li>
   </ul>
 </li>
@@ -278,7 +282,11 @@ function update_charts(data_url){
 function updateLink() {
     var select = document.getElementById("indexurlSelect");
     var goLink = document.getElementById("indexgoLink");
-    var url = select.options[select.selectedIndex].getAttribute("data-url");
+    var opt = select.options[select.selectedIndex];
+    if(!opt){
+        return
+    }
+    var url = opt.getAttribute("data-url");
     goLink.href = url;
     
     window["update_charts"](url + "/ut_data_progress.json");
@@ -696,7 +704,7 @@ function updateDUTestStatus(data_url){
             
             <div class="entry">
                 <h5>
-                    <a href="/UnityChipForXiangShan/docs/10_template_ut_readme/">模板-UT-ReadMe</a>
+                    <a href="/UnityChipForXiangShan/docs/10_template_ut_readme/">模板-UT-README</a>
                 </h5>
                 <p></p>
             </div>
@@ -704,7 +712,23 @@ function updateDUTestStatus(data_url){
             
             <div class="entry">
                 <h5>
-                    <a href="/UnityChipForXiangShan/docs/99_constraint/">基本规范</a>
+                    <a href="/UnityChipForXiangShan/docs/97_api/">常用API</a>
+                </h5>
+                <p></p>
+            </div>
+        
+            
+            <div class="entry">
+                <h5>
+                    <a href="/UnityChipForXiangShan/docs/98_others/">其他</a>
+                </h5>
+                <p></p>
+            </div>
+        
+            
+            <div class="entry">
+                <h5>
+                    <a href="/UnityChipForXiangShan/docs/99_constraint/">必要规范</a>
                 </h5>
                 <p></p>
             </div>
@@ -712,7 +736,7 @@ function updateDUTestStatus(data_url){
     
 </div>
 <div class="text-muted mt-5 pt-3 border-top">
-  最后修改 November 20, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/532a16f9cd9b504b93d8e88c2ad9e25daa9da99b">doc: update (532a16f)</a>
+  最后修改 November 21, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/cb7f1f70983a49645e3b27c8a429ab3adf2068ad">decode: mark fcov in env (cb7f1f7)</a>
 </div>
 </div>
 
