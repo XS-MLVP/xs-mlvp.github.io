@@ -30,14 +30,14 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/02_build_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-11-21T18:25:05+08:00" />
+<meta property="article:modified_time" content="2024-11-22T18:51:25+08:00" />
 <meta itemprop="name" content="构建测试环境">
 <meta itemprop="description" content="确定目录结构 单元测试所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过Python进行import。模块（例如decode）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。
 编写测试环境 在UT验证模块的测试环境中，目标是完成以下工作：
 对DUT进行功能封装，提供稳定测试API 定义功能覆盖率 定义必要fixture提供给测试用例 在合理时刻统计覆盖率 以decode环境中的RVCExpander为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
 1. DUT封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 关联引脚 self.bind(self.dut) # 把 Bunldle 与 DUT 进行绑定 def expand(self, instr): self.io[&#34;in&#34;].value = instr # 给DUT引脚赋值 self.dut.RefreshComb() # 推动组合电路 self.cover_group.sample() # 调用sample对功能覆盖率进行统计 return self.io[&#34;out_bits&#34;].value, self.io[&#34;ill&#34;].value # 返回结果 和 是否是非法指令 def stat(self): # 获取当前状态 return { &#34;instr&#34;: self.">
-<meta itemprop="dateModified" content="2024-11-21T18:25:05+08:00" />
-<meta itemprop="wordCount" content="264">
+<meta itemprop="dateModified" content="2024-11-22T18:51:25+08:00" />
+<meta itemprop="wordCount" content="295">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="构建测试环境"/>
 <meta name="twitter:description" content="确定目录结构 单元测试所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过Python进行import。模块（例如decode）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。
 编写测试环境 在UT验证模块的测试环境中，目标是完成以下工作：
@@ -147,7 +147,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1255159a098caedb05b8a785799ba410.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cb244d3e2a003a4465de3dedd2a8dfeb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -171,7 +171,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1255159a098caedb05b8a785799ba410.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cb244d3e2a003a4465de3dedd2a8dfeb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -213,10 +213,6 @@
   <a href="/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test05_cover_func"><span class="">功能覆盖率</span></a>
 </li>
   </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs04_add_doc-li">
-  <a href="/UnityChipForXiangShan/docs/04_add_doc/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs04_add_doc"><span class="">如何提交文档</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs05_report_bug-li">
-  <a href="/UnityChipForXiangShan/docs/05_report_bug/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs05_report_bug"><span class="">如何提交Bug</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs06_join_us-li">
   <a href="/UnityChipForXiangShan/docs/06_join_us/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs06_join_us"><span class="">如何参与本项目</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs08_template_pr-li">
@@ -328,7 +324,7 @@
 </ul>
 <p>上述API屏蔽了DUT的引脚，对外程序通用功能。</p>
 <h4 id="2-定义功能覆盖率">2. 定义功能覆盖率</h4>
-<p>尽可能的在Env中定义好功能覆盖率，如果有必要也可以在测试用例中定义覆盖率。</p>
+<p>尽可能的在Env中定义好功能覆盖率，如果有必要也可以在测试用例中定义覆盖率。toffee功能覆盖率的定义请参考<a href="/UnityChipForXiangShan/">此处的文档</a>。为了完善功能检查点和测试用例之间的对应关系，功能覆盖率定义完成后，需要在适合的位置进行检查点和测试用例的对应关系（测试点反标）。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee.funcov</span> <span style="color:#204a87;font-weight:bold">as</span> <span style="color:#000">fc</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">init_rvc_expander_funcov</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">g</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">fc</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">CovGroup</span><span style="color:#000;font-weight:bold">):</span>
@@ -342,7 +338,17 @@
 </span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;SUCCE&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">stat</span><span style="color:#000;font-weight:bold">()[</span><span style="color:#4e9a06">&#34;ilegal&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">,</span>
 </span></span><span style="display:flex;"><span>                          <span style="color:#000;font-weight:bold">},</span> <span style="color:#000">name</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;RVC_EXPAND_RET&#34;</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
-</span></span></code></pre></div><p>在上述代码中添加了名为<code>RVC_EXPAND_RET</code>的功能检查点来检查<code>RVCExpander</code>模块是否具有返回非法指令的能力。需要满足<code>ERROR</code>和<code>SUCCE</code>两个条件，即<code>stat()</code>中的<code>ileage</code>需要有<code>True</code>也需要有<code>False</code>值。toffee中覆盖率的使用方法请参考其<a href="/UnityChipForXiangShan/">使用文档</a>。</p>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 5. Reverse mark function coverage to the check point</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">_M</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># get the module name</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">module_name_with</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;../../test_rv_decode&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">#  - mark RVC_EXPAND_RET</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">g</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">mark_function</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;RVC_EXPAND_RET&#34;</span><span style="color:#000;font-weight:bold">,</span>     <span style="color:#000">_M</span><span style="color:#000;font-weight:bold">([</span><span style="color:#4e9a06">&#34;test_rvc_expand_16bit_full&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>                                              <span style="color:#4e9a06">&#34;test_rvc_expand_32bit_full&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>                                              <span style="color:#4e9a06">&#34;test_rvc_expand_32bit_randomN&#34;</span><span style="color:#000;font-weight:bold">]),</span> <span style="color:#000">bin_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;ERROR&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;SUCCE&#34;</span><span style="color:#000;font-weight:bold">])</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
+</span></span></code></pre></div><p>在上述代码中添加了名为<code>RVC_EXPAND_RET</code>的功能检查点来检查<code>RVCExpander</code>模块是否具有返回非法指令的能力。需要满足<code>ERROR</code>和<code>SUCCE</code>两个条件，即<code>stat()</code>中的<code>ileage</code>需要有<code>True</code>也需要有<code>False</code>值。在定义完检查点后，通过<code>mark_function</code>方法，对会覆盖到该检查的测试用例进行了标记。</p>
 <h4 id="3-定义必要fixture">3. 定义必要fixture</h4>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">version_check</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_version_checker</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;openxiangshan-kmh-*&#34;</span><span style="color:#000;font-weight:bold">)</span>     <span style="color:#8f5902;font-style:italic"># 指定满足要的RTL版本</span>
 </span></span><span style="display:flex;"><span>
@@ -382,7 +388,7 @@
 </ul>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 November 21, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/cb7f1f70983a49645e3b27c8a429ab3adf2068ad">decode: mark fcov in env (cb7f1f7)</a>
+  最后修改 November 22, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/337a6bcaca3a6c1661a604ad4bdb0049b0de6c1c">doc: merge doc &amp; bug &amp; pr (337a6bc)</a>
 </div>
 
 </div>

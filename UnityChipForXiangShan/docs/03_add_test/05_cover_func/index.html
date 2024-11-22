@@ -18,31 +18,31 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>功能覆盖率 | 万众一芯之香山处理器</title>
-<meta name="description" content="什么是功能覆盖率 TBD
-本项目中相关涉及位置 TBD
-指定Group名称 TBD
-自定义检查点 TBD">
+<meta name="description" content="什么是功能覆盖率 [TBD]、为什么需要反标
+本项目中相关涉及位置 1、Env 中创建 cover group 2、Env 或者 Test case中使用 3、fixture传递结果给toffee-report
+指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&amp;#34;../../INT&amp;#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）">
 <meta property="og:title" content="功能覆盖率" />
-<meta property="og:description" content="什么是功能覆盖率 TBD
-本项目中相关涉及位置 TBD
-指定Group名称 TBD
-自定义检查点 TBD" />
+<meta property="og:description" content="什么是功能覆盖率 [TBD]、为什么需要反标
+本项目中相关涉及位置 1、Env 中创建 cover group 2、Env 或者 Test case中使用 3、fixture传递结果给toffee-report
+指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-11-21T18:25:05+08:00" />
+<meta property="article:modified_time" content="2024-11-22T18:51:25+08:00" />
 <meta itemprop="name" content="功能覆盖率">
-<meta itemprop="description" content="什么是功能覆盖率 TBD
-本项目中相关涉及位置 TBD
-指定Group名称 TBD
-自定义检查点 TBD">
-<meta itemprop="dateModified" content="2024-11-21T18:25:05+08:00" />
-<meta itemprop="wordCount" content="8">
+<meta itemprop="description" content="什么是功能覆盖率 [TBD]、为什么需要反标
+本项目中相关涉及位置 1、Env 中创建 cover group 2、Env 或者 Test case中使用 3、fixture传递结果给toffee-report
+指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）">
+<meta itemprop="dateModified" content="2024-11-22T18:51:25+08:00" />
+<meta itemprop="wordCount" content="33">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="功能覆盖率"/>
-<meta name="twitter:description" content="什么是功能覆盖率 TBD
-本项目中相关涉及位置 TBD
-指定Group名称 TBD
-自定义检查点 TBD"/>
+<meta name="twitter:description" content="什么是功能覆盖率 [TBD]、为什么需要反标
+本项目中相关涉及位置 1、Env 中创建 cover group 2、Env 或者 Test case中使用 3、fixture传递结果给toffee-report
+指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）"/>
 
 
 
@@ -147,7 +147,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1255159a098caedb05b8a785799ba410.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cb244d3e2a003a4465de3dedd2a8dfeb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -171,7 +171,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1255159a098caedb05b8a785799ba410.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cb244d3e2a003a4465de3dedd2a8dfeb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -213,10 +213,6 @@
   <a href="/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test05_cover_func"><span class="td-sidebar-nav-active-item">功能覆盖率</span></a>
 </li>
   </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs04_add_doc-li">
-  <a href="/UnityChipForXiangShan/docs/04_add_doc/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs04_add_doc"><span class="">如何提交文档</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs05_report_bug-li">
-  <a href="/UnityChipForXiangShan/docs/05_report_bug/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs05_report_bug"><span class="">如何提交Bug</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs06_join_us-li">
   <a href="/UnityChipForXiangShan/docs/06_join_us/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs06_join_us"><span class="">如何参与本项目</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs08_template_pr-li">
@@ -254,10 +250,8 @@
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#什么是功能覆盖率">什么是功能覆盖率</a></li>
     <li><a href="#本项目中相关涉及位置">本项目中相关涉及位置</a></li>
     <li><a href="#指定group名称">指定Group名称</a></li>
-    <li><a href="#自定义检查点">自定义检查点</a></li>
   </ul>
 </nav>
       </div>
@@ -286,17 +280,22 @@
 	<header class="article-meta">
 		
   </header>
-	<h2 id="什么是功能覆盖率">什么是功能覆盖率</h2>
-<p>TBD</p>
+	<p>什么是功能覆盖率 [TBD]、为什么需要反标</p>
 <h2 id="本项目中相关涉及位置">本项目中相关涉及位置</h2>
-<p>TBD</p>
+<p>1、Env 中创建 cover group
+2、Env 或者 Test case中使用
+3、fixture传递结果给toffee-report</p>
 <h2 id="指定group名称">指定Group名称</h2>
-<p>TBD</p>
-<h2 id="自定义检查点">自定义检查点</h2>
-<p>TBD</p>
+<p>测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块<code>ut_backend/ctrl_block/decode/env/decode_wrapper.py</code>中进行如下调用：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">comm</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">UT_FCOV</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 通过../../去掉了上级模块env和decode_wrapper</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># UT_FCOV会默认去掉前缀 ut_</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">name</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">UT_FCOV</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;../../INT&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>name的值为<code>backend.ctrl_block.decode.INT</code>，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 November 21, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/cb7f1f70983a49645e3b27c8a429ab3adf2068ad">decode: mark fcov in env (cb7f1f7)</a>
+  最后修改 November 22, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/337a6bcaca3a6c1661a604ad4bdb0049b0de6c1c">doc: merge doc &amp; bug &amp; pr (337a6bc)</a>
 </div>
 
 </div>
