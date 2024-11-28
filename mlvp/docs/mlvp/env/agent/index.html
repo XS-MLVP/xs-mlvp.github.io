@@ -32,14 +32,14 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/agent/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-11-26T19:34:10+08:00" />
+<meta property="article:modified_time" content="2024-11-28T17:19:59+08:00" />
 <meta itemprop="name" content="如何编写 Agent">
 <meta itemprop="description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
 一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
 初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
 from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
 创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。">
-<meta itemprop="dateModified" content="2024-11-26T19:34:10+08:00" />
+<meta itemprop="dateModified" content="2024-11-28T17:19:59+08:00" />
 <meta itemprop="wordCount" content="242">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何编写 Agent"/>
 <meta name="twitter:description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
@@ -151,7 +151,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.325d5f4e362d13d50a1af43106b07853.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.867e0647fcf72642fba13cb21e522f0b.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -175,7 +175,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.325d5f4e362d13d50a1af43106b07853.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.867e0647fcf72642fba13cb21e522f0b.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -458,7 +458,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
 <p>通过在 Agent 中编写多个驱动方法和监测方法，便完成了整个 <code>Agent</code> 的编写。</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  最后修改 November 26, 2024: <a href="https://github.com/XS-MLVP/course/commit/3682c375d9d23228e72acba6a5a3a76017d468eb">Tidy up example code of cpp. (3682c37)</a>
+  最后修改 November 28, 2024: <a href="https://github.com/XS-MLVP/course/commit/bff37d0fbbad653f7f218b6256decab9a5cf970b">rename mlvp to toffee (bff37d0)</a>
 </div>
 
 </div>

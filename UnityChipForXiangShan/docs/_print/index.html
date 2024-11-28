@@ -133,7 +133,7 @@ DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.4b317cd443cf0479d3f17e9e27fbfa61.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f4316018adbdd674ea7f1ca7e0e85769.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -813,6 +813,14 @@ document.addEventListener('DOMContentLoaded', function() {
 </code></pre><p>完成转换后，在测试用例代码中可以import对应的DUT，例如：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dut.PreDecode</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">DUTPreDecode</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTPreDecode</span><span style="color:#000;font-weight:bold">()</span>
+</span></span></code></pre></div><h4 id="编译配置">编译配置</h4>
+<p>编译时，默认使用configs/_default.yaml中的配置项。</p>
+<p>当然，也可以使用自定义配置，方法如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 指定自定义CFG文件</span>
+</span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">CFG</span><span style="color:#ce5c00;font-weight:bold">=</span>path/to/your_cfg.yaml
+</span></span></code></pre></div><p>类似地，可以在命令行直接指定键值对传入。目前仅有test相关阶段支持命令行配置键值对：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 指定KV，传递命令行参数，键值对之间用空格隔开</span>
+</span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">KV</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;log.term-level=\&#39;debug\&#39; test.skip-tags=[\&#39;RARELY_USED\&#39;]&#34;</span>
 </span></span></code></pre></div>
 </div>
 

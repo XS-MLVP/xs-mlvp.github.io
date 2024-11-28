@@ -30,13 +30,13 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/02_build_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-11-27T13:10:19+08:00" />
+<meta property="article:modified_time" content="2024-11-28T19:00:31+08:00" />
 <meta itemprop="name" content="构建测试环境">
 <meta itemprop="description" content="确定目录结构 单元测试所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过Python进行import。模块（例如decode）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。
 编写测试环境 在UT验证模块的测试环境中，目标是完成以下工作：
 对DUT进行功能封装，提供稳定测试API 定义功能覆盖率 定义必要fixture提供给测试用例 在合理时刻统计覆盖率 以decode环境中的RVCExpander为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
 1. DUT封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 关联引脚 self.bind(self.dut) # 把 Bunldle 与 DUT 进行绑定 def expand(self, instr): self.io[&#34;in&#34;].value = instr # 给DUT引脚赋值 self.dut.RefreshComb() # 推动组合电路 self.cover_group.sample() # 调用sample对功能覆盖率进行统计 return self.io[&#34;out_bits&#34;].value, self.io[&#34;ill&#34;].value # 返回结果 和 是否是非法指令 def stat(self): # 获取当前状态 return { &#34;instr&#34;: self.">
-<meta itemprop="dateModified" content="2024-11-27T13:10:19+08:00" />
+<meta itemprop="dateModified" content="2024-11-28T19:00:31+08:00" />
 <meta itemprop="wordCount" content="295">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="构建测试环境"/>
 <meta name="twitter:description" content="确定目录结构 单元测试所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过Python进行import。模块（例如decode）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。
@@ -144,7 +144,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.4b317cd443cf0479d3f17e9e27fbfa61.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f4316018adbdd674ea7f1ca7e0e85769.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -168,7 +168,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.4b317cd443cf0479d3f17e9e27fbfa61.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f4316018adbdd674ea7f1ca7e0e85769.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -384,7 +384,7 @@
 </ul>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 November 27, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/deb6fb2fa0d5c97315d0ccd5aaa623cf1756621a">doc: rm _gen/* (deb6fb2)</a>
+  最后修改 November 28, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/e347eaabb4cc7abfb04a4240d64a16088f9e1bd1">decode: use dynamic_bin=True in funcov (e347eaa)</a>
 </div>
 
 </div>
