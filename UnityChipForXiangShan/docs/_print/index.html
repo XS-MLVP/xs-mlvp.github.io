@@ -20,7 +20,7 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>进度概述 | 万众一芯之香山处理器</title>
-<meta name="description" content="当前版本： 查看测试报告 香山昆明湖架构各个模块验证情况如上图中所示。总统计数据如下：
+<meta name="description" content="当前版本： 20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6 20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42 查看测试报告 香山昆明湖架构各个模块验证情况如上图中所示。总统计数据如下：
 总测试用例数（Total Cases）： - 测试用例通过数（Passed Cases）： - 测试用例通过率（Passed Rate）： - 测试用例未过数（Failed Cases）： - 测试用例跳过数（Skipped Cases）： - 测试用例跳过率（Skip Rate）： - 总功能覆盖点数（Function Coverage）： - 覆盖点已覆盖数（Covered Functions）： - 覆盖点已覆盖率（Covered Rate）： - 总代码行覆盖率（Total Lines）： - 总代码行覆盖数（Covered Lines）： - 总代码行覆盖率（Covered Rate）： - *总代码行会随着DUT的增加而不断增加，因此：总代码行覆盖率不是最终覆盖率
 其他内容快捷连接：
 DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正在进行的任务列表 已完成的任务列表 香山昆明湖DUT验证进展 注：本文档中的统计信息根据测试结果自动生成
@@ -133,7 +133,7 @@ DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f4316018adbdd674ea7f1ca7e0e85769.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b8abc2ad87aadbf5473f4846b0cee2.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -339,6 +339,10 @@ function update_charts(data_url){
     
     
     
+    <option value="20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6" data-url="../data/reports//UnityChipForXiangShan/20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6"  selected>20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6</option>
+    
+    <option value="20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42" data-url="../data/reports//UnityChipForXiangShan/20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42"  >20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42</option>
+    
 </select>
 <a id="indexgoLink" href="#" target=“_blank“>查看测试报告</a>
 
@@ -442,6 +446,11 @@ document.addEventListener('DOMContentLoaded', function() {
 .div-dut-test-report td {
     text-align: right;
 }
+
+.div-dut-test-report .td-desc{
+    text-align: left;
+}
+
 .div-dut-test-report th {
     text-align: right;
 }
@@ -486,6 +495,26 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 28px;
     font-weight: bold;
 }
+
+
+table .td-desc .tooltiptext {
+  visibility: hidden;
+  width: 250px;
+  background-color: rgb(87, 87, 87);
+  color: #fff1f1;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+   
+  position: absolute;
+  z-index: 1;
+}
+
+.td-desc:hover .tooltiptext{
+    visibility: visible;
+}
+
 </style>
 
 <div id="line-file-modal" class="modal-linecov">
@@ -519,6 +548,7 @@ function updateDUTestStatus(data_url){
     <tr>\
         <th class=\"td-index\">Index</th>\
         <th class=\"td-name\">Name</th>\
+        <th class=\"td-desc\">Description </th> \
         <th>Document</th>\
         <th>&nbsp;&nbsp;Cases</th>\
         <th>&nbsp;&nbsp;&nbsp;Fail</th>\
@@ -645,13 +675,32 @@ function updateDUTestStatus(data_url){
             var K_fail = K_case + "&K=li,point_name,,,span,Failed&K=ul,grou_name,,,ul,failed";
             return "<a href=\""+ url + K_fail +"\" target=\"_blank\">" + redItem(total - cover) + "</a>";
         }
+
+        function getDescComp(desc) {
+            initial = "<td class=\"td-desc\">";
+            end = "</td>"
+            scale = 15
+            if (desc.length <= scale){
+                return initial + desc + end
+            }
+
+            emit_desc = desc.substr(0, scale) + "..."
+            tooltip_res = "<div class=\"tooltiptext\">" + desc + "</div>"
+            return initial + emit_desc + tooltip_res + end
+
+        }
+
         function traverse(node) {
             if (!node.children || node.children.length === 0) {
                 var meta = node.meta
+                var desc = node.desc
+                console.log("meta infos!")
+                console.log(node)
                 $("#dut-test-items").html($("#dut-test-items").html() + 
                     "<tr><td class=\"td-index\">" + index + "</td>" +
                     "<td class=\"td-name\">" + meta.paths.replace(prefix + "/",
                         "").replaceAll("/", ".") + "</td>" +
+                    getDescComp(desc) + 
                     "<td>" + getDocUrl(meta.doc_url) + "</td>" +
                     "<td>" + getCaseUrl(meta.paths, meta.cases.pass, meta.cases.total) + "</td>" +
                     "<td>" + getCaseFailSkipUrl(meta.paths, meta.cases.fail, false) + "</td>" +
@@ -722,6 +771,10 @@ function update_dut_charts(data_url){
     
     
     
+    <option value="20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6" data-url="../../data/reports//UnityChipForXiangShan/20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6"  selected>20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6</option>
+    
+    <option value="20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42" data-url="../../data/reports//UnityChipForXiangShan/20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42"  >20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42</option>
+    
 </select>
 <a id="dutgoLink" href="#" target=“_blank“>查看测试报告</a>
 
@@ -779,16 +832,17 @@ document.addEventListener('DOMContentLoaded', function() {
 	<h1 id="pg-e819c695f47dc3893fee99c05230ff78">2 - 准备验证环境</h1>
     
 	<h4 id="基础环境需求">基础环境需求</h4>
-<p>本项目基于<code>Python</code>编程语言进行UT验证，采用的工具和测试框架为<a href="https://github.com/XS-MLVP/picker">picker</a>和<a href="https://github.com/XS-MLVP/toffe">toffe</a>，环境需求如下：</p>
+<p>本项目基于<code>Python</code>编程语言进行UT验证，采用的工具和测试框架为<a href="https://github.com/XS-MLVP/picker">picker</a>和<a href="https://github.com/XS-MLVP/toffe">toffe</a>，<strong>环境需求</strong>如下：</p>
 <ol>
 <li>Linux操作系统。建议WSL2下安装Ubuntu22.04。</li>
 <li>Python。建议Python3.11。</li>
 <li>picker。按照<a href="https://open-verify.cc/mlvp/docs/quick-start/installer/">快速开始</a>中的提示安装最新版本。</li>
+<li>lcov 用于后续test阶段报告生成。使用包管理器即可下载：sudo apt install lcov</li>
 </ol>
-<p>环境配置完成后，clone仓库：</p>
+<p><strong>环境配置完成</strong>后，clone仓库：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git
 </span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> UnityChipForXiangShan
-</span></span><span style="display:flex;"><span>pip3 install -r requirements.txt <span style="color:#8f5902;font-style:italic"># 安装python依赖（例如 toffe）</span>
+</span></span><span style="display:flex;"><span>pip3 install -r requirements.txt <span style="color:#8f5902;font-style:italic"># 安装python依赖（例如 toffee）</span>
 </span></span></code></pre></div><h4 id="下载rtl代码">下载RTL代码：</h4>
 <p>默认从仓库<a href="https://github.com/XS-MLVP/UnityChipXiangShanRTLs">https://github.com/XS-MLVP/UnityChipXiangShanRTLs</a>中下载。用户也可以自行按照XiangShan文档编译生成RTL。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make rtl    <span style="color:#8f5902;font-style:italic"># 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接</span>
@@ -813,11 +867,11 @@ document.addEventListener('DOMContentLoaded', function() {
 </code></pre><p>完成转换后，在测试用例代码中可以import对应的DUT，例如：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dut.PreDecode</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">DUTPreDecode</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTPreDecode</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><h4 id="编译配置">编译配置</h4>
-<p>编译时，默认使用configs/_default.yaml中的配置项。</p>
+</span></span></code></pre></div><h4 id="编辑配置">编辑配置</h4>
+<p>运行rtl、dut、test等命令时，默认使用configs/_default.yaml中的配置项。</p>
 <p>当然，也可以使用自定义配置，方法如下：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 指定自定义CFG文件</span>
-</span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">CFG</span><span style="color:#ce5c00;font-weight:bold">=</span>path/to/your_cfg.yaml
+</span></span><span style="display:flex;"><span>make <span style="color:#000">CFG</span><span style="color:#ce5c00;font-weight:bold">=</span>path/to/your_cfg.yaml
 </span></span></code></pre></div><p>类似地，可以在命令行直接指定键值对传入。目前仅有test相关阶段支持命令行配置键值对：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 指定KV，传递命令行参数，键值对之间用空格隔开</span>
 </span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">KV</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;log.term-level=\&#39;debug\&#39; test.skip-tags=[\&#39;RARELY_USED\&#39;]&#34;</span>
@@ -838,7 +892,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
 	<h1 id="pg-a5fd55875e0540351befe9b3a6e05b98">3 - 运行测试</h1>
     
-	<p>本项目基于PyTest测试框架进行验证。运算测试时，PyTest框架自动搜索所有<code>test_*.py</code>文件，并自动执行其中所有以<code>test_</code>开头的测试用例（Test Case）。</p>
+	<p>本项目基于PyTest测试框架进行验证。运行测试时，PyTest框架自动搜索所有<code>test_*.py</code>文件，并自动执行其中所有以<code>test_</code>开头的测试用例（Test Case）。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 执行所有ut_*目录中的test case</span>
 </span></span><span style="display:flex;"><span>make test_all
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 执行指定目录下的test case</span>

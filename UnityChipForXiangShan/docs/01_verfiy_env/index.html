@@ -19,50 +19,46 @@
 
 <title>准备验证环境 | 万众一芯之香山处理器</title>
 <meta name="description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和toffe，环境需求如下：
-Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 环境配置完成后，clone仓库：
-git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖（例如 toffe） 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
+Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 lcov 用于后续test阶段报告生成。使用包管理器即可下载：sudo apt install lcov 环境配置完成后，clone仓库：
+git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖（例如 toffee） 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
 make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 RTL压缩包的命名规范为：名称-微架构-Git标记-日期编号.tar.gz，例如openxiangshan-kmh-97e37a2237-24092701.tar.gz。在使用时，仓库代码会过滤掉git标记和后缀，例如通过 cfg.rtl.version 访问到的版本号为：openxiangshan-kmh-24092701。压缩包内的目录结构为：
 openxiangshan-kmh-97e37a2237-24092701.tar.gz └── rtl # 目录 |-- *.sv # 所有sv文件 `-- *.v # 所有v文件 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
 # 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
-dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
-from dut.">
+dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：">
 <meta property="og:title" content="准备验证环境" />
 <meta property="og:description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和toffe，环境需求如下：
-Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 环境配置完成后，clone仓库：
-git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖（例如 toffe） 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
+Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 lcov 用于后续test阶段报告生成。使用包管理器即可下载：sudo apt install lcov 环境配置完成后，clone仓库：
+git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖（例如 toffee） 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
 make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 RTL压缩包的命名规范为：名称-微架构-Git标记-日期编号.tar.gz，例如openxiangshan-kmh-97e37a2237-24092701.tar.gz。在使用时，仓库代码会过滤掉git标记和后缀，例如通过 cfg.rtl.version 访问到的版本号为：openxiangshan-kmh-24092701。压缩包内的目录结构为：
 openxiangshan-kmh-97e37a2237-24092701.tar.gz └── rtl # 目录 |-- *.sv # 所有sv文件 `-- *.v # 所有v文件 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
 # 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
-dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
-from dut." />
+dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/01_verfiy_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-11-28T19:00:31+08:00" />
+<meta property="article:modified_time" content="2024-11-29T19:31:14+08:00" />
 <meta itemprop="name" content="准备验证环境">
 <meta itemprop="description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和toffe，环境需求如下：
-Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 环境配置完成后，clone仓库：
-git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖（例如 toffe） 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
+Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 lcov 用于后续test阶段报告生成。使用包管理器即可下载：sudo apt install lcov 环境配置完成后，clone仓库：
+git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖（例如 toffee） 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
 make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 RTL压缩包的命名规范为：名称-微架构-Git标记-日期编号.tar.gz，例如openxiangshan-kmh-97e37a2237-24092701.tar.gz。在使用时，仓库代码会过滤掉git标记和后缀，例如通过 cfg.rtl.version 访问到的版本号为：openxiangshan-kmh-24092701。压缩包内的目录结构为：
 openxiangshan-kmh-97e37a2237-24092701.tar.gz └── rtl # 目录 |-- *.sv # 所有sv文件 `-- *.v # 所有v文件 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
 # 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
-dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
-from dut.">
-<meta itemprop="dateModified" content="2024-11-28T19:00:31+08:00" />
-<meta itemprop="wordCount" content="91">
+dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：">
+<meta itemprop="dateModified" content="2024-11-29T19:31:14+08:00" />
+<meta itemprop="wordCount" content="95">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="准备验证环境"/>
 <meta name="twitter:description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和toffe，环境需求如下：
-Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 环境配置完成后，clone仓库：
-git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖（例如 toffe） 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
+Linux操作系统。建议WSL2下安装Ubuntu22.04。 Python。建议Python3.11。 picker。按照快速开始中的提示安装最新版本。 lcov 用于后续test阶段报告生成。使用包管理器即可下载：sudo apt install lcov 环境配置完成后，clone仓库：
+git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install -r requirements.txt # 安装python依赖（例如 toffee） 下载RTL代码： 默认从仓库https://github.com/XS-MLVP/UnityChipXiangShanRTLs中下载。用户也可以自行按照XiangShan文档编译生成RTL。
 make rtl # 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接 所有RTL下载包请在UnityChipXiangShanRTLs中查看。
 RTL压缩包的命名规范为：名称-微架构-Git标记-日期编号.tar.gz，例如openxiangshan-kmh-97e37a2237-24092701.tar.gz。在使用时，仓库代码会过滤掉git标记和后缀，例如通过 cfg.rtl.version 访问到的版本号为：openxiangshan-kmh-24092701。压缩包内的目录结构为：
 openxiangshan-kmh-97e37a2237-24092701.tar.gz └── rtl # 目录 |-- *.sv # 所有sv文件 `-- *.v # 所有v文件 编译DUT 该过程的目的是将RTL通过picker工具打包为Python模块。可以通过make命令指定被打包DUT，也可以一次性打包所有DUT。
 # 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
-dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
-from dut."/>
+dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如："/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <script
@@ -164,7 +160,7 @@ from dut."/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f4316018adbdd674ea7f1ca7e0e85769.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b8abc2ad87aadbf5473f4846b0cee2.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -188,7 +184,7 @@ from dut."/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f4316018adbdd674ea7f1ca7e0e85769.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b8abc2ad87aadbf5473f4846b0cee2.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -298,16 +294,17 @@ from dut."/>
 		
   </header>
 	<h4 id="基础环境需求">基础环境需求</h4>
-<p>本项目基于<code>Python</code>编程语言进行UT验证，采用的工具和测试框架为<a href="https://github.com/XS-MLVP/picker">picker</a>和<a href="https://github.com/XS-MLVP/toffe">toffe</a>，环境需求如下：</p>
+<p>本项目基于<code>Python</code>编程语言进行UT验证，采用的工具和测试框架为<a href="https://github.com/XS-MLVP/picker">picker</a>和<a href="https://github.com/XS-MLVP/toffe">toffe</a>，<strong>环境需求</strong>如下：</p>
 <ol>
 <li>Linux操作系统。建议WSL2下安装Ubuntu22.04。</li>
 <li>Python。建议Python3.11。</li>
 <li>picker。按照<a href="https://open-verify.cc/mlvp/docs/quick-start/installer/">快速开始</a>中的提示安装最新版本。</li>
+<li>lcov 用于后续test阶段报告生成。使用包管理器即可下载：sudo apt install lcov</li>
 </ol>
-<p>环境配置完成后，clone仓库：</p>
+<p><strong>环境配置完成</strong>后，clone仓库：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git
 </span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> UnityChipForXiangShan
-</span></span><span style="display:flex;"><span>pip3 install -r requirements.txt <span style="color:#8f5902;font-style:italic"># 安装python依赖（例如 toffe）</span>
+</span></span><span style="display:flex;"><span>pip3 install -r requirements.txt <span style="color:#8f5902;font-style:italic"># 安装python依赖（例如 toffee）</span>
 </span></span></code></pre></div><h4 id="下载rtl代码">下载RTL代码：</h4>
 <p>默认从仓库<a href="https://github.com/XS-MLVP/UnityChipXiangShanRTLs">https://github.com/XS-MLVP/UnityChipXiangShanRTLs</a>中下载。用户也可以自行按照XiangShan文档编译生成RTL。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make rtl    <span style="color:#8f5902;font-style:italic"># 该命下载最新的rtl代码，并解压至rtl目录，并创建软连接</span>
@@ -332,17 +329,17 @@ from dut."/>
 </code></pre><p>完成转换后，在测试用例代码中可以import对应的DUT，例如：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dut.PreDecode</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">DUTPreDecode</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTPreDecode</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><h4 id="编译配置">编译配置</h4>
-<p>编译时，默认使用configs/_default.yaml中的配置项。</p>
+</span></span></code></pre></div><h4 id="编辑配置">编辑配置</h4>
+<p>运行rtl、dut、test等命令时，默认使用configs/_default.yaml中的配置项。</p>
 <p>当然，也可以使用自定义配置，方法如下：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 指定自定义CFG文件</span>
-</span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">CFG</span><span style="color:#ce5c00;font-weight:bold">=</span>path/to/your_cfg.yaml
+</span></span><span style="display:flex;"><span>make <span style="color:#000">CFG</span><span style="color:#ce5c00;font-weight:bold">=</span>path/to/your_cfg.yaml
 </span></span></code></pre></div><p>类似地，可以在命令行直接指定键值对传入。目前仅有test相关阶段支持命令行配置键值对：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 指定KV，传递命令行参数，键值对之间用空格隔开</span>
 </span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">KV</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;log.term-level=\&#39;debug\&#39; test.skip-tags=[\&#39;RARELY_USED\&#39;]&#34;</span>
 </span></span></code></pre></div>
 	<div class="td-page-meta__lastmod">
-  最后修改 November 28, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/e347eaabb4cc7abfb04a4240d64a16088f9e1bd1">decode: use dynamic_bin=True in funcov (e347eaa)</a>
+  最后修改 November 29, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/86690f308c597b821faa4dacc65cd862be913a2a">github: add fetch-depth: 2 (86690f3)</a>
 </div>
 
 </div>

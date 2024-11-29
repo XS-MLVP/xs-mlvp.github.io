@@ -20,7 +20,7 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>进度概述 | 万众一芯之香山处理器</title>
-<meta name="description" content="当前版本： 查看测试报告 香山昆明湖架构各个模块验证情况如上图中所示。总统计数据如下：
+<meta name="description" content="当前版本： 20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6 20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42 查看测试报告 香山昆明湖架构各个模块验证情况如上图中所示。总统计数据如下：
 总测试用例数（Total Cases）： - 测试用例通过数（Passed Cases）： - 测试用例通过率（Passed Rate）： - 测试用例未过数（Failed Cases）： - 测试用例跳过数（Skipped Cases）： - 测试用例跳过率（Skip Rate）： - 总功能覆盖点数（Function Coverage）： - 覆盖点已覆盖数（Covered Functions）： - 覆盖点已覆盖率（Covered Rate）： - 总代码行覆盖率（Total Lines）： - 总代码行覆盖数（Covered Lines）： - 总代码行覆盖率（Covered Rate）： - *总代码行会随着DUT的增加而不断增加，因此：总代码行覆盖率不是最终覆盖率
 其他内容快捷连接：
 DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正在进行的任务列表 已完成的任务列表 香山昆明湖DUT验证进展 注：本文档中的统计信息根据测试结果自动生成
@@ -133,7 +133,7 @@ DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f4316018adbdd674ea7f1ca7e0e85769.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b8abc2ad87aadbf5473f4846b0cee2.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -157,7 +157,7 @@ DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f4316018adbdd674ea7f1ca7e0e85769.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b8abc2ad87aadbf5473f4846b0cee2.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -271,6 +271,10 @@ function update_charts(data_url){
     
     
     
+    <option value="20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6" data-url="../data/reports//UnityChipForXiangShan/20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6"  selected>20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6</option>
+    
+    <option value="20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42" data-url="../data/reports//UnityChipForXiangShan/20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42"  >20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42</option>
+    
 </select>
 <a id="indexgoLink" href="#" target=“_blank“>查看测试报告</a>
 
@@ -374,6 +378,11 @@ document.addEventListener('DOMContentLoaded', function() {
 .div-dut-test-report td {
     text-align: right;
 }
+
+.div-dut-test-report .td-desc{
+    text-align: left;
+}
+
 .div-dut-test-report th {
     text-align: right;
 }
@@ -418,6 +427,26 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 28px;
     font-weight: bold;
 }
+
+
+table .td-desc .tooltiptext {
+  visibility: hidden;
+  width: 250px;
+  background-color: rgb(87, 87, 87);
+  color: #fff1f1;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+   
+  position: absolute;
+  z-index: 1;
+}
+
+.td-desc:hover .tooltiptext{
+    visibility: visible;
+}
+
 </style>
 
 <div id="line-file-modal" class="modal-linecov">
@@ -451,6 +480,7 @@ function updateDUTestStatus(data_url){
     <tr>\
         <th class=\"td-index\">Index</th>\
         <th class=\"td-name\">Name</th>\
+        <th class=\"td-desc\">Description </th> \
         <th>Document</th>\
         <th>&nbsp;&nbsp;Cases</th>\
         <th>&nbsp;&nbsp;&nbsp;Fail</th>\
@@ -577,13 +607,32 @@ function updateDUTestStatus(data_url){
             var K_fail = K_case + "&K=li,point_name,,,span,Failed&K=ul,grou_name,,,ul,failed";
             return "<a href=\""+ url + K_fail +"\" target=\"_blank\">" + redItem(total - cover) + "</a>";
         }
+
+        function getDescComp(desc) {
+            initial = "<td class=\"td-desc\">";
+            end = "</td>"
+            scale = 15
+            if (desc.length <= scale){
+                return initial + desc + end
+            }
+
+            emit_desc = desc.substr(0, scale) + "..."
+            tooltip_res = "<div class=\"tooltiptext\">" + desc + "</div>"
+            return initial + emit_desc + tooltip_res + end
+
+        }
+
         function traverse(node) {
             if (!node.children || node.children.length === 0) {
                 var meta = node.meta
+                var desc = node.desc
+                console.log("meta infos!")
+                console.log(node)
                 $("#dut-test-items").html($("#dut-test-items").html() + 
                     "<tr><td class=\"td-index\">" + index + "</td>" +
                     "<td class=\"td-name\">" + meta.paths.replace(prefix + "/",
                         "").replaceAll("/", ".") + "</td>" +
+                    getDescComp(desc) + 
                     "<td>" + getDocUrl(meta.doc_url) + "</td>" +
                     "<td>" + getCaseUrl(meta.paths, meta.cases.pass, meta.cases.total) + "</td>" +
                     "<td>" + getCaseFailSkipUrl(meta.paths, meta.cases.fail, false) + "</td>" +
@@ -686,7 +735,7 @@ function updateDUTestStatus(data_url){
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 November 28, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/e347eaabb4cc7abfb04a4240d64a16088f9e1bd1">decode: use dynamic_bin=True in funcov (e347eaa)</a>
+  最后修改 November 29, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/86690f308c597b821faa4dacc65cd862be913a2a">github: add fetch-depth: 2 (86690f3)</a>
 </div>
 </div>
 
