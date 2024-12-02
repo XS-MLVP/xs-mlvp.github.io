@@ -40,7 +40,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/01_build_script/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-01T22:20:27+08:00" />
+<meta property="article:modified_time" content="2024-12-02T16:56:49+08:00" />
 <meta itemprop="name" content="添加编译脚本">
 <meta itemprop="description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
 创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑config/dutree/xiangshan=lmh.yaml自行添加。
@@ -51,7 +51,7 @@ ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中�
 编写 build(cfg) -&gt; bool 函数 build函数定义如下：
 def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build在make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了RTL检查、DUT检查、RTL编译、disasm依赖编译等工作：
 def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import match_version from comm import is_all_file_exist, get_rtl_dir, exe_cmd, get_root_dir # 检查RTL版本（version参数为空，表示所有版本都支持） if not match_version(cfg.">
-<meta itemprop="dateModified" content="2024-12-01T22:20:27+08:00" />
+<meta itemprop="dateModified" content="2024-12-02T16:56:49+08:00" />
 <meta itemprop="wordCount" content="249">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="添加编译脚本"/>
 <meta name="twitter:description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
@@ -164,7 +164,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.357c507ea9227fbd0dc4585e9d692027.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.e09c9c0df7fd7c9424ad4b4d296c7255.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -188,7 +188,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.357c507ea9227fbd0dc4585e9d692027.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.e09c9c0df7fd7c9424ad4b4d296c7255.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -381,7 +381,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 </span></span></code></pre></div><p>标识该模块关注的是对<code>PreDecode.v</code>, <code>DecodeStage.v</code>文件的覆盖。如果不开启测试结果后处理(<code>cfg.doc_result.disable = False</code>)，上述函数则不会被调用。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 1, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/365f53f574ba5c6875b3389824a3c898c642ed2b">Decoder: filter some RVC illegal instructions (365f53f)</a>
+  最后修改 December 2, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/f8903a8c4021ba3e310bf097b07147892729341c">config: ci update report info (f8903a8)</a>
 </div>
 
 </div>

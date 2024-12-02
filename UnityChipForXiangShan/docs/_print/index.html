@@ -133,7 +133,7 @@ DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.357c507ea9227fbd0dc4585e9d692027.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.e09c9c0df7fd7c9424ad4b4d296c7255.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -1732,19 +1732,26 @@ Please also list any relevant details for your test configuration</p>
 <li>输入：如果cfg不为空，则返回cfg。否则则自动通过toffee获取全局Config。</li>
 <li>返回：Config对象</li>
 </ul>
-<h4 id="cfg_as_strcfg-cfgobject">cfg_as_str(cfg: CfgObject):</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">cfg</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">get_config</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">rtl</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">version</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h4 id="cfg_as_strcfg-cfgobject">cfg_as_str(cfg: CfgObject):</h4>
 <p>把config对象转换为字符类型</p>
 <ul>
 <li>输入：Config对象</li>
 <li>返回：编码后的Config对象</li>
 </ul>
-<h4 id="cfg_from_strcfg_str">cfg_from_str(cfg_str)</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">cfg_str</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cfg_as_str</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">get_config</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><h4 id="cfg_from_strcfg_str">cfg_from_str(cfg_str)</h4>
 <p>把字符类型的Config对象还原</p>
 <ul>
 <li>输入：编码后的Config对象</li>
 <li>返回：Config对象</li>
 </ul>
-<h4 id="dump_cfgcfg-cfgobject--none-cfg_filenone">dump_cfg(cfg: CfgObject = None, cfg_file=None)</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">cfg</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cfg_from_str</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg_str</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h4 id="dump_cfgcfg-cfgobject--none-cfg_filenone">dump_cfg(cfg: CfgObject = None, cfg_file=None)</h4>
 <p>把config对象保持到文件</p>
 <ul>
 <li>输入：
@@ -1754,13 +1761,10 @@ Please also list any relevant details for your test configuration</p>
 </ul>
 </li>
 </ul>
-<h3 id="functions-子模块">functions 子模块</h3>
-<h4 id="merge_dictdict1-dict2">merge_dict(dict1, dict2)</h4>
-<p>将dict2中的内容，合并到dict1</p>
-<ul>
-<li>输入：2个dict类型的字典</li>
-<li>返回：合并之后的字典</li>
-</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">cfg</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">get_config</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dump_cfg</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;config.yaml&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h3 id="functions-子模块">functions 子模块</h3>
 <h4 id="get_log_dirsubdir-cfgnone">get_log_dir(subdir=&quot;&quot;, cfg=None)</h4>
 <p>获取日志目录</p>
 <ul>
@@ -1772,7 +1776,10 @@ Please also list any relevant details for your test configuration</p>
 </li>
 <li>输出：日志目录</li>
 </ul>
-<h4 id="get_out_dirsubdir-cfgnone">get_out_dir(subdir=&quot;&quot;, cfg=None)</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">my_log</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">get_log_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;my_log&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_log</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># /workspace/UnityChipForXiangShan/out/log/my_log</span>
+</span></span></code></pre></div><h4 id="get_out_dirsubdir-cfgnone">get_out_dir(subdir=&quot;&quot;, cfg=None)</h4>
 <p>获取输出目录</p>
 <ul>
 <li>输入：
@@ -1822,19 +1829,26 @@ Please also list any relevant details for your test configuration</p>
 </li>
 <li>返回：格式化之后的时间字符串</li>
 </ul>
-<h4 id="base64_encodeinput_str">base64_encode(input_str)</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">time</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">time_format</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">time</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">time</span><span style="color:#000;font-weight:bold">()))</span> <span style="color:#8f5902;font-style:italic"># 20241202-083726</span>
+</span></span></code></pre></div><h4 id="base64_encodeinput_str">base64_encode(input_str)</h4>
 <p>base64编码：</p>
 <ul>
 <li>输入：需要编码的字符串</li>
 <li>输出：编码之后的字符串</li>
 </ul>
-<h4 id="base64_decodebase64_str">base64_decode(base64_str)</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">base64_encode</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;test&#34;</span><span style="color:#000;font-weight:bold">))</span> <span style="color:#8f5902;font-style:italic"># dGVzdA==</span>
+</span></span></code></pre></div><h4 id="base64_decodebase64_str">base64_decode(base64_str)</h4>
 <p>base64解码：</p>
 <ul>
 <li>输入：bas64编码</li>
 <li>输出：解码之后的原始字符串</li>
 </ul>
-<h4 id="exe_cmdcmd-no_logfalse">exe_cmd(cmd, no_log=False)</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">base64_decode</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;dGVzdA==&#34;</span><span style="color:#000;font-weight:bold">))</span> <span style="color:#8f5902;font-style:italic"># test</span>
+</span></span></code></pre></div><h4 id="exe_cmdcmd-no_logfalse">exe_cmd(cmd, no_log=False)</h4>
 <p>执行操作系统命令：</p>
 <ul>
 <li>输入：
@@ -1851,7 +1865,10 @@ Please also list any relevant details for your test configuration</p>
 </ul>
 </li>
 </ul>
-<h4 id="get_git_commit">get_git_commit()</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">su</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">st</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">er</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">exe_cmd</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;pwd&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">st</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h4 id="get_git_commit">get_git_commit()</h4>
 <p>获取当前仓库git commit号</p>
 <h4 id="get_git_branch">get_git_branch()</h4>
 <p>获取当前仓库git 分支名称</p>
@@ -1877,7 +1894,16 @@ Please also list any relevant details for your test configuration</p>
 <li>输出：检测函数</li>
 </ul>
 <p>返回的检测函数，一般在fixture中进行版本判断。</p>
-<h4 id="module_name_withnames-prefixnone">module_name_with(names, prefix=None)</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">comm</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">pytest</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">checker</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">get_version_checker</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;openxiangshan-kmh-24092701+&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.fixture</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">fixture</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000">checker</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ce5c00;font-weight:bold">...</span>
+</span></span></code></pre></div><h4 id="module_name_withnames-prefixnone">module_name_with(names, prefix=None)</h4>
 <p>给names统一加上模块前缀</p>
 <ul>
 <li>输入：
