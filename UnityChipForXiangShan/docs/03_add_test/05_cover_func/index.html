@@ -18,31 +18,39 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>功能覆盖率 | 万众一芯之香山处理器</title>
-<meta name="description" content="什么是功能覆盖率 [TBD]、为什么需要反标
-本项目中相关涉及位置 1、Env 中创建 cover group 2、Env 或者 Test case中使用 3、fixture传递结果给toffee-report
-指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
-from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）">
+<meta name="description" content="什么是功能覆盖率 [TBD]、为什么需要反标 功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
+反标是指从功能测试回溯到代码覆盖率，通过将功能点与代码逻辑关联起来，反向追踪测试覆盖率。 例如：
+将功能点映射到相关代码模块或路径。 检查测试覆盖率工具报告，分析对应功能点的代码是否被执行。 确定测试用例对功能的覆盖程度，以及代码的遗漏部分。 本项目中相关涉及位置 在构建测试环境中：
+定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标 定义必要fixture： 把统计结果传递给toffee-report 统计覆盖率： 添加观察点和反标 其他：
+Test case中使用 指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会按照最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）">
 <meta property="og:title" content="功能覆盖率" />
-<meta property="og:description" content="什么是功能覆盖率 [TBD]、为什么需要反标
-本项目中相关涉及位置 1、Env 中创建 cover group 2、Env 或者 Test case中使用 3、fixture传递结果给toffee-report
-指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
-from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）" />
+<meta property="og:description" content="什么是功能覆盖率 [TBD]、为什么需要反标 功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
+反标是指从功能测试回溯到代码覆盖率，通过将功能点与代码逻辑关联起来，反向追踪测试覆盖率。 例如：
+将功能点映射到相关代码模块或路径。 检查测试覆盖率工具报告，分析对应功能点的代码是否被执行。 确定测试用例对功能的覆盖程度，以及代码的遗漏部分。 本项目中相关涉及位置 在构建测试环境中：
+定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标 定义必要fixture： 把统计结果传递给toffee-report 统计覆盖率： 添加观察点和反标 其他：
+Test case中使用 指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会按照最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-04T18:33:01+08:00" />
+<meta property="article:modified_time" content="2024-12-05T18:59:30+08:00" />
 <meta itemprop="name" content="功能覆盖率">
-<meta itemprop="description" content="什么是功能覆盖率 [TBD]、为什么需要反标
-本项目中相关涉及位置 1、Env 中创建 cover group 2、Env 或者 Test case中使用 3、fixture传递结果给toffee-report
-指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
-from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）">
-<meta itemprop="dateModified" content="2024-12-04T18:33:01+08:00" />
-<meta itemprop="wordCount" content="33">
+<meta itemprop="description" content="什么是功能覆盖率 [TBD]、为什么需要反标 功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
+反标是指从功能测试回溯到代码覆盖率，通过将功能点与代码逻辑关联起来，反向追踪测试覆盖率。 例如：
+将功能点映射到相关代码模块或路径。 检查测试覆盖率工具报告，分析对应功能点的代码是否被执行。 确定测试用例对功能的覆盖程度，以及代码的遗漏部分。 本项目中相关涉及位置 在构建测试环境中：
+定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标 定义必要fixture： 把统计结果传递给toffee-report 统计覆盖率： 添加观察点和反标 其他：
+Test case中使用 指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会按照最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）">
+<meta itemprop="dateModified" content="2024-12-05T18:59:30+08:00" />
+<meta itemprop="wordCount" content="41">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="功能覆盖率"/>
-<meta name="twitter:description" content="什么是功能覆盖率 [TBD]、为什么需要反标
-本项目中相关涉及位置 1、Env 中创建 cover group 2、Env 或者 Test case中使用 3、fixture传递结果给toffee-report
-指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
-from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）"/>
+<meta name="twitter:description" content="什么是功能覆盖率 [TBD]、为什么需要反标 功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
+反标是指从功能测试回溯到代码覆盖率，通过将功能点与代码逻辑关联起来，反向追踪测试覆盖率。 例如：
+将功能点映射到相关代码模块或路径。 检查测试覆盖率工具报告，分析对应功能点的代码是否被执行。 确定测试用例对功能的覆盖程度，以及代码的遗漏部分。 本项目中相关涉及位置 在构建测试环境中：
+定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标 定义必要fixture： 把统计结果传递给toffee-report 统计覆盖率： 添加观察点和反标 其他：
+Test case中使用 指定Group名称 测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name的值为backend.ctrl_block.decode.INT，在最后统计结果时，会按照最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）"/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <script
@@ -144,7 +152,7 @@ from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.de
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c58e41366748f8f062049848aae608db.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -168,7 +176,7 @@ from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.de
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c58e41366748f8f062049848aae608db.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -276,11 +284,38 @@ from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.de
 	<header class="article-meta">
 		
   </header>
-	<p>什么是功能覆盖率 [TBD]、为什么需要反标</p>
+	<p>什么是功能覆盖率 [TBD]、为什么需要反标
+功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。</p>
+<p>反标是指从功能测试回溯到代码覆盖率，通过将功能点与代码逻辑关联起来，反向追踪测试覆盖率。
+例如：</p>
+<ul>
+<li>将功能点映射到相关代码模块或路径。</li>
+<li>检查测试覆盖率工具报告，分析对应功能点的代码是否被执行。</li>
+<li>确定测试用例对功能的覆盖程度，以及代码的遗漏部分。</li>
+</ul>
 <h2 id="本项目中相关涉及位置">本项目中相关涉及位置</h2>
-<p>1、Env 中创建 cover group
-2、Env 或者 Test case中使用
-3、fixture传递结果给toffee-report</p>
+<p>在<a href="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/02_build_env/">构建测试环境</a>中：</p>
+<ul>
+<li>
+<ol start="2">
+<li>定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>定义必要fixture： 把统计结果传递给toffee-report</li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li>统计覆盖率： 添加观察点和反标</li>
+</ol>
+</li>
+</ul>
+<p>其他：</p>
+<ul>
+<li>Test case中使用</li>
+</ul>
 <h2 id="指定group名称">指定Group名称</h2>
 <p>测试报告通过Group名字和 DUT名字进行匹配，利用comm.UT_FCOV 获取 DUT前缀，例如在Python模块<code>ut_backend/ctrl_block/decode/env/decode_wrapper.py</code>中进行如下调用：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">comm</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">UT_FCOV</span>
@@ -288,10 +323,10 @@ from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.de
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 通过../../去掉了上级模块env和decode_wrapper</span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># UT_FCOV会默认去掉前缀 ut_</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">name</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">UT_FCOV</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;../../INT&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><p>name的值为<code>backend.ctrl_block.decode.INT</code>，在最后统计结果时，会安装最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）</p>
+</span></span></code></pre></div><p>name的值为<code>backend.ctrl_block.decode.INT</code>，在最后统计结果时，会按照最长前缀匹配到目标UT（即匹配到：backend.ctrl_block.decode 模块）</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 4, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/dbbb604cc0449d474bbfe398c279339d22be8a71">readme: update (dbbb604)</a>
+  最后修改 December 5, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/06fcda50d26afd75c8c9326e27259d0d88a810a1">docker: add more doc (06fcda5)</a>
 </div>
 
 </div>

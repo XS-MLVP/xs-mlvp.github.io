@@ -18,47 +18,43 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>代码覆盖率 | 万众一芯之香山处理器</title>
-<meta name="description" content="TBD [简单描述 &#43; 参考]
-本项目中相关涉及位置 1. build script picker命令行开启代码覆盖率(picker -c参数)、设置目标覆盖文件(line_coverage_files函数)
-1. Env中的fixture 通过函数toffee-test.set_line_coverage把覆盖率文件传递给toffe-test。
+<meta name="description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
+代码覆盖率包括：
+行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if … else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 本项目中相关涉及位置 添加编译脚本 picker 命令行开启代码覆盖率(&#34;-c&#34;参数)、设置目标覆盖文件(line_coverage_files 函数)
+构建测试环境-3.定义必要 fixture 通过函数toffee-test.set_line_coverage把覆盖率文件传递给 toffe-test。
 忽略指定统计 1、通过 verilator 指定忽略统计的内容
-2、提过toffee指定需要过滤掉的内存
-def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: request (pytest.Request): Pytest的默认fixture， datfile (string): DUT生成的 ignore (list[str]): 覆盖率过滤文件/或者文件夹 &#34;&#34;&#34; ignore参数可以指定在覆盖率文件中需要过滤掉的内容，例如：
-... set_line_coverage(request, coverage_file, get_root_dir(&#34;scripts/backend_ctrlblock_decode&#34;)) 在统计覆盖率时，会在&#34;scripts/backend_ctrlblock_decode&#34;目录中搜索到line_coverage.ignore文件，然后按其中没行的通配符进行过滤。
-查看统计结果 在 测试报告 和 进度章节 有展示">
+2、提过 toffee 指定需要过滤掉的内存
+def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: request (pytest.Request): Pytest的默认fixture， datfile (string): DUT生成的 ignore (list[str]): 覆盖率过滤文件/或者文件夹 &#34;&#34;&#34; ignore 参数可以指定在覆盖率文件中需要过滤掉的内容，例如：">
 <meta property="og:title" content="代码覆盖率" />
-<meta property="og:description" content="TBD [简单描述 &#43; 参考]
-本项目中相关涉及位置 1. build script picker命令行开启代码覆盖率(picker -c参数)、设置目标覆盖文件(line_coverage_files函数)
-1. Env中的fixture 通过函数toffee-test.set_line_coverage把覆盖率文件传递给toffe-test。
+<meta property="og:description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
+代码覆盖率包括：
+行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if &hellip; else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 本项目中相关涉及位置 添加编译脚本 picker 命令行开启代码覆盖率(&quot;-c&quot;参数)、设置目标覆盖文件(line_coverage_files 函数)
+构建测试环境-3.定义必要 fixture 通过函数toffee-test.set_line_coverage把覆盖率文件传递给 toffe-test。
 忽略指定统计 1、通过 verilator 指定忽略统计的内容
-2、提过toffee指定需要过滤掉的内存
-def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: request (pytest.Request): Pytest的默认fixture， datfile (string): DUT生成的 ignore (list[str]): 覆盖率过滤文件/或者文件夹 &#34;&#34;&#34; ignore参数可以指定在覆盖率文件中需要过滤掉的内容，例如：
-... set_line_coverage(request, coverage_file, get_root_dir(&#34;scripts/backend_ctrlblock_decode&#34;)) 在统计覆盖率时，会在&quot;scripts/backend_ctrlblock_decode&quot;目录中搜索到line_coverage.ignore文件，然后按其中没行的通配符进行过滤。
-查看统计结果 在 测试报告 和 进度章节 有展示" />
+2、提过 toffee 指定需要过滤掉的内存
+def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: request (pytest.Request): Pytest的默认fixture， datfile (string): DUT生成的 ignore (list[str]): 覆盖率过滤文件/或者文件夹 &#34;&#34;&#34; ignore 参数可以指定在覆盖率文件中需要过滤掉的内容，例如：" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/04_cover_line/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-04T18:33:01+08:00" />
+<meta property="article:modified_time" content="2024-12-05T18:59:30+08:00" />
 <meta itemprop="name" content="代码覆盖率">
-<meta itemprop="description" content="TBD [简单描述 &#43; 参考]
-本项目中相关涉及位置 1. build script picker命令行开启代码覆盖率(picker -c参数)、设置目标覆盖文件(line_coverage_files函数)
-1. Env中的fixture 通过函数toffee-test.set_line_coverage把覆盖率文件传递给toffe-test。
+<meta itemprop="description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
+代码覆盖率包括：
+行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if &hellip; else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 本项目中相关涉及位置 添加编译脚本 picker 命令行开启代码覆盖率(&quot;-c&quot;参数)、设置目标覆盖文件(line_coverage_files 函数)
+构建测试环境-3.定义必要 fixture 通过函数toffee-test.set_line_coverage把覆盖率文件传递给 toffe-test。
 忽略指定统计 1、通过 verilator 指定忽略统计的内容
-2、提过toffee指定需要过滤掉的内存
-def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: request (pytest.Request): Pytest的默认fixture， datfile (string): DUT生成的 ignore (list[str]): 覆盖率过滤文件/或者文件夹 &#34;&#34;&#34; ignore参数可以指定在覆盖率文件中需要过滤掉的内容，例如：
-... set_line_coverage(request, coverage_file, get_root_dir(&#34;scripts/backend_ctrlblock_decode&#34;)) 在统计覆盖率时，会在&quot;scripts/backend_ctrlblock_decode&quot;目录中搜索到line_coverage.ignore文件，然后按其中没行的通配符进行过滤。
-查看统计结果 在 测试报告 和 进度章节 有展示">
-<meta itemprop="dateModified" content="2024-12-04T18:33:01+08:00" />
-<meta itemprop="wordCount" content="46">
+2、提过 toffee 指定需要过滤掉的内存
+def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: request (pytest.Request): Pytest的默认fixture， datfile (string): DUT生成的 ignore (list[str]): 覆盖率过滤文件/或者文件夹 &#34;&#34;&#34; ignore 参数可以指定在覆盖率文件中需要过滤掉的内容，例如：">
+<meta itemprop="dateModified" content="2024-12-05T18:59:30+08:00" />
+<meta itemprop="wordCount" content="83">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="代码覆盖率"/>
-<meta name="twitter:description" content="TBD [简单描述 &#43; 参考]
-本项目中相关涉及位置 1. build script picker命令行开启代码覆盖率(picker -c参数)、设置目标覆盖文件(line_coverage_files函数)
-1. Env中的fixture 通过函数toffee-test.set_line_coverage把覆盖率文件传递给toffe-test。
+<meta name="twitter:description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
+代码覆盖率包括：
+行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if &hellip; else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 本项目中相关涉及位置 添加编译脚本 picker 命令行开启代码覆盖率(&quot;-c&quot;参数)、设置目标覆盖文件(line_coverage_files 函数)
+构建测试环境-3.定义必要 fixture 通过函数toffee-test.set_line_coverage把覆盖率文件传递给 toffe-test。
 忽略指定统计 1、通过 verilator 指定忽略统计的内容
-2、提过toffee指定需要过滤掉的内存
-def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: request (pytest.Request): Pytest的默认fixture， datfile (string): DUT生成的 ignore (list[str]): 覆盖率过滤文件/或者文件夹 &#34;&#34;&#34; ignore参数可以指定在覆盖率文件中需要过滤掉的内容，例如：
-... set_line_coverage(request, coverage_file, get_root_dir(&#34;scripts/backend_ctrlblock_decode&#34;)) 在统计覆盖率时，会在&quot;scripts/backend_ctrlblock_decode&quot;目录中搜索到line_coverage.ignore文件，然后按其中没行的通配符进行过滤。
-查看统计结果 在 测试报告 和 进度章节 有展示"/>
+2、提过 toffee 指定需要过滤掉的内存
+def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: request (pytest.Request): Pytest的默认fixture， datfile (string): DUT生成的 ignore (list[str]): 覆盖率过滤文件/或者文件夹 &#34;&#34;&#34; ignore 参数可以指定在覆盖率文件中需要过滤掉的内容，例如："/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <script
@@ -160,7 +156,7 @@ def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: re
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c58e41366748f8f062049848aae608db.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -184,7 +180,7 @@ def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: re
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c58e41366748f8f062049848aae608db.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -297,33 +293,41 @@ def set_line_coverage(request, datfile, ignore=[]): &#34;&#34;&#34;Pass Args: re
 	<header class="article-meta">
 		
   </header>
-	<p>TBD [简单描述 + 参考]</p>
+	<p>代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。</p>
+<p>代码覆盖率包括：</p>
+<ul>
+<li>行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。</li>
+<li>条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？</li>
+<li>有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。</li>
+<li>翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。</li>
+<li>路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if &hellip; else 和 case 语句，在电路结构上便会产生一系列的数据路径。。</li>
+</ul>
 <h2 id="本项目中相关涉及位置">本项目中相关涉及位置</h2>
-<h4 id="1-build-script">1. build script</h4>
-<p>picker命令行开启代码覆盖率(picker -c参数)、设置目标覆盖文件(line_coverage_files函数)</p>
-<h4 id="1-env中的fixture">1. Env中的fixture</h4>
-<p>通过函数<code>toffee-test.set_line_coverage</code>把覆盖率文件传递给toffe-test。</p>
+<h4 id="添加编译脚本httpsopen-verifyccunitychipforxiangshandocs03_add_test01_build_script"><a href="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/01_build_script/">添加编译脚本</a></h4>
+<p>picker 命令行开启代码覆盖率(&quot;-c&quot;参数)、设置目标覆盖文件(line_coverage_files 函数)</p>
+<h4 id="构建测试环境-3定义必要-fixturehttpsopen-verifyccunitychipforxiangshandocs03_add_test02_build_env"><a href="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/02_build_env/">构建测试环境-3.定义必要 fixture</a></h4>
+<p>通过函数<code>toffee-test.set_line_coverage</code>把覆盖率文件传递给 toffe-test。</p>
 <h2 id="忽略指定统计">忽略指定统计</h2>
 <p>1、<a href="https://veripool.org/guide/latest/exe_verilator.html#configuration-files">通过 verilator 指定忽略统计的内容</a></p>
-<p>2、提过toffee指定需要过滤掉的内存</p>
+<p>2、提过 toffee 指定需要过滤掉的内存</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">set_line_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">datfile</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">ignore</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">[]):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;&#34;&#34;Pass
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Args:
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        request (pytest.Request): Pytest的默认fixture，
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        datfile (string): DUT生成的
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        ignore (list[str]): 覆盖率过滤文件/或者文件夹
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    &#34;&#34;&#34;</span>
-</span></span></code></pre></div><p>ignore参数可以指定在覆盖率文件中需要过滤掉的内容，例如：</p>
+</span></span></code></pre></div><p>ignore 参数可以指定在覆盖率文件中需要过滤掉的内容，例如：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">...</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">set_line_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">,</span> 
+</span></span><span style="display:flex;"><span><span style="color:#000">set_line_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">,</span>
 </span></span><span style="display:flex;"><span>                  <span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;scripts/backend_ctrlblock_decode&#34;</span><span style="color:#000;font-weight:bold">))</span>
-</span></span></code></pre></div><p>在统计覆盖率时，会在&quot;scripts/backend_ctrlblock_decode&quot;目录中搜索到<code>line_coverage.ignore</code>文件，然后按其中没行的通配符进行过滤。</p>
+</span></span></code></pre></div><p>在统计覆盖率时，会在&quot;scripts/backend_ctrlblock_decode&quot;目录中搜索到<code>line_coverage.ignore</code>文件，然后按其中每行的通配符进行过滤。</p>
 <h2 id="查看统计结果">查看统计结果</h2>
-<p>在 测试报告 和 进度章节 有展示</p>
+<p>在<a href="https://open-verify.cc/UnityChipForXiangShan/docs/">进度概述</a>图形下方的“当前版本”选择对应的测试报告，然后点击右侧链接即可查看统计结果。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 4, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/dbbb604cc0449d474bbfe398c279339d22be8a71">readme: update (dbbb604)</a>
+  最后修改 December 5, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/06fcda50d26afd75c8c9326e27259d0d88a810a1">docker: add more doc (06fcda5)</a>
 </div>
 
 </div>

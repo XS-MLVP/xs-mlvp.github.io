@@ -18,31 +18,35 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>构建测试环境 | 万众一芯之香山处理器</title>
-<meta name="description" content="确定目录结构 单元测试所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过Python进行import。模块（例如decode）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。
-编写测试环境 在UT验证模块的测试环境中，目标是完成以下工作：
-对DUT进行功能封装，提供稳定测试API 定义功能覆盖率 定义必要fixture提供给测试用例 在合理时刻统计覆盖率 以decode环境中的RVCExpander为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
-1. DUT封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 关联引脚 self.bind(self.dut) # 把 Bunldle 与 DUT 进行绑定 def expand(self, instr): self.io[&#34;in&#34;].value = instr # 给DUT引脚赋值 self.dut.RefreshComb() # 推动组合电路 self.cover_group.sample() # 调用sample对功能覆盖率进行统计 return self.io[&#34;out_bits&#34;].value, self.io[&#34;ill&#34;].value # 返回结果 和 是否是非法指令 def stat(self): # 获取当前状态 return { &#34;instr&#34;: self.">
+<meta name="description" content="确定目录结构 UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │ ├── __init__.py ├── __init__.py ├── README.md └── test_rv_decode.py 模块（例如decode）中的代码目录结构由贡献者自行决定，但需要满足 python 规范，且逻辑和命名合理。
+编写测试环境 在 UT 验证模块的测试环境中，目标是完成以下工作：
+对 DUT 进行功能封装，为测试提供稳定 API 定义功能覆盖率 定义必要 fixture 提供给测试用例 在合理时刻统计覆盖率 以 decode 环境中的 RVCExpander 为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
+1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 使用前缀关联引脚 self.bind(self.dut) # 把 Bundle 与 DUT 进行绑定 def expand(self, instr): self.">
 <meta property="og:title" content="构建测试环境" />
-<meta property="og:description" content="确定目录结构 单元测试所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过Python进行import。模块（例如decode）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。
-编写测试环境 在UT验证模块的测试环境中，目标是完成以下工作：
-对DUT进行功能封装，提供稳定测试API 定义功能覆盖率 定义必要fixture提供给测试用例 在合理时刻统计覆盖率 以decode环境中的RVCExpander为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
-1. DUT封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 关联引脚 self.bind(self.dut) # 把 Bunldle 与 DUT 进行绑定 def expand(self, instr): self.io[&#34;in&#34;].value = instr # 给DUT引脚赋值 self.dut.RefreshComb() # 推动组合电路 self.cover_group.sample() # 调用sample对功能覆盖率进行统计 return self.io[&#34;out_bits&#34;].value, self.io[&#34;ill&#34;].value # 返回结果 和 是否是非法指令 def stat(self): # 获取当前状态 return { &#34;instr&#34;: self." />
+<meta property="og:description" content="确定目录结构 UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │ ├── __init__.py ├── __init__.py ├── README.md └── test_rv_decode.py 模块（例如decode）中的代码目录结构由贡献者自行决定，但需要满足 python 规范，且逻辑和命名合理。
+编写测试环境 在 UT 验证模块的测试环境中，目标是完成以下工作：
+对 DUT 进行功能封装，为测试提供稳定 API 定义功能覆盖率 定义必要 fixture 提供给测试用例 在合理时刻统计覆盖率 以 decode 环境中的 RVCExpander 为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
+1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 使用前缀关联引脚 self.bind(self.dut) # 把 Bundle 与 DUT 进行绑定 def expand(self, instr): self." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/02_build_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-04T18:33:01+08:00" />
+<meta property="article:modified_time" content="2024-12-05T18:59:30+08:00" />
 <meta itemprop="name" content="构建测试环境">
-<meta itemprop="description" content="确定目录结构 单元测试所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过Python进行import。模块（例如decode）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。
-编写测试环境 在UT验证模块的测试环境中，目标是完成以下工作：
-对DUT进行功能封装，提供稳定测试API 定义功能覆盖率 定义必要fixture提供给测试用例 在合理时刻统计覆盖率 以decode环境中的RVCExpander为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
-1. DUT封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 关联引脚 self.bind(self.dut) # 把 Bunldle 与 DUT 进行绑定 def expand(self, instr): self.io[&#34;in&#34;].value = instr # 给DUT引脚赋值 self.dut.RefreshComb() # 推动组合电路 self.cover_group.sample() # 调用sample对功能覆盖率进行统计 return self.io[&#34;out_bits&#34;].value, self.io[&#34;ill&#34;].value # 返回结果 和 是否是非法指令 def stat(self): # 获取当前状态 return { &#34;instr&#34;: self.">
-<meta itemprop="dateModified" content="2024-12-04T18:33:01+08:00" />
-<meta itemprop="wordCount" content="295">
+<meta itemprop="description" content="确定目录结构 UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │ ├── __init__.py ├── __init__.py ├── README.md └── test_rv_decode.py 模块（例如decode）中的代码目录结构由贡献者自行决定，但需要满足 python 规范，且逻辑和命名合理。
+编写测试环境 在 UT 验证模块的测试环境中，目标是完成以下工作：
+对 DUT 进行功能封装，为测试提供稳定 API 定义功能覆盖率 定义必要 fixture 提供给测试用例 在合理时刻统计覆盖率 以 decode 环境中的 RVCExpander 为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
+1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 使用前缀关联引脚 self.bind(self.dut) # 把 Bundle 与 DUT 进行绑定 def expand(self, instr): self.">
+<meta itemprop="dateModified" content="2024-12-05T18:59:30+08:00" />
+<meta itemprop="wordCount" content="497">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="构建测试环境"/>
-<meta name="twitter:description" content="确定目录结构 单元测试所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过Python进行import。模块（例如decode）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。
-编写测试环境 在UT验证模块的测试环境中，目标是完成以下工作：
-对DUT进行功能封装，提供稳定测试API 定义功能覆盖率 定义必要fixture提供给测试用例 在合理时刻统计覆盖率 以decode环境中的RVCExpander为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
-1. DUT封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 关联引脚 self.bind(self.dut) # 把 Bunldle 与 DUT 进行绑定 def expand(self, instr): self.io[&#34;in&#34;].value = instr # 给DUT引脚赋值 self.dut.RefreshComb() # 推动组合电路 self.cover_group.sample() # 调用sample对功能覆盖率进行统计 return self.io[&#34;out_bits&#34;].value, self.io[&#34;ill&#34;].value # 返回结果 和 是否是非法指令 def stat(self): # 获取当前状态 return { &#34;instr&#34;: self."/>
+<meta name="twitter:description" content="确定目录结构 UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │ ├── __init__.py ├── __init__.py ├── README.md └── test_rv_decode.py 模块（例如decode）中的代码目录结构由贡献者自行决定，但需要满足 python 规范，且逻辑和命名合理。
+编写测试环境 在 UT 验证模块的测试环境中，目标是完成以下工作：
+对 DUT 进行功能封装，为测试提供稳定 API 定义功能覆盖率 定义必要 fixture 提供给测试用例 在合理时刻统计覆盖率 以 decode 环境中的 RVCExpander 为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
+1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 使用前缀关联引脚 self.bind(self.dut) # 把 Bundle 与 DUT 进行绑定 def expand(self, instr): self."/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <script
@@ -144,7 +148,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c58e41366748f8f062049848aae608db.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -168,7 +172,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c58e41366748f8f062049848aae608db.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -249,7 +253,11 @@
     <li><a href="#确定目录结构">确定目录结构</a></li>
     <li><a href="#编写测试环境">编写测试环境</a>
       <ul>
-        <li></li>
+        <li><a href="#1-dut-封装">1. DUT 封装</a></li>
+        <li><a href="#a-id定义功能覆盖率a2-定义功能覆盖率"><a id="定义功能覆盖率"></a>2. 定义功能覆盖率</a></li>
+        <li><a href="#a-id定义必要fixture3-定义必要-fixture"><a id="定义必要fixture">3. 定义必要 fixture</a></li>
+        <li><a href="#a-id统计覆盖率4-统计覆盖率"><a id="统计覆盖率">4. 统计覆盖率</a></li>
+        <li><a href="#env-编写要求">Env 编写要求</a></li>
       </ul>
     </li>
   </ul>
@@ -281,25 +289,33 @@
 		
   </header>
 	<h2 id="确定目录结构">确定目录结构</h2>
-<p>单元测试所在的目录位置的层级结构应该与名称一致，例如<code>backend.ctrl_block.decode</code>应当位于<code>ut_backend/ctrl_block/decode</code>目录，且每层目录都需要有<code>__init__.py</code>，便于通过Python进行import。模块（例如<code>decode</code>）中的代码目录结构由贡献者自行决定，当需要满足python规范，且逻辑合理，命名合理。</p>
+<p>UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如<code>backend.ctrl_block.decode</code>应当位于<code>ut_backend/ctrl_block/decode</code>目录，且每层目录都需要有<code>__init__.py</code>，便于通过 python 进行<code>import</code>。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ut_backend/ctrl_block/decode
+</span></span><span style="display:flex;"><span>├── env
+</span></span><span style="display:flex;"><span>│   ├── decode_wrapper.py
+</span></span><span style="display:flex;"><span>│   ├── __init__.py
+</span></span><span style="display:flex;"><span>├── __init__.py
+</span></span><span style="display:flex;"><span>├── README.md
+</span></span><span style="display:flex;"><span>└── test_rv_decode.py
+</span></span></code></pre></div><p>模块（例如<code>decode</code>）中的代码目录结构由贡献者自行决定，但需要满足 python 规范，且逻辑和命名合理。</p>
 <h2 id="编写测试环境">编写测试环境</h2>
-<p>在UT验证模块的测试环境中，目标是完成以下工作：</p>
+<p>在 UT 验证模块的测试环境中，目标是完成以下工作：</p>
 <ol>
-<li>对DUT进行功能封装，提供稳定测试API</li>
+<li>对 DUT 进行功能封装，为测试提供稳定 API</li>
 <li>定义功能覆盖率</li>
-<li>定义必要fixture提供给测试用例</li>
+<li>定义必要 fixture 提供给测试用例</li>
 <li>在合理时刻统计覆盖率</li>
 </ol>
-<p>以decode环境中的RVCExpander为例（<code>ut_backend/ctrl_block/decode/env/decode_wrapper.py</code>）：</p>
-<h4 id="1-dut封装">1. DUT封装</h4>
+<p>以 decode 环境中的 RVCExpander 为例（<code>ut_backend/ctrl_block/decode/env/decode_wrapper.py</code>）：</p>
+<h3 id="1-dut-封装">1. DUT 封装</h3>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">RVCExpander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cover_group</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#000">kwargs</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cover_group</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">cover_group</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTRVCExpander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#000">kwargs</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 创建DUT</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io_in</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">AsImmWrite</span><span style="color:#000;font-weight:bold">()</span>         <span style="color:#8f5902;font-style:italic"># DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_prefix</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;io_&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 通过 Bundle 关联引脚</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bind</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>                 <span style="color:#8f5902;font-style:italic"># 把 Bunldle 与 DUT 进行绑定</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_prefix</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;io_&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 通过 Bundle 使用前缀关联引脚</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bind</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>                 <span style="color:#8f5902;font-style:italic"># 把 Bundle 与 DUT 进行绑定</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">expand</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">instr</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;in&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">instr</span>         <span style="color:#8f5902;font-style:italic"># 给DUT引脚赋值</span>
@@ -313,15 +329,17 @@
 </span></span><span style="display:flex;"><span>            <span style="color:#4e9a06">&#34;decode&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;out_bits&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span>  <span style="color:#8f5902;font-style:italic"># 返回展开结果</span>
 </span></span><span style="display:flex;"><span>            <span style="color:#4e9a06">&#34;ilegal&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">io</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;ill&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>  <span style="color:#8f5902;font-style:italic"># 输入是否非法</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>在上述例子中，<code>class RVCExpander</code>对<code>DUTRVCExpander</code>进行了封装，对外提供了两个API：</p>
+</span></span></code></pre></div><p>在上述例子中，<code>class RVCExpander</code>对<code>DUTRVCExpander</code>进行了封装，对外提供了两个 API：</p>
 <ul>
-<li>expand(instr: int) -&gt; (int, int) ：该函数用于接受输入指令 instr 进行解码，返回（结果，非法指令标记）。如果非法指令标记不为0，者说明输入指令非法。</li>
+<li>expand(instr: int) -&gt; (int, int) ：该函数用于接受输入指令 instr 进行解码，返回（结果，非法指令标记）。如果非法指令标记不为 0，者说明输入指令非法。</li>
 <li>stat() -&gt; dict(instr, decode, ilegal)：该函数用于返回当前的状态，其中包含当前的输入指令，解码结果以及非法指令标记。</li>
 </ul>
-<p>上述API屏蔽了DUT的引脚，对外程序通用功能。</p>
-<h4 id="2-定义功能覆盖率">2. 定义功能覆盖率</h4>
-<p>尽可能的在Env中定义好功能覆盖率，如果有必要也可以在测试用例中定义覆盖率。toffee功能覆盖率的定义请参考<a href="/UnityChipForXiangShan/">此处的文档</a>。为了完善功能检查点和测试用例之间的对应关系，功能覆盖率定义完成后，需要在适合的位置进行检查点和测试用例的对应关系（测试点反标）。</p>
+<p>上述 API <strong>屏蔽了 DUT 的引脚</strong>，对外程序通用功能。</p>
+<h3 id="a-id定义功能覆盖率a2-定义功能覆盖率"><a id="定义功能覆盖率"></a>2. 定义功能覆盖率</h3>
+<p>尽可能的在 Env 中定义好功能覆盖率，如果有必要也可以在测试用例中定义覆盖率。toffee 功能覆盖率的定义请参考<a href="http://localhost:1313/docs/03_add_test/05_cover_func/">什么是功能覆盖率</a>。为了完善功能检查点和测试用例之间的对应关系，功能覆盖率定义完成后，需要在适合的位置进行检查点和测试用例的对应（测试点反标）。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee.funcov</span> <span style="color:#204a87;font-weight:bold">as</span> <span style="color:#000">fc</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 创建功能覆盖率组</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">g</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">fc</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">CovGroup</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">UT_FCOV</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;../../INT&#34;</span><span style="color:#000;font-weight:bold">))</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">init_rvc_expander_funcov</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">g</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">fc</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">CovGroup</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;&#34;&#34;Add watch points to the RVCExpander module to collect function coverage information&#34;&#34;&#34;</span>
@@ -345,46 +363,72 @@
 </span></span><span style="display:flex;"><span>                                              <span style="color:#4e9a06">&#34;test_rvc_expand_32bit_randomN&#34;</span><span style="color:#000;font-weight:bold">]),</span> <span style="color:#000">bin_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;ERROR&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;SUCCE&#34;</span><span style="color:#000;font-weight:bold">])</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
 </span></span></code></pre></div><p>在上述代码中添加了名为<code>RVC_EXPAND_RET</code>的功能检查点来检查<code>RVCExpander</code>模块是否具有返回非法指令的能力。需要满足<code>ERROR</code>和<code>SUCCE</code>两个条件，即<code>stat()</code>中的<code>ileage</code>需要有<code>True</code>也需要有<code>False</code>值。在定义完检查点后，通过<code>mark_function</code>方法，对会覆盖到该检查的测试用例进行了标记。</p>
-<h4 id="3-定义必要fixture">3. 定义必要fixture</h4>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">version_check</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_version_checker</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;openxiangshan-kmh-*&#34;</span><span style="color:#000;font-weight:bold">)</span>     <span style="color:#8f5902;font-style:italic"># 指定满足要的RTL版本</span>
-</span></span><span style="display:flex;"><span>
+<h3 id="a-id定义必要fixture3-定义必要-fixture"><a id="定义必要fixture">3. 定义必要 fixture</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">version_check</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_version_checker</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;openxiangshan-kmh-*&#34;</span><span style="color:#000;font-weight:bold">)</span>             <span style="color:#8f5902;font-style:italic"># 指定满足要的RTL版本</span>
 </span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.fixture</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">rvc_expander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">version_check</span><span style="color:#000;font-weight:bold">()</span>                                            <span style="color:#8f5902;font-style:italic"># 进行版本检查</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">fname</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">request</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">node</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">name</span>                                  <span style="color:#8f5902;font-style:italic"># 获取调用该fixture的测试用例</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">version_check</span><span style="color:#000;font-weight:bold">()</span>                                                    <span style="color:#8f5902;font-style:italic"># 进行版本检查</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">fname</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">request</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">node</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">name</span>                                          <span style="color:#8f5902;font-style:italic"># 获取调用该fixture的测试用例</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">wave_file</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_out_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;decoder/rvc_expander_</span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">.fst&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#000">fname</span><span style="color:#000;font-weight:bold">)</span>     <span style="color:#8f5902;font-style:italic"># 设置波形文件路径</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">coverage_file</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_out_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;decoder/rvc_expander_</span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">.dat&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#000">fname</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 设置代码覆盖率文件路径</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">coverage_dir</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">path</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dirname</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">makedirs</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">coverage_dir</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">exist_ok</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>                           <span style="color:#8f5902;font-style:italic"># 目标目录不正在则创建目录</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">expander</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">RVCExpander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">g</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">coverage_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">waveform_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">wave_file</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 创建RVCExpander</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">expander</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">RVCExpander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">g</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">coverage_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">waveform_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">wave_file</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>                                                                       <span style="color:#8f5902;font-style:italic"># 创建RVCExpander</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">init_rvc_expander_funcov</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">g</span><span style="color:#000;font-weight:bold">)</span>                              <span style="color:#8f5902;font-style:italic"># 初始化功能检查点</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">yield</span> <span style="color:#000">expander</span>                                                     <span style="color:#8f5902;font-style:italic"># 返回创建好的 RVCExpander 给 Test Case</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">expander</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span>                                              <span style="color:#8f5902;font-style:italic"># Tests Case运行完成后，结束DUT</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">set_line_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">)</span>                          <span style="color:#8f5902;font-style:italic"># 把生成的代码覆盖率文件告诉 toffee-report</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">set_func_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">g</span><span style="color:#000;font-weight:bold">)</span>                                      <span style="color:#8f5902;font-style:italic"># 把生成的功能覆盖率数据告诉 toffee-report</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">g</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">clear</span><span style="color:#000;font-weight:bold">()</span>                                                          <span style="color:#8f5902;font-style:italic"># 清空功能覆盖统计</span>
-</span></span></code></pre></div><p>上述fixture完成了以下功能：</p>
+</span></span></code></pre></div><p>上述 fixture 完成了以下功能：</p>
 <ol>
-<li>进行RTL版本检查，如果不满足<code>&quot;openxiangshan-kmh-*&quot;</code>要求，则跳过调用改fixture的测试用例</li>
-<li>创建DUT，并指定了波形，代码行覆盖率文件路径（路径中含有调用该fixure的用例名称：fname）</li>
+<li>进行 RTL 版本检查，如果不满足<code>&quot;openxiangshan-kmh-*&quot;</code>要求，则跳过调用改 fixture 的测试用例</li>
+<li>创建 DUT，并指定了波形，代码行覆盖率文件路径（路径中含有调用该 fixure 的用例名称：fname）</li>
 <li>调用<code>init_rvc_expander_funcov</code>添加功能覆盖点</li>
-<li>结束DUT，处理代码行覆盖率和功能覆盖率（发往toffee-report进行处理）</li>
+<li>结束 DUT，处理代码行覆盖率和功能覆盖率（发往 toffee-report 进行处理）</li>
 <li>清空功能覆盖率</li>
 </ol>
-<p>*注：在PyTest中，执行测试用例<code>test_A(rvc_expander, ....)</code>前，会自动调用并执行<code>rvc_expander(request)</code>中<code>yield</code>关键字前的部分，然后通过<code>yield</code>返回<code>rvc_expander</code>调用<code>test_A</code>用例，用例执行完成后，再继续执行<code>fixture</code>中<code>yield</code>关键字之后的部分。</p>
-<h4 id="env编写要求">Env编写要求：</h4>
+<p>*注：在 PyTest 中，执行测试用例<code>test_A(rvc_expander, ....)</code>前，会自动调用并执行<code>rvc_expander(request)</code>中<code>yield</code>关键字前的部分，然后通过<code>yield</code>返回<code>rvc_expander</code>调用<code>test_A</code>用例，用例执行完成后，再继续执行<code>fixture</code>中<code>yield</code>关键字之后的部分。</p>
+<h3 id="a-id统计覆盖率4-统计覆盖率"><a id="统计覆盖率">4. 统计覆盖率</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">N</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">10</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">T</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span><span style="color:#0000cf;font-weight:bold">16</span>
+</span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.mark.toffee_tags</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">TAG_LONG_TIME_RUN</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.mark.parametrize</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;start,end&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>                         <span style="color:#000;font-weight:bold">[(</span><span style="color:#000">r</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">T</span><span style="color:#ce5c00;font-weight:bold">//</span><span style="color:#000">N</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">r</span><span style="color:#ce5c00;font-weight:bold">+</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">T</span><span style="color:#ce5c00;font-weight:bold">//</span><span style="color:#000">N</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">r</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#000">N</span><span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">r</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#204a87">range</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">N</span><span style="color:#000;font-weight:bold">)])</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_rvc_expand_16bit_full</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">rvc_expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">start</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">end</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;&#34;&#34;Test the RVC expand function with a full compressed instruction set
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Description:
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        Perform an expand check on 16-bit compressed instructions within the range from &#39;start&#39; to &#39;end&#39;.
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Add check point: RVC_EXPAND_RANGE to check expander input range.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">#   When run to here, the range[start, end] is covered</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">covered</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">g</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_watch_point</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">rvc_expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;RANGE[</span><span style="color:#4e9a06">%d</span><span style="color:#4e9a06">-</span><span style="color:#4e9a06">%d</span><span style="color:#4e9a06">]&#34;</span><span style="color:#ce5c00;font-weight:bold">%</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">end</span><span style="color:#000;font-weight:bold">):</span> <span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">_</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">covered</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">end</span>
+</span></span><span style="display:flex;"><span>                          <span style="color:#000;font-weight:bold">},</span> <span style="color:#000">name</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;RVC_EXPAND_ALL_16B&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dynamic_bin</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Reverse mark function to the check point</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">g</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">mark_function</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;RVC_EXPAND_ALL_16B&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">test_rvc_expand_16bit_full</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bin_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;RANGE[</span><span style="color:#4e9a06">%d</span><span style="color:#4e9a06">-</span><span style="color:#4e9a06">%d</span><span style="color:#4e9a06">]&#34;</span><span style="color:#ce5c00;font-weight:bold">%</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">end</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Drive the expander and check the result</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">rvc_expand</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">rvc_expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">generate_rvc_instructions</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">end</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># When go to here, the range[start, end] is covered</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">covered</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">g</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sample</span><span style="color:#000;font-weight:bold">()</span>                                                              <span style="color:#8f5902;font-style:italic"># 覆盖率采样</span>
+</span></span></code></pre></div><p>在定义了覆盖率之后，还需要在测试用例中进行覆盖率统计。上述代码中，在测试用例中使用<code>add_watch_point</code>添加了一个功能检查点<code>rvc_expander</code>，并在后面进行了标记和采样。</p>
+<h3 id="env-编写要求">Env 编写要求</h3>
 <ul>
-<li>需要进行RTL版本检查</li>
-<li>Env提供的API需要和引脚、时序无关</li>
-<li>Env提供的API需要稳定，不能随意进行接口/返回值修改</li>
-<li>需要定义必要的fixture</li>
+<li>需要进行 RTL 版本检查</li>
+<li>Env 提供的 API 需要和引脚、时序无关</li>
+<li>Env 提供的 API 需要稳定，不能随意进行接口/返回值修改</li>
+<li>需要定义必要的 fixture</li>
 <li>需要初始化功能检查点（功能检查点可以独立成一个模块）</li>
 <li>需要进行覆盖率统计</li>
 <li>需要有说明文档</li>
 </ul>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 4, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/dbbb604cc0449d474bbfe398c279339d22be8a71">readme: update (dbbb604)</a>
+  最后修改 December 5, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/06fcda50d26afd75c8c9326e27259d0d88a810a1">docker: add more doc (06fcda5)</a>
 </div>
 
 </div>

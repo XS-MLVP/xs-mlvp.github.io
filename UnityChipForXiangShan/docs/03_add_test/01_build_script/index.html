@@ -19,9 +19,9 @@
 
 <title>添加编译脚本 | 万众一芯之香山处理器</title>
 <meta name="description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
-创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑config/dutree/xiangshan=lmh.yaml自行添加。
+创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
 脚本文件的命名格式如下：
-scripts/build_ut_&lt;顶层模块&gt;_&lt;下层模块名&gt;[...].&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
+scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
 ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中的子模块没有ut_前缀（顶层目录有该前缀是为了和其他目录区分开）。
 例如验证目标DUT为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
 编写 build(cfg) -&gt; bool 函数 build函数定义如下：
@@ -29,9 +29,9 @@ def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置�
 def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import match_version from comm import is_all_file_exist, get_rtl_dir, exe_cmd, get_root_dir # 检查RTL版本（version参数为空，表示所有版本都支持） if not match_version(cfg.">
 <meta property="og:title" content="添加编译脚本" />
 <meta property="og:description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
-创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑config/dutree/xiangshan=lmh.yaml自行添加。
+创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
 脚本文件的命名格式如下：
-scripts/build_ut_&lt;顶层模块&gt;_&lt;下层模块名&gt;[...].&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
+scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
 ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中的子模块没有ut_前缀（顶层目录有该前缀是为了和其他目录区分开）。
 例如验证目标DUT为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
 编写 build(cfg) -&gt; bool 函数 build函数定义如下：
@@ -40,24 +40,24 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/01_build_script/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-04T18:33:01+08:00" />
+<meta property="article:modified_time" content="2024-12-05T18:59:30+08:00" />
 <meta itemprop="name" content="添加编译脚本">
 <meta itemprop="description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
-创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑config/dutree/xiangshan=lmh.yaml自行添加。
+创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
 脚本文件的命名格式如下：
-scripts/build_ut_&lt;顶层模块&gt;_&lt;下层模块名&gt;[...].&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
+scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
 ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中的子模块没有ut_前缀（顶层目录有该前缀是为了和其他目录区分开）。
 例如验证目标DUT为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
 编写 build(cfg) -&gt; bool 函数 build函数定义如下：
 def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build在make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了RTL检查、DUT检查、RTL编译、disasm依赖编译等工作：
 def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import match_version from comm import is_all_file_exist, get_rtl_dir, exe_cmd, get_root_dir # 检查RTL版本（version参数为空，表示所有版本都支持） if not match_version(cfg.">
-<meta itemprop="dateModified" content="2024-12-04T18:33:01+08:00" />
+<meta itemprop="dateModified" content="2024-12-05T18:59:30+08:00" />
 <meta itemprop="wordCount" content="249">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="添加编译脚本"/>
 <meta name="twitter:description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
-创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑config/dutree/xiangshan=lmh.yaml自行添加。
+创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
 脚本文件的命名格式如下：
-scripts/build_ut_&lt;顶层模块&gt;_&lt;下层模块名&gt;[...].&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
+scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
 ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中的子模块没有ut_前缀（顶层目录有该前缀是为了和其他目录区分开）。
 例如验证目标DUT为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
 编写 build(cfg) -&gt; bool 函数 build函数定义如下：
@@ -164,7 +164,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c58e41366748f8f062049848aae608db.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -188,7 +188,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c58e41366748f8f062049848aae608db.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -306,9 +306,9 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 <p>该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。</p>
 <h2 id="创建过程">创建过程</h2>
 <h3 id="确定文件名称">确定文件名称</h3>
-<p>在<a href="/UnityChipForXiangShan/">香山昆明湖DUT验证进展</a>中选择需要验证的UT，如果没有或者进一步细化，可通过编辑<code>config/dutree/xiangshan=lmh.yaml</code>自行添加。</p>
+<p>在<a href="/UnityChipForXiangShan/">香山昆明湖DUT验证进展</a>中选择需要验证的UT，如果没有或者进一步细化，可通过编辑<code>configs/dutree/xiangshan-kmh.yaml</code>自行添加。</p>
 <p>脚本文件的命名格式如下：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>scripts/build_ut_&lt;顶层模块&gt;_&lt;下层模块名&gt;<span style="color:#ce5c00;font-weight:bold">[</span>...<span style="color:#ce5c00;font-weight:bold">]</span>.&lt;目标模块名&gt;.py
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py
 </span></span></code></pre></div><p>目前本项目内置了4个顶层模块：</p>
 <ol>
 <li>ut_frontend 前端</li>
@@ -381,7 +381,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 </span></span></code></pre></div><p>标识该模块关注的是对<code>PreDecode.v</code>, <code>DecodeStage.v</code>文件的覆盖。如果不开启测试结果后处理(<code>cfg.doc_result.disable = False</code>)，上述函数则不会被调用。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 4, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/dbbb604cc0449d474bbfe398c279339d22be8a71">readme: update (dbbb604)</a>
+  最后修改 December 5, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/06fcda50d26afd75c8c9326e27259d0d88a810a1">docker: add more doc (06fcda5)</a>
 </div>
 
 </div>
