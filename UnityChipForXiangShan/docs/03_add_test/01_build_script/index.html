@@ -18,51 +18,51 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>添加编译脚本 | 万众一芯之香山处理器</title>
-<meta name="description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
-创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
+<meta name="description" content="脚本目标 该脚本的目标是提供 RTL 到 Python DUT 的编译、目标覆盖文件，以及自定义功能等内容。
+创建过程 确定文件名称 在香山昆明湖 DUT 验证进展中选择需要验证的 UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
 脚本文件的命名格式如下：
-scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
+scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了 4 个顶层模块：
 ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中的子模块没有ut_前缀（顶层目录有该前缀是为了和其他目录区分开）。
-例如验证目标DUT为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
-编写 build(cfg) -&gt; bool 函数 build函数定义如下：
-def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build在make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了RTL检查、DUT检查、RTL编译、disasm依赖编译等工作：
-def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import match_version from comm import is_all_file_exist, get_rtl_dir, exe_cmd, get_root_dir # 检查RTL版本（version参数为空，表示所有版本都支持） if not match_version(cfg.">
+例如验证目标 DUT 为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
+编写 build(cfg) -&gt; bool 函数 build 函数定义如下：
+def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build 在 make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了 RTL 检查、DUT 检查、RTL 编译、disasm 依赖编译等工作：
+def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.">
 <meta property="og:title" content="添加编译脚本" />
-<meta property="og:description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
-创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
+<meta property="og:description" content="脚本目标 该脚本的目标是提供 RTL 到 Python DUT 的编译、目标覆盖文件，以及自定义功能等内容。
+创建过程 确定文件名称 在香山昆明湖 DUT 验证进展中选择需要验证的 UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
 脚本文件的命名格式如下：
-scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
+scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了 4 个顶层模块：
 ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中的子模块没有ut_前缀（顶层目录有该前缀是为了和其他目录区分开）。
-例如验证目标DUT为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
-编写 build(cfg) -&gt; bool 函数 build函数定义如下：
-def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build在make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了RTL检查、DUT检查、RTL编译、disasm依赖编译等工作：
-def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import match_version from comm import is_all_file_exist, get_rtl_dir, exe_cmd, get_root_dir # 检查RTL版本（version参数为空，表示所有版本都支持） if not match_version(cfg." />
+例如验证目标 DUT 为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
+编写 build(cfg) -&gt; bool 函数 build 函数定义如下：
+def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build 在 make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了 RTL 检查、DUT 检查、RTL 编译、disasm 依赖编译等工作：
+def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/01_build_script/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-05T18:59:30+08:00" />
+<meta property="article:modified_time" content="2024-12-06T19:38:32+08:00" />
 <meta itemprop="name" content="添加编译脚本">
-<meta itemprop="description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
-创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
+<meta itemprop="description" content="脚本目标 该脚本的目标是提供 RTL 到 Python DUT 的编译、目标覆盖文件，以及自定义功能等内容。
+创建过程 确定文件名称 在香山昆明湖 DUT 验证进展中选择需要验证的 UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
 脚本文件的命名格式如下：
-scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
+scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了 4 个顶层模块：
 ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中的子模块没有ut_前缀（顶层目录有该前缀是为了和其他目录区分开）。
-例如验证目标DUT为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
-编写 build(cfg) -&gt; bool 函数 build函数定义如下：
-def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build在make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了RTL检查、DUT检查、RTL编译、disasm依赖编译等工作：
-def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import match_version from comm import is_all_file_exist, get_rtl_dir, exe_cmd, get_root_dir # 检查RTL版本（version参数为空，表示所有版本都支持） if not match_version(cfg.">
-<meta itemprop="dateModified" content="2024-12-05T18:59:30+08:00" />
-<meta itemprop="wordCount" content="249">
+例如验证目标 DUT 为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
+编写 build(cfg) -&gt; bool 函数 build 函数定义如下：
+def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build 在 make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了 RTL 检查、DUT 检查、RTL 编译、disasm 依赖编译等工作：
+def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.">
+<meta itemprop="dateModified" content="2024-12-06T19:38:32+08:00" />
+<meta itemprop="wordCount" content="276">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="添加编译脚本"/>
-<meta name="twitter:description" content="脚本目标 该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。
-创建过程 确定文件名称 在香山昆明湖DUT验证进展中选择需要验证的UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
+<meta name="twitter:description" content="脚本目标 该脚本的目标是提供 RTL 到 Python DUT 的编译、目标覆盖文件，以及自定义功能等内容。
+创建过程 确定文件名称 在香山昆明湖 DUT 验证进展中选择需要验证的 UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
 脚本文件的命名格式如下：
-scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了4个顶层模块：
+scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py 目前本项目内置了 4 个顶层模块：
 ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中的子模块没有ut_前缀（顶层目录有该前缀是为了和其他目录区分开）。
-例如验证目标DUT为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
-编写 build(cfg) -&gt; bool 函数 build函数定义如下：
-def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build在make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了RTL检查、DUT检查、RTL编译、disasm依赖编译等工作：
-def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import match_version from comm import is_all_file_exist, get_rtl_dir, exe_cmd, get_root_dir # 检查RTL版本（version参数为空，表示所有版本都支持） if not match_version(cfg."/>
+例如验证目标 DUT 为：backend.ctrl_block.decode，需要创建的脚本名称为 build_ut_backend_ctrl_block_decode.py。
+编写 build(cfg) -&gt; bool 函数 build 函数定义如下：
+def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build 在 make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了 RTL 检查、DUT 检查、RTL 编译、disasm 依赖编译等工作：
+def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test."/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <script
@@ -164,7 +164,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.72872f62915244d001d8b55795bdcb2d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -188,7 +188,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6070221bf22a263abbc85396cefc1b83.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.72872f62915244d001d8b55795bdcb2d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -196,7 +196,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
     <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
     </button>
   </form>
-  <nav class="td-sidebar-nav collapse" id="td-section-nav">
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
     <div class="td-sidebar-nav__section nav-item dropdown d-block d-lg-none">
       <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
@@ -210,40 +210,110 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
   <a href="/UnityChipForXiangShan/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-unitychipforxiangshandocs"><span class="">进度概述</span></a>
   <ul class="ul-1">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-li">
-  <a href="/UnityChipForXiangShan/docs/00_unitychip_for_xiangshan/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan"><span class="">目标验证单元</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-check"/>
+  <label for="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-check"><a href="/UnityChipForXiangShan/docs/00_unitychip_for_xiangshan/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan"><span class="">目标验证单元</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs01_verfiy_env-li">
-  <a href="/UnityChipForXiangShan/docs/01_verfiy_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs01_verfiy_env"><span class="">准备验证环境</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs01_verfiy_env-check"/>
+  <label for="m-unitychipforxiangshandocs01_verfiy_env-check"><a href="/UnityChipForXiangShan/docs/01_verfiy_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs01_verfiy_env"><span class="">准备验证环境</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs02_run_test-li">
-  <a href="/UnityChipForXiangShan/docs/02_run_test/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs02_run_test"><span class="">运行测试</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs02_run_test-check"/>
+  <label for="m-unitychipforxiangshandocs02_run_test-check"><a href="/UnityChipForXiangShan/docs/02_run_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs02_run_test"><span class="">运行测试</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs03_add_test-li">
-  <a href="/UnityChipForXiangShan/docs/03_add_test/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs03_add_test"><span class="">添加测试</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test-check" checked/>
+  <label for="m-unitychipforxiangshandocs03_add_test-check"><a href="/UnityChipForXiangShan/docs/03_add_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs03_add_test"><span class="">添加测试</span></a></label>
+  
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs03_add_test01_build_script-li">
-  <a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test01_build_script"><span class="td-sidebar-nav-active-item">添加编译脚本</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test01_build_script-check" checked/>
+  <label for="m-unitychipforxiangshandocs03_add_test01_build_script-check"><a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test01_build_script"><span class="td-sidebar-nav-active-item">添加编译脚本</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test02_build_env-li">
-  <a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test02_build_env"><span class="">构建测试环境</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test02_build_env-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test02_build_env-check"><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test02_build_env"><span class="">构建测试环境</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test03_add_test-li">
-  <a href="/UnityChipForXiangShan/docs/03_add_test/03_add_test/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test03_add_test"><span class="">添加测试用例</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test03_add_test-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test03_add_test-check"><a href="/UnityChipForXiangShan/docs/03_add_test/03_add_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test03_add_test"><span class="">添加测试用例</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test04_cover_line-li">
-  <a href="/UnityChipForXiangShan/docs/03_add_test/04_cover_line/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test04_cover_line"><span class="">代码覆盖率</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test04_cover_line-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test04_cover_line-check"><a href="/UnityChipForXiangShan/docs/03_add_test/04_cover_line/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test04_cover_line"><span class="">代码覆盖率</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test05_cover_func-li">
-  <a href="/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test05_cover_func"><span class="">功能覆盖率</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test05_cover_func-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test05_cover_func-check"><a href="/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test05_cover_func"><span class="">功能覆盖率</span></a></label>
+  
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs06_join_us-li">
-  <a href="/UnityChipForXiangShan/docs/06_join_us/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs06_join_us"><span class="">如何参与本项目</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs06_join_us-check"/>
+  <label for="m-unitychipforxiangshandocs06_join_us-check"><a href="/UnityChipForXiangShan/docs/06_join_us/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs06_join_us"><span class="">如何参与本项目</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs08_template_pr-li">
-  <a href="/UnityChipForXiangShan/docs/08_template_pr/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs08_template_pr"><span class="">模板-PR</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs08_template_pr-check"/>
+  <label for="m-unitychipforxiangshandocs08_template_pr-check"><a href="/UnityChipForXiangShan/docs/08_template_pr/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs08_template_pr"><span class="">模板-PR</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs09_template_issue-li">
-  <a href="/UnityChipForXiangShan/docs/09_template_issue/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs09_template_issue"><span class="">模板-ISSUE</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs09_template_issue-check"/>
+  <label for="m-unitychipforxiangshandocs09_template_issue-check"><a href="/UnityChipForXiangShan/docs/09_template_issue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs09_template_issue"><span class="">模板-ISSUE</span></a></label>
+  
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs10_template_ut_readme-li">
-  <a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-README</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs97_api-li">
-  <a href="/UnityChipForXiangShan/docs/97_api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs97_api"><span class="">常用API</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_others-li">
-  <a href="/UnityChipForXiangShan/docs/98_others/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_others"><span class="">其他</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs99_constraint-li">
-  <a href="/UnityChipForXiangShan/docs/99_constraint/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_constraint"><span class="">必要规范</span></a>
+  <input type="checkbox" id="m-unitychipforxiangshandocs10_template_ut_readme-check"/>
+  <label for="m-unitychipforxiangshandocs10_template_ut_readme-check"><a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-README</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs95_api-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs95_api-check"/>
+  <label for="m-unitychipforxiangshandocs95_api-check"><a href="/UnityChipForXiangShan/docs/95_api/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs95_api"><span class="">常用API</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs96_others-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs96_others-check"/>
+  <label for="m-unitychipforxiangshandocs96_others-check"><a href="/UnityChipForXiangShan/docs/96_others/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs96_others"><span class="">其他</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs97_constraint-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs97_constraint-check"/>
+  <label for="m-unitychipforxiangshandocs97_constraint-check"><a href="/UnityChipForXiangShan/docs/97_constraint/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs97_constraint"><span class="">必要规范</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut-check"><a href="/UnityChipForXiangShan/docs/98_ut/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut"><span class="">验证文档</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_ifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_ifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_ifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_ifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_ifu"><span class="">IFU</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ifu_rvc_exp/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp"><span class="">IFU-RVC-Expander</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut02_backend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut02_backend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut02_backend-check"><a href="/UnityChipForXiangShan/docs/98_ut/02_backend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut02_backend"><span class="">Backend</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock"><span class="">Mem Block</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut04_misc-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut04_misc-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut04_misc-check"><a href="/UnityChipForXiangShan/docs/98_ut/04_misc/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut04_misc"><span class="">Misc</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs99_maintain-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs99_maintain-check"/>
+  <label for="m-unitychipforxiangshandocs99_maintain-check"><a href="/UnityChipForXiangShan/docs/99_maintain/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_maintain"><span class="">维护者</span></a></label>
+  
 </li>
   </ul>
 </li>
@@ -303,13 +373,13 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 		
   </header>
 	<h2 id="脚本目标">脚本目标</h2>
-<p>该脚本的目标是提供RTL到Python DUT的编译、目标覆盖文件，以及自定义功能等内容。</p>
+<p>该脚本的目标是提供 RTL 到 Python DUT 的编译、目标覆盖文件，以及自定义功能等内容。</p>
 <h2 id="创建过程">创建过程</h2>
 <h3 id="确定文件名称">确定文件名称</h3>
-<p>在<a href="/UnityChipForXiangShan/">香山昆明湖DUT验证进展</a>中选择需要验证的UT，如果没有或者进一步细化，可通过编辑<code>configs/dutree/xiangshan-kmh.yaml</code>自行添加。</p>
+<p>在<a href="/UnityChipForXiangShan/">香山昆明湖 DUT 验证进展</a>中选择需要验证的 UT，如果没有或者进一步细化，可通过编辑<code>configs/dutree/xiangshan-kmh.yaml</code>自行添加。</p>
 <p>脚本文件的命名格式如下：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>scripts/build_&lt;顶层模块&gt;_&lt;下层模块名&gt;_..._&lt;目标模块名&gt;.py
-</span></span></code></pre></div><p>目前本项目内置了4个顶层模块：</p>
+</span></span></code></pre></div><p>目前本项目内置了 4 个顶层模块：</p>
 <ol>
 <li>ut_frontend 前端</li>
 <li>ut_backend 后端</li>
@@ -317,9 +387,9 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 <li>ut_misc 其他</li>
 </ol>
 <p>其中的子模块没有<code>ut_</code>前缀（顶层目录有该前缀是为了和其他目录区分开）。</p>
-<p>例如验证目标DUT为：<code>backend.ctrl_block.decode</code>，需要创建的脚本名称为 <code>build_ut_backend_ctrl_block_decode.py</code>。</p>
+<p>例如验证目标 DUT 为：<code>backend.ctrl_block.decode</code>，需要创建的脚本名称为 <code>build_ut_backend_ctrl_block_decode.py</code>。</p>
 <h3 id="编写-buildcfg---bool-函数">编写 build(cfg) -&gt; bool 函数</h3>
-<p>build函数定义如下：</p>
+<p>build 函数定义如下：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">build</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#204a87">bool</span><span style="color:#000;font-weight:bold">:</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;&#34;&#34;编译DUT
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Args:
@@ -327,7 +397,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Return:
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">        返回 True 或者 False，表明该函数是否完成预期目标
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    &#34;&#34;&#34;</span>
-</span></span></code></pre></div><p>build在make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以<code>build_ut_backend_ctrl_block_decode.py</code>为例，主要完成了RTL检查、DUT检查、RTL编译、disasm依赖编译等工作：</p>
+</span></span></code></pre></div><p>build 在 make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以<code>build_ut_backend_ctrl_block_decode.py</code>为例，主要完成了 RTL 检查、DUT 检查、RTL 编译、disasm 依赖编译等工作：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">build</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#204a87">bool</span><span style="color:#000;font-weight:bold">:</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># import 相关依赖</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee_test.markers</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">match_version</span>
@@ -364,10 +434,10 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Failed to build disasm&#34;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 编译成功</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">True</span>
-</span></span></code></pre></div><p>picker的使用方式请参考其<a href="/UnityChipForXiangShan/">使用文档</a></p>
-<p>在<code>scripts</code>目录中可以创建子目录保存UT验证需要的文件，例如decode模块创建了<code>scripts/backend_ctrlblock_decode</code>目录，其中的<code>rtl_file.f</code>用来指定输入的RTL文件，<code>line_coverage.ignore</code>用来保存需要忽略的代码行统计。自定义目录的命名需要合理，且能通过名字判断其所属模块和文件。</p>
+</span></span></code></pre></div><p>picker 的使用方式请参考其<a href="https://github.com/XS-MLVP/picker/blob/master/README.zh.md">文档</a>和<a href="https://open-verify.cc/mlvp/docs/env_usage/picker_usage/">使用</a></p>
+<p>在<code>scripts</code>目录中可以创建子目录保存 UT 验证需要的文件，例如 decode 模块创建了<code>scripts/backend_ctrlblock_decode</code>目录，其中的<code>rtl_file.f</code>用来指定输入的 RTL 文件，<code>line_coverage.ignore</code>用来保存需要忽略的代码行统计。自定义目录的命名需要合理，且能通过名字判断其所属模块和文件。</p>
 <h3 id="编写-line_coverage_filescfg---liststr-函数">编写 line_coverage_files(cfg) -&gt; list[str] 函数</h3>
-<p>line_coverage_files函数的定义如下：</p>
+<p>line_coverage_files 函数的定义如下：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">line_coverage_files</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#204a87">list</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">]:</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;&#34;&#34;指定需要覆盖的文件
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    Args:
@@ -378,10 +448,10 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.markers import
 </span></span></code></pre></div><p>在<code>build_ut_backend_ctrl_block_decode.py</code>文件中，<code>line_coverage_files</code>函数的定义如下：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">line_coverage_files</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;PreDecode.v&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;DecodeStage.v&#34;</span><span style="color:#000;font-weight:bold">]</span>
-</span></span></code></pre></div><p>标识该模块关注的是对<code>PreDecode.v</code>, <code>DecodeStage.v</code>文件的覆盖。如果不开启测试结果后处理(<code>cfg.doc_result.disable = False</code>)，上述函数则不会被调用。</p>
+</span></span></code></pre></div><p>标识该模块关注的是对<code>PreDecode.v</code>, <code>DecodeStage.v</code>文件的覆盖。如果要开启测试结果处理，还需要在<code>configs/_default.yaml</code>中的<code>doc-result</code>下<code>disable=False</code>（默认参数是<code>False</code>，也就是开启状态）;如果不开启测试结果处理则(<code>disable = True</code>)。注意，如果不开启测试结果处理，那么上述函数就不会被调用。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 5, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/06fcda50d26afd75c8c9326e27259d0d88a810a1">docker: add more doc (06fcda5)</a>
+  最后修改 December 6, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/9fe690ea7856f6e1c8b397253a7f7ffb4d4ac20f">update new version (9fe690e)</a>
 </div>
 
 </div>
