@@ -18,35 +18,51 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>构建测试环境 | 万众一芯之香山处理器</title>
-<meta name="description" content="确定目录结构 UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+<meta name="description" content="确定目录结构 UT(Unit Test, 单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+本章节的文件为your_module_wrapper.py（如果你的模块是decode，那么文件就是decode_wrapper.py）。
+wrapper 是包装的意思，也就是我们测试中需要用到的方法封装成和dut解耦合的API提供给测试用例使用。
+*注：解耦合是为了测试用例和 DUT 解耦，使得测试用例可以独立于 DUT 进行编写和调试，也就是在测试用例中，不需要知道 DUT 的具体实现细节，只需要知道如何使用 API 即可。可以参照将验证代码与DUT进行解耦
+该文件应该放于ut_frontend_or_backend/top_module/your_module/env（这里依然以decode举例：decode属于后端，其顶层目录则应该是ut_backend；decode的顶层模块是ctrlblock，那么次级目录就是ctrl_block;之后的就是decode自己了；最后，由于我们是在构建测试环境，再建一级env目录。将它们连起来就是：ut_frontend_or_backend/top_module/your_module/env）目录下。
 ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │ ├── __init__.py ├── __init__.py ├── README.md └── test_rv_decode.py 模块（例如decode）中的代码目录结构由贡献者自行决定，但需要满足 python 规范，且逻辑和命名合理。
 编写测试环境 在 UT 验证模块的测试环境中，目标是完成以下工作：
 对 DUT 进行功能封装，为测试提供稳定 API 定义功能覆盖率 定义必要 fixture 提供给测试用例 在合理时刻统计覆盖率 以 decode 环境中的 RVCExpander 为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
-1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 使用前缀关联引脚 self.bind(self.dut) # 把 Bundle 与 DUT 进行绑定 def expand(self, instr): self.">
+1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.">
 <meta property="og:title" content="构建测试环境" />
-<meta property="og:description" content="确定目录结构 UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+<meta property="og:description" content="确定目录结构 UT(Unit Test, 单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+本章节的文件为your_module_wrapper.py（如果你的模块是decode，那么文件就是decode_wrapper.py）。
+wrapper 是包装的意思，也就是我们测试中需要用到的方法封装成和dut解耦合的API提供给测试用例使用。
+*注：解耦合是为了测试用例和 DUT 解耦，使得测试用例可以独立于 DUT 进行编写和调试，也就是在测试用例中，不需要知道 DUT 的具体实现细节，只需要知道如何使用 API 即可。可以参照将验证代码与DUT进行解耦
+该文件应该放于ut_frontend_or_backend/top_module/your_module/env（这里依然以decode举例：decode属于后端，其顶层目录则应该是ut_backend；decode的顶层模块是ctrlblock，那么次级目录就是ctrl_block;之后的就是decode自己了；最后，由于我们是在构建测试环境，再建一级env目录。将它们连起来就是：ut_frontend_or_backend/top_module/your_module/env）目录下。
 ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │ ├── __init__.py ├── __init__.py ├── README.md └── test_rv_decode.py 模块（例如decode）中的代码目录结构由贡献者自行决定，但需要满足 python 规范，且逻辑和命名合理。
 编写测试环境 在 UT 验证模块的测试环境中，目标是完成以下工作：
 对 DUT 进行功能封装，为测试提供稳定 API 定义功能覆盖率 定义必要 fixture 提供给测试用例 在合理时刻统计覆盖率 以 decode 环境中的 RVCExpander 为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
-1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 使用前缀关联引脚 self.bind(self.dut) # 把 Bundle 与 DUT 进行绑定 def expand(self, instr): self." />
+1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/02_build_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-06T19:38:32+08:00" />
+<meta property="article:modified_time" content="2024-12-09T11:33:17+08:00" />
 <meta itemprop="name" content="构建测试环境">
-<meta itemprop="description" content="确定目录结构 UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+<meta itemprop="description" content="确定目录结构 UT(Unit Test, 单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+本章节的文件为your_module_wrapper.py（如果你的模块是decode，那么文件就是decode_wrapper.py）。
+wrapper 是包装的意思，也就是我们测试中需要用到的方法封装成和dut解耦合的API提供给测试用例使用。
+*注：解耦合是为了测试用例和 DUT 解耦，使得测试用例可以独立于 DUT 进行编写和调试，也就是在测试用例中，不需要知道 DUT 的具体实现细节，只需要知道如何使用 API 即可。可以参照将验证代码与DUT进行解耦
+该文件应该放于ut_frontend_or_backend/top_module/your_module/env（这里依然以decode举例：decode属于后端，其顶层目录则应该是ut_backend；decode的顶层模块是ctrlblock，那么次级目录就是ctrl_block;之后的就是decode自己了；最后，由于我们是在构建测试环境，再建一级env目录。将它们连起来就是：ut_frontend_or_backend/top_module/your_module/env）目录下。
 ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │ ├── __init__.py ├── __init__.py ├── README.md └── test_rv_decode.py 模块（例如decode）中的代码目录结构由贡献者自行决定，但需要满足 python 规范，且逻辑和命名合理。
 编写测试环境 在 UT 验证模块的测试环境中，目标是完成以下工作：
 对 DUT 进行功能封装，为测试提供稳定 API 定义功能覆盖率 定义必要 fixture 提供给测试用例 在合理时刻统计覆盖率 以 decode 环境中的 RVCExpander 为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
-1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 使用前缀关联引脚 self.bind(self.dut) # 把 Bundle 与 DUT 进行绑定 def expand(self, instr): self.">
-<meta itemprop="dateModified" content="2024-12-06T19:38:32+08:00" />
-<meta itemprop="wordCount" content="497">
+1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.">
+<meta itemprop="dateModified" content="2024-12-09T11:33:17+08:00" />
+<meta itemprop="wordCount" content="515">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="构建测试环境"/>
-<meta name="twitter:description" content="确定目录结构 UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+<meta name="twitter:description" content="确定目录结构 UT(Unit Test, 单元测试)所在的目录位置的层级结构应该与名称一致，例如backend.ctrl_block.decode应当位于ut_backend/ctrl_block/decode目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
+本章节的文件为your_module_wrapper.py（如果你的模块是decode，那么文件就是decode_wrapper.py）。
+wrapper 是包装的意思，也就是我们测试中需要用到的方法封装成和dut解耦合的API提供给测试用例使用。
+*注：解耦合是为了测试用例和 DUT 解耦，使得测试用例可以独立于 DUT 进行编写和调试，也就是在测试用例中，不需要知道 DUT 的具体实现细节，只需要知道如何使用 API 即可。可以参照将验证代码与DUT进行解耦
+该文件应该放于ut_frontend_or_backend/top_module/your_module/env（这里依然以decode举例：decode属于后端，其顶层目录则应该是ut_backend；decode的顶层模块是ctrlblock，那么次级目录就是ctrl_block;之后的就是decode自己了；最后，由于我们是在构建测试环境，再建一级env目录。将它们连起来就是：ut_frontend_or_backend/top_module/your_module/env）目录下。
 ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │ ├── __init__.py ├── __init__.py ├── README.md └── test_rv_decode.py 模块（例如decode）中的代码目录结构由贡献者自行决定，但需要满足 python 规范，且逻辑和命名合理。
 编写测试环境 在 UT 验证模块的测试环境中，目标是完成以下工作：
 对 DUT 进行功能封装，为测试提供稳定 API 定义功能覆盖率 定义必要 fixture 提供给测试用例 在合理时刻统计覆盖率 以 decode 环境中的 RVCExpander 为例（ut_backend/ctrl_block/decode/env/decode_wrapper.py）：
-1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self.dut.io_in.AsImmWrite() # DUTRVCExpander为组合电路，将输入引脚设置为ImmWrite写入模式 self.io = toffee.Bundle.from_prefix(&#34;io_&#34;, self.dut) # 通过 Bundle 使用前缀关联引脚 self.bind(self.dut) # 把 Bundle 与 DUT 进行绑定 def expand(self, instr): self."/>
+1. DUT 封装 class RVCExpander(toffee.Bundle): def __init__(self, cover_group, **kwargs): super().__init__() self.cover_group = cover_group self.dut = DUTRVCExpander(**kwargs) # 创建DUT self."/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <script
@@ -148,7 +164,7 @@ ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.72872f62915244d001d8b55795bdcb2d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6ba19b6db8d4e55568baa6b60bfac534.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -172,7 +188,7 @@ ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.72872f62915244d001d8b55795bdcb2d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6ba19b6db8d4e55568baa6b60bfac534.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -359,7 +375,11 @@ ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │�
 		
   </header>
 	<h2 id="确定目录结构">确定目录结构</h2>
-<p>UT(单元测试)所在的目录位置的层级结构应该与名称一致，例如<code>backend.ctrl_block.decode</code>应当位于<code>ut_backend/ctrl_block/decode</code>目录，且每层目录都需要有<code>__init__.py</code>，便于通过 python 进行<code>import</code>。</p>
+<p>UT(Unit Test, 单元测试)所在的目录位置的层级结构应该与名称一致，例如<code>backend.ctrl_block.decode</code>应当位于<code>ut_backend/ctrl_block/decode</code>目录，且每层目录都需要有<code>__init__.py</code>，便于通过 python 进行<code>import</code>。</p>
+<p><strong>本章节的文件为<code>your_module_wrapper.py</code></strong>（如果你的模块是decode，那么文件就是<code>decode_wrapper.py</code>）。</p>
+<p>wrapper 是包装的意思，也就是我们测试中需要用到的方法封装成和dut解耦合的API提供给测试用例使用。</p>
+<p>*注：解耦合是为了测试用例和 DUT 解耦，使得测试用例可以独立于 DUT 进行编写和调试，也就是在测试用例中，不需要知道 DUT 的具体实现细节，只需要知道如何使用 API 即可。可以参照<a href="https://open-verify.cc/mlvp/docs/mlvp/canonical_env/#%E5%B0%86%E9%AA%8C%E8%AF%81%E4%BB%A3%E7%A0%81%E4%B8%8Edut%E8%BF%9B%E8%A1%8C%E8%A7%A3%E8%80%A6">将验证代码与DUT进行解耦</a></p>
+<p>该文件应该放于<code>ut_frontend_or_backend/top_module/your_module/env</code>（这里依然以<code>decode</code>举例：<code>decode</code>属于后端，其顶层目录则应该是<code>ut_backend</code>；<code>decode</code>的顶层模块是<code>ctrlblock</code>，那么次级目录就是<code>ctrl_block</code>;之后的就是<code>decode</code>自己了；最后，由于我们是在<strong>构建测试环境</strong>，再建一级<code>env</code>目录。将它们连起来就是：<code>ut_frontend_or_backend/top_module/your_module/env</code>）目录下。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ut_backend/ctrl_block/decode
 </span></span><span style="display:flex;"><span>├── env
 </span></span><span style="display:flex;"><span>│   ├── decode_wrapper.py
@@ -442,7 +462,7 @@ ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │�
 </span></span><span style="display:flex;"><span>    <span style="color:#000">wave_file</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_out_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;decoder/rvc_expander_</span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">.fst&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#000">fname</span><span style="color:#000;font-weight:bold">)</span>     <span style="color:#8f5902;font-style:italic"># 设置波形文件路径</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">coverage_file</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_out_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;decoder/rvc_expander_</span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">.dat&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#000">fname</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 设置代码覆盖率文件路径</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">coverage_dir</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">path</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dirname</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">makedirs</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">coverage_dir</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">exist_ok</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>                           <span style="color:#8f5902;font-style:italic"># 目标目录不正在则创建目录</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">makedirs</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">coverage_dir</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">exist_ok</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>                           <span style="color:#8f5902;font-style:italic"># 目标目录不存在则创建目录</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">expander</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">RVCExpander</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">g</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">coverage_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">waveform_filename</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">wave_file</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>                                                                       <span style="color:#8f5902;font-style:italic"># 创建RVCExpander</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">init_rvc_expander_funcov</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">g</span><span style="color:#000;font-weight:bold">)</span>                              <span style="color:#8f5902;font-style:italic"># 初始化功能检查点</span>
@@ -459,7 +479,8 @@ ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │�
 <li>结束 DUT，处理代码行覆盖率和功能覆盖率（发往 toffee-report 进行处理）</li>
 <li>清空功能覆盖率</li>
 </ol>
-<p>*注：在 PyTest 中，执行测试用例<code>test_A(rvc_expander, ....)</code>前，会自动调用并执行<code>rvc_expander(request)</code>中<code>yield</code>关键字前的部分，然后通过<code>yield</code>返回<code>rvc_expander</code>调用<code>test_A</code>用例，用例执行完成后，再继续执行<code>fixture</code>中<code>yield</code>关键字之后的部分。</p>
+<p>*注：在 PyTest 中，执行测试用例<code>test_A(rvc_expander, ....)</code>前（<strong>rvc_expander是我们在使用fixure装饰器时定义的方法名</strong>），会自动调用并执行<code>rvc_expander(request)</code>中<code>yield</code>关键字前的部分（相当于初始化），然后通过<code>yield</code>返回<code>rvc_expander</code>调用<code>test_A</code>用例（<strong>yield返回的对象，在测试用例里就是我们fixture下定义的方法名</strong>），用例执行完成后，再继续执行<code>fixture</code>中<code>yield</code>关键字之后的部分。比如：参照下面统计覆盖率的代码，倒数第四行的
+<code>rvc_expand(rvc_expander, generate_rvc_instructions(start, end))</code>，其中的<code>rvc_expander</code>就是我们在<code>fixture</code>中定义的方法名，也就是<code>yield</code>返回的对象。</p>
 <h3 id="4-统计覆盖率">4. 统计覆盖率</h3>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">N</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">10</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">T</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span><span style="color:#0000cf;font-weight:bold">16</span>
@@ -499,7 +520,7 @@ ut_backend/ctrl_block/decode ├── env │ ├── decode_wrapper.py │�
 </ul>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 6, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/9fe690ea7856f6e1c8b397253a7f7ffb4d4ac20f">update new version (9fe690e)</a>
+  最后修改 December 9, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c33915b6272a29e107e62ff8d92e30495679405b">docs: improve directory structure and fixture explanation (c33915b)</a>
 </div>
 
 </div>
