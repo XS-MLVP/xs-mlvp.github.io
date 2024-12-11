@@ -40,7 +40,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/01_build_script/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-09T11:33:17+08:00" />
+<meta property="article:modified_time" content="2024-12-11T18:29:50+08:00" />
 <meta itemprop="name" content="添加编译脚本">
 <meta itemprop="description" content="脚本目标 该脚本的目标是提供 RTL 到 Python DUT 的编译、目标覆盖文件，以及自定义功能等内容。
 创建过程 确定文件名称 在香山昆明湖 DUT 验证进展中选择需要验证的 UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。
@@ -51,7 +51,7 @@ ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中�
 编写 build(cfg) -&gt; bool 函数 build 函数定义如下：
 def build(cfg) -&gt; bool: &#34;&#34;&#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.rtl.version Return: 返回 True 或者 False，表明该函数是否完成预期目标 &#34;&#34;&#34; build 在 make dut 时会被调用，其主要是将目标 RTL 转换为 Python 模块。在该过程中也可以加入其他必要过程，例如编译依赖项等。以build_ut_backend_ctrl_block_decode.py为例，主要完成了 RTL 检查、DUT 检查、RTL 编译、disasm 依赖编译等工作：
 def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test.">
-<meta itemprop="dateModified" content="2024-12-09T11:33:17+08:00" />
+<meta itemprop="dateModified" content="2024-12-11T18:29:50+08:00" />
 <meta itemprop="wordCount" content="276">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="添加编译脚本"/>
 <meta name="twitter:description" content="脚本目标 该脚本的目标是提供 RTL 到 Python DUT 的编译、目标覆盖文件，以及自定义功能等内容。
@@ -451,7 +451,7 @@ def build(cfg) -&gt; bool: # import 相关依赖 from toffee_test."/>
 </span></span></code></pre></div><p>标识该模块关注的是对<code>PreDecode.v</code>, <code>DecodeStage.v</code>文件的覆盖。如果要开启测试结果处理，还需要在<code>configs/_default.yaml</code>中的<code>doc-result</code>下<code>disable=False</code>（默认参数是<code>False</code>，也就是开启状态）;如果不开启测试结果处理则(<code>disable = True</code>)。注意，如果不开启测试结果处理，那么上述函数就不会被调用。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 9, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c33915b6272a29e107e62ff8d92e30495679405b">docs: improve directory structure and fixture explanation (c33915b)</a>
+  最后修改 December 11, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/65d0056e19efb1b0723b073d0ba50a8df839789e">comm: fix get_git_url_with_commit (65d0056)</a>
 </div>
 
 </div>

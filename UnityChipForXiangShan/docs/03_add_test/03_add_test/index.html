@@ -30,13 +30,13 @@ def test_rvi_inst(decoder, rvc_expander): &#34;&#34;&#34; Test the RVI instructi
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/03_add_test/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-09T11:33:17+08:00" />
+<meta property="article:modified_time" content="2024-12-11T18:29:50+08:00" />
 <meta itemprop="name" content="添加测试用例">
 <meta itemprop="description" content="命名要求 所有测试用例文件请以test_*.py的方式进行命名，*用测试目标替换（例如test_rv_decode.py）。所有测试用例也需要以test_前缀开头。用例名称需要具有明确意义。
 命名举例如下：
 def test_a(): # 不合理，无法通过a判断测试目标 pass def test_rvc_expand_16bit_full(): # 合理，可以通过用例名称大体知道测试内容 pass 使用 Assert 在每个测试用例中，都需要通过assert来判断本测试是否通过。 pytest统计的是assert语句的结果，因此assert语句需要保证能够通过。
 def test_rvi_inst(decoder, rvc_expander): &#34;&#34;&#34; Test the RVI instruction set. randomly generate instructions for testing Args: decoder (fixure): the fixture of the decoder &#34;&#34;&#34; need_log_file = True insn_list_temp = generate_random_32bits(100) ref_lists = convert_reference_format(rvc_expander, insn_list_temp, True, libdisasm.disasm, libdisasm.disasm_free_mem) assert decode_run(decoder, ref_lists, need_log_file,&#34;test_rvi_inst&#34;) == True, &#34;RVI decode error&#34; g.add_cover_point(decoder, {&#34;illegal_inst_triggers_an_exception&#34;: lambda _: decoder.Get_decode_checkpoint_illeagl_inst() != 0}, name=&#34;RVI_illegal_inst&#34;).sample() g.">
-<meta itemprop="dateModified" content="2024-12-09T11:33:17+08:00" />
+<meta itemprop="dateModified" content="2024-12-11T18:29:50+08:00" />
 <meta itemprop="wordCount" content="358">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="添加测试用例"/>
 <meta name="twitter:description" content="命名要求 所有测试用例文件请以test_*.py的方式进行命名，*用测试目标替换（例如test_rv_decode.py）。所有测试用例也需要以test_前缀开头。用例名称需要具有明确意义。
@@ -442,7 +442,7 @@ def test_rvi_inst(decoder, rvc_expander): &#34;&#34;&#34; Test the RVI instructi
 </span></span></code></pre></div><p>在上述用例中定义了参数化参数<code>start</code>, <code>end</code>，用来指定压缩指令的开始值和结束值，然后通过装饰器<code>@pytest.mark.parametrize</code>对他们进行分组赋值。变量 N 可以指定将目标数据进行分组的组数，默认设置为 10 组。在运行时用例<code>test_rvc_expand_16bit_full</code>会展开为<code>test_rvc_expand_16bit_full[0-6553]</code>至<code>test_rvc_expand_16bit_full[58977-65536]</code>10 个测试用例运行。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 9, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c33915b6272a29e107e62ff8d92e30495679405b">docs: improve directory structure and fixture explanation (c33915b)</a>
+  最后修改 December 11, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/65d0056e19efb1b0723b073d0ba50a8df839789e">comm: fix get_git_url_with_commit (65d0056)</a>
 </div>
 
 </div>
