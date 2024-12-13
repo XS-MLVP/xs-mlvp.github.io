@@ -20,11 +20,11 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>添加测试 | 万众一芯之香山处理器</title>
-<meta name="description" content="添加一个全新的 DUT 测试用例，需要完成以下三部分内容：
-添加编译脚本： 在scripts目录下使用python编写对应rtl的编译文件（例如build_ut_backend_ctrl_block_decode.py）。 构建测试环境： 在目录中创建目标测试 UT 目录（例如ut_backend/ctrl_block/decode）。如果有需要的话，可以在tools、comm等模块中添加该 DUT 测试需要的基础工具。 添加测试用例： 在测试 UT 目录，按PyTest 规范添加测试用例。 如果是在已有的 DUT 测试中增加内容，按原有目录结构添加即可。
+<meta name="description" content="添加一个全新的 DUT 测试用例，需要完成以下三部分内容(本节以前端的ifu下的rvc_expander为例)：
+添加编译脚本： 在scripts目录下使用python编写对应rtl的编译文件（例如build_ut_frontend_ifu_rvc_expander.py）。 构建测试环境： 在目录中创建目标测试 UT 目录（例如ut_frontend/ifu/rvc_expander）。如果有需要的话，可以在tools、comm等模块中添加该 DUT 测试需要的基础工具。 添加测试用例： 在测试 UT 目录，按PyTest 规范添加测试用例。 如果是在已有的 DUT 测试中增加内容，按原有目录结构添加即可。
 如何通过 picker 和 toffee 库进行 Python 芯片验证，请参考：https://open-verify.cc/mlvp/docs
 在测试时还需要关心以下内容：
-UT 模块说明: 在添加的模块顶层文件夹中，添加README.md说明，具体格式和要求请参考模板。 代码覆盖率：代码覆盖率是芯片验证的重要指标，一般需需要覆盖目标 DUT 的所有代码。 功能覆盖率：功能覆盖率即目标功能验证完成了多少，一般需要达到 100%。 在后续的文档中，我们将以 decode 模块为例，详细说明上述过程。
+UT 模块说明: 在添加的模块顶层文件夹中，添加README.md说明，具体格式和要求请参考模板。 代码覆盖率：代码覆盖率是芯片验证的重要指标，一般需需要覆盖目标 DUT 的所有代码。 功能覆盖率：功能覆盖率即目标功能验证完成了多少，一般需要达到 100%。 在后续的文档中，我们将继续以rvc_expander模块为例，详细说明上述过程。
 *注：目录或文件名称需要合理，以便于能通过命名知晓其具体含义。">
 <meta property="og:title" content="添加测试" />
 <meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
@@ -134,7 +134,7 @@ UT 模块说明: 在添加的模块顶层文件夹中，添加README.md说明，
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d4706c50020aa550a8486752bdefd0c1.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b72bf5997048622b5885e01e44b39a02.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -158,7 +158,7 @@ UT 模块说明: 在添加的模块顶层文件夹中，添加README.md说明，
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d4706c50020aa550a8486752bdefd0c1.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b72bf5997048622b5885e01e44b39a02.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -326,10 +326,10 @@ UT 模块说明: 在添加的模块顶层文件夹中，添加README.md说明，
 	<header class="article-meta">
 		
   </header>
-	<p>添加一个全新的 DUT 测试用例，需要完成以下三部分内容：</p>
+	<p>添加一个全新的 DUT 测试用例，需要完成以下三部分内容(本节以前端的<code>ifu</code>下的<code>rvc_expander</code>为例)：</p>
 <ol>
-<li><strong>添加编译脚本</strong>： 在<code>scripts</code>目录下使用<code>python</code>编写对应<code>rtl</code>的编译文件（例如<code>build_ut_backend_ctrl_block_decode.py</code>）。</li>
-<li><strong>构建测试环境</strong>： 在目录中创建目标测试 UT 目录（例如<code>ut_backend/ctrl_block/decode</code>）。如果有需要的话，可以在<code>tools、comm</code>等模块中添加该 DUT 测试需要的基础工具。</li>
+<li><strong>添加编译脚本</strong>： 在<code>scripts</code>目录下使用<code>python</code>编写对应<code>rtl</code>的编译文件（例如<code>build_ut_frontend_ifu_rvc_expander.py</code>）。</li>
+<li><strong>构建测试环境</strong>： 在目录中创建目标测试 UT 目录（例如<code>ut_frontend/ifu/rvc_expander</code>）。如果有需要的话，可以在<code>tools、comm</code>等模块中添加该 DUT 测试需要的基础工具。</li>
 <li><strong>添加测试用例</strong>： 在测试 UT 目录，按<a href="https://docs.pytest.org/en/stable/">PyTest 规范</a>添加测试用例。</li>
 </ol>
 <p>如果是在已有的 DUT 测试中增加内容，按原有目录结构添加即可。</p>
@@ -340,7 +340,7 @@ UT 模块说明: 在添加的模块顶层文件夹中，添加README.md说明，
 <li><strong>代码覆盖率</strong>：代码覆盖率是芯片验证的重要指标，一般需需要覆盖目标 DUT 的所有代码。</li>
 <li><strong>功能覆盖率</strong>：功能覆盖率即目标功能验证完成了多少，一般需要达到 100%。</li>
 </ol>
-<p>在后续的文档中，我们将以 decode 模块为例，详细说明上述过程。</p>
+<p>在后续的文档中，我们将继续以<code>rvc_expander</code>模块为例，详细说明上述过程。</p>
 <p>*注：目录或文件名称需要合理，以便于能通过命名知晓其具体含义。</p>
 
   <div class="section-index">
@@ -379,7 +379,7 @@ UT 模块说明: 在添加的模块顶层文件夹中，添加README.md说明，
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 December 12, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c54c0c2e590cf334b986f8ef3eacc53329f4ed1e">Merge pull request #6 from miceforrat/main (c54c0c2)</a>
+  最后修改 December 13, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/676079f8e2cc111dafdeeed07681ca88398735c2">docs: make the content consistent with rvc_expander and fix the serial number error (676079f)</a>
 </div>
 </div>
 

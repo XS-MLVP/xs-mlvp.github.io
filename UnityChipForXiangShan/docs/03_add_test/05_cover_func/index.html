@@ -23,54 +23,46 @@
 本项目中相关涉及位置 功能覆盖率需要我们先定义了才能统计，主要是在构建测试环境的时候涉及。
 在构建测试环境中：
 定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标 定义必要 fixture： 把统计结果传递给 toffee-report 统计覆盖率： 添加观察点和反标 其他：
-在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
-from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name 的值为backend.ctrl_block.decode.INT，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：backend.ctrl_block.decode 模块）
+在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper # 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper # UT_FCOV会默认去掉前缀 ut_ g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;)) # name = UT_FCOV(&#34;../../../CLASSIC&#34;) name 的值为frontend.ifu.rvc_expander.CLASSIC，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）
 创建覆盖率组 使用toffee的funcov可以创建覆盖率组。
-import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。
-添加观察点和反标 在每个测试用例内部，可以使用add_watch_point（add_cover_point是其别名，二者完全一致）来添加观察点和mark_function来添加反标。 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。 反标是，将功能点和测试用例进行关联，这样在统计时，就能看到每个功能点对应了哪些测试用例。
-对于观察点的位置，需要根据实际情况来定，一般来说，在测试用例外直接添加观察点是没有问题的。 不过有时候我们可以更加的灵活。">
+import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。">
 <meta property="og:title" content="功能覆盖率" />
 <meta property="og:description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
 反标是指将功能点与测试用例对应起来。这样，在统计时，就能看到每个功能点对应了哪些测试用例，从而方便查看哪些功能点用的测试用例多，哪些功能点用的测试用例少，有利于后期的测试用例优化。
 本项目中相关涉及位置 功能覆盖率需要我们先定义了才能统计，主要是在构建测试环境的时候涉及。
 在构建测试环境中：
 定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标 定义必要 fixture： 把统计结果传递给 toffee-report 统计覆盖率： 添加观察点和反标 其他：
-在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
-from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name 的值为backend.ctrl_block.decode.INT，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：backend.ctrl_block.decode 模块）
+在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper # 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper # UT_FCOV会默认去掉前缀 ut_ g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;)) # name = UT_FCOV(&#34;../../../CLASSIC&#34;) name 的值为frontend.ifu.rvc_expander.CLASSIC，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）
 创建覆盖率组 使用toffee的funcov可以创建覆盖率组。
-import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。
-添加观察点和反标 在每个测试用例内部，可以使用add_watch_point（add_cover_point是其别名，二者完全一致）来添加观察点和mark_function来添加反标。 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。 反标是，将功能点和测试用例进行关联，这样在统计时，就能看到每个功能点对应了哪些测试用例。
-对于观察点的位置，需要根据实际情况来定，一般来说，在测试用例外直接添加观察点是没有问题的。 不过有时候我们可以更加的灵活。" />
+import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&quot;../../../CLASSIC&quot;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-12T17:12:11+08:00" />
+<meta property="article:modified_time" content="2024-12-13T19:18:10+08:00" />
 <meta itemprop="name" content="功能覆盖率">
 <meta itemprop="description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
 反标是指将功能点与测试用例对应起来。这样，在统计时，就能看到每个功能点对应了哪些测试用例，从而方便查看哪些功能点用的测试用例多，哪些功能点用的测试用例少，有利于后期的测试用例优化。
 本项目中相关涉及位置 功能覆盖率需要我们先定义了才能统计，主要是在构建测试环境的时候涉及。
 在构建测试环境中：
 定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标 定义必要 fixture： 把统计结果传递给 toffee-report 统计覆盖率： 添加观察点和反标 其他：
-在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
-from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name 的值为backend.ctrl_block.decode.INT，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：backend.ctrl_block.decode 模块）
+在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper # 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper # UT_FCOV会默认去掉前缀 ut_ g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;)) # name = UT_FCOV(&#34;../../../CLASSIC&#34;) name 的值为frontend.ifu.rvc_expander.CLASSIC，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）
 创建覆盖率组 使用toffee的funcov可以创建覆盖率组。
-import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。
-添加观察点和反标 在每个测试用例内部，可以使用add_watch_point（add_cover_point是其别名，二者完全一致）来添加观察点和mark_function来添加反标。 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。 反标是，将功能点和测试用例进行关联，这样在统计时，就能看到每个功能点对应了哪些测试用例。
-对于观察点的位置，需要根据实际情况来定，一般来说，在测试用例外直接添加观察点是没有问题的。 不过有时候我们可以更加的灵活。">
-<meta itemprop="dateModified" content="2024-12-12T17:12:11+08:00" />
-<meta itemprop="wordCount" content="347">
+import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&quot;../../../CLASSIC&quot;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。">
+<meta itemprop="dateModified" content="2024-12-13T19:18:10+08:00" />
+<meta itemprop="wordCount" content="356">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="功能覆盖率"/>
 <meta name="twitter:description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
 反标是指将功能点与测试用例对应起来。这样，在统计时，就能看到每个功能点对应了哪些测试用例，从而方便查看哪些功能点用的测试用例多，哪些功能点用的测试用例少，有利于后期的测试用例优化。
 本项目中相关涉及位置 功能覆盖率需要我们先定义了才能统计，主要是在构建测试环境的时候涉及。
 在构建测试环境中：
 定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标 定义必要 fixture： 把统计结果传递给 toffee-report 统计覆盖率： 添加观察点和反标 其他：
-在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_backend/ctrl_block/decode/env/decode_wrapper.py中进行如下调用：
-from comm import UT_FCOV # 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper # 通过../../去掉了上级模块env和decode_wrapper # UT_FCOV会默认去掉前缀 ut_ name = UT_FCOV(&#34;../../INT&#34;) name 的值为backend.ctrl_block.decode.INT，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：backend.ctrl_block.decode 模块）
+在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py中进行如下调用：
+from comm import UT_FCOV # 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper # 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper # UT_FCOV会默认去掉前缀 ut_ g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;)) # name = UT_FCOV(&#34;../../../CLASSIC&#34;) name 的值为frontend.ifu.rvc_expander.CLASSIC，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）
 创建覆盖率组 使用toffee的funcov可以创建覆盖率组。
-import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。
-添加观察点和反标 在每个测试用例内部，可以使用add_watch_point（add_cover_point是其别名，二者完全一致）来添加观察点和mark_function来添加反标。 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。 反标是，将功能点和测试用例进行关联，这样在统计时，就能看到每个功能点对应了哪些测试用例。
-对于观察点的位置，需要根据实际情况来定，一般来说，在测试用例外直接添加观察点是没有问题的。 不过有时候我们可以更加的灵活。"/>
+import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&quot;../../../CLASSIC&quot;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。"/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <script
@@ -172,7 +164,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d4706c50020aa550a8486752bdefd0c1.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b72bf5997048622b5885e01e44b39a02.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -196,7 +188,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d4706c50020aa550a8486752bdefd0c1.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b72bf5997048622b5885e01e44b39a02.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -397,19 +389,21 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 </ul>
 <h2 id="功能覆盖率使用流程">功能覆盖率使用流程</h2>
 <h3 id="指定-group-名称">指定 Group 名称</h3>
-<p>测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块<code>ut_backend/ctrl_block/decode/env/decode_wrapper.py</code>中进行如下调用：</p>
+<p>测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块<code>ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py</code>中进行如下调用：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">comm</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">UT_FCOV</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 本模块名为：ut_backend.ctrl_block.decode.env.decode_wrapper</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 通过../../去掉了上级模块env和decode_wrapper</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper</span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># UT_FCOV会默认去掉前缀 ut_</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">name</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">UT_FCOV</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;../../INT&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><p>name 的值为<code>backend.ctrl_block.decode.INT</code>，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：backend.ctrl_block.decode 模块）</p>
+</span></span><span style="display:flex;"><span><span style="color:#000">g</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">fc</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">CovGroup</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">UT_FCOV</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;../../../CLASSIC&#34;</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># name = UT_FCOV(&#34;../../../CLASSIC&#34;)</span>
+</span></span></code></pre></div><p>name 的值为<code>frontend.ifu.rvc_expander.CLASSIC</code>，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）</p>
 <h3 id="创建覆盖率组">创建覆盖率组</h3>
 <p>使用<code>toffee</code>的<code>funcov</code>可以创建覆盖率组。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee.funcov</span> <span style="color:#204a87;font-weight:bold">as</span> <span style="color:#000">fc</span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 使用上面指定的GROUP名字</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">g</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">fc</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">CovGroup</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><p>创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。</p>
+</span></span></code></pre></div><p>这两步也可以合成一句<code>g = fc.CovGroup(UT_FCOV(&quot;../../../CLASSIC&quot;))</code>。
+创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。</p>
 <h3 id="添加观察点和反标">添加观察点和反标</h3>
 <p>在每个测试用例内部，可以使用<code>add_watch_point</code>（<code>add_cover_point</code>是其别名，二者完全一致）来添加观察点和<code>mark_function</code>来添加反标。
 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。
@@ -442,7 +436,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">None</span> 
 </span></span></code></pre></div><p>这个例子的第一个<code>g.add_watch_point</code>是放在测试用例之外的，因为它和现有的测试用例没有直接关系，放在测试用例之外反而更加方便。添加观察点之后，只要<code>add_watch_point</code>方法中的<code>bins</code>条件触发了，我们的<code>toffee-test</code>框架就能够收集到对应的功能点。</p>
 <ol start="2">
-<li>在测试用例之中（<code>test_rv_decode.py</code>中）</li>
+<li>在测试用例之中（<code>test_rvc_expander.py</code>中）</li>
 </ol>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">N</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">10</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">T</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span><span style="color:#0000cf;font-weight:bold">32</span>
@@ -470,6 +464,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 <h3 id="采样">采样</h3>
 <p>在上一个例子的最后，我们调用了<code>g.sample()</code>，这个函数的作用是告诉<code>toffee-test</code>，<code>add_watch_point</code>里的<code>bins</code>已经执行过了，判断一下是不是True，是的话就为这个观察点记录一次Pass。</p>
 <p>有手动就有自动。我们可以在构建测试环境时，在定义fixture中加入<code>StepRis(lambda x: g.sample())</code>,这样就会在每个时钟周期的上升沿自动采样。</p>
+<p>以下内容来自<code>ut_backend/ctrl_block/decode/env/decode_wrapper.py </code>。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@pytest.fixture</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">decoder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># before test</span>
@@ -497,7 +492,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 <p><code>StepRis</code>函数的作用是在每个时钟周期的上升沿执行传入的函数，详情可参照<a href="https://open-verify.cc/mlvp/docs/env_usage/picker_usage/">picker使用介绍</a></p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 12, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c54c0c2e590cf334b986f8ef3eacc53329f4ed1e">Merge pull request #6 from miceforrat/main (c54c0c2)</a>
+  最后修改 December 13, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/676079f8e2cc111dafdeeed07681ca88398735c2">docs: make the content consistent with rvc_expander and fix the serial number error (676079f)</a>
 </div>
 
 </div>
