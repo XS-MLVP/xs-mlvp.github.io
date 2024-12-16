@@ -19,7 +19,7 @@
       <link>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ifu_rvc_exp/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ifu_rvc_exp/</guid>
-      <description>TBD</description>
+      <description>子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。&#xA;该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。&#xA;输出量也是两个：输入指令对应的RVI指令；RVC指令是否非法。&#xA;指令扩展 如果是RVI指令，则无需扩展。&#xA;否则对RVC指令，按照手册的约定进行扩展。&#xA;非法指令判断 RVI指令永远判断为合法。&#xA;对于RVC指令的判定，详细内容参阅20240411的RISCV手册的26.8节表格列出的指令条件。&#xA;功能点和测试点 功能点1 指令扩展 RVCExpander负责接收预译码器拼接的指令码，并进行指令扩展，如果是16位RVC指令，需要按照RISCV手册的约定完成扩展&#xA;对此，我们需要随机生成RVI指令和RVC指令，送入预译码器：&#xA;序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法&#xA;对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：&#xA;同时，需要判定双精度浮点指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。&#xA;序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 双精度浮点指令测试 CSR未使能fs.status的情况下，双精度浮点指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。&#xA;对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)&#xA;op\funct 000 001 010 011 100 101 110 111 00 addi4spn fld lw ld lbu&#xA;lhu;lh&#xA;sb;sh fsd sw sd 01 addi addiw li lui</description>
     </item>
   </channel>
 </rss>
