@@ -17,7 +17,7 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
-<title>IFU-RVC-Expander | 万众一芯之香山处理器</title>
+<title>RVCExpander | 万众一芯之香山处理器</title>
 <meta name="description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
 输出量也是两个：输入指令对应的RVI指令；RVC指令是否非法。
@@ -29,13 +29,10 @@
 对此，我们需要随机生成RVI指令和RVC指令，送入预译码器：
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
-同时，需要判定双精度浮点指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 双精度浮点指令测试 CSR未使能fs.status的情况下，双精度浮点指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。
-对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)
-op\funct 000 001 010 011 100 101 110 111 00 addi4spn fld lw ld lbu
-lhu;lh
-sb;sh fsd sw sd 01 addi addiw li lui">
-<meta property="og:title" content="IFU-RVC-Expander" />
+此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。
+对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)">
+<meta property="og:title" content="RVCExpander" />
 <meta property="og:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
 输出量也是两个：输入指令对应的RVI指令；RVC指令是否非法。
@@ -47,17 +44,14 @@ sb;sh fsd sw sd 01 addi addiw li lui">
 对此，我们需要随机生成RVI指令和RVC指令，送入预译码器：
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
-同时，需要判定双精度浮点指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 双精度浮点指令测试 CSR未使能fs.status的情况下，双精度浮点指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。
-对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)
-op\funct 000 001 010 011 100 101 110 111 00 addi4spn fld lw ld lbu
-lhu;lh
-sb;sh fsd sw sd 01 addi addiw li lui" />
+此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。
+对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ifu_rvc_exp/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-16T12:41:33+08:00" />
-<meta itemprop="name" content="IFU-RVC-Expander">
+<meta property="article:modified_time" content="2024-12-17T17:55:13+08:00" />
+<meta itemprop="name" content="RVCExpander">
 <meta itemprop="description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
 输出量也是两个：输入指令对应的RVI指令；RVC指令是否非法。
@@ -69,15 +63,12 @@ sb;sh fsd sw sd 01 addi addiw li lui" />
 对此，我们需要随机生成RVI指令和RVC指令，送入预译码器：
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
-同时，需要判定双精度浮点指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 双精度浮点指令测试 CSR未使能fs.status的情况下，双精度浮点指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。
-对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)
-op\funct 000 001 010 011 100 101 110 111 00 addi4spn fld lw ld lbu
-lhu;lh
-sb;sh fsd sw sd 01 addi addiw li lui">
-<meta itemprop="dateModified" content="2024-12-16T12:41:33+08:00" />
-<meta itemprop="wordCount" content="884">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="IFU-RVC-Expander"/>
+此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。
+对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)">
+<meta itemprop="dateModified" content="2024-12-17T17:55:13+08:00" />
+<meta itemprop="wordCount" content="908">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RVCExpander"/>
 <meta name="twitter:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
 输出量也是两个：输入指令对应的RVI指令；RVC指令是否非法。
@@ -89,14 +80,11 @@ sb;sh fsd sw sd 01 addi addiw li lui">
 对此，我们需要随机生成RVI指令和RVC指令，送入预译码器：
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
-同时，需要判定双精度浮点指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 双精度浮点指令测试 CSR未使能fs.status的情况下，双精度浮点指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。
-对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)
-op\funct 000 001 010 011 100 101 110 111 00 addi4spn fld lw ld lbu
-lhu;lh
-sb;sh fsd sw sd 01 addi addiw li lui"/>
-<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
-<link href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
+此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。
+对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)"/>
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.bdee11f6cee31bc3630ab45096c7f90e26285b6f4360d3b477566fbfd4d77159.css" as="style" integrity="sha256-ve4R9s7jG8NjCrRQlsf5DiYoW29DYNO0d1Zvv9TXcVk=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.bdee11f6cee31bc3630ab45096c7f90e26285b6f4360d3b477566fbfd4d77159.css" rel="stylesheet" integrity="sha256-ve4R9s7jG8NjCrRQlsf5DiYoW29DYNO0d1Zvv9TXcVk=" crossorigin="anonymous">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
   integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
@@ -196,7 +184,7 @@ sb;sh fsd sw sd 01 addi addiw li lui"/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.8dc06058c502efa8aa240e27ef6323c3.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5bac4add28080c1b109a8c47dab68b48.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -220,7 +208,7 @@ sb;sh fsd sw sd 01 addi addiw li lui"/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.8dc06058c502efa8aa240e27ef6323c3.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5bac4add28080c1b109a8c47dab68b48.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -318,14 +306,33 @@ sb;sh fsd sw sd 01 addi addiw li lui"/>
   <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
   
   <ul class="ul-3 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_ifu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_ifu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_ifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_ifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_ifu"><span class="">IFU</span></a></label>
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu"><span class="">IFU</span></a></label>
   
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp-check" checked/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ifu_rvc_exp/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp"><span class="td-sidebar-nav-active-item">IFU-RVC-Expander</span></a></label>
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder"><span class="">F3PreDecoder</span></a></label>
   
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/05_frontend_trigger/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger"><span class="">FrontendTrigger</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker"><span class="">PredChecker</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode"><span class="">PreDecode</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp"><span class="td-sidebar-nav-active-item">RVCExpander</span></a></label>
+  
+</li>
+  </ul>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut02_backend-li">
@@ -356,12 +363,12 @@ sb;sh fsd sw sd 01 addi addiw li lui"/>
           </aside>
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
             <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_UT/01_frontend/03_ifu_rvc_exp.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_UT/01_frontend/03_ifu_rvc_exp.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs/98_UT/01_frontend?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=IFU-RVC-Expander" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_UT/01_frontend/01_ifu/03_ifu_rvc_exp.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_UT/01_frontend/01_ifu/03_ifu_rvc_exp.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs/98_UT/01_frontend/01_ifu?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=RVCExpander" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
   <a href="https://github.com/XS-MLVP/UnityChipForXiangShan//issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
-  <a id="print" href="/UnityChipForXiangShan/docs/98_ut/01_frontend/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+  <a id="print" href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
 </div>
 
@@ -373,8 +380,10 @@ sb;sh fsd sw sd 01 addi addiw li lui"/>
     <li><a href="#功能点和测试点">功能点和测试点</a>
       <ul>
         <li><a href="#功能点1-指令扩展">功能点1 指令扩展</a></li>
+        <li><a href="#功能点2-非法指令判断">功能点2 非法指令判断</a></li>
       </ul>
     </li>
+    <li><a href="#测试点汇总-a-idrvc_expander_functions-a">测试点汇总 <a id="rvc_expander_functions"> </a></a></li>
     <li><a href="#rvc扩展辅助阅读材料">RVC扩展辅助阅读材料</a>
       <ul>
         <li><a href="#op--b00">op = b'00'</a></li>
@@ -401,13 +410,15 @@ sb;sh fsd sw sd 01 addi addiw li lui"/>
     <a href="/UnityChipForXiangShan/docs/98_ut/">验证文档</a></li>
   <li class="breadcrumb-item">
     <a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/">Frontend</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/">IFU</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    IFU-RVC-Expander</li>
+    RVCExpander</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>IFU-RVC-Expander</h1>
+	<h1>RVCExpander</h1>
 	
 	<header class="article-meta">
 		
@@ -447,10 +458,10 @@ sb;sh fsd sw sd 01 addi addiw li lui"/>
 </tr>
 </tbody>
 </table>
-<h4 id="功能点2-非法指令判断">功能点2 非法指令判断</h4>
+<h3 id="功能点2-非法指令判断">功能点2 非法指令判断</h3>
 <p>RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法</p>
 <p>对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：</p>
-<p>同时，需要判定双精度浮点指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。</p>
+<p>此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。</p>
 <table>
 <thead>
 <tr>
@@ -472,8 +483,51 @@ sb;sh fsd sw sd 01 addi addiw li lui"/>
 </tr>
 <tr>
 <td>2.3</td>
-<td>双精度浮点指令测试</td>
-<td>CSR未使能fs.status的情况下，双精度浮点指令应该为非法</td>
+<td>C.fp指令测试</td>
+<td>CSR未使能fs.status的情况下，C.fp指令应该为非法</td>
+</tr>
+</tbody>
+</table>
+<h2 id="测试点汇总-a-idrvc_expander_functions-a">测试点汇总 <a id="rvc_expander_functions"> </a></h2>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>功能</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td>指令扩展</td>
+<td>RVI指令保留</td>
+<td>构造RVI指令传入，检查保留情况</td>
+</tr>
+<tr>
+<td>1.2</td>
+<td>指令扩展</td>
+<td>RVC指令扩展</td>
+<td>构造RVC指令传入，按手册检查扩展结果</td>
+</tr>
+<tr>
+<td>2.1</td>
+<td>非法指令判断</td>
+<td>非法指令测试</td>
+<td>随机构造非法RVC指令传入，检查判断结果</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td>非法指令判断</td>
+<td>合法指令测试</td>
+<td>随机构造合法RVC指令传入，检查判断结果</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td>C.fp指令测试</td>
+<td>CSR未使能fs.status的情况下，C.fp指令应该为非法</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -789,7 +843,7 @@ imm[12|10:5]rs2rs1001imm[4:1|11]1100011BNE</p>
 <p>RVI的SD格式形如：| imm[11:5]| rs2 | rs1 | 011 | imm[4:0] | 0100111 |</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 16, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/7d081626cef0910d9490d169053ee32a8e0c51db">rvc expander doc finished (7d08162)</a>
+  最后修改 December 17, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/53f30b46ed6e6eeb261894c4a71a60f69777ef8c">rvc expander markdown verified and code little verified (53f30b4)</a>
 </div>
 
 </div>

@@ -17,22 +17,78 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
-<title>IFU | 万众一芯之香山处理器</title>
-<meta name="description" content="TBD">
-<meta property="og:title" content="IFU" />
-<meta property="og:description" content="TBD" />
+<title>FrontendTrigger | 万众一芯之香山处理器</title>
+<meta name="description" content="FrontendTrigger子模块 该子模块的主要作用是在前端设置硬件断点和检查。
+FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger模块里共4个Trigger，编号为0,1,6,8，每个Trigger的配置信息（断点类型、匹配地址等）保存在tdata寄存器中。
+当软件向CSR寄存器tselect、tdata1/2写入特定的值时，CSR会向IFU发送tUpdate请求，更新FrontendTrigger内的tdata寄存器中的配置信息。 目前前端的Trigger仅可以配置成PC断点（mcontrol(tdata1)寄存器的select位为0；当select=1时，该Trigger将永远不会命中，且不会产生异常）。
+在取指时，IFU的F3流水级会向FrontendTrigger模块发起查询并在同一周期得到结果。后者会对取指块内每一条指令在每一个Trigger上做检查， 当指令的PC和tdata2寄存器内容的关系满足mcontrol的match位所指示的关系（香山支持match位为0、2、3，对应等于、大于、小于）时， 该指令会被标记为Trigger命中，随着执行在后端产生断点异常，进入M-Mode或调试模式。
+链式断点 前端的0、6、8号Trigger支持Chain功能。 当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中
+FrontEndTrigger测试点和功能点 功能点1 设置断点和断点检查 FrontEndTrigger目前仅支持设置PC断点，这通过设置断点的tdata1寄存器的select位为0实现。 同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系， 关系满足时，该指令会被标记为trigger命中。
+所以，基于以上功能描述，我们需要测试：
+select位为1时，断点是否永远不会处罚。
+select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。
+select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。
+综上所述，我们在这一功能点设计的测试点如下：
+序号 名称 描述 1.1 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 功能点2 链式断点 当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。
+对0号trigger，不需要考虑链式的情况
+由此，我们可以设置几种测试点：
+序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 断点设置和检查 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 2.">
+<meta property="og:title" content="FrontendTrigger" />
+<meta property="og:description" content="FrontendTrigger子模块 该子模块的主要作用是在前端设置硬件断点和检查。
+FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger模块里共4个Trigger，编号为0,1,6,8，每个Trigger的配置信息（断点类型、匹配地址等）保存在tdata寄存器中。
+当软件向CSR寄存器tselect、tdata1/2写入特定的值时，CSR会向IFU发送tUpdate请求，更新FrontendTrigger内的tdata寄存器中的配置信息。 目前前端的Trigger仅可以配置成PC断点（mcontrol(tdata1)寄存器的select位为0；当select=1时，该Trigger将永远不会命中，且不会产生异常）。
+在取指时，IFU的F3流水级会向FrontendTrigger模块发起查询并在同一周期得到结果。后者会对取指块内每一条指令在每一个Trigger上做检查， 当指令的PC和tdata2寄存器内容的关系满足mcontrol的match位所指示的关系（香山支持match位为0、2、3，对应等于、大于、小于）时， 该指令会被标记为Trigger命中，随着执行在后端产生断点异常，进入M-Mode或调试模式。
+链式断点 前端的0、6、8号Trigger支持Chain功能。 当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中
+FrontEndTrigger测试点和功能点 功能点1 设置断点和断点检查 FrontEndTrigger目前仅支持设置PC断点，这通过设置断点的tdata1寄存器的select位为0实现。 同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系， 关系满足时，该指令会被标记为trigger命中。
+所以，基于以上功能描述，我们需要测试：
+select位为1时，断点是否永远不会处罚。
+select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。
+select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。
+综上所述，我们在这一功能点设计的测试点如下：
+序号 名称 描述 1.1 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 功能点2 链式断点 当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。
+对0号trigger，不需要考虑链式的情况
+由此，我们可以设置几种测试点：
+序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 断点设置和检查 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 2." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/02_ifu/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/05_frontend_trigger/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-16T12:41:33+08:00" />
-<meta itemprop="name" content="IFU">
-<meta itemprop="description" content="TBD">
-<meta itemprop="dateModified" content="2024-12-16T12:41:33+08:00" />
-<meta itemprop="wordCount" content="1">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="IFU"/>
-<meta name="twitter:description" content="TBD"/>
-<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
-<link href="/UnityChipForXiangShan/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
+<meta property="article:modified_time" content="2024-12-17T17:55:13+08:00" />
+<meta itemprop="name" content="FrontendTrigger">
+<meta itemprop="description" content="FrontendTrigger子模块 该子模块的主要作用是在前端设置硬件断点和检查。
+FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger模块里共4个Trigger，编号为0,1,6,8，每个Trigger的配置信息（断点类型、匹配地址等）保存在tdata寄存器中。
+当软件向CSR寄存器tselect、tdata1/2写入特定的值时，CSR会向IFU发送tUpdate请求，更新FrontendTrigger内的tdata寄存器中的配置信息。 目前前端的Trigger仅可以配置成PC断点（mcontrol(tdata1)寄存器的select位为0；当select=1时，该Trigger将永远不会命中，且不会产生异常）。
+在取指时，IFU的F3流水级会向FrontendTrigger模块发起查询并在同一周期得到结果。后者会对取指块内每一条指令在每一个Trigger上做检查， 当指令的PC和tdata2寄存器内容的关系满足mcontrol的match位所指示的关系（香山支持match位为0、2、3，对应等于、大于、小于）时， 该指令会被标记为Trigger命中，随着执行在后端产生断点异常，进入M-Mode或调试模式。
+链式断点 前端的0、6、8号Trigger支持Chain功能。 当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中
+FrontEndTrigger测试点和功能点 功能点1 设置断点和断点检查 FrontEndTrigger目前仅支持设置PC断点，这通过设置断点的tdata1寄存器的select位为0实现。 同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系， 关系满足时，该指令会被标记为trigger命中。
+所以，基于以上功能描述，我们需要测试：
+select位为1时，断点是否永远不会处罚。
+select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。
+select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。
+综上所述，我们在这一功能点设计的测试点如下：
+序号 名称 描述 1.1 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 功能点2 链式断点 当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。
+对0号trigger，不需要考虑链式的情况
+由此，我们可以设置几种测试点：
+序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 断点设置和检查 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 2.">
+<meta itemprop="dateModified" content="2024-12-17T17:55:13+08:00" />
+<meta itemprop="wordCount" content="89">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FrontendTrigger"/>
+<meta name="twitter:description" content="FrontendTrigger子模块 该子模块的主要作用是在前端设置硬件断点和检查。
+FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger模块里共4个Trigger，编号为0,1,6,8，每个Trigger的配置信息（断点类型、匹配地址等）保存在tdata寄存器中。
+当软件向CSR寄存器tselect、tdata1/2写入特定的值时，CSR会向IFU发送tUpdate请求，更新FrontendTrigger内的tdata寄存器中的配置信息。 目前前端的Trigger仅可以配置成PC断点（mcontrol(tdata1)寄存器的select位为0；当select=1时，该Trigger将永远不会命中，且不会产生异常）。
+在取指时，IFU的F3流水级会向FrontendTrigger模块发起查询并在同一周期得到结果。后者会对取指块内每一条指令在每一个Trigger上做检查， 当指令的PC和tdata2寄存器内容的关系满足mcontrol的match位所指示的关系（香山支持match位为0、2、3，对应等于、大于、小于）时， 该指令会被标记为Trigger命中，随着执行在后端产生断点异常，进入M-Mode或调试模式。
+链式断点 前端的0、6、8号Trigger支持Chain功能。 当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中
+FrontEndTrigger测试点和功能点 功能点1 设置断点和断点检查 FrontEndTrigger目前仅支持设置PC断点，这通过设置断点的tdata1寄存器的select位为0实现。 同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系， 关系满足时，该指令会被标记为trigger命中。
+所以，基于以上功能描述，我们需要测试：
+select位为1时，断点是否永远不会处罚。
+select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。
+select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。
+综上所述，我们在这一功能点设计的测试点如下：
+序号 名称 描述 1.1 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 功能点2 链式断点 当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。
+对0号trigger，不需要考虑链式的情况
+由此，我们可以设置几种测试点：
+序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 断点设置和检查 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 2."/>
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.bdee11f6cee31bc3630ab45096c7f90e26285b6f4360d3b477566fbfd4d77159.css" as="style" integrity="sha256-ve4R9s7jG8NjCrRQlsf5DiYoW29DYNO0d1Zvv9TXcVk=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.bdee11f6cee31bc3630ab45096c7f90e26285b6f4360d3b477566fbfd4d77159.css" rel="stylesheet" integrity="sha256-ve4R9s7jG8NjCrRQlsf5DiYoW29DYNO0d1Zvv9TXcVk=" crossorigin="anonymous">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
   integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
@@ -132,7 +188,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.8dc06058c502efa8aa240e27ef6323c3.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5bac4add28080c1b109a8c47dab68b48.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -156,7 +212,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.8dc06058c502efa8aa240e27ef6323c3.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5bac4add28080c1b109a8c47dab68b48.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -254,14 +310,33 @@
   <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
   
   <ul class="ul-3 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend02_ifu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_ifu-check" checked/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_ifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_ifu/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_ifu"><span class="td-sidebar-nav-active-item">IFU</span></a></label>
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu"><span class="">IFU</span></a></label>
   
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ifu_rvc_exp/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ifu_rvc_exp"><span class="">IFU-RVC-Expander</span></a></label>
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder"><span class="">F3PreDecoder</span></a></label>
   
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/05_frontend_trigger/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger"><span class="td-sidebar-nav-active-item">FrontendTrigger</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker"><span class="">PredChecker</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode"><span class="">PreDecode</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp"><span class="">RVCExpander</span></a></label>
+  
+</li>
+  </ul>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut02_backend-li">
@@ -292,16 +367,35 @@
           </aside>
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
             <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_UT/01_frontend/02_ifu.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_UT/01_frontend/02_ifu.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs/98_UT/01_frontend?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=IFU" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_UT/01_frontend/01_ifu/05_frontend_trigger.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_UT/01_frontend/01_ifu/05_frontend_trigger.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs/98_UT/01_frontend/01_ifu?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=FrontendTrigger" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
   <a href="https://github.com/XS-MLVP/UnityChipForXiangShan//issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
-  <a id="print" href="/UnityChipForXiangShan/docs/98_ut/01_frontend/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+  <a id="print" href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
 </div>
 
-            
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#frontendtrigger功能介绍">FrontendTrigger功能介绍</a>
+      <ul>
+        <li><a href="#断点设置和断点检查">断点设置和断点检查</a></li>
+        <li><a href="#链式断点">链式断点</a></li>
+      </ul>
+    </li>
+    <li><a href="#frontendtrigger测试点和功能点">FrontEndTrigger测试点和功能点</a>
+      <ul>
+        <li><a href="#功能点1-设置断点和断点检查">功能点1 设置断点和断点检查</a></li>
+        <li><a href="#功能点2-链式断点">功能点2 链式断点</a></li>
+      </ul>
+    </li>
+    <li><a href="#测试点汇总"><strong>测试点汇总</strong></a></li>
+  </ul>
+</nav>
+      </div>
+    
             
 	
           </aside>
@@ -317,21 +411,161 @@
     <a href="/UnityChipForXiangShan/docs/98_ut/">验证文档</a></li>
   <li class="breadcrumb-item">
     <a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/">Frontend</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/">IFU</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    IFU</li>
+    FrontendTrigger</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>IFU</h1>
+	<h1>FrontendTrigger</h1>
 	
 	<header class="article-meta">
 		
   </header>
-	<p>TBD</p>
+	<h1 id="frontendtrigger子模块">FrontendTrigger子模块</h1>
+<p>该子模块的主要作用是在前端设置硬件断点和检查。</p>
+<h2 id="frontendtrigger功能介绍">FrontendTrigger功能介绍</h2>
+<h3 id="断点设置和断点检查">断点设置和断点检查</h3>
+<p>在IFU的FrontendTrigger模块里共4个Trigger，编号为0,1,6,8，每个Trigger的配置信息（断点类型、匹配地址等）保存在tdata寄存器中。</p>
+<p>当软件向CSR寄存器tselect、tdata1/2写入特定的值时，CSR会向IFU发送tUpdate请求，更新FrontendTrigger内的tdata寄存器中的配置信息。
+目前前端的Trigger仅可以配置成PC断点（mcontrol(tdata1)寄存器的select位为0；当select=1时，该Trigger将永远不会命中，且不会产生异常）。</p>
+<p>在取指时，IFU的F3流水级会向FrontendTrigger模块发起查询并在同一周期得到结果。后者会对取指块内每一条指令在每一个Trigger上做检查，
+当指令的PC和tdata2寄存器内容的关系满足mcontrol的match位所指示的关系（香山支持match位为0、2、3，对应等于、大于、小于）时，
+该指令会被标记为Trigger命中，随着执行在后端产生断点异常，进入M-Mode或调试模式。</p>
+<h3 id="链式断点">链式断点</h3>
+<p>前端的0、6、8号Trigger支持Chain功能。
+当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中</p>
+<h2 id="frontendtrigger测试点和功能点">FrontEndTrigger测试点和功能点</h2>
+<h3 id="功能点1-设置断点和断点检查">功能点1 设置断点和断点检查</h3>
+<p>FrontEndTrigger目前仅支持设置PC断点，这通过设置断点的tdata1寄存器的select位为0实现。
+同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系，
+关系满足时，该指令会被标记为trigger命中。</p>
+<p>所以，基于以上功能描述，我们需要测试：</p>
+<p>select位为1时，断点是否永远不会处罚。</p>
+<p>select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。</p>
+<p>select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。</p>
+<p>综上所述，我们在这一功能点设计的测试点如下：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td>select1判定</td>
+<td>给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发</td>
+</tr>
+<tr>
+<td>1.2.1</td>
+<td>select0关系匹配判定</td>
+<td>给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发</td>
+</tr>
+<tr>
+<td>1.2.2</td>
+<td>select0关系不匹配判定</td>
+<td>给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发</td>
+</tr>
+</tbody>
+</table>
+<h3 id="功能点2-链式断点">功能点2 链式断点</h3>
+<p>当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。</p>
+<p>对0号trigger，不需要考虑链式的情况</p>
+<p>由此，我们可以设置几种测试点：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.1</td>
+<td>chain位测试</td>
+<td>对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td>timing测试</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。</td>
+</tr>
+<tr>
+<td>2.3.1</td>
+<td>未命中测试</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。</td>
+</tr>
+<tr>
+<td>2.3.2</td>
+<td>命中测试</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="测试点汇总"><strong>测试点汇总</strong></h2>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>功能</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td>断点设置和检查</td>
+<td>select1判定</td>
+<td>给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发</td>
+</tr>
+<tr>
+<td>1.2.1</td>
+<td>断点设置和检查</td>
+<td>select0关系匹配判定</td>
+<td>给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发</td>
+</tr>
+<tr>
+<td>1.2.2</td>
+<td>断点设置和检查</td>
+<td>select0关系不匹配判定</td>
+<td>给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发</td>
+</tr>
+<tr>
+<td>2.1</td>
+<td>链式断点</td>
+<td>chain位测试</td>
+<td>对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td>链式断点</td>
+<td>timing测试</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发</td>
+</tr>
+<tr>
+<td>2.3.1</td>
+<td>链式断点</td>
+<td>未命中测试</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发</td>
+</tr>
+<tr>
+<td>2.3.2</td>
+<td>链式断点</td>
+<td>命中测试</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发</td>
+</tr>
+</tbody>
+</table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 16, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/7d081626cef0910d9490d169053ee32a8e0c51db">rvc expander doc finished (7d08162)</a>
+  最后修改 December 17, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/53f30b46ed6e6eeb261894c4a71a60f69777ef8c">rvc expander markdown verified and code little verified (53f30b4)</a>
 </div>
 
 </div>
