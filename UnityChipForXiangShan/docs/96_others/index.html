@@ -36,7 +36,7 @@ name-number1 &lt; namer-number2: 表示版本需要在number1和number2之间（
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/96_others/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-17T17:55:13+08:00" />
+<meta property="article:modified_time" content="2024-12-18T15:53:44+08:00" />
 <meta itemprop="name" content="其他">
 <meta itemprop="description" content="测试用例管理 如果测试用例和目标RTL版本紧密相关，RTL发生变化，之前的测试用例不一定适用。此外，不同场景下有不同需求，例如验证测试环境时，不运行耗时太长的用例等。因此需要对用例进行管理，让用户能在在特定场景下跳过某些用例。为了实现该目标，我们需要通过pytest.mark.toffee_tags对于每个用例进行tag和version标记。然后在配置文件中设置需要跳过哪些tag或者只运行哪些tag的测试。
 @pytest.mark.toffee_tags(&#34;my_tag&#34;, &#34;version1 &lt; version13&#34;) def test_case_1(): ... 例如上述test_case_1被标记上了标签my_tag，支持版本设置为version1到version13。因此可以在配置文件中指定test.skip-tags=[&quot;my_tag&quot;]，来表示运行过程中跳过该用例。
@@ -45,7 +45,7 @@ pytest.mark.toffee_tags的参数说明如下：
 name-number1 &lt; namer-number2: 表示版本需要在number1和number2之间（包含边界，number表示数字，也可以为小数，eg 1.11） name-number1&#43;：表示number1版本以及以后的版本 name-number1-：表示number1版本以及以前的版本 如果不存在上述情况，且有*或者?表示通配符类型。其他情况为精确匹配。
 预定义标签，可以在comm/constants.py中查看，例如：
 # Predefined tags for test cases TAG_LONG_TIME_RUN = &#34;LONG_TIME_RUN&#34; # 运行时间长 TAG_SMOKE = &#34;SMOKE&#34; # 冒烟测试 TAG_RARELY_USED = &#34;RARELY_USED&#34; # 非常少用 TAG_REGRESSION = &#34;REGRESSION&#34; # 回归测试 TAG_PERFORMANCE = &#34;PERFORMANCE&#34; # 性能测试 TAG_STABILITY = &#34;STABILITY&#34; # 稳定测试 TAG_SECURITY = &#34;SECURITY&#34; # 安全测试 TAG_COMPATIBILITY = &#34;COMPATIBILITY&#34; # 兼容测试 TAG_OTHER = &#34;OTHER&#34; # 其他 TAG_CI = &#34;CI&#34; # 集成测试 TAG_DEBUG = &#34;DEBUG&#34; # 测试 TAG_DEMO = &#34;DEMO&#34; # demo 在默认配置中(config/_default.">
-<meta itemprop="dateModified" content="2024-12-17T17:55:13+08:00" />
+<meta itemprop="dateModified" content="2024-12-18T15:53:44+08:00" />
 <meta itemprop="wordCount" content="412">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="其他"/>
 <meta name="twitter:description" content="测试用例管理 如果测试用例和目标RTL版本紧密相关，RTL发生变化，之前的测试用例不一定适用。此外，不同场景下有不同需求，例如验证测试环境时，不运行耗时太长的用例等。因此需要对用例进行管理，让用户能在在特定场景下跳过某些用例。为了实现该目标，我们需要通过pytest.mark.toffee_tags对于每个用例进行tag和version标记。然后在配置文件中设置需要跳过哪些tag或者只运行哪些tag的测试。
@@ -156,7 +156,7 @@ name-number1 &lt; namer-number2: 表示版本需要在number1和number2之间（
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5bac4add28080c1b109a8c47dab68b48.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.612b4d05aaa18297d8515e2213d2d5bb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -180,7 +180,7 @@ name-number1 &lt; namer-number2: 表示版本需要在number1和number2之间（
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5bac4add28080c1b109a8c47dab68b48.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.612b4d05aaa18297d8515e2213d2d5bb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -525,7 +525,7 @@ name-number1 &lt; namer-number2: 表示版本需要在number1和number2之间（
 </span></span></span></code></pre></div><p>可在上述配置文件中添加自定义参数，通过<code>cfg = comm.get_config()</code>获取全局配置信息，然后通过<code>cfg.your_key</code>进行访问。<code>cfg</code>信息为只读信息，默认情况下不能进行修改。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 17, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/53f30b46ed6e6eeb261894c4a71a60f69777ef8c">rvc expander markdown verified and code little verified (53f30b4)</a>
+  最后修改 December 18, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/1a0a3175bdd967193d612f4aa39663111f9d9f05">workflow: new PR test self-hosted-ci-pr-checker.yaml (1a0a317)</a>
 </div>
 
 </div>

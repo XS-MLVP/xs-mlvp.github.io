@@ -18,7 +18,9 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>PreDecode | 万众一芯之香山处理器</title>
-<meta name="description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码生成，每个指令码查询预译码表产生预译码信息， 预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。 预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
+<meta name="description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
+所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
+预译码器的输出是：16x4B的拼接指令码；对每个4B指令码，该条指令是否为RVI或RVC指令（RVC指令只考虑该4B的低2B）；对每个4B指令码，该条指令的跳转偏移；两个16位的有效指令开始向量，其中第一种向量假定当前预测块的起始2字节为一条有效指令的开始，而第二种向量假定当前预测块的起始2字节为一条有效RVI指令的结束（但是由于第二种向量的前两位必然为0和1,所以编译优化后，第二种向量实际只有14个信号，表示2-15位；同理，第1种向量的第0位因为恒为1,所以也被优化）
 功能介绍 指令码生成 预译码器接受来自IFU完成指令切分的17 × 2字节的初始指令码，并以4字节为窗口，2字节为步进长度， 从第1个2字节开始，直到第16个2字节，选出总共16个4字节的指令码。
 预译码信息生成 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 首先是判断是否是RVC指令，RVC指令的具体格式参阅RISCV手册的描述：
@@ -37,9 +39,11 @@ PreDecoder测试点和功能点 功能点1 生成指令码 预译码器从IFU接
 CFI类型的判定则时序优化到了F3PreDecoder中。
 据此，我们可以设计下述测试点。
 首先是判定RVC指令，我们随机生成输入初始指令码，对返回的16位RVC判定结果进行检验。 具体来说，对每32位指令，考虑RVC和RVI两种情况。
-序号 名称 描述 2.1.1 RVC判定 传入RVC指令，应该判断为RVC 2.">
+序号 名称 描述 2.">
 <meta property="og:title" content="PreDecode" />
-<meta property="og:description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码生成，每个指令码查询预译码表产生预译码信息， 预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。 预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
+<meta property="og:description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
+所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
+预译码器的输出是：16x4B的拼接指令码；对每个4B指令码，该条指令是否为RVI或RVC指令（RVC指令只考虑该4B的低2B）；对每个4B指令码，该条指令的跳转偏移；两个16位的有效指令开始向量，其中第一种向量假定当前预测块的起始2字节为一条有效指令的开始，而第二种向量假定当前预测块的起始2字节为一条有效RVI指令的结束（但是由于第二种向量的前两位必然为0和1,所以编译优化后，第二种向量实际只有14个信号，表示2-15位；同理，第1种向量的第0位因为恒为1,所以也被优化）
 功能介绍 指令码生成 预译码器接受来自IFU完成指令切分的17 × 2字节的初始指令码，并以4字节为窗口，2字节为步进长度， 从第1个2字节开始，直到第16个2字节，选出总共16个4字节的指令码。
 预译码信息生成 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 首先是判断是否是RVC指令，RVC指令的具体格式参阅RISCV手册的描述：
@@ -58,13 +62,15 @@ PreDecoder测试点和功能点 功能点1 生成指令码 预译码器从IFU接
 CFI类型的判定则时序优化到了F3PreDecoder中。
 据此，我们可以设计下述测试点。
 首先是判定RVC指令，我们随机生成输入初始指令码，对返回的16位RVC判定结果进行检验。 具体来说，对每32位指令，考虑RVC和RVI两种情况。
-序号 名称 描述 2.1.1 RVC判定 传入RVC指令，应该判断为RVC 2." />
+序号 名称 描述 2." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-17T17:55:13+08:00" />
+<meta property="article:modified_time" content="2024-12-18T15:53:44+08:00" />
 <meta itemprop="name" content="PreDecode">
-<meta itemprop="description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码生成，每个指令码查询预译码表产生预译码信息， 预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。 预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
+<meta itemprop="description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
+所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
+预译码器的输出是：16x4B的拼接指令码；对每个4B指令码，该条指令是否为RVI或RVC指令（RVC指令只考虑该4B的低2B）；对每个4B指令码，该条指令的跳转偏移；两个16位的有效指令开始向量，其中第一种向量假定当前预测块的起始2字节为一条有效指令的开始，而第二种向量假定当前预测块的起始2字节为一条有效RVI指令的结束（但是由于第二种向量的前两位必然为0和1,所以编译优化后，第二种向量实际只有14个信号，表示2-15位；同理，第1种向量的第0位因为恒为1,所以也被优化）
 功能介绍 指令码生成 预译码器接受来自IFU完成指令切分的17 × 2字节的初始指令码，并以4字节为窗口，2字节为步进长度， 从第1个2字节开始，直到第16个2字节，选出总共16个4字节的指令码。
 预译码信息生成 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 首先是判断是否是RVC指令，RVC指令的具体格式参阅RISCV手册的描述：
@@ -83,11 +89,13 @@ PreDecoder测试点和功能点 功能点1 生成指令码 预译码器从IFU接
 CFI类型的判定则时序优化到了F3PreDecoder中。
 据此，我们可以设计下述测试点。
 首先是判定RVC指令，我们随机生成输入初始指令码，对返回的16位RVC判定结果进行检验。 具体来说，对每32位指令，考虑RVC和RVI两种情况。
-序号 名称 描述 2.1.1 RVC判定 传入RVC指令，应该判断为RVC 2.">
-<meta itemprop="dateModified" content="2024-12-17T17:55:13+08:00" />
-<meta itemprop="wordCount" content="125">
+序号 名称 描述 2.">
+<meta itemprop="dateModified" content="2024-12-18T15:53:44+08:00" />
+<meta itemprop="wordCount" content="128">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PreDecode"/>
-<meta name="twitter:description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码生成，每个指令码查询预译码表产生预译码信息， 预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。 预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
+<meta name="twitter:description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
+所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
+预译码器的输出是：16x4B的拼接指令码；对每个4B指令码，该条指令是否为RVI或RVC指令（RVC指令只考虑该4B的低2B）；对每个4B指令码，该条指令的跳转偏移；两个16位的有效指令开始向量，其中第一种向量假定当前预测块的起始2字节为一条有效指令的开始，而第二种向量假定当前预测块的起始2字节为一条有效RVI指令的结束（但是由于第二种向量的前两位必然为0和1,所以编译优化后，第二种向量实际只有14个信号，表示2-15位；同理，第1种向量的第0位因为恒为1,所以也被优化）
 功能介绍 指令码生成 预译码器接受来自IFU完成指令切分的17 × 2字节的初始指令码，并以4字节为窗口，2字节为步进长度， 从第1个2字节开始，直到第16个2字节，选出总共16个4字节的指令码。
 预译码信息生成 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 首先是判断是否是RVC指令，RVC指令的具体格式参阅RISCV手册的描述：
@@ -106,7 +114,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 预译码器从IFU接
 CFI类型的判定则时序优化到了F3PreDecoder中。
 据此，我们可以设计下述测试点。
 首先是判定RVC指令，我们随机生成输入初始指令码，对返回的16位RVC判定结果进行检验。 具体来说，对每32位指令，考虑RVC和RVI两种情况。
-序号 名称 描述 2.1.1 RVC判定 传入RVC指令，应该判断为RVC 2."/>
+序号 名称 描述 2."/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.bdee11f6cee31bc3630ab45096c7f90e26285b6f4360d3b477566fbfd4d77159.css" as="style" integrity="sha256-ve4R9s7jG8NjCrRQlsf5DiYoW29DYNO0d1Zvv9TXcVk=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.bdee11f6cee31bc3630ab45096c7f90e26285b6f4360d3b477566fbfd4d77159.css" rel="stylesheet" integrity="sha256-ve4R9s7jG8NjCrRQlsf5DiYoW29DYNO0d1Zvv9TXcVk=" crossorigin="anonymous">
 <script
@@ -208,7 +216,7 @@ CFI类型的判定则时序优化到了F3PreDecoder中。
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5bac4add28080c1b109a8c47dab68b48.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.612b4d05aaa18297d8515e2213d2d5bb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -232,7 +240,7 @@ CFI类型的判定则时序优化到了F3PreDecoder中。
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5bac4add28080c1b109a8c47dab68b48.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.612b4d05aaa18297d8515e2213d2d5bb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -446,9 +454,9 @@ CFI类型的判定则时序优化到了F3PreDecoder中。
 		
   </header>
 	<h1 id="子模块predecoder简介">子模块：PreDecoder简介</h1>
-<p>预译码器PreDeocoder接受初始指令码并进行指令码生成，每个指令码查询预译码表产生预译码信息，
-预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。
-预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。</p>
+<p>预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。</p>
+<p>所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。</p>
+<p>预译码器的输出是：16x4B的拼接指令码；对每个4B指令码，该条指令是否为RVI或RVC指令（RVC指令只考虑该4B的低2B）；对每个4B指令码，该条指令的跳转偏移；两个16位的有效指令开始向量，其中第一种向量假定当前预测块的起始2字节为一条有效指令的开始，而第二种向量假定当前预测块的起始2字节为一条有效RVI指令的结束（但是由于第二种向量的前两位必然为0和1,所以编译优化后，第二种向量实际只有14个信号，表示2-15位；同理，第1种向量的第0位因为恒为1,所以也被优化）</p>
 <h3 id="功能介绍">功能介绍</h3>
 <h3 id="指令码生成">指令码生成</h3>
 <p>预译码器接受来自IFU完成指令切分的17 × 2字节的初始指令码，并以4字节为窗口，2字节为步进长度，
@@ -609,7 +617,7 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 17, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/53f30b46ed6e6eeb261894c4a71a60f69777ef8c">rvc expander markdown verified and code little verified (53f30b4)</a>
+  最后修改 December 18, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/1a0a3175bdd967193d612f4aa39663111f9d9f05">workflow: new PR test self-hosted-ci-pr-checker.yaml (1a0a317)</a>
 </div>
 
 </div>
