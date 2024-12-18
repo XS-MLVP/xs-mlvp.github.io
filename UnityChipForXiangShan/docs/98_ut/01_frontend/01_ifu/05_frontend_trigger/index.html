@@ -25,7 +25,7 @@ FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger
 链式断点 前端的0、6、8号Trigger支持Chain功能。 当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中
 FrontEndTrigger测试点和功能点 功能点1 设置断点和断点检查 FrontEndTrigger目前仅支持设置PC断点，这通过设置断点的tdata1寄存器的select位为0实现。 同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系， 关系满足时，该指令会被标记为trigger命中。
 所以，基于以上功能描述，我们需要测试：
-select位为1时，断点是否永远不会处罚。
+select位为1时，断点是否永远不会触发。
 select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。
 select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。
 综上所述，我们在这一功能点设计的测试点如下：
@@ -41,7 +41,7 @@ FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger
 链式断点 前端的0、6、8号Trigger支持Chain功能。 当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中
 FrontEndTrigger测试点和功能点 功能点1 设置断点和断点检查 FrontEndTrigger目前仅支持设置PC断点，这通过设置断点的tdata1寄存器的select位为0实现。 同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系， 关系满足时，该指令会被标记为trigger命中。
 所以，基于以上功能描述，我们需要测试：
-select位为1时，断点是否永远不会处罚。
+select位为1时，断点是否永远不会触发。
 select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。
 select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。
 综上所述，我们在这一功能点设计的测试点如下：
@@ -52,7 +52,7 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/05_frontend_trigger/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-18T15:53:44+08:00" />
+<meta property="article:modified_time" content="2024-12-18T20:01:17+08:00" />
 <meta itemprop="name" content="FrontendTrigger">
 <meta itemprop="description" content="FrontendTrigger子模块 该子模块的主要作用是在前端设置硬件断点和检查。
 FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger模块里共4个Trigger，编号为0,1,6,8，每个Trigger的配置信息（断点类型、匹配地址等）保存在tdata寄存器中。
@@ -61,7 +61,7 @@ FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger
 链式断点 前端的0、6、8号Trigger支持Chain功能。 当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中
 FrontEndTrigger测试点和功能点 功能点1 设置断点和断点检查 FrontEndTrigger目前仅支持设置PC断点，这通过设置断点的tdata1寄存器的select位为0实现。 同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系， 关系满足时，该指令会被标记为trigger命中。
 所以，基于以上功能描述，我们需要测试：
-select位为1时，断点是否永远不会处罚。
+select位为1时，断点是否永远不会触发。
 select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。
 select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。
 综上所述，我们在这一功能点设计的测试点如下：
@@ -69,7 +69,7 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 对0号trigger，不需要考虑链式的情况
 由此，我们可以设置几种测试点：
 序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 断点设置和检查 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 2.">
-<meta itemprop="dateModified" content="2024-12-18T15:53:44+08:00" />
+<meta itemprop="dateModified" content="2024-12-18T20:01:17+08:00" />
 <meta itemprop="wordCount" content="89">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FrontendTrigger"/>
 <meta name="twitter:description" content="FrontendTrigger子模块 该子模块的主要作用是在前端设置硬件断点和检查。
@@ -79,7 +79,7 @@ FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger
 链式断点 前端的0、6、8号Trigger支持Chain功能。 当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中
 FrontEndTrigger测试点和功能点 功能点1 设置断点和断点检查 FrontEndTrigger目前仅支持设置PC断点，这通过设置断点的tdata1寄存器的select位为0实现。 同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系， 关系满足时，该指令会被标记为trigger命中。
 所以，基于以上功能描述，我们需要测试：
-select位为1时，断点是否永远不会处罚。
+select位为1时，断点是否永远不会触发。
 select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。
 select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。
 综上所述，我们在这一功能点设计的测试点如下：
@@ -188,7 +188,7 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.612b4d05aaa18297d8515e2213d2d5bb.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.14631cf7322b81f8979e42a49131bc60.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -212,7 +212,7 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.612b4d05aaa18297d8515e2213d2d5bb.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.14631cf7322b81f8979e42a49131bc60.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -443,7 +443,7 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 同时，tdata2寄存器的mcontrol位负责设置指令PC和tdata2寄存器的地址需要满足的关系，
 关系满足时，该指令会被标记为trigger命中。</p>
 <p>所以，基于以上功能描述，我们需要测试：</p>
-<p>select位为1时，断点是否永远不会处罚。</p>
+<p>select位为1时，断点是否永远不会触发。</p>
 <p>select位为0时，当PC和tdata2的数据的关系满足tdata2的match位时，是否会设置断点。</p>
 <p>select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时，断点是否一定不会触发。</p>
 <p>综上所述，我们在这一功能点设计的测试点如下：</p>
@@ -565,7 +565,7 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 18, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/1a0a3175bdd967193d612f4aa39663111f9d9f05">workflow: new PR test self-hosted-ci-pr-checker.yaml (1a0a317)</a>
+  最后修改 December 18, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/17ecfe8e26aeaba96770c15c3c1a74d832b8a6d1">friend link changed at documents/content/zh-cn/docs/_index.md and changed false ch in frontend trigger (17ecfe8)</a>
 </div>
 
 </div>
