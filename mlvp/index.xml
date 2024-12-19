@@ -1,17 +1,249 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>开放验证平台学习资源 – Goldydocs</title>
+    <title>Goldydocs on 开放验证平台学习资源</title>
     <link>https://xs-mlvp.github.io/mlvp/</link>
     <description>Recent content in Goldydocs on 开放验证平台学习资源</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    
-	  <atom:link href="https://xs-mlvp.github.io/mlvp/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-      
-      
-    
-    
+    <atom:link href="https://xs-mlvp.github.io/mlvp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bundle API</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/api/bundle/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/api/bundle/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>搭建验证环境</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/installer/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/installer/</guid>
+      <description>源码安装Picker工具 依赖安装 cmake ( &amp;gt;=3.11 ) gcc ( 支持c++20,至少为gcc版本10, 建议11及以上 ) python3 ( &amp;gt;=3.8 ) verilator ( ==4.218 ) verible-verilog-format ( &amp;gt;=0.0-3428-gcfcbb82b ) swig ( &amp;gt;=4.2.0, 用于多语言支持 ) 请注意，请确保verible-verilog-format等工具的路径已经添加到环境变量$PATH中，可以直接命令行调用。&#xA;下载源码 git clone https://github.com/XS-MLVP/picker.git --depth=1 cd picker make init 构建并安装 cd picker make # 可通过 make BUILD_XSPCOMM_SWIG=python,java,scala,golang 开启其他语言支持。 # 各语言需要自己的开发环境，需要自行配置，例如javac等 sudo -E make install 默认的安装的目标路径是 /usr/local， 二进制文件被置于 /usr/local/bin，模板文件被置于 /usr/local/share/picker。 如果需要修改安装目录，可以通过指定ARGS给cmake传递参数，例如make ARGS=&amp;quot;-DCMAKE_INSTALL_PREFIX=your_instal_dir&amp;quot; 安装时会自动安装 xspcomm基础库（https://github.com/XS-MLVP/xcomm），该基础库是用于封装 RTL 模块的基础类型，位于 /usr/local/lib/libxspcomm.so。 可能需要手动设置编译时的链接目录参数(-L)&#xA;如果开启了Java等语言支持，还会安装 xspcomm 对应的多语言软件包。&#xA;picker也可以编译为wheel文件，通过pip安装</description>
+    </item>
+    <item>
+      <title>工具介绍</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/picker_usage/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/picker_usage/</guid>
+      <description>为满足开放验证的环境要求，我们开发了 Picker 工具，用于将 RTL 设计转换为多语言接口，并在此基础上进行验证，我们将会使用 Picker 工具生成的环境作为基础的验证环境。接下来我们将介绍 Picker 工具，及其基础的使用方法。&#xA;Picker 简介 picker 是一个芯片验证辅助工具，具有两个主要功能：&#xA;打包RTL设计验证模块： picker 可以将 RTL 设计验证模块（.v/.scala/.sv）打包成动态库，并提供多种高级语言（目前支持 C++、Python、Java、Scala、Golang）的编程接口来驱动电路。 UVM-TLM代码自动生成： picker 能够基于用户提供的 UVM sequence_item 进行自动化的 TLM 代码封装，提供 UVM 与其他高级语言（如 Python）的通信接口。 该工具允许用户基于现有的软件测试框架，例如 pytest、junit、TestNG、go test 等，进行芯片单元测试。 基于 Picker 进行验证的优点:&#xA;不泄露 RTL 设计：经过 Picker 转换后，原始的设计文件（.v）被转化成了二进制文件（.so），脱离原始设计文件后，依旧可进行验证，且验证者无法获取 RTL 源代码。 减少编译时间：当 DUT（设计待测）稳定时，只需要编译一次（打包成 .so 文件）。 用户范围广：提供的编程接口多，覆盖不同语言的开发者。 使用丰富的软件生态：支持 Python3、Java、Golang 等生态系统。 自动化的 UVM 事务封装：通过自动化封装 UVM 事务，实现 UVM 和 Python 的通信。 Picker 目前支持的 RTL 仿真器：&#xA;Verilator Synopsys VCS Picker的工作原理</description>
+    </item>
+    <item>
+      <title>加法器</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/adder/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/adder/</guid>
+      <description>以Adder为例，各语言的验证代码和注释如下：&#xA;Cpp Java Scala Python Go #include &#34;UT_Adder.hpp&#34; int64_t random_int64() { static std::random_device rd; static std::mt19937_64 generator(rd()); static std::uniform_int_distribution distribution(INT64_MIN, INT64_MAX); return distribution(generator); } int main() { UTAdder *dut = new UTAdder(); dut-&gt;Step(1); printf(&#34;Initialized UTAdder\n&#34;); struct input_t { uint64_t a; uint64_t b; uint64_t cin; }; struct output_t { uint64_t sum; uint64_t cout; }; for (int c = 0; c &lt; 114514; c++) { input_t i; output_t o_dut, o_ref; i.a = random_int64(); i.</description>
+    </item>
+    <item>
+      <title>快速开始</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/quick-start/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/quick-start/</guid>
+      <description>安装 toffee Toffee 是一款基于 Python 的硬件验证框架，旨在帮助用户更加便捷、规范地使用 Python 构建硬件验证环境。它依托于多语言转换工具 picker，该工具能够将硬件设计的 Verilog 代码转换为 Python Package，使得用户可以使用 Python 来驱动并验证硬件设计。&#xA;Toffee 需要的依赖有：&#xA;Python 3.6.8+ Picker 0.9.0+ 当安装好上述依赖后,可通过pip安装toffee：&#xA;pip install pytoffee 或通过以下命令安装最新版本的toffee：&#xA;pip install pytoffee@git+https://github.com/XS-MLVP/toffee@master 或通过以下方式进行本地安装：&#xA;git clone https://github.com/XS-MLVP/toffee.git cd toffee pip install . toffee-test Toffee-test 是一个用于为 Toffee 框架提供测试支持的 Pytest 插件，他为 toffee 框架提供了将测试用例函数标识为 toffee 的测试用例对象，使其可以被 toffee 框架识别并执行;测试用例资源的管理功能;测试报告生成功能，以便于用户编写测试用例。&#xA;通过 pip 安装 toffee-test&#xA;pip install toffee-test 或安装开发版本&#xA;pip install toffee-test@git+https://github.com/XS-MLVP/toffee-test@master 或通过源码安装&#xA;git clone https://github.com/XS-MLVP/toffee-test.git cd toffee-test pip install .</description>
+    </item>
+    <item>
+      <title>如何使用测试环境接口进行驱动</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/cases/executor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/cases/executor/</guid>
+      <description>如何同时调用多个驱动函数 当验证环境搭建完成后，可以通过验证环境提供的接口来编写测试用例。然而，通过普通的串行代码，往往无法完成两个驱动函数的同时调用。在多个接口需要同时驱动的情况下，这种情况变得尤为重要，mlvp 为这种场景提供了简便的调用方式。&#xA;同时调用多个不同类别的驱动函数 例如目前的 Env 结构如下：&#xA;DualPortStackEnv - port1_agent - @driver_method push - @driver_method pop - port2_agent - @driver_method push - @driver_method pop 我们期望在测试用例中同时调用 port1_agent 和 port2_agent 的 push 函数，以便同时驱动两个接口。&#xA;在 mlvp 中，可以通过 Executor 来完成。&#xA;from mlvp import Executor def test_push(env): async with Executor() as exec: exec(env.port1_agent.push(1)) exec(env.port2_agent.push(2)) print(&amp;#34;result&amp;#34;, exec.get_results()) 我们使用 async with 来创建一个 Executor 对象，并建立一个执行块，通过直接调用 exec 可以添加需要执行的驱动函数。当 Executor 对象退出作用域时，会将所有添加的驱动函数同时执行。Executor 会自动等待所有驱动函数执行完毕。&#xA;如果需要获取驱动函数的返回值，可以通过 get_results 方法来获取，get_results 会以字典的形式返回所有驱动函数的返回值，其中键为驱动函数的名称，值为一个列表，列表中存放了对应驱动函数的返回值。&#xA;同一驱动函数被多次调用 如果在在执行块中多次调用同一驱动函数，Executor 会自动将这些调用串行执行。&#xA;from mlvp import Executor def test_push(env): async with Executor() as exec: for i in range(5): exec(env.</description>
+    </item>
+    <item>
+      <title>如何使用异步环境</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/start_test/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/start_test/</guid>
+      <description>启动事件循环 在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。&#xA;例如，我们创建了两个驱动方法分别驱动两个接口，在每一个驱动方法内部，都需要等待 DUT 经过若干个时钟周期，并且这两个驱动方法需要同时运行。这时候，如果使用朴素的单线程程序，会发现很难同时让两个驱动方法同时运行，即便我们使用多线程强势使他们同时运行，也会发现缺乏一种机制，使他们能够等待 DUT 经过若干时钟周期。这是因为在 Picker 提供的接口中，我们只能去推动 DUT 向前执行一个周期，而无法去等待 DUT 执行一个周期。&#xA;更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。mlvp 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。&#xA;在启动事件循环之前，我们首先需要了解两个关键字 async 和 await 来了解 Python 对与协程的管理。&#xA;当我们在函数前加上 async 关键字时，这个函数就变成了一个协程函数，例如&#xA;async def my_coro(): ... 当我们在协程函数内部使用 await 关键字时，我们就可以执行一个协程函数，并等待其执行完成并返回结果，例如&#xA;async def my_coro(): return &amp;#34;my_coro&amp;#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 mlvp 提供的 create_task 方法，例如&#xA;import mlvp async def my_coro(): return &amp;#34;my_coro&amp;#34; async def my_coro2(): mlvp.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 mlvp 中，我们使用 mlvp.run 来启动事件循环，并运行异步程序。</description>
+    </item>
+    <item>
+      <title>完整果壳 Cache 验证</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/nutshellcache/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/nutshellcache/</guid>
+      <description>验证报告 https://github.com/XS-MLVP/Example-NutShellCache/blob/master/nutshell_cache_report_demo.pdf&#xA;验证环境&amp;amp;用例代码 https://github.com/XS-MLVP/Example-NutShellCache</description>
+    </item>
+    <item>
+      <title>芯片验证</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/ic_verify/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/ic_verify/</guid>
+      <description>本页简单介绍什么是芯片验证，以及示例里面用到的概念，如 DUT (Design Under Test) 和 RM (Reference Model) 。&#xA;芯片验证过程需要和企业、团队的实际情况契合，没有符合所有要求，必须参考的绝对标准。&#xA;什么是芯片验证 芯片从设计到成品的过程主要包括芯片设计、芯片制造、芯片封测试三大阶段。在芯片设计中，又分前端设计和后端设计，前端设计也称之为逻辑设计，目标是让电路逻辑达到预期功能要求。后端设计也称为物理设计，主要工作是优化布局布线，减小芯片面积，降低功耗，提高频率等。芯片验证（Chip Verification）是芯片设计流程中的一个重要环节。它的目标是确保设计的芯片在功能、性能和功耗等方面都满足预定的规格。验证过程通常包括功能验证、时序验证和功耗验证等多个步骤，使用的方法和工具包括仿真、形式验证、硬件加速和原型制作等。针对本文，芯片验证仅包含对芯片前端设计的验证，验证设计的电路逻辑是否满足既定需求（&amp;ldquo;Does this proposed design do what is intended?&amp;quot;），通常也称为功能验证（Functional verification），不包含功耗、频率等后端设计。&#xA;对于芯片产品，一旦设计错误被制造出来修改成本将会非常高昂，因为可能需要召回产品，并重新制造芯片，无论是经济成本还是时间成本都十分昂贵。经典由于芯片验证不足导致失败的典型案例如下： Intel Pentium FDIV Bug：在1994年，Intel的Pentium处理器被发现存在一个严重的除法错误，这个错误被称为FDIV bug。这个错误是由于在芯片的浮点单元中，一个查找表中的几个条目错误导致的。这个错误在大多数应用中不会出现，但在一些特定的计算中会导致结果错误。由于这个错误，Intel不得不召回了大量的处理器，造成了巨大的经济损失。&#xA;Ariane 5 Rocket Failure：虽然这不是一个芯片的例子，但它展示了硬件验证的重要性。在1996年，欧洲空间局的Ariane 5火箭在发射后不久就爆炸了。原因是火箭的导航系统中的一个64位浮点数被转换为16位整数时溢出，导致系统崩溃。这个错误在设计阶段没有被发现，导致了火箭的失败。&#xA;AMD Barcelona Bug：在2007年，AMD的Barcelona处理器被发现存在一个严重的转译查找缓冲（TLB）错误。这个错误会导致系统崩溃或者重启。AMD不得不通过降低处理器的频率和发布BIOS更新来解决这个问题，这对AMD的声誉和财务状况造成了重大影响。&#xA;这些案例都强调了芯片验证的重要性。如果在设计阶段就能发现并修复这些错误，那么就可以避免这些昂贵的失败。验证不足的案例不仅发生在过去，也发生在现在，例如某新入局 ASIC 芯片市场的互联网企业打造一款 55 纳米芯片，极力追求面积缩减并跳过验证环节，最终导致算法失败，三次流片皆未通过测试，平均每次流片失败导致企业损失约 50 万美元。&#xA;芯片验证流程 芯片设计和验证的耦合关系如上图所示，设计和验证有同样的输入，即规范文档（specification）。参考规范，设计与验证人员双方按照各自的理解，以及各自的需求进行独立编码实现。设计方需要满足的前提是编码的RTL代码“可综合”，需要考虑电路特性，而验证方一般只要考虑功能是否满足要求，编码限制少。双方完成模块开发后，需要进行健全性对比测试（Sanity Test），判定功能是否表现一致，若不一致需要进行协同排查，确定问题所在并进行修复，再进行对比测试，直到所有功能点都满足预期。由于芯片设计和芯片验证耦合度很高，因此有些企业在研发队伍上也进行了直接耦合，为每个子模块的设计团队都配置了对应的验证团队（DV）。上图中的设计与验证的耦合流程为粗粒度的关系，具体到具体芯片（例如Soc、DDR）、具体企业等都有其适合自身的合作模式。&#xA;在上述对比测试中，设计方的产出的模块通常称为DUT（Design Under Test），验证方开发的模型通常称为RM（Reference Model）。针对图中的验证工作，按照流程可以有：编写验证计划、创建验证平台、整理功能点、构建测试用例、运行调试、收集Bug/覆盖率、回归测试、编写测试报告等多个阶段。&#xA;验证计划： 验证计划描述了如何进行验证，以及如何保证验证质量，达到功能验证要求。在文档结构上通常包含验证目标，验证策略、验证环境、验证项、验证过程、风险防范、资源及时间表、结果和报告等部分。验证目标明确需要验证的功能或性能指标，这些目标应该直接从芯片的规范文档中提取。验证策略描述如何进行验证，包括可能使用的验证方法，例如仿真、形式化、FPGA加速等，以及如何组织验证任务。验证环境用于描述具体的测试环境，例如验证工具类型，版本号等。验证项包含了需要验证的具体项以及预期结果。验证计划可以有总计划，也可以针对具体验证的子任务进行编写。&#xA;平台搭建： 验证平台是具体验证任务的执行环境，同一类验证任务可以使用相同的验证平台。验证平台的搭建是验证流程中的关键步骤、具体包含验证工具选择（例如是采用软件仿真，还是采用形式化验证，或者硬件加速）、环境配置（例如配置服务器环境，FPGA环境）、创建测试环境、基本测试案例等。创建好基本测试平台，跑通基本测试案例，也通常称为“冒烟测试”。后继具体的测试代码，都将基于该测试平台进行，因此测试平台需要具有可重用性。验证平台通常包含测试框架和被测试代码，以及对应的基本信号激励。&#xA;功能点整理： 根据规范手册（spec）列出DUT的基本功能，并对其进行明确的描述，以及如何对该功能点进行测试。功能点整理过程中，需要根据重要性、风险、复杂性等因数对其进行优先级排序。功能点整理还需要对各个功能点进行追踪和状态，如果发现原始功能点有更新需要及时进行对应计划的同步。&#xA;测试用例： 测试用例是指一组条件或变量，用于确定DUT是否满足特定需求并能正确运行。每个测试用例通常包含测试条件，输入数据，预期结果，实际结果和测试结果。通过运行测试用例并比较预期结果和实际结果，可以确定系统或应用是否正确实现了特定的功能或需求。在芯片验证中，测试用例是用来验证芯片设计是否满足规格要求的重要工具。&#xA;编码实现： 编码实现即测试用例的具体执行过程，包括测试数据生成、测试框架选择、编程语言选择、参考模型编写等。编码实现是对功能点和测试用例充分理解后工作，如果理解不到位，可能导致DUT无法驱动，不能发现潜在bug等问题。&#xA;收集bug/覆盖率： 验证的目标就是提前发现设计中存在的bug，因此需要对发现的bug进行收集和管理。每发现一个新缺陷，需要给定唯一标号，并同设计工程师进行bug定级，然后进行状态追踪。能发现bug最好，但在实际验证中不是每次测试都能发现bug，因此需要另外一个指标评价验证是否到位。该指标通常采用覆盖率，当覆盖率超过一点阈值（例如代码覆盖率大于90%）后方可任务进行了充分验证。&#xA;回归测试： 验证和设计是一个相互迭代的过程，因此当验证出bug后，需要设计进行修正，且需要保证修正后的DUT仍然能正常工作。这种测试的目的是捕获可能由于修改而引入的新错误，或者重新激活旧错误。回归测试可以是全面的，也就是说，它涵盖了所有的功能，或者可以是选择性的，只针对某些特定的功能或系统部分。&#xA;测试报告： 测试报告是对整个验证过程的总结，它提供了关于测试活动的全面视图，包括测试的目标、执行的测试用例、发现的问题和缺陷、测试覆盖率和测试效率等。&#xA;芯片验证层次 按照验证对象的大小，芯片验证通常包含UT、BT、IT、ST四个层次。&#xA;单元测试（Unit Testing， UT）： 这是最低的验证层次，主要针对单个模块或组件进行。目标是验证每个模块或组件的功能是否正确。</description>
+    </item>
+    <item>
+      <title>验证接口</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/multi-lang/interface/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/multi-lang/interface/</guid>
+      <description>生成库文件 picker可以通过参数--lang指定转换的对应语言（参数已支持cpp、python、java、scala、golang），由于不同编程语言对应的“库”不同，因此生成的库文件有所区别，例如java生成的是jar包，python生成的为文件夹。picker导出对应编程语言的库，需要xcomm的支持，可以通过picker --check查看支持情况：&#xA;$picker --check [OK ] Version: 0.9.0---dirty [OK ] Exec path: /home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/bin/picker [OK ] Template path: /home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/share/picker/template [OK ] Support Cpp (find: &amp;#39;/home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/share/picker/include&amp;#39; success) [Err] Support Java (find: &amp;#39;java/xspcomm-java.jar&amp;#39; fail) [Err] Support Scala (find: &amp;#39;scala/xspcomm-scala.jar&amp;#39; fail) [OK ] Support Python (find: &amp;#39;/home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/share/picker/python&amp;#39; success) [Err] Support Golang (find: &amp;#39;golang&amp;#39; fail) 输出显示success表示支持，fail表示不支持。&#xA;C++ 对于C++语言，picker生成的为so动态链接库，和对应的头文件。例如：&#xA;UT_Adder/ ├── UT_Adder.cpp # DUT 文件 ├── UT_Adder.hpp # DUT 头文件 ├── UT_Adder_dpi.hpp # DPI 头文件 ├── dut_base.</description>
+    </item>
+    <item>
+      <title>TileLink 协议</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/advance_case/tilelink/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>编写规范的验证环境</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/canonical_env/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/canonical_env/</guid>
+      <description>概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。&#xA;验证环境的搭建 旨在完成对待测设计（DUT）的封装，使得验证人员在驱动DUT时，不必面临繁杂的接口信号，而是可以直接使用验证环境中提供的高级接口。如果需要编写参考模型，则参考模型也应是验证环境的一部分。&#xA;测试用例的编写 则是测试人员使用验证环境提供的接口，编写一个个测试用例，对DUT进行功能验证。&#xA;搭建验证环境是一件相当有挑战的事情，当 DUT 极度复杂，特别是在接口信号繁多的情况下，搭建验证环境的难度会更大。此时，若没有一个统一的规范，验证环境的搭建将会变得混乱不堪，一个人编写的验证环境很难被其他人维护。并且当出现新的验证任务与原有验证任务有交集时，因为原有的验证环境缺乏规范，很难将原有的验证环境复用。&#xA;本节将会介绍一个规范的验证环境所应该具备的特性，这将有助于理解 mlvp 验证环境的搭建流程。&#xA;无法复用的验证代码 以一个简单的加法器为例，该加法器拥有两个输入端口 io_a 和 io_b，一个输出端口 io_sum。 在没有意识到验证代码可能会被用于其他验证任务的情况下，我们可能会编写出这样的驱动代码：&#xA;def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) return dut.io_sum.value 上述代码中，我们编写了一个 exec_add 方法，该方法本质上是对加法器加法操作的一次高层封装。拥有 exec_add 方法以后，我们无需再关心如何对加法器的接口信号进行赋值，也无需关心怎样驱动加法器并获取其输出，只需要调用 exec_add 方法即可驱动加法器完成一次加法操作。&#xA;然而，这个驱动函数却有一个很大的弊端，它直接使用了 DUT 的接口信号来与 DUT 进行交互，这也就意味着，这个驱动函数只能用于这个加法器。&#xA;与软件测试不同，在硬件验证中我们每时每刻都能碰到接口结构相同的情况。假设我们拥有另一个具有相同功能的加法器，但其接口信号名称分别是 io_a_0、io_b_0 和 io_sum_0，那么这个驱动函数对这个加法器则直接失效，无法复用。要想驱动，只能重新编写一个新的驱动函数。&#xA;一个加法器尚且如此，倘若我们拿到了一个拥有繁杂接口的 DUT，费尽心思为其编写了驱动代码。当后续发现驱动代码需要迁移至另一个相似结构的接口上时，我们将会面临巨大的工作量。例如出现接口名称改变、部分接口缺少但驱动代码中却有引用，部分接口新增等等一系列的问题。&#xA;出现这种问题的根本原因在于，我们在验证代码中直接对 DUT 的接口信号进行操作，如下图所示，这种做法是不可取的。&#xA;+-----------+ +-----------+ | |--&amp;gt;| | | Test Code | | DUT | | |&amp;lt;--| | +-----------+ +-----------+ 将验证代码与DUT进行解耦 为了解决上述问题，我们需要将验证代码与 DUT 进行解耦，使得验证代码不再直接操作 DUT 的接口信号，而是通过一个中间层来与 DUT 进行交互。这个中间层是人为定义的一个接口结构，在 mlvp 中，我们将这个中间层定义为 Bundle，下文也将会使用 Bundle 来代指这个中间层。</description>
+    </item>
+    <item>
+      <title>波形生成</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/wave/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/wave/</guid>
+      <description>使用方法 在使用 Picker 工具封装 DUT 时，使用选项-w [wave_file]指定需要保存的波形文件。 针对不同的后端仿真器，支持不同的波形文件类型，具体如下：&#xA;Verilator .vcd格式的波形文件。 .fst格式的波形文件，更高效的压缩文件。 VCS .fsdb格式的波形文件，更高效的压缩文件。 需要注意的是，如果你选择自行生成 libDPI_____.so 文件，那么波形文件格式不受上述约束的限制。因为波形文件是在仿真器构建 libDPI.so 时决定的，如果你自行生成，那么波形文件格式也需要自行用对应仿真器的配置指定。&#xA;Python 示例 正常情况下，dut需要被显式地声明完成任务，以通知进行模拟器的后处理工作（写入波形、覆盖率等文件）。 在Python中，需要在完成所有测试后，调用dut的.finalize()方法以通知模拟器任务已完成，进而将文件flush到磁盘。&#xA;以加法器为例，以下为测试程序：&#xA;from UT_Adder import * if __name__ == &amp;#34;__main__&amp;#34;: dut = DUTAdder() for i in range(10): dut.a.value = i * 2 dut.b.value = int(i / 4) dut.Step(1) print(dut.sum.value, dut.cout.value) dut.finalize() # flush the wave file to disk 运行结束后即可生成指定文件名的波形文件。&#xA;查看结果 GTKWave 使用 GTKWave 打开 fst 或 vcd 波形文件，即可查看波形图。&#xA;Verdi 使用 Verdi 打开 fsdb 或 vcd 波形文件，即可查看波形图。</description>
+    </item>
+    <item>
+      <title>如何使用 Bundle</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/bundle/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/bundle/</guid>
+      <description>Bundle 在 mlvp 验证环境中，用于构建 Agent 与 DUT 之间交互的中间层，以保证 Agent 与 DUT 之间的解耦。同时 Bundle 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。&#xA;一个简单的 Bundle 的定义 为了定义一个 Bundle，需要自定义一个新类，并继承 mlvp 中的 Bundle 类。下面是一个简单的 Bundle 的定义示例：&#xA;from mlvp import Bundle, Signals class AdderBundle(Bundle): a, b, sum, cin, cout = Signals(5) 该 Bundle 定义了一个简单的加法器接口，在 AdderBundle 类中，我们定义了五个信号 a, b, sum, cin, cout，这五个信号分别代表了加法器的输入端口 a, b，输出端口 sum，以及进位输入端口 cin 和进位输出端口 cout。&#xA;定义完成后，我们可以通过 AdderBundle 类的实例来访问这些信号，例如：&#xA;adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 adder_bundle.</description>
+    </item>
+    <item>
+      <title>如何使用 Pytest 管理测试用例</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/cases/pytest/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/cases/pytest/</guid>
+      <description>编写测试用例 在 mlvp 中，测试用例是通过 pytest 来管理的。pytest 是一个功能强大的 Python 测试框架，如果你不熟悉 pytest，可以查看 pytest 官方文档。&#xA;编写第一个测试用例 首先，我们需要创建一个测试用例文件，例如 test_adder.py，该文件需要以 test_ 开头，或以 _test.py 结尾，以便 pytest 能够识别。接着可以在其中编写我们的第一个测试用例。&#xA;# test_adder.py async def my_test(): env = AdderEnv() env.add_agent.exec_add(1, 2, 0) def test_adder(): mlvp.run(my_test()) pytest 并不能直接运行协程测试用例，因此我们需要在测试用例中调用 mlvp.run 来运行异步测试用例。&#xA;用例编写完成后，我们可以在终端中运行 pytest。&#xA;pytest pytest 会查找当前目录下所有以 test_ 开头或以 _test.py 结尾的文件，并运行其中以 test_ 开头的函数，每一个函数被视作一个测试用例。&#xA;运行协程测试用例 为了使 pytest 能够直接运行协程测试用例，mlvp 提供了 mlvp_async 标记来标记异步测试用例。&#xA;# test_adder.py @pytest.mark.mlvp_async async def test_adder(): env = AdderEnv(DUTAdder()) await env.add_agent.exec_add(1, 2, 0) 如图所示，我们只需要在测试用例函数上添加 @pytest.</description>
+    </item>
+    <item>
+      <title>数字电路</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/ic_base/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/ic_base/</guid>
+      <description>本页将介绍数字电路的基础知识。数字电路是利用数字信号的电子电路。近年来，绝大多数的计算机都是基于数字电路实现的。&#xA;什么是数字电路 数字电路是一种利用两种不连续的电位来表示信息的电子电路。在数字电路中，通常使用两个电源电压，分别表示高电平（H）和低电平（L），分别代表数字1和0。这样的表示方式通过离散的电信号，以二进制形式传递和处理信息。&#xA;大多数数字电路的实现基于场效应管，其中最常用的是 MOSFET（Metal-Oxide-Semiconductor Field-Effect Transistor，金属氧化物半导体场效应管）。MOSFET 是一种半导体器件，可以在电场的控制下调控电流流动，从而实现数字信号的处理。&#xA;在数字电路中，MOSFET 被组合成各种逻辑电路，如与门、或门、非门等。这些逻辑门通过不同的组合方式，构建了数字电路中的各种功能和操作。以下是一些数字电路的基本特征：&#xA;(1) 电位表示信息： 数字电路使用两种电位，即高电平和低电平，来表示数字信息。通常，高电平代表数字1，低电平代表数字0。&#xA;(2) MOSFET 实现： MOSFET 是数字电路中最常用的元件之一。通过控制 MOSFET 的导通和截止状态，可以实现数字信号的处理和逻辑运算。&#xA;(3) 逻辑门的组合： 逻辑门是数字电路的基本构建块，由 MOSFET 组成。通过组合不同的逻辑门，可以构建复杂的数字电路，实现各种逻辑功能。&#xA;(4) 二进制表达： 数字电路中的信息通常使用二进制系统进行表示。每个数字都可以由一串二进制位组成，这些位可以在数字电路中被处理和操作。&#xA;(5) 电平转换和信号处理： 数字电路通过电平的变化和逻辑操作，实现信号的转换和处理。这种离散的处理方式使得数字电路非常适用于计算和信息处理任务。&#xA;为什么要学习数字电路 学习数字电路是芯片验证过程中的基础和必要前提，主要体现在以下多个方面：&#xA;(1) 理解设计原理： 数字电路是芯片设计的基础，了解数字电路的基本原理和设计方法是理解芯片结构和功能的关键。芯片验证的目的是确保设计的数字电路在实际硬件中按照规格正常工作，而理解数字电路原理是理解设计的关键。&#xA;(2) 设计规范： 芯片验证通常涉及验证设计是否符合特定的规范和功能要求。学习数字电路可以帮助理解这些规范，从而更好地构建测试用例和验证流程，确保验证的全面性和准确性。&#xA;(3) 时序和时钟： 时序问题是数字电路设计和验证中的常见挑战。学习数字电路可以帮助理解时序和时钟的概念，以确保验证过程中能够正确处理时序问题，避免电路中的时序迟滞和冲突。&#xA;(4) 逻辑分析： 芯片验证通常涉及对逻辑的分析，确保电路的逻辑正确性。学习数字电路可以培养对逻辑的深刻理解，从而更好地进行逻辑分析和故障排查。&#xA;(5) 测试用例编写： 在芯片验证中，需要编写各种测试用例来确保设计的正确性。对数字电路的理解可以帮助设计更全面、有针对性的测试用例，涵盖电路的各个方面。&#xA;(6) 信号完整性： 学习数字电路有助于理解信号在电路中的传播和完整性问题。在芯片验证中，确保信号在不同条件下的正常传递是至关重要的，特别是在高速设计中。&#xA;整体而言，学习数字电路为芯片验证提供了基础知识和工具，使验证工程师能够更好地理解设计，编写有效的测试用例，分析验证结果，并解决可能出现的问题。数字电路的理论和实践经验对于芯片验证工程师来说都是不可或缺的。&#xA;数字电路基础知识 可以通过以下在线资源进行数字电路学习：&#xA;清华大学数字电路基础 中科大数字电路实验 数字设计和计算机体系结构 MIT 数字集成电路分析与设计 硬件描述语言Chisel 传统描述语言 硬件描述语言（Hardware Description Language，简称 HDL）是一种用于描述数字电路、系统和硬件的语言。它允许工程师通过编写文本文件来描述硬件的结构、功能和行为，从而实现对硬件设计的抽象和建模。&#xA;HDL 通常被用于设计和仿真数字电路，如处理器、存储器、控制器等。它提供了一种形式化的方法来描述硬件电路的行为和结构，使得设计工程师可以更方便地进行硬件设计、验证和仿真。&#xA;常见的硬件描述语言包括：&#xA;Verilog：Verilog 是最常用的 HDL 之一，它是一种基于事件驱动的硬件描述语言，广泛应用于数字电路设计、验证和仿真。 VHDL：VHDL 是另一种常用的 HDL，它是一种面向对象的硬件描述语言，提供了更丰富的抽象和模块化的设计方法。 SystemVerilog：SystemVerilog 是 Verilog 的扩展，它引入了一些高级特性，如对象导向编程、随机化测试等，使得 Verilog 更适用于复杂系统的设计和验证。 Chisel Chisel 是一种现代化高级的硬件描述语言，与传统的 Verilog 和 VHDL 不同，它是基于 Scala 编程语言的硬件构建语言。Chisel 提供了一种更加现代化和灵活的方法来描述硬件，通过利用 Scala 的特性，可以轻松地实现参数化、抽象化和复用，同时保持硬件级别的效率和性能。</description>
+    </item>
+    <item>
+      <title>案例一：简单加法器</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-adder/</link>
+      <pubDate>Thu, 05 Jan 2017 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-adder/</guid>
+      <description>RTL源码 在本案例中，我们驱动一个 64 位的加法器（组合电路），其源码如下：&#xA;// A verilog 64-bit full adder with carry in and carry out module Adder #( parameter WIDTH = 64 ) ( input [WIDTH-1:0] a, input [WIDTH-1:0] b, input cin, output [WIDTH-1:0] sum, output cout ); assign {cout, sum} = a + b + cin; endmodule 该加法器包含一个 64 位的加法器，其输入为两个 64 位的数和一个进位信号，输出为一个 64 位的和和一个进位信号。&#xA;测试过程 在测试过程中，我们将创建一个名为 Adder 的文件夹，其中包含一个 Adder.v 文件。该文件内容即为上述的 RTL 源码。&#xA;将RTL导出为 Python Module 生成中间文件 进入 Adder 文件夹，执行如下命令：</description>
+    </item>
+    <item>
+      <title>CoupledL2</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/coupledl2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/coupledl2/</guid>
+      <description>CoupledL2是一个非阻塞的L2 Cache。&#xA;下面的代码会对CoupledL2进行简单的验证，并使用数组作为参考模型，验证过程如下：&#xA;生成随机的地址addr、执行AcquireBlock，请求读取addr的数据。 执行GrantData，接收DUT响应的数据。 把接收到的数据和参考模型的内容进行比较，验证行为是否一致。 执行GrantAck，响应DUT。 执行ReleaseData，向DUT请求在addr写入随机数据data。 同步参考模型，把addr的数据更新为data。 执行ReleaseAck，接收DUT的写入响应。 上述步骤会重复4000次。&#xA;验证代码：&#xA;Cpp Java Python #include &#34;UT_CoupledL2.hpp&#34; using TLDataArray = std::array; enum class OpcodeA : uint32_t { PutFullData = 0x0, PutPartialData = 0x1, ArithmeticData = 0x2, LogicalData = 0x3, Get = 0x4, Hint = 0x5, AcquireBlock = 0x6, AcquirePerm = 0x7, }; enum class OpcodeB : uint32_t { ProbeBlock = 0x6, ProbePerm = 0x7 }; enum class OpcodeC : uint32_t { ProbeAck = 0x4, ProbeAckData = 0x5, Release = 0x6, ReleaseData = 0x7 }; enum class OpcodeD : uint32_t { AccessAck, AccessAckData, HintAck, Grant = 0x4, GrantData = 0x5, ReleaseAck = 0x6 }; enum class OpcodeE : uint32_t { GrantAck = 0x4 }; constexpr std::initializer_list ARGS = {&#34;</description>
+    </item>
+    <item>
+      <title>创建DUT</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/create_dut/</guid>
+      <description>以果壳cache为例，介绍如何创建基于Chisel的DUT&#xA;在本文档中，DUT（Design Under Test）是指在芯片验证过程中，被验证的对象电路或系统。DUT是验证的主体，在基于picker工具创建DUT时，需要考虑被测对象的功能、性能要求和验证目标，例如是需要更快的执行速度，还是需要更详细的测试信息。通常情况下DUT，即RTL编写的源码，与外围环境一起构成验证环境（test_env），然后基于该验证环境编写测试用例。在本项目中，DUT是需要测试的Python模块，需要通过RTL进行转换。传统的RTL语言包括Verilog、System Verilog、VHDL等，然而作为新兴的RTL设计语言，Chisel（https://www.chisel-lang.org/）也以其面向对象的特征和便捷性，逐渐在RTL设计中扮演越来越重要的角色。本章以果壳处理器-NutShell中的cache源代码到Python模块的转换为例进行介绍如何创建DUT。&#xA;Chisel与果壳 准确来说，Chisel是基于Scala语言的高级硬件构造（HCL）语言。传统HDL是描述电路，而HCL则是生成电路，更加抽象和高级。同时Chisel中提供的Stage包则可以将HCL设计转化成Verilog、System Verilog等传统的HDL语言设计。配合上Mill、Sbt等Scala工具则可以实现自动化的开发。&#xA;果壳是使用 Chisel 语言模块化设计的、基于 RISC-V RV64 开放指令集的顺序单发射处理器实现。果壳更详细的介绍请参考链接：https://oscpu.github.io/NutShell-doc/&#xA;果壳 cache 果壳cache（Nutshell Cache）是果壳处理器中使用的缓存模块。其采用三级流水设计，当第三级流水检出当前请求为MMIO或者发生重填（refill）时，会阻塞流水线。同时，果壳cache采用可定制的模块化设计，通过改变参数可以生成存储空间大小不同的一级cache（L1 Cache）或者二级cache（L2 Cache）。此外，果壳cache留有一致性（coherence）接口，可以处理一致性相关的请求。&#xA;Chisel 转 Verilog Chisel中的stage库可以帮助由Chisel代码生成Verilog、System Verilog等传统的HDL代码。以下将简单介绍如何由基于Chisel的cache实现转换成对应的Verilog电路描述。&#xA;初始化果壳环境 首先从源仓库下载整个果壳源代码，并进行初始化：&#xA;mkdir cache-ut cd cache-ut git clone https://github.com/OSCPU/NutShell.git cd NutShell &amp;amp;&amp;amp; git checkout 97a025d make init 创建scala编译配置 在cache-ut目录下创建build.sc，其中内容如下：&#xA;import $file.NutShell.build import mill._, scalalib._ import coursier.maven.MavenRepository import mill.scalalib.TestModule._ // 指定Nutshell的依赖 object difftest extends NutShell.build.CommonNS { override def millSourcePath = os.pwd / &amp;#34;NutShell&amp;#34; / &amp;#34;difftest&amp;#34; } // Nutshell 配置 object NtShell extends NutShell.</description>
+    </item>
+    <item>
+      <title>多文件输入</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/multifile/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/multifile/</guid>
+      <description>多文件输入输出 在许多情况中，某文件下的某个模块会例化其他文件下的模块，在这种情况下您可以使用Picker工具的-f选项处理多个verilog源文件。例如，假设您有Cache.sv, CacheStage.sv以及CacheMeta.sv三个源文件：&#xA;文件列表 Cache.sv // In module Cache( ... ); CacheStage s1( ... ); CacheStage s2( ... ); CacheStage s3( ... ); CacheMeta cachemeta( ... ); endmodule CacheStage.sv // In CacheStage.sv module CacheStage( ... ); ... endmodule CacheMeta.sv // In CacheMeta.sv module CacheMeta( ... ); ... endmodule 应用方式 其中，待测模块为Cache，位于Cache.sv中，则您可以通过以下命令生成DUT：&#xA;命令行指定 picker export Cache.sv --fs CacheStage.sv,CacheMeta.sv --sname Cache 通过文件列表文件指定 您也可以通过传入.txt文件的方式来实现多文件输入：&#xA;picker export Cache.sv --fs src.txt --sname Cache 其中src.txt的内容为:&#xA;CacheStage.sv CacheMeta.sv 注意事项 需要注意的是，使用多文件输入时仍需要指定待测顶层模块所在的文件，例如上文中所示的Cache.</description>
+    </item>
+    <item>
+      <title>功能检查点（功能覆盖率）</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/cases/cov/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/cases/cov/</guid>
+      <description>什么是功能检查点 在 mlvp 中，功能检查点(Cover Point) 是指对设计的某个功能进行验证的最小单元，判断该功能是否满足设计目标。测试组(Cover Croup) 是一类检查点的集合。&#xA;定义一个检查点，需要指定检查点的名称及检查点的触发条件（触发条件可以有多个，最终的检查结果为所有条件取“逻辑与”，触发条件称为Cover Bin）。例如，可以定义了一个检查点，“当加法器运算结果不为 0 时，结果运算正确”，此时，检查点的触发条件可以为 “加法器的 sum 信号不为零”。&#xA;当检查点的所有触发条件都满足时，检查点被触发，此时，验证报告将会记录下该检查点的触发。并会提升验证的功能覆盖率。当所有检查点都被触发时，验证的功能覆盖率达到 100%。&#xA;如何编写检查点 编写检查点前，首先需要创建一个测试组，并指定测试组的名称&#xA;import mlvp.funcov as fc g = fc.CovGroup(&amp;#34;Group-A&amp;#34;) 接着，需要往这个测试组中添加检查点。一般情况下，一个功能点对应一个或多个检查点，用来检查是否满足该功能。例如我们需要检查Adder的cout是否有0出现，我们可以通过如下方式添加：&#xA;g.add_watch_point(adder.io_cout, {&amp;#34;io_cout is 0&amp;#34;: fc.Eq(0)}, name=&amp;#34;cover_point_1&amp;#34;) 在上述检查点中，需要观察的数据为io_cout引脚，检查条件(Cover Bin)的名称为io_cout is 0，检查点名称为cover_point_1。函数add_watch_point的参数说明如下：&#xA;def add_watch_point(target, bins: dict, check_func: dict = {}, name: str = &amp;#34;&amp;#34;, once=None): &amp;#34;&amp;#34;&amp;#34; @param target: 检查目标，可以是一个引脚，也可以是一个DUT对象 @param bins: 检查条件，dict格式，key为条件名称，value为具体检查方法或者检查方法的数组。 @param check_func: 用于覆盖bins中的检查函数（不建议使用，后续版本会删除该参数） @param name: 检查点名称 @param once，如果once=True，表明只检查一次，一旦该检查点满足要求后就不再进行重复条件判断。 通常情况下，target为DUT引脚，bins中的检查函数来检查target的value是否满足预定义条件。funcov模块内存了部分检查函数，例如Eq(x), Gt(x), Lt(x), Ge(x), Le(x), Ne(x), In(list), NotIn(list), isInRange([low,high])等。当内置检查函数不满足要求时，也可以自定义，例如需要跨时钟周期进行检查等。自定义检查函数的输入参数为target，返回值为bool。例如：</description>
+    </item>
+    <item>
+      <title>如何编写 Agent</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/agent/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/agent/</guid>
+      <description>Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。&#xA;一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。&#xA;初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：&#xA;from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。&#xA;创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。</description>
+    </item>
+    <item>
+      <title>案例二：随机数生成器</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/</guid>
+      <description>RTL源码 在本案例中，我们驱动一个随机数生成器，其源码如下：&#xA;module RandomGenerator ( input wire clk, input wire reset, input [15:0] seed, output [15:0] random_number ); reg [15:0] lfsr; always @(posedge clk or posedge reset) begin if (reset) begin lfsr &amp;lt;= seed; end else begin lfsr &amp;lt;= {lfsr[14:0], lfsr[15] ^ lfsr[14]}; end end assign random_number = lfsr; endmodule 该随机数生成器包含一个 16 位的 LFSR，其输入为一个 16 位的种子数，输出为一个 16 位的随机数。LFSR 的更新规则为：&#xA;将当前的 LFSR 的最高位与次高位异或，称为new_bit。 将原来的 LFSR 向左平移一位，将 new_bit 放在最低位。 丢弃最高位。 测试过程 在测试过程中，我们将创建一个名为 RandomGenerator 的文件夹，其中包含一个 RandomGenerator.</description>
+    </item>
+    <item>
+      <title>覆盖率统计</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/coverage/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/coverage/</guid>
+      <description>Picker 工具支持生成代码行覆盖率报告，MLVP（https://github.com/XS-MLVP/mlvp） 项目支持生成功能覆盖率报告。&#xA;代码行覆盖率 目前 Picker 工具支持基于 Verilator 仿真器生成的代码行覆盖率报告。&#xA;Verilator Verilator 仿真器提供了覆盖率支持功能。&#xA;该功能的实现方式是：&#xA;利用 verilator_coverage 工具处理或合并覆盖率数据库，最终针对多个DUT生成一个 coverage.info 文件。 利用 lcov 工具的 genhtml 命令基于coverage.info和RTL代码源文件，生成完整的代码覆盖率报告。 使用时的流程如下：&#xA;使用 Picker 生成 dut 时，使能 COVERAGE 功能 （添加-c选项）。 仿真器运行完成后，dut.finalize() 之后会生成覆盖率数据库文件 V{DUT_NAME}.dat。 基于 verilator_coverage 的 write-info 功能将其转换成 .info文件。 基于 lcov 的 genhtml 功能，使用.info文件和文件中指定的rtl源文件，生成html报告。 注意： 文件中指定的rtl源文件是指在生成的DUT时使用的源文件路径，需要保证这些路径在当前环境下是有效的。简单来说，需要编译时用到的所有.sv/.v文件都需要在当前环境下存在，并且目录不变。&#xA;verilator_coverage verilator_coverage 工具用于处理 DUT 运行后生成的 .dat 的覆盖率数据。该工具可以处理并合并多个 .dat 文件，同时具有两类功能：&#xA;基于 .dat 文件生成 .info 文件，用于后续生成网页报告。&#xA;-annotate &amp;lt;output_dir&amp;gt;：以标注的形式在源文件中呈现覆盖率情况，结果保存到output_dir中。形式如下：&#xA;100000 input logic a; // Begins with whitespace, because // number of hits (100000) is above the limit.</description>
+    </item>
+    <item>
+      <title>如何搭建 Env</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/build_env/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/build_env/</guid>
+      <description>Env 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。&#xA;创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。&#xA;创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 mlvp 中的 Env 类。下面是一个简单的 Env 的定义示例：&#xA;from mlvp.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。&#xA;可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。&#xA;此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：&#xA;port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env.</description>
+    </item>
+    <item>
+      <title>DUT验证</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/test_dut/</guid>
+      <description>本节介绍基于Picker验证DUT的一般流程&#xA;开放验证平台的目标是功能性验证，其一般有以下步骤：&#xA;1. 确定验证对象和目标 通常来说，同时交付给验证工程师的还有DUT的设计文档。此时您需要阅读文档或者源代码，了解验证对象的基本功能、主体结构以及预期功能。&#xA;2. 构建基本验证环境 充分了解设计之后，您需要构建验证的基本环境。例如，除了由Picker生成的DUT外，您可能还需要搭建用于比对的参考模型，也可能需要为后续功能点的评测搭建信号的监听平台。&#xA;3. 功能点与测试点分解 在正式开始验证之前，您还需要提取功能点，并将其进一步分解成测试点。提取和分解方法可以参考：CSDN:芯片验证系列——Testpoints分解&#xA;4. 构造测试用例 有了测试点之后，您需要构造测试用例来覆盖相应的测试点。一个用例可能覆盖多个测试点。&#xA;5. 收集测试结果 运行完所有的测试用例之后，您需要汇总所有的测试结果。一般来说包括代码行覆盖率以及功能覆盖率。前者可以通过Picker工具提供的覆盖率功能获得，后者则需要您通过监听DUT的行为判断某功能是否被用例覆盖到。&#xA;6. 评估测试结果 最后您需要评估得到的结果，如是否存在错误的设计、某功能是否无法被触发、设计文档表述是否与DUT行为一致、设计文档是否表述清晰等。&#xA;接下来我们以果壳Cache的MMIO读写为例，介绍一般验证流程：&#xA;1 确定验证对象和目标：&#xA;果壳Cache的MMIO读写功能。MMIO是一类特殊的IO映射，其支持通过访问内存地址的方式访问IO设备寄存器。由于IO设备的寄存器状态是随时可能改变的，因此不适合将其缓存在cache中。当收到MMIO请求时，果壳cache不会在普通的cache行中查询命中/缺失情况，而是会直接访问MMIO的内存区域来读取或者写入数据。&#xA;2 构建基本验证环境：&#xA;我们可以将验证环境大致分为五个部分：&#xA;1. Testcase Driver：负责由用例产生相应的信号驱动&#xA;2. Monitor：监听信号，判断功能是否被覆盖以及功能是否正确&#xA;3. Ref Cache：一个简单的参考模型&#xA;4. Memory/MMIO Ram：外围设备的模拟，用于模拟相应cache的请求&#xA;5. Nutshell Cache Dut：由Picker生成的DUT&#xA;此外，您可能还需要对DUT的接口做进一步封装以实现更方便的读写请求操作，具体可以参考Nutshll cachewrapper。&#xA;3 功能点与测试点分解：&#xA;果壳cache可以响应MMIO请求，进一步分解可以得到一下测试点：&#xA;测试点1：MMIO请求会被转发到MMIO端口上&#xA;测试点2：cache响应MMIO请求时，不会发出突发传输（Burst Transfer）的请求&#xA;测试点3：cache响应MMIO请求时，会阻塞流水线&#xA;4 构造测试用例： 测试用例的构造是简单的，已知通过创建DUT得到的Nutshell cache的MMIO地址范围是0x30000000~0x7fffffff，则我们只需访问这段内存区间，应当就能获得MMIO的预期结果。需要注意的是，为了触发阻塞流水线的测试点，您可能需要连续地发起请求。&#xA;以下是一个简单的测试用例：&#xA;# import CacheWrapper here def mmio_test(cache: CacheWrapper): mmio_lb&#x9;= 0x30000000 mmio_rb&#x9;= 0x30001000 print(&amp;#34;\n[MMIO Test]: Start MMIO Serial Test&amp;#34;) for addr in range(mmio_lb, mmio_rb, 16): addr &amp;amp;= ~(0xf) addr1 = addr addr2 = addr + 4 addr3 = addr + 8 cache.</description>
+    </item>
+    <item>
+      <title>案例三：双端口栈（回调）</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-callback/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-callback/</guid>
+      <description>双端口栈简介 双端口栈是一种数据结构，支持两个端口同时进行操作。与传统单端口栈相比，双端口栈允许同时进行数据的读写操作，在例如多线程并发读写等场景下，双端口栈能够提供更好的性能。本例中，我们提供了一个简易的双端口栈实现，其源码如下：&#xA;module dual_port_stack ( input clk, input rst, // Interface 0 input in0_valid, output in0_ready, input [7:0] in0_data, input [1:0] in0_cmd, output out0_valid, input out0_ready, output [7:0] out0_data, output [1:0] out0_cmd, // Interface 1 input in1_valid, output in1_ready, input [7:0] in1_data, input [1:0] in1_cmd, output out1_valid, input out1_ready, output [7:0] out1_data, output [1:0] out1_cmd ); // Command definitions localparam CMD_PUSH = 2&amp;#39;b00; localparam CMD_POP = 2&amp;#39;b01; localparam CMD_PUSH_OKAY = 2&amp;#39;b10; localparam CMD_POP_OKAY = 2&amp;#39;b11; // Stack memory and pointer reg [7:0] stack_mem[0:255]; reg [7:0] sp; reg busy; reg [7:0] out0_data_reg, out1_data_reg; reg [1:0] out0_cmd_reg, out1_cmd_reg; reg out0_valid_reg, out1_valid_reg; assign out0_data = out0_data_reg; assign out0_cmd = out0_cmd_reg; assign out0_valid = out0_valid_reg; assign out1_data = out1_data_reg; assign out1_cmd = out1_cmd_reg; assign out1_valid = out1_valid_reg; always @(posedge clk or posedge rst) begin if (rst) begin sp &amp;lt;= 0; busy &amp;lt;= 0; end else begin // Interface 0 Request Handling if (!</description>
+    </item>
+    <item>
+      <title>开始新的验证任务</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/verification/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/verification/</guid>
+      <description>使用 mlvp，你已经可以搭建出一个完整的验证环境，并且方便地去编写测试用例了。然而在实际的业务中，往往无法理解如何开始上手，并最终完成验证任务。实际编写代码后，会遇到无法正确划分 Bundle，无法正确理解 Agent 的高级语义封装，搭建完环境之后不知道做什么等问题。&#xA;在这一节中，将会介绍如何从头开始完成一个新的验证任务，以及如何更好地使用 mlvp 来完成验证任务。&#xA;1. 了解待验证设计 拿到一个新的设计后，往往面对的是几十或数百个输入输出信号，如果直接看这些信号，很可能一头雾水，感觉无从下手。在这时，你必须坚信，输入输出信号都是设计人员来定义的，只要能够理解设计的功能，就能够理解这些信号的含义。&#xA;如果设计人员提供了设计文档，那么你可以阅读设计文档，了解设计的功能，并一步步地将功能与输入输出信号对应起来，并且要清楚地理解输入输出信号的时序，以及如何使用这些信号来驱动设计。一般来说，你还需要阅读设计的源代码，来找寻更细节的接口时序问题。&#xA;当大致了解了 DUT 的功能，并明白如何驱动起 DUT 接口之后，你就可以开始搭建验证环境了。&#xA;2. 划分 Bundle 搭建环境的第一件事，就是根据接口的逻辑功能，将其划分为若干个接口集合，我们可以每一个接口集合视作一个 Bundle。划分为的每个 Bundle 都应是独立的，由一个独立的 Agent 来驱动。&#xA;但是，往往实际中的接口是这样的：&#xA;|---------------------- DUT Bundle -------------------------------| |------- Bundle 1 ------| |------ Bundle 2 ------| |-- Bundle 3 --| |-- B1.1 --| |-- B1.2 --| |-- B2.1 --| 那么问题就出现了，例如究竟是应该为 B1.1， B1.2 各自创建一个 Agent，还是应该直接为 Bundle 1 建立一个 Agent 呢？&#xA;这还是取决于接口的逻辑功能，如果需要定义一个独立的请求，这个请求需要对 B1.1 和 B1.2 同时进行操作，那么就应该为 Bundle 1 创建一个 Agent，而不是为 B1.</description>
+    </item>
+    <item>
+      <title>如何编写参考模型</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/ref_model/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/ref_model/</guid>
+      <description>参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。&#xA;参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。&#xA;这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。&#xA;函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。&#xA;下面是一个简单的函数调用模式的参考模型的定义示例：&#xA;例如，这是一个简单的加法器参考模型：&#xA;class AdderRefModel(): def add(self, a, b): return a + b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。&#xA;需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。&#xA;独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。&#xA;我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。&#xA;class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&amp;#34;a&amp;#34;] + operands[&amp;#34;b&amp;#34;] await self.</description>
+    </item>
+    <item>
+      <title>案例四：双端口栈（协程）</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-async/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-async/</guid>
+      <description>双端口栈简介与环境构建 本案例中使用的双端口栈与案例三中的实现完全相同，请查看案例三中的双端口栈简介及构建驱动环境。&#xA;利用协程驱动 DUT 在案例三中，我们使用了回调函数的方式来驱动DUT，回调函数虽然给我们提供了一种能够完成并行操作的方式，然而其却把完成的执行流程割裂为多次函数调用，并需要维护大量中间状态，导致代码的编写及调试变得较为复杂。&#xA;在本案例中，我们将会介绍一种通过协程驱动的方法，这种方法不仅能够做到并行操作，同时能够很好地避免回调函数所带来的问题。&#xA;协程简介 协程是一种“轻量级”的线程，通过协程，你可以实现与线程相似的并发执行的行为，但其开销却远小于线程。其实现原理是，协程库实现了一个运行于单线程之上的事件循环（EventLoop），程序员可以定义若干协程并且加入到事件循环，由事件循环负责这些协程的调度。&#xA;一般来说，我们定义的协程在执行过程中会持续执行，直到遇到一个需要等待的“事件”，此时事件循环就会暂停执行该协程，并调度其他协程运行。当事件发生后，事件循环会再次唤醒该协程，继续执行。&#xA;对于硬件验证中的并行执行来说，这种特性正是我们所需要的，我们可以创建多个协程，来完成验证中的多个驱动任务。我们可以将时钟的执行当做事件，在每个协程中等待这个事件，当时钟信号到来时，事件循环会唤醒所有等待的协程，使其继续执行，直到他们等待下一个时钟信号。&#xA;我们用 Python 中的 asyncio 来实现对协程的支持：&#xA;import asyncio from dual_port_stack import * async def my_coro(dut, name): for i in range(10): print(f&amp;#34;{name}: {i}&amp;#34;) await dut.AStep(1) async def test_dut(dut): asyncio.create_task(my_coro(dut, &amp;#34;coroutine 1&amp;#34;)) asyncio.create_task(my_coro(dut, &amp;#34;coroutine 2&amp;#34;)) await asyncio.create_task(dut.RunStep(10)) dut = DUTdual_port_stack() dut.InitClock(&amp;#34;clk&amp;#34;) asyncio.run(test_dut(dut)) dut.Finish() 你可以直接运行上述代码来观察协程的执行过程。在上述代码中我们用 create_task 创建了两个协程任务并加入到事件循环中，每个协程任务中，会不断打印一个数字并等待下一个时钟信号到来。&#xA;我们使用 dut.RunStep(10) 来创建一个后台时钟，它会不断产生时钟同步信号，使得其他协程能够在时钟信号到来时继续执行。&#xA;基于协程驱动的双端口栈 利用协程，我们就可以将驱动双端口栈中单个端口逻辑写成一个独立的执行流，不需要再去维护大量的中间状态。&#xA;下面是我们提供的一个简单的使用协程驱动的验证代码：&#xA;import asyncio import random from dual_port_stack import * from enum import Enum class StackModel: def __init__(self): self.</description>
+    </item>
+    <item>
+      <title>验证报告</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/basic/report/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/basic/report/</guid>
+      <description>在我们完成DUT验证后，编写验证报告是至关重要的一环。本节将从整体角度概述验证报告的结构以及报告所需覆盖的内容。&#xA;验证报告是对整个验证过程的回顾，是验证合理与否的重要支持文件。一般情况下，验证报告需要包含以下内容：&#xA;文档基本信息（作者、日志、版本等） 验证对象（验证目标） 功能点介绍 验证方案 测试点分解 测试用例 测试环境 结果分析 缺陷分析 测试结论 以下内容对列表进行进一步解释，具体示例可以参考nutshell_cache_report_demo.pdf&#xA;1. 基本信息 应当包括作者、日志、版本、日期等。&#xA;2. 验证对象（验证目标） 需要对您的验证对象做必要的介绍，可以包括其结构、基本功能、接口信息等。&#xA;3. 功能点介绍 通过阅读设计文档或者源码，您需要总结DUT的目标功能，并将其细化为各功能点。&#xA;4. 验证方案 应当包括您计划的验证流程以及验证框架。同时，您也应当接受您的框架各部分是如何协同工作的。&#xA;5. 测试点分解 针对功能点提出的测试方法。具体可以包括在怎样的信号输入下应当观测到怎样的信号输出。&#xA;6. 测试用例 测试点的具体实现。一个测试用例可以包括多个测试点。&#xA;7. 测试环境 包括硬件信息、软件版本信息等。&#xA;8. 结果分析 结果分析一般指覆盖率分析。通常来说应当考虑两类覆盖率：&#xA;1. 行覆盖率： 在测试用例中有多少RTL行代码被执行。一般来说我们要求行覆盖率在98%以上。&#xA;2. 功能覆盖率：根据相应的信号判断您提取的功能点是否被覆盖且被正确触发。一般我们要求测试用例覆盖每个功能点。&#xA;9. 缺陷分析 对DUT存在的缺陷进行分析。可以包括设计文档的规范性和详细性、DUT功能的正确性（是否存在bug）、DUT功能是否能被触发等方面。&#xA;10. 验证结论 验证结论是在完成芯片验证过程后得出的最终结论，是对以上内容的总结。</description>
+    </item>
+    <item>
+      <title>PyTest</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/frameworks/pytest/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/frameworks/pytest/</guid>
+      <description>软件测试 在正式开始pytest 之间我们先了解一下软件的测试，软件测试一般分为如下四个方面&#xA;单元测试：称模块测试，针对软件设计中的最小单位——程序模块，进行正确性检查的测试工作 集成测试：称组装测试，通常在单元测试的基础上，将所有程序模块进行有序的、递增测试，重点测试不同模块的接口部分 系统测试：将整个软件系统看成一个整体进行测试，包括对功能、性能以及软件所运行的软硬件环境进行测试 验收测试：指按照项目任务书或合同、供需双方约定的验收依据文档进行的对整个系统的测试与评审，决定是否接收或拒收系统 pytest最初是作为一个单元测试框架而设计的，但它也提供了许多功能，使其能够进行更广泛的测试，包括集成测试，系统测试，他是一个非常成熟的全功能的python 测试框架。 它通过收集测试函数和模块，并提供丰富的断言库来简化测试的编写和运行，是一个非常成熟且功能强大的 Python 测试框架，具有以下几个特点：&#xA;简单灵活：Pytest 容易上手，且具有灵活性。 支持参数化：您可以轻松地为测试用例提供不同的参数。 全功能：Pytest 不仅支持简单的单元测试，还可以处理复杂的功能测试。您甚至可以使用它来进行自动化测试，如 Selenium 或 Appium 测试，以及接口自动化测试（结合 Pytest 和 Requests 库）。 丰富的插件生态：Pytest 有许多第三方插件，您还可以自定义扩展。一些常用的插件包括： pytest-selenium：集成 Selenium。 pytest-html：生成HTML测试报告。 pytest-rerunfailures：在失败的情况下重复执行测试用例。 pytest-xdist：支持多 CPU 分发。 与 Jenkins 集成良好。 支持 Allure 报告框架。 本文将基于测试需求简单介绍pytest的用法，其完整手册在这里，供同学们进行深入学习。&#xA;Pytest安装 # 安装pytest： pip install pytest # 升级pytest pip install -U pytest # 查看pytest版本 pytest --version # 查看已安装包列表 pip list # 查看pytest帮助文档 pytest -h # 安装第三方插件 pip install pytest-sugar pip install pytest-rerunfailures pip install pytest-xdist pip install pytest-assume pip install pytest-html Pytest使用 命名规则 # 首先在使用pytest 时我们的模块名通常是以test开头或者test结尾，也可以修改配置文件，自定义命名规则 # test_*.</description>
+    </item>
+    <item>
+      <title>Hypothesis</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/frameworks/hypothesis/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/frameworks/hypothesis/</guid>
+      <description>Hypothesis 在上一节中，我们通过手动编写测试用例，并为每个用例指定输入和预期输出。这种方式存在一些问题，例如测试用例覆盖不全面、边界条件 容易被忽略等。它是一个用于属性基于断言的软件测试的 Python 库。Hypothesis 的主要目标是使测试更简单、更快速、更可靠。它使用了一种称为属性基于断言的测试方法，即你可以为你的代码编写一些假（hypotheses），然后 Hypothesis 将会自动生成测试用例并验证这些假设。这使得编写全面且高效的测试变得更加容易。Hypothesis 可以自动生成各种类型的输入数据，包括基本类型（例如整数、浮点数、字符串等）、容器类型（例如列表、集合、字典等）、自定义类型等。然后，它会根据你提供的属性（即断言）进行测试，如果发现测试失败，它将尝试缩小输入数据的范围以找出最小的失败案例。通过 Hypothesis，你可以更好地覆盖代码的边界条件，并发现那些你可能没有考虑到的错误情况。这有助于提高代码的质量和可靠性。&#xA;基本概念 测试函数：即待测试的函数或方法，我们需要对其进行测试。 属性：定义了测试函数应该满足的条件。属性是以装饰器的形式应用于测试函数上的。 策略：用于生成测试数据的生成器。Hypothesis 提供了一系列内置的策略，如整数、字符串、列表等。我们也可以自定义策略。 测试生成器：基于策略生成测试数据的函数。Hypothesis 会自动为我们生成测试数据，并将其作为参数传递给测试函数。 本文将基于测试需求简单介绍Hypothesis的用法，其完整手册在这里，供同学们进行深入学习。&#xA;安装 使用pip安装，在python中导入即可使用&#xA;pip install hypothesis import hypothesis 基本用法 属性和策略 Hypothesis 使用属性装饰器来定义测试函数的属性。最常用的装饰器是 @given，它指定了测试函数应该满足的属性。 我们可以通过@given 装饰器定义了一个测试函数 test_addition。并给x 添加对应的属性，测试生成器会自动为测试函数生成测试数据，并将其作为参数传递给函数，例如&#xA;def addition(number: int) -&amp;gt; int: return number + 1 @given(x=integers(), y=integers())　def test_addition(x, y):　assert x + 1 == addition（1） 其中integers () 是一个内置的策略，用于生成整数类型的测试数据。Hypothesis 提供了丰富的内置策略，用于生成各种类型的测试数据。除了integers ()之外，还有字符串、布尔值、列表、字典等策略。例如使用 text () 策略生成字符串类型的测试数据，使用 lists (text ()) 策略生成字符串列表类型的测试数据&#xA;@given(s=text(), l=lists(text())) def test_string_concatenation(s, l):　result = s + &amp;#34;&amp;#34;.</description>
+    </item>
+    <item>
+      <title>搜索结果</title>
+      <link>https://xs-mlvp.github.io/mlvp/search/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/search/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>
