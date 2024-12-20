@@ -32,7 +32,7 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 序号 名称 描述 1.1 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 功能点2 链式断点 当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。
 对0号trigger，不需要考虑链式的情况
 由此，我们可以设置几种测试点：
-序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 断点设置和检查 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 2.">
+序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.">
 <meta property="og:title" content="FrontendTrigger" />
 <meta property="og:description" content="FrontendTrigger子模块 该子模块的主要作用是在前端设置硬件断点和检查。
 FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger模块里共4个Trigger，编号为0,1,6,8，每个Trigger的配置信息（断点类型、匹配地址等）保存在tdata寄存器中。
@@ -48,11 +48,11 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 序号 名称 描述 1.1 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 功能点2 链式断点 当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。
 对0号trigger，不需要考虑链式的情况
 由此，我们可以设置几种测试点：
-序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 断点设置和检查 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 2." />
+序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/05_frontend_trigger/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-18T20:01:17+08:00" />
+<meta property="article:modified_time" content="2024-12-20T14:07:14+08:00" />
 <meta itemprop="name" content="FrontendTrigger">
 <meta itemprop="description" content="FrontendTrigger子模块 该子模块的主要作用是在前端设置硬件断点和检查。
 FrontendTrigger功能介绍 断点设置和断点检查 在IFU的FrontendTrigger模块里共4个Trigger，编号为0,1,6,8，每个Trigger的配置信息（断点类型、匹配地址等）保存在tdata寄存器中。
@@ -68,8 +68,8 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 序号 名称 描述 1.1 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 功能点2 链式断点 当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。
 对0号trigger，不需要考虑链式的情况
 由此，我们可以设置几种测试点：
-序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 断点设置和检查 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 2.">
-<meta itemprop="dateModified" content="2024-12-18T20:01:17+08:00" />
+序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.">
+<meta itemprop="dateModified" content="2024-12-20T14:07:14+08:00" />
 <meta itemprop="wordCount" content="89">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FrontendTrigger"/>
 <meta name="twitter:description" content="FrontendTrigger子模块 该子模块的主要作用是在前端设置硬件断点和检查。
@@ -86,9 +86,9 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 序号 名称 描述 1.1 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 功能点2 链式断点 当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。
 对0号trigger，不需要考虑链式的情况
 由此，我们可以设置几种测试点：
-序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1.2.2 断点设置和检查 select0关系不匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发 2."/>
-<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.bdee11f6cee31bc3630ab45096c7f90e26285b6f4360d3b477566fbfd4d77159.css" as="style" integrity="sha256-ve4R9s7jG8NjCrRQlsf5DiYoW29DYNO0d1Zvv9TXcVk=" crossorigin="anonymous">
-<link href="/UnityChipForXiangShan/scss/main.min.bdee11f6cee31bc3630ab45096c7f90e26285b6f4360d3b477566fbfd4d77159.css" rel="stylesheet" integrity="sha256-ve4R9s7jG8NjCrRQlsf5DiYoW29DYNO0d1Zvv9TXcVk=" crossorigin="anonymous">
+序号 名称 描述 2.1 chain位测试 对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。 2.2 timing测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。 2.3.1 未命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。 2.3.2 命中测试 对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。 测试点汇总 序号 功能 名称 描述 1.1 断点设置和检查 select1判定 给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发 1.2.1 断点设置和检查 select0关系匹配判定 给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发 1."/>
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.28dee116d76198cd41791ec8d9adf684b9621dd93c371caac3e05359925d5d62.css" as="style" integrity="sha256-KN7hFtdhmM1BeR7I2a32hLliHdk8Nxyqw&#43;BTWZJdXWI=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.28dee116d76198cd41791ec8d9adf684b9621dd93c371caac3e05359925d5d62.css" rel="stylesheet" integrity="sha256-KN7hFtdhmM1BeR7I2a32hLliHdk8Nxyqw&#43;BTWZJdXWI=" crossorigin="anonymous">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
   integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
@@ -188,7 +188,7 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.14631cf7322b81f8979e42a49131bc60.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.452182ba53a3c55cea520e8f7e104110.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -212,7 +212,7 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.14631cf7322b81f8979e42a49131bc60.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.452182ba53a3c55cea520e8f7e104110.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -424,7 +424,8 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 	<header class="article-meta">
 		
   </header>
-	<h1 id="frontendtrigger子模块">FrontendTrigger子模块</h1>
+	<div class="ifu-ctx">
+<h1 id="frontendtrigger子模块">FrontendTrigger子模块</h1>
 <p>该子模块的主要作用是在前端设置硬件断点和检查。</p>
 <h2 id="frontendtrigger功能介绍">FrontendTrigger功能介绍</h2>
 <h3 id="断点设置和断点检查">断点设置和断点检查</h3>
@@ -563,9 +564,9 @@ select位为0时，当PC和tdata2的数据的关系不满足tdata2的match位时
 </tr>
 </tbody>
 </table>
-
+</div>
 	<div class="td-page-meta__lastmod">
-  最后修改 December 18, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/17ecfe8e26aeaba96770c15c3c1a74d832b8a6d1">friend link changed at documents/content/zh-cn/docs/_index.md and changed false ch in frontend trigger (17ecfe8)</a>
+  最后修改 December 20, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/ea10ef89e59151144ff01b1d21f08027d76f3fa3">limit the table css to ifu verify documents only (ea10ef8)</a>
 </div>
 
 </div>
