@@ -70,7 +70,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码eDecode 子模块：Pr
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-20T14:07:14+08:00" />
+<meta property="article:modified_time" content="2024-12-23T21:30:07+08:00" />
 <meta itemprop="name" content="PreDecode">
 <meta itemprop="description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
 所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
@@ -96,7 +96,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码eDecode 子模块：Pr
 预译码器从IFU接收完成指令切分的17 x 2 字节的初始指令码，以4字节为窗口，2字节为步进长度，选出16 x 4字节的指令码
 我们需要随机生成初始指令码，并测试拼接的结果。
 序号 名称 描述 1 拼接测试 随机生成17 x 2字节的初始指令码，检验PreDecoder拼接结果 功能点2 生成预译码信息 预译码器会根据指令码产生预译码信息，包括RVC指令的判定和CFI指令的目标地址计算偏移。">
-<meta itemprop="dateModified" content="2024-12-20T14:07:14+08:00" />
+<meta itemprop="dateModified" content="2024-12-23T21:30:07+08:00" />
 <meta itemprop="wordCount" content="144">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PreDecode"/>
 <meta name="twitter:description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
@@ -224,7 +224,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码eDecode 子模块：Pr
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.452182ba53a3c55cea520e8f7e104110.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.088985b6f261e66594c8b6a044d79037.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -248,7 +248,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码eDecode 子模块：Pr
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.452182ba53a3c55cea520e8f7e104110.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.088985b6f261e66594c8b6a044d79037.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -635,7 +635,7 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 December 20, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/ea10ef89e59151144ff01b1d21f08027d76f3fa3">limit the table css to ifu verify documents only (ea10ef8)</a>
+  最后修改 December 23, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/2a8c1ab351e4ea786c55435dd18f60c0c523cc8a">Merge pull request #8 from miceforrat/main (2a8c1ab)</a>
 </div>
 
 </div>
