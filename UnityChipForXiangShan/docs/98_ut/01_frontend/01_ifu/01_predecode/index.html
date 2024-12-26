@@ -66,7 +66,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-26T11:19:31+08:00" />
+<meta property="article:modified_time" content="2024-12-26T16:05:34+08:00" />
 <meta itemprop="name" content="PreDecode">
 <meta itemprop="description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
 所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
@@ -90,8 +90,8 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 预译码器接受来自IFU完成指令切分的17 × 2字节的初始指令码，并以4字节为窗口，2字节为步进长度， 从第1个2字节开始，直到第16个2字节，选出总共16个4字节的指令码。 预译码信息生成
 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 预译码器从IFU接收完成指令切分的17 x 2 字节的初始指令码，以4字节为窗口，2字节为步进长度，选出16 x 4字节的指令码">
-<meta itemprop="dateModified" content="2024-12-26T11:19:31+08:00" />
-<meta itemprop="wordCount" content="146">
+<meta itemprop="dateModified" content="2024-12-26T16:05:34+08:00" />
+<meta itemprop="wordCount" content="164">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PreDecode"/>
 <meta name="twitter:description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
 所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
@@ -216,7 +216,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d7dfd74fe6bc198da88ce40150c167e4.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b0a89e8d8cae6b970d3ab630bdbe3405.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -240,7 +240,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d7dfd74fe6bc198da88ce40150c167e4.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b0a89e8d8cae6b970d3ab630bdbe3405.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -418,6 +418,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
       <ul>
         <li><a href="#功能点1-生成指令码">功能点1 生成指令码</a></li>
         <li><a href="#功能点2-生成预译码信息">功能点2 生成预译码信息</a></li>
+        <li><a href="#功能点3-生成指令开始向量">功能点3 生成指令开始向量</a></li>
       </ul>
     </li>
     <li><a href="#测试点汇总a-idpred_decoder_functions-a"><strong>测试点汇总</strong><a id="pred_decoder_functions"> </a></a></li>
@@ -569,6 +570,29 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 </tr>
 </tbody>
 </table>
+<h3 id="功能点3-生成指令开始向量">功能点3 生成指令开始向量</h3>
+<p>最后，预译码还需要生成两种指令开始向量：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.3.1</td>
+<td>有效指令开始向量计算1</td>
+<td>对预测块，假定第一条指令为一条有效指令的开始，对每条指令计算其是否为有效指令开始</td>
+</tr>
+<tr>
+<td>2.3.2</td>
+<td>有效指令开始向量计算2</td>
+<td>对预测块，假定第一条指令为一条有效指令的结束，对每条指令计算其是否为有效指令开始</td>
+</tr>
+</tbody>
+</table>
 <h2 id="测试点汇总a-idpred_decoder_functions-a"><strong>测试点汇总</strong><a id="pred_decoder_functions"> </a></h2>
 <p>综上所述，对PredDecoder，所有的测试点为：</p>
 <table>
@@ -623,11 +647,23 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 <td>RVI.BR计算</td>
 <td>对传入RVI扩展的BR指令，检查计算的偏移</td>
 </tr>
+<tr>
+<td>2.3.1</td>
+<td>有效指令开始向量计算1</td>
+<td>对预测块，假定第一条指令为一条有效指令的开始，对每条指令计算其是否为有效指令开始</td>
+<td></td>
+</tr>
+<tr>
+<td>2.3.2</td>
+<td>有效指令开始向量计算2</td>
+<td>对预测块，假定第一条指令为一条有效指令的结束，对每条指令计算其是否为有效指令开始</td>
+<td></td>
+</tr>
 </tbody>
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 December 26, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/759ac68265dcea27aab2d2bb0a3ddf7780d7adda">doc wrong word fix (759ac68)</a>
+  最后修改 December 26, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/91ccfc51455efbc383d1b3ccae3a09dcac2f5f3d">add function point for valid start vectors (91ccfc5)</a>
 </div>
 
 </div>

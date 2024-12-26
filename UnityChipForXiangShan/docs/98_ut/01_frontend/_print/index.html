@@ -129,7 +129,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d7dfd74fe6bc198da88ce40150c167e4.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b0a89e8d8cae6b970d3ab630bdbe3405.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -2213,6 +2213,29 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 </tr>
 </tbody>
 </table>
+<h3 id="功能点3-生成指令开始向量">功能点3 生成指令开始向量</h3>
+<p>最后，预译码还需要生成两种指令开始向量：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.3.1</td>
+<td>有效指令开始向量计算1</td>
+<td>对预测块，假定第一条指令为一条有效指令的开始，对每条指令计算其是否为有效指令开始</td>
+</tr>
+<tr>
+<td>2.3.2</td>
+<td>有效指令开始向量计算2</td>
+<td>对预测块，假定第一条指令为一条有效指令的结束，对每条指令计算其是否为有效指令开始</td>
+</tr>
+</tbody>
+</table>
 <h2 id="测试点汇总a-idpred_decoder_functions-a"><strong>测试点汇总</strong><a id="pred_decoder_functions"> </a></h2>
 <p>综上所述，对PredDecoder，所有的测试点为：</p>
 <table>
@@ -2266,6 +2289,18 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 <td>跳转目标计算</td>
 <td>RVI.BR计算</td>
 <td>对传入RVI扩展的BR指令，检查计算的偏移</td>
+</tr>
+<tr>
+<td>2.3.1</td>
+<td>有效指令开始向量计算1</td>
+<td>对预测块，假定第一条指令为一条有效指令的开始，对每条指令计算其是否为有效指令开始</td>
+<td></td>
+</tr>
+<tr>
+<td>2.3.2</td>
+<td>有效指令开始向量计算2</td>
+<td>对预测块，假定第一条指令为一条有效指令的结束，对每条指令计算其是否为有效指令开始</td>
+<td></td>
 </tr>
 </tbody>
 </table>

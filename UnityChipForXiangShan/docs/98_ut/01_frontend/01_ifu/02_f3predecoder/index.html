@@ -38,7 +38,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-26T11:19:31+08:00" />
+<meta property="article:modified_time" content="2024-12-26T16:05:34+08:00" />
 <meta itemprop="name" content="F3PreDecoder">
 <meta itemprop="description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
 F3PreDecoder功能介绍 CFI指令类型判定 要想确定CFI指令类型，只需要分别尝试匹配JAL、JALR、BR和他们的RVC版本即可，注意，RVC的EBREAK 不应该被视为CFI指令。在匹配的过程中，自然CFI指令的类型就被甄别出来了。在这一步中，我们将所有指令分到四类brType中。
@@ -48,7 +48,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 对于类型2，只有为RVC指令且目的寄存器rd为link寄存器（x1或x5）时，才为Call。
 对于类型3，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。
 序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVC.JAL判定call 对传入的RVC.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVC.JAL例外 对传入的RVC.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVI.JAL不判定 对传入的RVI.JAL指令，无论什么情况都不能判定为call或ret 2.3 JALR和rd为link 传入JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3 JALR且仅rs为link 传入JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3 JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 测试点汇总 序号 功能 名称 描述 1.1 CFI指令类型判定 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 CFI指令类型判定 BR判定 对传入的BR指令，应该判定为类型1 1.">
-<meta itemprop="dateModified" content="2024-12-26T11:19:31+08:00" />
+<meta itemprop="dateModified" content="2024-12-26T16:05:34+08:00" />
 <meta itemprop="wordCount" content="107">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="F3PreDecoder"/>
 <meta name="twitter:description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
@@ -160,7 +160,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d7dfd74fe6bc198da88ce40150c167e4.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b0a89e8d8cae6b970d3ab630bdbe3405.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -184,7 +184,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d7dfd74fe6bc198da88ce40150c167e4.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b0a89e8d8cae6b970d3ab630bdbe3405.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -573,7 +573,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 December 26, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/759ac68265dcea27aab2d2bb0a3ddf7780d7adda">doc wrong word fix (759ac68)</a>
+  最后修改 December 26, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/91ccfc51455efbc383d1b3ccae3a09dcac2f5f3d">add function point for valid start vectors (91ccfc5)</a>
 </div>
 
 </div>
