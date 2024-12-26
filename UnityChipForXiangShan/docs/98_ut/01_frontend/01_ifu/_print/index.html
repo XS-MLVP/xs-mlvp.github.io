@@ -152,7 +152,7 @@ CFI指令类型 brType类型编码 非CFI 00 branch指令 01 jal指令 10 jalr�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.3099907ffc5a7ebf81a6431a6d664e54.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d7dfd74fe6bc198da88ce40150c167e4.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -2096,7 +2096,7 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 <p><img alt="JOP" src="JOP.png"></p>
 <p>这里对imm立即数的注解是，立即数的每一位最后对应到的是偏移的哪一位。</p>
 <p>所以，可以认为立即数是这么重组的：</p>
-<p>instr(12) + instr(10, 9) + instr(6) + instr(7) + instr(2) + instr(11) +instr(5,3) + &ldquo;0&rdquo;</p>
+<p>instr(12) + instr(8) + instr(10, 9) + instr(6) + instr(7) + instr(2) + instr(11) +instr(5,3) + &ldquo;0&rdquo;</p>
 <p>而RVI中，对于JAL指令，是这么定义的：</p>
 <p><img alt="RVIJ" src="RVIJ.png"></p>
 <p>我们可以类似地计算立即数。</p>
@@ -2104,7 +2104,7 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 <p><img alt="RVIBR" src="RVIBR.png"></p>
 <p><img alt="RVCBR" src="RVCBR.png"></p>
 <h2 id="predecoder测试点和功能点">PreDecoder测试点和功能点</h2>
-<h3 id="功能点1-生成指令码edecode">功能点1 生成指令码eDecode</h3>
+<h3 id="功能点1-生成指令码">功能点1 生成指令码</h3>
 <p>子模块：PreDecoder简介</p>
 <p>预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。</p>
 <p>所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。</p>
