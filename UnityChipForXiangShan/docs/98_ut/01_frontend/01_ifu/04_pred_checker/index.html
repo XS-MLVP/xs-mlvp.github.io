@@ -56,7 +56,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-26T16:05:34+08:00" />
+<meta property="article:modified_time" content="2024-12-29T18:17:41+08:00" />
 <meta itemprop="name" content="PredChecker">
 <meta itemprop="description" content="子模块：PredChecker简介 分支预测检查器PredChecker接收来自IFU的预测块信息（包括预测跳转指令在预测块的位置、预测的跳转目标、预译码得到的指令信息、指令PC以及预译码得到的跳转目标偏移等），在模块内部检查五种类型的分支预测错误。模块内部分为两个流水线stage，分别输出信息，第一个stage输出给f3阶段，用于修正预测块的指令范围和预测结果。第二个stage输出给wb阶段，用于在发现分支预测错误时产生前端重定向以及写回给FTQ正确的预测信息。
 PredChecker功能介绍 JAL预测错误检查 jal指令预测错误的条件是，预测块中有一条jal指令（由预译码信息给出），但是要么这个预测块没有预测跳转，要么此预测块预测跳转的指令在这条jal指令之后（即这条jal指令没有被预测跳转）。
@@ -75,7 +75,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 对于误检，我们设计如下的测试点：
 序号 名称 描述 2.1.1 误检测试1 预测块中没有RET指令且最终预测信息也没有取用任何跳转指令的输入，检查PredChecker是否会误报RET预测错误。 2.1.2 误检测试2 预测块中有RET指令且最终预测信息取用的正是本条跳转指令的输入，检查PredChecker是否会误报RET预测错误。 对于RET预测错误的正确检出，我们设计如下的测试点：
 序号 名称 描述 2.2.1 存在RET未预测 预测块中存在RET指令，但是最终预测信息未预测跳转，检查PredChecker是否能检测出RET预测错误。 2.2.2 预测的跳转并非第一条 预测块中存在RET指令，但是最终预测信息取的跳转指令在第一条RET指令之后，检查PredChecker是否能检测出RET预测错误。 功能点3 更新指令有效范围向量和预测跳转的指令 PredChecker在检查出Jal/Ret指令预测错误时，需要重新生成指令有效范围向量， 有效范围截取到Jal/Ret指令的位置，之后的bit全部置为0。 同时，还需要根据每条指令的预译码信息和最终的预测信息修复预测跳转的结果。">
-<meta itemprop="dateModified" content="2024-12-26T16:05:34+08:00" />
+<meta itemprop="dateModified" content="2024-12-29T18:17:41+08:00" />
 <meta itemprop="wordCount" content="245">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PredChecker"/>
 <meta name="twitter:description" content="子模块：PredChecker简介 分支预测检查器PredChecker接收来自IFU的预测块信息（包括预测跳转指令在预测块的位置、预测的跳转目标、预译码得到的指令信息、指令PC以及预译码得到的跳转目标偏移等），在模块内部检查五种类型的分支预测错误。模块内部分为两个流水线stage，分别输出信息，第一个stage输出给f3阶段，用于修正预测块的指令范围和预测结果。第二个stage输出给wb阶段，用于在发现分支预测错误时产生前端重定向以及写回给FTQ正确的预测信息。
@@ -196,7 +196,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b0a89e8d8cae6b970d3ab630bdbe3405.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1281e6474dc839eac243a5b8d2959149.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -220,7 +220,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b0a89e8d8cae6b970d3ab630bdbe3405.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.1281e6474dc839eac243a5b8d2959149.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -850,7 +850,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 December 26, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/91ccfc51455efbc383d1b3ccae3a09dcac2f5f3d">add function point for valid start vectors (91ccfc5)</a>
+  最后修改 December 29, 2024: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/2a1f9af7d2bb8436dde0b9f2673871fdcf36d0fe">modified f3predecoder (2a1f9af)</a>
 </div>
 
 </div>
