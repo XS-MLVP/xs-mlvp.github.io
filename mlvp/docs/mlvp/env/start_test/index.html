@@ -38,7 +38,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/start_test/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-24T16:43:53+08:00" />
+<meta property="article:modified_time" content="2024-12-31T17:27:07+08:00" />
 <meta itemprop="name" content="如何使用异步环境">
 <meta itemprop="description" content="启动事件循环 在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。
 例如，我们创建了两个驱动方法分别驱动两个接口，在每一个驱动方法内部，都需要等待 DUT 经过若干个时钟周期，并且这两个驱动方法需要同时运行。这时候，如果使用朴素的单线程程序，会发现很难同时让两个驱动方法同时运行，即便我们使用多线程强势使他们同时运行，也会发现缺乏一种机制，使他们能够等待 DUT 经过若干时钟周期。这是因为在 Picker 提供的接口中，我们只能去推动 DUT 向前执行一个周期，而无法去等待 DUT 执行一个周期。
@@ -48,7 +48,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
 async def my_coro(): ... 当我们在协程函数内部使用 await 关键字时，我们就可以执行一个协程函数，并等待其执行完成并返回结果，例如
 async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 mlvp 提供的 create_task 方法，例如
 import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): mlvp.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 mlvp 中，我们使用 mlvp.run 来启动事件循环，并运行异步程序。">
-<meta itemprop="dateModified" content="2024-12-24T16:43:53+08:00" />
+<meta itemprop="dateModified" content="2024-12-31T17:27:07+08:00" />
 <meta itemprop="wordCount" content="208">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何使用异步环境"/>
 <meta name="twitter:description" content="启动事件循环 在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。
@@ -158,7 +158,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.f35f50845cd5b93036e9ac9af9cf10ae.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -182,7 +182,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.f35f50845cd5b93036e9ac9af9cf10ae.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -472,7 +472,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
 <p>更多等待时钟信号的方法，参见 API 文档。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 24, 2024: <a href="https://github.com/XS-MLVP/course/commit/6b3ed11ba875b1fac580fd56952ca04dbbb2c902">content/zh-cn/env-usage:add content of multiinstance (6b3ed11)</a>
+  最后修改 December 31, 2024: <a href="https://github.com/XS-MLVP/course/commit/3b7f59d48ca51a87fcda67635a183e90459a6be1">change mlvp to toffee in eg-stack-async (3b7f59d)</a>
 </div>
 
 </div>
@@ -508,7 +508,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
 
       </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
         <span class="td-footer__copyright">&copy;
-    2024
+    2025
     <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">保留所有权利</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
       </div>
     </div>
