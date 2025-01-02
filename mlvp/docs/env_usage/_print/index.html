@@ -127,7 +127,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -644,7 +644,7 @@ CacheMeta.sv
 	<h1 id="pg-625b33435a15ffee912f47c5443ffc13">4 - 覆盖率统计</h1>
     <div class="lead">覆盖率工具</div>
 	<blockquote>
-<p>Picker 工具支持生成代码行覆盖率报告，MLVP（<a href="https://github.com/XS-MLVP/mlvp">https://github.com/XS-MLVP/mlvp</a>） 项目支持生成功能覆盖率报告。</p>
+<p>Picker 工具支持生成代码行覆盖率报告，toffee-test（<a href="https://github.com/XS-MLVP/toffee-test">https://github.com/XS-MLVP/toffee-test</a>） 项目支持生成功能覆盖率报告。</p>
 </blockquote>
 <h2 id="代码行覆盖率">代码行覆盖率</h2>
 <p>目前 Picker 工具支持基于 Verilator 仿真器生成的代码行覆盖率报告。</p>
@@ -652,18 +652,18 @@ CacheMeta.sv
 <p>Verilator 仿真器提供了<a href="https://verilator.org/guide/latest/exe_verilator_coverage.html">覆盖率支持</a>功能。<br>
 该功能的实现方式是：</p>
 <ol>
-<li>利用 <code>verilator_coverage</code> 工具处理或合并覆盖率数据库，最终针对多个DUT生成一个 <code>coverage.info</code> 文件。</li>
-<li>利用 <code>lcov</code> 工具的 <code>genhtml</code> 命令基于<code>coverage.info</code>和RTL代码源文件，生成完整的代码覆盖率报告。</li>
+<li>利用 <code>verilator_coverage</code> 工具处理或合并覆盖率数据库，最终针对多个 DUT 生成一个 <code>coverage.info</code> 文件。</li>
+<li>利用 <code>lcov</code> 工具的 <code>genhtml</code> 命令基于<code>coverage.info</code>和 RTL 代码源文件，生成完整的代码覆盖率报告。</li>
 </ol>
 <p>使用时的流程如下：</p>
 <ol>
 <li>使用 Picker 生成 dut 时，使能 COVERAGE 功能 （添加<code>-c</code>选项）。</li>
 <li>仿真器运行完成后，<code>dut.finalize()</code> 之后会生成覆盖率数据库文件 <code>V{DUT_NAME}.dat</code>。</li>
 <li>基于 <code>verilator_coverage</code> 的 write-info 功能将其转换成 <code>.info</code>文件。</li>
-<li>基于 <code>lcov</code> 的 <code>genhtml</code> 功能，使用<code>.info</code>文件和文件中指定的<strong>rtl源文件</strong>，生成html报告。</li>
+<li>基于 <code>lcov</code> 的 <code>genhtml</code> 功能，使用<code>.info</code>文件和文件中指定的<strong>rtl 源文件</strong>，生成 html 报告。</li>
 </ol>
 <blockquote>
-<p>注意： 文件中指定的<strong>rtl源文件</strong>是指在生成的<code>DUT</code>时使用的源文件路径，需要保证这些路径在当前环境下是有效的。简单来说，需要编译时用到的所有<code>.sv/.v</code>文件都需要在当前环境下存在，并且目录不变。</p>
+<p>注意： 文件中指定的<strong>rtl 源文件</strong>是指在生成的<code>DUT</code>时使用的源文件路径，需要保证这些路径在当前环境下是有效的。简单来说，需要编译时用到的所有<code>.sv/.v</code>文件都需要在当前环境下存在，并且目录不变。</p>
 </blockquote>
 <h4 id="verilator_coverage">verilator_coverage</h4>
 <p><code>verilator_coverage</code> 工具用于处理 <code>DUT</code> 运行后生成的 <code>.dat</code> 的覆盖率数据。该工具可以处理并合并多个 <code>.dat</code> 文件，同时具有两类功能：</p>
@@ -679,34 +679,34 @@ CacheMeta.sv
 </span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>                        <span style="color:#8f5902;font-style:italic">// number of hits (0) is below the limit.
 </span></span></span></code></pre></div></li>
 <li>
-<p><code>-annotate-min &lt;count&gt;</code>：指定上述的limit为count</p>
+<p><code>-annotate-min &lt;count&gt;</code>：指定上述的 limit 为 count</p>
 </li>
 </ul>
 </li>
 <li>
 <p>可以将 <code>.dat</code> 文件，结合源代码文件，将覆盖率数据以标注的形式与源代码结合在一起，并写入到指定目录。</p>
 <ul>
-<li><code>-write &lt;merged-datafile&gt; -read &lt;datafiles&gt;</code>：将若干个.dat(<code>datafiles</code>)文件合并为一个.dat文件</li>
-<li><code>-write-info &lt;merged-info&gt; -read &lt;datafiles&gt;</code>：将若干个.dat(<code>datafiles</code>)文件合并为一个.info文件</li>
+<li><code>-write &lt;merged-datafile&gt; -read &lt;datafiles&gt;</code>：将若干个.dat(<code>datafiles</code>)文件合并为一个.dat 文件</li>
+<li><code>-write-info &lt;merged-info&gt; -read &lt;datafiles&gt;</code>：将若干个.dat(<code>datafiles</code>)文件合并为一个.info 文件</li>
 </ul>
 </li>
 </ol>
 <h4 id="genhtml">genhtml</h4>
-<p>由 <code>locv</code> 包提供的 <code>genhtml</code> 可以由上述的.info文件导出可读性更好的html报告。命令格式为：<code>genhtml [OPTIONS] &lt;infofiles&gt;</code>。
+<p>由 <code>locv</code> 包提供的 <code>genhtml</code> 可以由上述的.info 文件导出可读性更好的 html 报告。命令格式为：<code>genhtml [OPTIONS] &lt;infofiles&gt;</code>。
 建议使用<code>-o &lt;outputdir&gt;</code>选项将结果输出到指定目录。</p>
 <p>以<a href="/mlvp/docs/quick-start/eg-adder/">加法器</a>为例。</p>
 <p><img alt="adder.jpg" src="adder.jpg"></p>
 <h2 id="使用示例">使用示例</h2>
-<p>如果您使用Picker时打开了<code>-c</code>选项，那么在仿真结束后，会生成一个<code>V{DUT_NAME}.dat</code>文件。并且顶层目录会有一个Makefile文件，其中包含了生成覆盖率报告的命令。</p>
+<p>如果您使用 Picker 时打开了<code>-c</code>选项，那么在仿真结束后，会生成一个<code>V{DUT_NAME}.dat</code>文件。并且顶层目录会有一个 Makefile 文件，其中包含了生成覆盖率报告的命令。</p>
 <p>命令内容如下：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-make" data-lang="make"><span style="display:flex;"><span><span style="color:#000">coverage</span><span style="color:#ce5c00;font-weight:bold">:</span>
 </span></span><span style="display:flex;"><span>    ...
 </span></span><span style="display:flex;"><span>    verilator_coverage -write-info coverage.info ./<span style="color:#4e9a06">${</span><span style="color:#000">TARGET</span><span style="color:#4e9a06">}</span>/V<span style="color:#4e9a06">${</span><span style="color:#000">PROJECT</span><span style="color:#4e9a06">}</span>_coverage.dat
 </span></span><span style="display:flex;"><span>    genhtml coverage.info --output-directory coverage
 </span></span><span style="display:flex;"><span>    ...
-</span></span></code></pre></div><p>在shell中输入<code>make coverage</code>,其会根据生成的.dat文件生成coverage.info，再使用<code>genhtml</code>再coverage目录下生成html报告。</p>
+</span></span></code></pre></div><p>在 shell 中输入<code>make coverage</code>,其会根据生成的.dat 文件生成 coverage.info，再使用<code>genhtml</code>再 coverage 目录下生成 html 报告。</p>
 <h2 id="vcs">VCS</h2>
-<p>VCS对应的文档正在完善当中。</p>
+<p>VCS 对应的文档正在完善当中。</p>
 
 </div>
 

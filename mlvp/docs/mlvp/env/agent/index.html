@@ -18,34 +18,34 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
 <title>如何编写 Agent | 开放验证平台学习资源</title>
-<meta name="description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
+<meta name="description" content="Agent 在 toffee 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
 一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
-初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
-from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
+初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 toffee 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
+from toffee.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
 创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。">
 <meta property="og:title" content="如何编写 Agent" />
-<meta property="og:description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
+<meta property="og:description" content="Agent 在 toffee 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
 一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
-初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
-from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
+初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 toffee 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
+from toffee.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
 创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/agent/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-31T17:27:07+08:00" />
+<meta property="article:modified_time" content="2025-01-02T16:48:10+08:00" />
 <meta itemprop="name" content="如何编写 Agent">
-<meta itemprop="description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
+<meta itemprop="description" content="Agent 在 toffee 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
 一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
-初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
-from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
+初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 toffee 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
+from toffee.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
 创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。">
-<meta itemprop="dateModified" content="2024-12-31T17:27:07+08:00" />
+<meta itemprop="dateModified" content="2025-01-02T16:48:10+08:00" />
 <meta itemprop="wordCount" content="242">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何编写 Agent"/>
-<meta name="twitter:description" content="Agent 在 mlvp 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
+<meta name="twitter:description" content="Agent 在 toffee 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。
 一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。
-初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 mlvp 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
-from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
+初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 toffee 中的 Agent 类。下面是一个简单的 Agent 的定义示例：
+from toffee.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。
 创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。"/>
 <link rel="preload" href="/mlvp/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
@@ -146,7 +146,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -170,7 +170,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -382,11 +382,11 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
 	<header class="article-meta">
 		
   </header>
-	<p><code>Agent</code> 在 mlvp 验证环境中实现了对一类 <code>Bundle</code> 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。</p>
+	<p><code>Agent</code> 在 toffee 验证环境中实现了对一类 <code>Bundle</code> 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。</p>
 <p>一个 <code>Agent</code> 由 <strong>驱动方法(driver_method)</strong> 和 <strong>监测方法(monitor_method)</strong> 组成，其中驱动方法用于主动驱动 <code>Bundle</code> 中的信号，而监测方法用于被动监测 <code>Bundle</code> 中的信号。</p>
 <h2 id="初始化-agent">初始化 Agent</h2>
-<p>为了定义一个 <code>Agent</code>，需要自定义一个新类，并继承 mlvp 中的 <code>Agent</code> 类。下面是一个简单的 <code>Agent</code> 的定义示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<p>为了定义一个 <code>Agent</code>，需要自定义一个新类，并继承 toffee 中的 <code>Agent</code> 类。下面是一个简单的 <code>Agent</code> 的定义示例：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Agent</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
@@ -397,7 +397,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
 <p>在 <code>Agent</code> 中，驱动方法是一个异步函数，用于主动驱动 <code>Bundle</code> 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 <code>Bundle</code> 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。</p>
 <p>每一个驱动方法都应是一个异步函数，并且使用 <code>@driver_method</code> 装饰器进行修饰，以便 <code>Agent</code> 能够识别该函数为驱动方法。</p>
 <p>下面是一个简单的驱动方法的定义示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Agent</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
@@ -422,7 +422,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
 <h2 id="创建监测方法">创建监测方法</h2>
 <p>监测方法同样需要是一个异步函数，并且使用 <code>@monitor_method</code> 装饰器进行修饰，以便 <code>Agent</code> 能够识别该函数为监测方法。</p>
 <p>一个简单的监测方法的定义示例如下：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Agent</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
@@ -452,7 +452,7 @@ from mlvp.agent import * class AdderAgent(Agent): def __init__(self, bundle): su
 <p>通过在 Agent 中编写多个驱动方法和监测方法，便完成了整个 <code>Agent</code> 的编写。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 31, 2024: <a href="https://github.com/XS-MLVP/course/commit/3b7f59d48ca51a87fcda67635a183e90459a6be1">change mlvp to toffee in eg-stack-async (3b7f59d)</a>
+  最后修改 January 2, 2025: <a href="https://github.com/XS-MLVP/course/commit/2f60f348abb61ece3d9af629da943f815fe00024">Rename &#39;mlvp&#39; to &#39;toffee&#39; (2f60f34)</a>
 </div>
 
 </div>

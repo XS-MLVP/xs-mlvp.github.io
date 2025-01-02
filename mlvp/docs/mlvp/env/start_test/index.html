@@ -20,45 +20,45 @@
 <title>如何使用异步环境 | 开放验证平台学习资源</title>
 <meta name="description" content="启动事件循环 在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。
 例如，我们创建了两个驱动方法分别驱动两个接口，在每一个驱动方法内部，都需要等待 DUT 经过若干个时钟周期，并且这两个驱动方法需要同时运行。这时候，如果使用朴素的单线程程序，会发现很难同时让两个驱动方法同时运行，即便我们使用多线程强势使他们同时运行，也会发现缺乏一种机制，使他们能够等待 DUT 经过若干时钟周期。这是因为在 Picker 提供的接口中，我们只能去推动 DUT 向前执行一个周期，而无法去等待 DUT 执行一个周期。
-更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。mlvp 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。
+更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。toffee 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。
 在启动事件循环之前，我们首先需要了解两个关键字 async 和 await 来了解 Python 对与协程的管理。
 当我们在函数前加上 async 关键字时，这个函数就变成了一个协程函数，例如
 async def my_coro(): ... 当我们在协程函数内部使用 await 关键字时，我们就可以执行一个协程函数，并等待其执行完成并返回结果，例如
-async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 mlvp 提供的 create_task 方法，例如
-import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): mlvp.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 mlvp 中，我们使用 mlvp.run 来启动事件循环，并运行异步程序。">
+async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 toffee 提供的 create_task 方法，例如
+import toffee async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): toffee.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 toffee 中，我们使用 toffee.run 来启动事件循环，并运行异步程序。">
 <meta property="og:title" content="如何使用异步环境" />
 <meta property="og:description" content="启动事件循环 在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。
 例如，我们创建了两个驱动方法分别驱动两个接口，在每一个驱动方法内部，都需要等待 DUT 经过若干个时钟周期，并且这两个驱动方法需要同时运行。这时候，如果使用朴素的单线程程序，会发现很难同时让两个驱动方法同时运行，即便我们使用多线程强势使他们同时运行，也会发现缺乏一种机制，使他们能够等待 DUT 经过若干时钟周期。这是因为在 Picker 提供的接口中，我们只能去推动 DUT 向前执行一个周期，而无法去等待 DUT 执行一个周期。
-更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。mlvp 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。
+更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。toffee 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。
 在启动事件循环之前，我们首先需要了解两个关键字 async 和 await 来了解 Python 对与协程的管理。
 当我们在函数前加上 async 关键字时，这个函数就变成了一个协程函数，例如
 async def my_coro(): ... 当我们在协程函数内部使用 await 关键字时，我们就可以执行一个协程函数，并等待其执行完成并返回结果，例如
-async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 mlvp 提供的 create_task 方法，例如
-import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): mlvp.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 mlvp 中，我们使用 mlvp.run 来启动事件循环，并运行异步程序。" />
+async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 toffee 提供的 create_task 方法，例如
+import toffee async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): toffee.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 toffee 中，我们使用 toffee.run 来启动事件循环，并运行异步程序。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/start_test/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-31T17:27:07+08:00" />
+<meta property="article:modified_time" content="2025-01-02T16:48:10+08:00" />
 <meta itemprop="name" content="如何使用异步环境">
 <meta itemprop="description" content="启动事件循环 在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。
 例如，我们创建了两个驱动方法分别驱动两个接口，在每一个驱动方法内部，都需要等待 DUT 经过若干个时钟周期，并且这两个驱动方法需要同时运行。这时候，如果使用朴素的单线程程序，会发现很难同时让两个驱动方法同时运行，即便我们使用多线程强势使他们同时运行，也会发现缺乏一种机制，使他们能够等待 DUT 经过若干时钟周期。这是因为在 Picker 提供的接口中，我们只能去推动 DUT 向前执行一个周期，而无法去等待 DUT 执行一个周期。
-更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。mlvp 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。
+更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。toffee 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。
 在启动事件循环之前，我们首先需要了解两个关键字 async 和 await 来了解 Python 对与协程的管理。
 当我们在函数前加上 async 关键字时，这个函数就变成了一个协程函数，例如
 async def my_coro(): ... 当我们在协程函数内部使用 await 关键字时，我们就可以执行一个协程函数，并等待其执行完成并返回结果，例如
-async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 mlvp 提供的 create_task 方法，例如
-import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): mlvp.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 mlvp 中，我们使用 mlvp.run 来启动事件循环，并运行异步程序。">
-<meta itemprop="dateModified" content="2024-12-31T17:27:07+08:00" />
+async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 toffee 提供的 create_task 方法，例如
+import toffee async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): toffee.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 toffee 中，我们使用 toffee.run 来启动事件循环，并运行异步程序。">
+<meta itemprop="dateModified" content="2025-01-02T16:48:10+08:00" />
 <meta itemprop="wordCount" content="208">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何使用异步环境"/>
 <meta name="twitter:description" content="启动事件循环 在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。
 例如，我们创建了两个驱动方法分别驱动两个接口，在每一个驱动方法内部，都需要等待 DUT 经过若干个时钟周期，并且这两个驱动方法需要同时运行。这时候，如果使用朴素的单线程程序，会发现很难同时让两个驱动方法同时运行，即便我们使用多线程强势使他们同时运行，也会发现缺乏一种机制，使他们能够等待 DUT 经过若干时钟周期。这是因为在 Picker 提供的接口中，我们只能去推动 DUT 向前执行一个周期，而无法去等待 DUT 执行一个周期。
-更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。mlvp 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。
+更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。toffee 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。
 在启动事件循环之前，我们首先需要了解两个关键字 async 和 await 来了解 Python 对与协程的管理。
 当我们在函数前加上 async 关键字时，这个函数就变成了一个协程函数，例如
 async def my_coro(): ... 当我们在协程函数内部使用 await 关键字时，我们就可以执行一个协程函数，并等待其执行完成并返回结果，例如
-async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 mlvp 提供的 create_task 方法，例如
-import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): mlvp.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 mlvp 中，我们使用 mlvp.run 来启动事件循环，并运行异步程序。"/>
+async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 toffee 提供的 create_task 方法，例如
+import toffee async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): toffee.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 toffee 中，我们使用 toffee.run 来启动事件循环，并运行异步程序。"/>
 <link rel="preload" href="/mlvp/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <script
@@ -158,7 +158,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -182,7 +182,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -396,7 +396,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
 	<h2 id="启动事件循环">启动事件循环</h2>
 <p>在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。</p>
 <p>例如，我们创建了两个驱动方法分别驱动两个接口，在每一个驱动方法内部，都需要等待 DUT 经过若干个时钟周期，并且这两个驱动方法需要同时运行。这时候，如果使用朴素的单线程程序，会发现很难同时让两个驱动方法同时运行，即便我们使用多线程强势使他们同时运行，也会发现缺乏一种机制，使他们能够等待 DUT 经过若干时钟周期。这是因为在 Picker 提供的接口中，我们只能去推动 DUT 向前执行一个周期，而无法去等待 DUT 执行一个周期。</p>
-<p>更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。mlvp 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。</p>
+<p>更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。toffee 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。</p>
 <p>在启动事件循环之前，我们首先需要了解两个关键字 <code>async</code> 和 <code>await</code> 来了解 Python 对与协程的管理。</p>
 <p>当我们在函数前加上 <code>async</code> 关键字时，这个函数就变成了一个协程函数，例如</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">():</span>
@@ -408,21 +408,21 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro2</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">result</span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><p>如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 mlvp 提供的 <code>create_task</code> 方法，例如</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
+</span></span></code></pre></div><p>如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 toffee 提供的 <code>create_task</code> 方法，例如</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#4e9a06">&#34;my_coro&#34;</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro2</span><span style="color:#000;font-weight:bold">():</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">create_task</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">())</span>
-</span></span></code></pre></div><p>那么如何启动事件循环，并使事件循环开始运行 <code>my_coro2</code> 呢？在 mlvp 中，我们使用 <code>mlvp.run</code> 来启动事件循环，并运行异步程序。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">create_task</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><p>那么如何启动事件循环，并使事件循环开始运行 <code>my_coro2</code> 呢？在 toffee 中，我们使用 <code>toffee.run</code> 来启动事件循环，并运行异步程序。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_coro2</span><span style="color:#000;font-weight:bold">())</span>
-</span></span></code></pre></div><p>mlvp 中的环境组件都需要在事件循环中运行，因此当启动 mlvp 验证环境时，必须通过 <code>mlvp.run</code> 先启动事件循环，然后在事件循环中去创建 mlvp 验证环境。</p>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_coro2</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><p>toffee 中的环境组件都需要在事件循环中运行，因此当启动 toffee 验证环境时，必须通过 <code>toffee.run</code> 先启动事件循环，然后在事件循环中去创建 toffee 验证环境。</p>
 <p>因此，在验证环境创建时，应该以类似如下的方式：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 创建验证环境</span>
@@ -430,22 +430,22 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
 </span></span></code></pre></div><h2 id="如何管理-dut-时钟">如何管理 DUT 时钟</h2>
 <p>正如开头提出的问题，如果我们需要两个驱动方法同时运行，并且在每个驱动方法需要等待 DUT 经过若干个时钟周期。异步环境给予了我们等待某个事件的能力，但 Picker 只提供了推动 DUT 向前执行一个周期的能力，没有有提供一个事件让我们来等待。</p>
-<p>mlvp 中提供了对这类功能的支持，它通过创建一个后台时钟，来实现对 DUT 进行一个个周期的向前推动，每推动一个周期，后台时钟就会向其他协程发出时钟信号，使得其他协程能够继续执行。因此，DUT 的实际执行周期推动是由后台时钟来完成的，其他协程中只需要等待后台时钟发布的时钟信号即可。</p>
-<p>在 mlvp 中，通过<code>start_clock</code>来创建后台时钟：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
+<p>toffee 中提供了对这类功能的支持，它通过创建一个后台时钟，来实现对 DUT 进行一个个周期的向前推动，每推动一个周期，后台时钟就会向其他协程发出时钟信号，使得其他协程能够继续执行。因此，DUT 的实际执行周期推动是由后台时钟来完成的，其他协程中只需要等待后台时钟发布的时钟信号即可。</p>
+<p>在 toffee 中，通过<code>start_clock</code>来创建后台时钟：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MyDUT</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">start_clock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">start_clock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
 </span></span></code></pre></div><p>只需要在事件循环中调用 <code>start_clock</code> 即可创建后台时钟，它需要一个 DUT 对象作为参数，用于推动 DUT 的执行，以及将时钟信号绑定到 DUT 以及其各个引脚。</p>
 <p>在其他协程中，我们可以通过 <code>ClockCycles</code> 来等待时钟信号到来，<code>ClockCycles</code> 的参数可以是 DUT，也可以是 DUT 的每一个引脚。例如：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.triggers</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.triggers</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">ClockCycles</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">10</span><span style="color:#000;font-weight:bold">)</span>
@@ -453,13 +453,13 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MyDUT</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">start_clock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">start_clock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
 </span></span></code></pre></div><p>在 <code>my_coro</code> 中，通过 <code>ClockCycles</code> 来等待 DUT 经过 10 个时钟周期，当 10 个时钟周期经过后，<code>my_coro</code> 就会继续执行，并打印 &ldquo;10 cycles passed&rdquo;。</p>
-<p>mlvp 中提供了多种等待时钟信号的方法，例如：</p>
+<p>toffee 中提供了多种等待时钟信号的方法，例如：</p>
 <ul>
 <li><code>ClockCycles</code> 等待 DUT 经过若干个时钟周期</li>
 <li><code>Value</code> 等待 DUT 的某个引脚的值等于某个值</li>
@@ -472,7 +472,7 @@ import mlvp async def my_coro(): return &#34;my_coro&#34; async def my_coro2(): 
 <p>更多等待时钟信号的方法，参见 API 文档。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 31, 2024: <a href="https://github.com/XS-MLVP/course/commit/3b7f59d48ca51a87fcda67635a183e90459a6be1">change mlvp to toffee in eg-stack-async (3b7f59d)</a>
+  最后修改 January 2, 2025: <a href="https://github.com/XS-MLVP/course/commit/2f60f348abb61ece3d9af629da943f815fe00024">Rename &#39;mlvp&#39; to &#39;toffee&#39; (2f60f34)</a>
 </div>
 
 </div>

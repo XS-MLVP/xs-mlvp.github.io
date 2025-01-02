@@ -20,10 +20,10 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
 <title>搭建验证环境 | 开放验证平台学习资源</title>
-<meta name="description" content="mlvp 提供了搭建验证环境全流程所需要的方法和工具，本章中将详细介绍如何使用 mlvp 搭建一个完整的验证环境。
-在阅读前请确保您已经阅读了 如何编写规范的验证环境，并了解了 mlvp 规范验证环境的基本结构。
+<meta name="description" content="toffee和toffee-test 提供了搭建验证环境全流程所需要的方法和工具，本章中将详细介绍如何使用 toffee和toffee-test 搭建一个完整的验证环境。
+在阅读前请确保您已经阅读了 如何编写规范的验证环境，并了解了 toffee 规范验证环境的基本结构。
 对于一次全新的验证工作来说，按照环境搭建步骤的开始顺序，搭建验证环境可以分为以下几个步骤：
-按照逻辑功能划分 DUT 接口，并定义 Bundle 为每个 Bundle 编写 Agent，完成对 Bundle 的高层封装 将多个 Agent 封装成 Env，完成对整个 DUT 的高层封装 按照 Env 的接口规范编写参考模型，并将其与 Env 进行绑定 本章将会分别介绍每个步骤中如何使用 mlvp 中的工具来完成环境搭建需求。">
+按照逻辑功能划分 DUT 接口，并定义 Bundle 为每个 Bundle 编写 Agent，完成对 Bundle 的高层封装 将多个 Agent 封装成 Env，完成对整个 DUT 的高层封装 按照 Env 的接口规范编写参考模型，并将其与 Env 进行绑定 本章将会分别介绍每个步骤中如何使用 toffee和toffee-test 中的工具来完成环境搭建需求。">
 <meta property="og:title" content="搭建验证环境" />
 <meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
 <meta property="og:type" content="website" />
@@ -130,7 +130,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -219,8 +219,8 @@
 
 
 <div class="content">
-      <p><strong>mlvp</strong> 提供了搭建验证环境全流程所需要的方法和工具，本章中将详细介绍如何使用 <strong>mlvp</strong> 搭建一个完整的验证环境。</p>
-<p>在阅读前请确保您已经阅读了 <a href="/mlvp/docs/mlvp/canonical_env/">如何编写规范的验证环境</a>，并了解了 mlvp 规范验证环境的基本结构。</p>
+      <p><strong>toffee和toffee-test</strong> 提供了搭建验证环境全流程所需要的方法和工具，本章中将详细介绍如何使用 <strong>toffee和toffee-test</strong> 搭建一个完整的验证环境。</p>
+<p>在阅读前请确保您已经阅读了 <a href="/mlvp/docs/mlvp/canonical_env/">如何编写规范的验证环境</a>，并了解了 toffee 规范验证环境的基本结构。</p>
 <p>对于一次全新的验证工作来说，按照环境搭建步骤的开始顺序，搭建验证环境可以分为以下几个步骤：</p>
 <ol>
 <li>按照逻辑功能划分 DUT 接口，并定义 Bundle</li>
@@ -228,7 +228,7 @@
 <li>将多个 Agent 封装成 Env，完成对整个 DUT 的高层封装</li>
 <li>按照 Env 的接口规范编写参考模型，并将其与 Env 进行绑定</li>
 </ol>
-<p>本章将会分别介绍每个步骤中如何使用 mlvp 中的工具来完成环境搭建需求。</p>
+<p>本章将会分别介绍每个步骤中如何使用 toffee和toffee-test 中的工具来完成环境搭建需求。</p>
 
 </div>
 </div>
@@ -255,7 +255,7 @@
 	<h2 id="启动事件循环">启动事件循环</h2>
 <p>在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。</p>
 <p>例如，我们创建了两个驱动方法分别驱动两个接口，在每一个驱动方法内部，都需要等待 DUT 经过若干个时钟周期，并且这两个驱动方法需要同时运行。这时候，如果使用朴素的单线程程序，会发现很难同时让两个驱动方法同时运行，即便我们使用多线程强势使他们同时运行，也会发现缺乏一种机制，使他们能够等待 DUT 经过若干时钟周期。这是因为在 Picker 提供的接口中，我们只能去推动 DUT 向前执行一个周期，而无法去等待 DUT 执行一个周期。</p>
-<p>更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。mlvp 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。</p>
+<p>更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。toffee 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。</p>
 <p>在启动事件循环之前，我们首先需要了解两个关键字 <code>async</code> 和 <code>await</code> 来了解 Python 对与协程的管理。</p>
 <p>当我们在函数前加上 <code>async</code> 关键字时，这个函数就变成了一个协程函数，例如</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">():</span>
@@ -267,21 +267,21 @@
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro2</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">result</span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><p>如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 mlvp 提供的 <code>create_task</code> 方法，例如</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
+</span></span></code></pre></div><p>如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 toffee 提供的 <code>create_task</code> 方法，例如</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#4e9a06">&#34;my_coro&#34;</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">my_coro2</span><span style="color:#000;font-weight:bold">():</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">create_task</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">())</span>
-</span></span></code></pre></div><p>那么如何启动事件循环，并使事件循环开始运行 <code>my_coro2</code> 呢？在 mlvp 中，我们使用 <code>mlvp.run</code> 来启动事件循环，并运行异步程序。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">create_task</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><p>那么如何启动事件循环，并使事件循环开始运行 <code>my_coro2</code> 呢？在 toffee 中，我们使用 <code>toffee.run</code> 来启动事件循环，并运行异步程序。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_coro2</span><span style="color:#000;font-weight:bold">())</span>
-</span></span></code></pre></div><p>mlvp 中的环境组件都需要在事件循环中运行，因此当启动 mlvp 验证环境时，必须通过 <code>mlvp.run</code> 先启动事件循环，然后在事件循环中去创建 mlvp 验证环境。</p>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">my_coro2</span><span style="color:#000;font-weight:bold">())</span>
+</span></span></code></pre></div><p>toffee 中的环境组件都需要在事件循环中运行，因此当启动 toffee 验证环境时，必须通过 <code>toffee.run</code> 先启动事件循环，然后在事件循环中去创建 toffee 验证环境。</p>
 <p>因此，在验证环境创建时，应该以类似如下的方式：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 创建验证环境</span>
@@ -289,22 +289,22 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
 </span></span></code></pre></div><h2 id="如何管理-dut-时钟">如何管理 DUT 时钟</h2>
 <p>正如开头提出的问题，如果我们需要两个驱动方法同时运行，并且在每个驱动方法需要等待 DUT 经过若干个时钟周期。异步环境给予了我们等待某个事件的能力，但 Picker 只提供了推动 DUT 向前执行一个周期的能力，没有有提供一个事件让我们来等待。</p>
-<p>mlvp 中提供了对这类功能的支持，它通过创建一个后台时钟，来实现对 DUT 进行一个个周期的向前推动，每推动一个周期，后台时钟就会向其他协程发出时钟信号，使得其他协程能够继续执行。因此，DUT 的实际执行周期推动是由后台时钟来完成的，其他协程中只需要等待后台时钟发布的时钟信号即可。</p>
-<p>在 mlvp 中，通过<code>start_clock</code>来创建后台时钟：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
+<p>toffee 中提供了对这类功能的支持，它通过创建一个后台时钟，来实现对 DUT 进行一个个周期的向前推动，每推动一个周期，后台时钟就会向其他协程发出时钟信号，使得其他协程能够继续执行。因此，DUT 的实际执行周期推动是由后台时钟来完成的，其他协程中只需要等待后台时钟发布的时钟信号即可。</p>
+<p>在 toffee 中，通过<code>start_clock</code>来创建后台时钟：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MyDUT</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">start_clock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">start_clock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
 </span></span></code></pre></div><p>只需要在事件循环中调用 <code>start_clock</code> 即可创建后台时钟，它需要一个 DUT 对象作为参数，用于推动 DUT 的执行，以及将时钟信号绑定到 DUT 以及其各个引脚。</p>
 <p>在其他协程中，我们可以通过 <code>ClockCycles</code> 来等待时钟信号到来，<code>ClockCycles</code> 的参数可以是 DUT，也可以是 DUT 的每一个引脚。例如：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">mlvp</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.triggers</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">toffee</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.triggers</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">ClockCycles</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">10</span><span style="color:#000;font-weight:bold">)</span>
@@ -312,13 +312,13 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">async</span> <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MyDUT</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">start_clock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">start_clock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">my_coro</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">mlvp</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">toffee</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">start_test</span><span style="color:#000;font-weight:bold">())</span>
 </span></span></code></pre></div><p>在 <code>my_coro</code> 中，通过 <code>ClockCycles</code> 来等待 DUT 经过 10 个时钟周期，当 10 个时钟周期经过后，<code>my_coro</code> 就会继续执行，并打印 &ldquo;10 cycles passed&rdquo;。</p>
-<p>mlvp 中提供了多种等待时钟信号的方法，例如：</p>
+<p>toffee 中提供了多种等待时钟信号的方法，例如：</p>
 <ul>
 <li><code>ClockCycles</code> 等待 DUT 经过若干个时钟周期</li>
 <li><code>Value</code> 等待 DUT 的某个引脚的值等于某个值</li>
@@ -346,10 +346,10 @@
     
 	<h1 id="pg-24fbc3c0d43eefa92eb8f640766a6876">2 - 如何使用 Bundle</h1>
     
-	<p><code>Bundle</code> 在 mlvp 验证环境中，用于构建 <code>Agent</code> 与 DUT 之间交互的中间层，以保证 <code>Agent</code> 与 DUT 之间的解耦。同时 <code>Bundle</code> 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。</p>
+	<p><code>Bundle</code> 在 toffee 验证环境中，用于构建 <code>Agent</code> 与 DUT 之间交互的中间层，以保证 <code>Agent</code> 与 DUT 之间的解耦。同时 <code>Bundle</code> 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。</p>
 <h2 id="一个简单的-bundle-的定义">一个简单的 Bundle 的定义</h2>
-<p>为了定义一个 <code>Bundle</code>，需要自定义一个新类，并继承 mlvp 中的 <code>Bundle</code> 类。下面是一个简单的 <code>Bundle</code> 的定义示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Signals</span>
+<p>为了定义一个 <code>Bundle</code>，需要自定义一个新类，并继承 toffee 中的 <code>Bundle</code> 类。下面是一个简单的 <code>Bundle</code> 的定义示例：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Signals</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">Signals</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">)</span>
@@ -414,9 +414,9 @@ cout -&gt; io_cout_out
 </span></span><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">bind</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder</span><span style="color:#000;font-weight:bold">)</span>
 </span></span></code></pre></div><p>使用正则表达式时，Bundle 会尝试将 DUT 中的接口名称与正则表达式进行匹配，匹配成功的接口，将会读取正则表达式中的所有捕获组，将其连接为一个字符串。再使用这个字符串与 Bundle 中的接口名称进行匹配。</p>
 <p>例如对于上面代码中的正则表达式，<code>io_a_in</code> 会与正则表达式成功匹配，唯一的捕获组捕获到的内容为 <code>a</code>。<code>a</code> 这个名称与 Bundle 中的接口名称 <code>a</code> 匹配，因此 <code>io_a_in</code> 会被正确绑定至 <code>a</code>。</p>
-<h2 id="创建子bundle">创建子Bundle</h2>
+<h2 id="创建子-bundle">创建子 Bundle</h2>
 <p>很多时候，我们会需要一个 Bundle 包含一个或多个其他 Bundle 的情况，这时我们可以将其他已经定义好的 Bundle 作为当前 Bundle 的子 Bundle。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Signal</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Signals</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Signal</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Signals</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">Signals</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">)</span>
@@ -462,7 +462,7 @@ cout -&gt; io_cout_out
 <p>同时，Bundle 提供了设置的快捷方法：<code>set_write_mode_as_imme</code>, <code>set_write_mode_as_rise</code> 与 <code>set_write_mode_as_fall</code>，分别用于设置 Bundle 的赋值模式为立即赋值、上升沿赋值与下降沿赋值。</p>
 <h3 id="消息支持">消息支持</h3>
 <p><strong>默认消息类型赋值</strong></p>
-<p>mlvp 支持一个默认的消息类型，可以通过 <code>assign</code> 方法将一个字典赋值给 Bundle 中的信号。</p>
+<p>toffee 支持一个默认的消息类型，可以通过 <code>assign</code> 方法将一个字典赋值给 Bundle 中的信号。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">assign</span><span style="color:#000;font-weight:bold">({</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;b&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span>
@@ -473,7 +473,7 @@ cout -&gt; io_cout_out
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;*&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;a&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
-</span></span></code></pre></div><p><strong>子Bundle的默认消息赋值支持</strong></p>
+</span></span></code></pre></div><p><strong>子 Bundle 的默认消息赋值支持</strong></p>
 <p>如果希望通过默认消息类型同时赋值子 Bundle 中的信号，可以通过两种方式实现。当 <code>assign</code> 中的 <code>multilevel</code> 参数为 <code>True</code> 时，Bundle 支持多级字典赋值。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">arithmetic_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">assign</span><span style="color:#000;font-weight:bold">({</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#39;selector&#39;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span>
@@ -558,12 +558,12 @@ cout -&gt; io_cout_out
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#000">my_message</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">MyMessage</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">from_bundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">adder_bundle</span><span style="color:#000;font-weight:bold">)</span>
 </span></span></code></pre></div><h3 id="时序封装">时序封装</h3>
-<p>Bundle类除了对DUT的引脚进行封装外，还提供了基于数组的时序封装，可以适用于部分简单时序场景。Bundle类提供了<code>process_requests(data_list)</code>函数，他接受一个数组输入，第<code>i</code>个时钟周期，会将<code>data_list[i]</code>对应的数据赋值给引脚。<code>data_list</code>中的数据可以是<code>dict</code>类型，或者<code>callable(cycle, bundle_ins)</code>类型的可调用对象。对于<code>dict</code>类型，特殊<code>key</code>有：</p>
+<p>Bundle 类除了对 DUT 的引脚进行封装外，还提供了基于数组的时序封装，可以适用于部分简单时序场景。Bundle 类提供了<code>process_requests(data_list)</code>函数，他接受一个数组输入，第<code>i</code>个时钟周期，会将<code>data_list[i]</code>对应的数据赋值给引脚。<code>data_list</code>中的数据可以是<code>dict</code>类型，或者<code>callable(cycle, bundle_ins)</code>类型的可调用对象。对于<code>dict</code>类型，特殊<code>key</code>有：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>__funcs__: func<span style="color:#ce5c00;font-weight:bold">(</span>cycle, self<span style="color:#ce5c00;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic"># 可调用对象，可以为函数数组[f1,f2,..]</span>
 </span></span><span style="display:flex;"><span>__condition_func__:  func<span style="color:#ce5c00;font-weight:bold">(</span>cycle, slef, cargs<span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 条件函数，当改函数返回为true时，进行赋值，否则继续推进时钟</span>
 </span></span><span style="display:flex;"><span>__condition_args__:  cargs <span style="color:#8f5902;font-style:italic"># 条件函数需要的参数</span>
 </span></span><span style="display:flex;"><span>__return_bundles__:  bundle <span style="color:#8f5902;font-style:italic"># 需要本次dict赋值时返回的bundle数据，可以是list[bundle]</span>
-</span></span></code></pre></div><p>如果输入的<code>dict</code>中有<code>__return_bundles__</code>，则函数会返回该输入对应的bundle值，例如<code>{&quot;data&quot;: x, &quot;cycle&quot;: y}</code>。以Adder为例，期望第三次加后返回结果：</p>
+</span></span></code></pre></div><p>如果输入的<code>dict</code>中有<code>__return_bundles__</code>，则函数会返回该输入对应的 bundle 值，例如<code>{&quot;data&quot;: x, &quot;cycle&quot;: y}</code>。以 Adder 为例，期望第三次加后返回结果：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Adder虽然为存组合逻辑，但此处当时序逻辑使用</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderBundle</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Bundle</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">Signals</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">)</span>             <span style="color:#8f5902;font-style:italic"># 指定引脚</span>
@@ -624,8 +624,8 @@ cout -&gt; io_cout_out
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">signal</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">adder_bundle</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">all_signals</span><span style="color:#000;font-weight:bold">():</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">signal</span><span style="color:#000;font-weight:bold">)</span>
 </span></span></code></pre></div><h2 id="bundle-的自动生成脚本">Bundle 的自动生成脚本</h2>
-<p>在很多情况下，DUT 的接口可能过于复杂，手动去编写 Bundle 的定义会变得非常繁琐。然而，Bundle 作为中间层，提供一个确切的信号名称定义是必要的。为了解决这个问题，mlvp 提供了一个自动生成 Bundle 的脚本来从 DUT 的接口定义中生成 Bundle 的定义。</p>
-<p>可以在 mlvp 仓库目录下的 <code>scripts</code> 文件夹中找到 <code>bundle_code_gen.py</code> 脚本。该脚本可以通过解析 DUT 实例，以及指定的绑定规则自动生成 Bundle 的定义。</p>
+<p>在很多情况下，DUT 的接口可能过于复杂，手动去编写 Bundle 的定义会变得非常繁琐。然而，Bundle 作为中间层，提供一个确切的信号名称定义是必要的。为了解决这个问题，toffee 提供了一个自动生成 Bundle 的脚本来从 DUT 的接口定义中生成 Bundle 的定义。</p>
+<p>可以在 toffee 仓库目录下的 <code>scripts</code> 文件夹中找到 <code>bundle_code_gen.py</code> 脚本。该脚本可以通过解析 DUT 实例，以及指定的绑定规则自动生成 Bundle 的定义。</p>
 <p>其中提供了三个函数</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">gen_bundle_code_from_dict</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bundle_name</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">dict</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">dict</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">max_width</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">int</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">120</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">gen_bundle_code_from_prefix</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bundle_name</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">prefix</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">str</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">max_width</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">int</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">120</span><span style="color:#000;font-weight:bold">):</span>
@@ -661,11 +661,11 @@ cout -&gt; io_cout_out
     
 	<h1 id="pg-d8294406c872c50fb824daf8117b16c4">3 - 如何编写 Agent</h1>
     
-	<p><code>Agent</code> 在 mlvp 验证环境中实现了对一类 <code>Bundle</code> 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。</p>
+	<p><code>Agent</code> 在 toffee 验证环境中实现了对一类 <code>Bundle</code> 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。</p>
 <p>一个 <code>Agent</code> 由 <strong>驱动方法(driver_method)</strong> 和 <strong>监测方法(monitor_method)</strong> 组成，其中驱动方法用于主动驱动 <code>Bundle</code> 中的信号，而监测方法用于被动监测 <code>Bundle</code> 中的信号。</p>
 <h2 id="初始化-agent">初始化 Agent</h2>
-<p>为了定义一个 <code>Agent</code>，需要自定义一个新类，并继承 mlvp 中的 <code>Agent</code> 类。下面是一个简单的 <code>Agent</code> 的定义示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<p>为了定义一个 <code>Agent</code>，需要自定义一个新类，并继承 toffee 中的 <code>Agent</code> 类。下面是一个简单的 <code>Agent</code> 的定义示例：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Agent</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
@@ -676,7 +676,7 @@ cout -&gt; io_cout_out
 <p>在 <code>Agent</code> 中，驱动方法是一个异步函数，用于主动驱动 <code>Bundle</code> 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 <code>Bundle</code> 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。</p>
 <p>每一个驱动方法都应是一个异步函数，并且使用 <code>@driver_method</code> 装饰器进行修饰，以便 <code>Agent</code> 能够识别该函数为驱动方法。</p>
 <p>下面是一个简单的驱动方法的定义示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Agent</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
@@ -701,7 +701,7 @@ cout -&gt; io_cout_out
 <h2 id="创建监测方法">创建监测方法</h2>
 <p>监测方法同样需要是一个异步函数，并且使用 <code>@monitor_method</code> 装饰器进行修饰，以便 <code>Agent</code> 能够识别该函数为监测方法。</p>
 <p>一个简单的监测方法的定义示例如下：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.agent</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderAgent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Agent</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">bundle</span><span style="color:#000;font-weight:bold">):</span>
@@ -746,11 +746,11 @@ cout -&gt; io_cout_out
     
 	<h1 id="pg-ef7ff8d9b1e4680f7bfedab19681abb5">4 - 如何搭建 Env</h1>
     
-	<p><code>Env</code> 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。</p>
+	<p><code>Env</code> 在 toffee 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。</p>
 <p>创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。</p>
 <h2 id="创建-env">创建 Env</h2>
-<p>为了定义一个 <code>Env</code>，需要自定义一个新类，并继承 mlvp 中的 <code>Env</code> 类。下面是一个简单的 <code>Env</code> 的定义示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.env</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<p>为了定义一个 <code>Env</code>，需要自定义一个新类，并继承 toffee 中的 <code>Env</code> 类。下面是一个简单的 <code>Env</code> 的定义示例：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.env</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">DualPortStackEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Env</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">port1_bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">port2_bundle</span><span style="color:#000;font-weight:bold">):</span>
@@ -802,9 +802,9 @@ cout -&gt; io_cout_out
     
 	<h1 id="pg-561e9af58bbb529ed50067d0df763d91">5 - 如何编写参考模型</h1>
     
-	<p><code>参考模型</code> 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 <code>Env</code> 的接口规范，以便能够附加到 <code>Env</code> 上，由 <code>Env</code> 来完成参考模型的自动同步。</p>
+	<p><code>参考模型</code> 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 toffee 验证环境中，参考模型需要遵循 <code>Env</code> 的接口规范，以便能够附加到 <code>Env</code> 上，由 <code>Env</code> 来完成参考模型的自动同步。</p>
 <h2 id="参考模型的两种实现方式">参考模型的两种实现方式</h2>
-<p>mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 <code>Env</code> 上，并由 <code>Env</code> 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。</p>
+<p>toffee 提供了两种参考模型的实现方式，这两种方式都可以被附加到 <code>Env</code> 上，并由 <code>Env</code> 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。</p>
 <p>这两种方式分别是 <strong>函数调用模式</strong> 与 <strong>独立执行流模式</strong>，下面将分别介绍这两种方式的具体概念。</p>
 <h3 id="函数调用模式">函数调用模式</h3>
 <p><strong>函数调用模式</strong>即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。</p>
@@ -817,7 +817,7 @@ cout -&gt; io_cout_out
 <p>需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。</p>
 <h3 id="独立执行流模式">独立执行流模式</h3>
 <p><strong>独立执行流模式</strong>即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。</p>
-<p>我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。</p>
+<p>我们用一段代码来说明这种模式，该示例中用到了 toffee 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">()</span>
@@ -852,7 +852,7 @@ cout -&gt; io_cout_out
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">pop</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
 </span></span></code></pre></div><p>此时，驱动函数与参考模型的对应关系已经建立，当 Env 中的某个驱动函数被调用时，参考模型中对应的函数将会被自动调用，并自动对比两者的返回值是否一致。</p>
-<p>mlvp 还提供了以下几种匹配方式，以便更好地匹配驱动函数：</p>
+<p>toffee 还提供了以下几种匹配方式，以便更好地匹配驱动函数：</p>
 <p><strong>指定驱动函数路径</strong></p>
 <p>可以通过 &ldquo;.&rdquo; 来指定驱动函数的路径，例如：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
@@ -901,7 +901,7 @@ cout -&gt; io_cout_out
 <p>当 <code>agent_hook</code> 与 <code>driver_hook</code> 同时存在时，框架会优先调用 <code>agent_hook</code> 函数，再调用 <code>driver_hook</code> 函数，并将 <code>driver_hook</code> 函数的返回值用于结果的对比。</p>
 <p>当 Env 中所有的驱动函数都能找到对应的 <code>driver_hook</code> 或 <code>agent_hook</code> 时，参考模型便能成功与 Env 建立匹配关系，此时可以直接通过 Env 中的 <code>attach</code> 方法将参考模型附加到 Env 上。</p>
 <h2 id="如何编写独立执行流模式的参考模型">如何编写独立执行流模式的参考模型</h2>
-<p>独立执行流模式的参考模型是通过 <code>port</code> 接口的形式来完成数据的输入输出，他可以主动向 <code>port</code> 请求数据，也可以主动向 <code>port</code> 输出数据。在 mlvp 中，我们提供了两种接口来实现这一功能，分别是 <code>DriverPort</code> 和 <code>MonitorPort</code>。</p>
+<p>独立执行流模式的参考模型是通过 <code>port</code> 接口的形式来完成数据的输入输出，他可以主动向 <code>port</code> 请求数据，也可以主动向 <code>port</code> 输出数据。在 toffee 中，我们提供了两种接口来实现这一功能，分别是 <code>DriverPort</code> 和 <code>MonitorPort</code>。</p>
 <p>类似地，我们需要定义一系列的 <code>DriverPort</code> 使其与 Env 中的驱动函数匹配，同时定义一系列的 <code>MonitorPort</code> 使其与 Env 中的监测函数匹配。</p>
 <p>当 Env 中的驱动函数被调用时，调用数据将会被发送到 <code>DriverPort</code> 中，参考模型将会主动获取这些数据，并进行计算。计算结果将会被输出到 <code>MonitorPort</code> 中，当 Env 中的监测函数被调用时，比较器会自动从 <code>MonitorPort</code> 中获取数据，并与 Env 中的监测函数的返回值进行比较。</p>
 <h3 id="驱动方法接口匹配">驱动方法接口匹配</h3>

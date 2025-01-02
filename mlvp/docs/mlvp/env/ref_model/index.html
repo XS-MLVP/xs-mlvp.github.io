@@ -18,8 +18,8 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
 <title>如何编写参考模型 | 开放验证平台学习资源</title>
-<meta name="description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
-参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
+<meta name="description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 toffee 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
+参考模型的两种实现方式 toffee 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
 这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。
 函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。
 下面是一个简单的函数调用模式的参考模型的定义示例：
@@ -27,11 +27,11 @@
 class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。
 需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。
 独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
-我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
+我们用一段代码来说明这种模式，该示例中用到了 toffee 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
 class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self.">
 <meta property="og:title" content="如何编写参考模型" />
-<meta property="og:description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
-参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
+<meta property="og:description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 toffee 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
+参考模型的两种实现方式 toffee 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
 这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。
 函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。
 下面是一个简单的函数调用模式的参考模型的定义示例：
@@ -39,15 +39,15 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。
 需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。
 独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
-我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
+我们用一段代码来说明这种模式，该示例中用到了 toffee 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
 class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/ref_model/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-31T17:27:07+08:00" />
+<meta property="article:modified_time" content="2025-01-02T16:48:10+08:00" />
 <meta itemprop="name" content="如何编写参考模型">
-<meta itemprop="description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
-参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
+<meta itemprop="description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 toffee 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
+参考模型的两种实现方式 toffee 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
 这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。
 函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。
 下面是一个简单的函数调用模式的参考模型的定义示例：
@@ -55,13 +55,13 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。
 需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。
 独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
-我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
+我们用一段代码来说明这种模式，该示例中用到了 toffee 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
 class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self.">
-<meta itemprop="dateModified" content="2024-12-31T17:27:07+08:00" />
+<meta itemprop="dateModified" content="2025-01-02T16:48:10+08:00" />
 <meta itemprop="wordCount" content="451">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何编写参考模型"/>
-<meta name="twitter:description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
-参考模型的两种实现方式 mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
+<meta name="twitter:description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 toffee 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
+参考模型的两种实现方式 toffee 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
 这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。
 函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。
 下面是一个简单的函数调用模式的参考模型的定义示例：
@@ -69,7 +69,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。
 需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。
 独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
-我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
+我们用一段代码来说明这种模式，该示例中用到了 toffee 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
 class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self."/>
 <link rel="preload" href="/mlvp/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
@@ -170,7 +170,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -194,7 +194,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -422,9 +422,9 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 	<header class="article-meta">
 		
   </header>
-	<p><code>参考模型</code> 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 mlvp 验证环境中，参考模型需要遵循 <code>Env</code> 的接口规范，以便能够附加到 <code>Env</code> 上，由 <code>Env</code> 来完成参考模型的自动同步。</p>
+	<p><code>参考模型</code> 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 toffee 验证环境中，参考模型需要遵循 <code>Env</code> 的接口规范，以便能够附加到 <code>Env</code> 上，由 <code>Env</code> 来完成参考模型的自动同步。</p>
 <h2 id="参考模型的两种实现方式">参考模型的两种实现方式</h2>
-<p>mlvp 提供了两种参考模型的实现方式，这两种方式都可以被附加到 <code>Env</code> 上，并由 <code>Env</code> 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。</p>
+<p>toffee 提供了两种参考模型的实现方式，这两种方式都可以被附加到 <code>Env</code> 上，并由 <code>Env</code> 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。</p>
 <p>这两种方式分别是 <strong>函数调用模式</strong> 与 <strong>独立执行流模式</strong>，下面将分别介绍这两种方式的具体概念。</p>
 <h3 id="函数调用模式">函数调用模式</h3>
 <p><strong>函数调用模式</strong>即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。</p>
@@ -437,7 +437,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 <p>需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。</p>
 <h3 id="独立执行流模式">独立执行流模式</h3>
 <p><strong>独立执行流模式</strong>即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。</p>
-<p>我们用一段代码来说明这种模式，该示例中用到了 mlvp 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。</p>
+<p>我们用一段代码来说明这种模式，该示例中用到了 toffee 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AdderRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87">super</span><span style="color:#000;font-weight:bold">()</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">()</span>
@@ -472,7 +472,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">pop</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">pass</span>
 </span></span></code></pre></div><p>此时，驱动函数与参考模型的对应关系已经建立，当 Env 中的某个驱动函数被调用时，参考模型中对应的函数将会被自动调用，并自动对比两者的返回值是否一致。</p>
-<p>mlvp 还提供了以下几种匹配方式，以便更好地匹配驱动函数：</p>
+<p>toffee 还提供了以下几种匹配方式，以便更好地匹配驱动函数：</p>
 <p><strong>指定驱动函数路径</strong></p>
 <p>可以通过 &ldquo;.&rdquo; 来指定驱动函数的路径，例如：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackRefModel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Model</span><span style="color:#000;font-weight:bold">):</span>
@@ -521,7 +521,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 <p>当 <code>agent_hook</code> 与 <code>driver_hook</code> 同时存在时，框架会优先调用 <code>agent_hook</code> 函数，再调用 <code>driver_hook</code> 函数，并将 <code>driver_hook</code> 函数的返回值用于结果的对比。</p>
 <p>当 Env 中所有的驱动函数都能找到对应的 <code>driver_hook</code> 或 <code>agent_hook</code> 时，参考模型便能成功与 Env 建立匹配关系，此时可以直接通过 Env 中的 <code>attach</code> 方法将参考模型附加到 Env 上。</p>
 <h2 id="如何编写独立执行流模式的参考模型">如何编写独立执行流模式的参考模型</h2>
-<p>独立执行流模式的参考模型是通过 <code>port</code> 接口的形式来完成数据的输入输出，他可以主动向 <code>port</code> 请求数据，也可以主动向 <code>port</code> 输出数据。在 mlvp 中，我们提供了两种接口来实现这一功能，分别是 <code>DriverPort</code> 和 <code>MonitorPort</code>。</p>
+<p>独立执行流模式的参考模型是通过 <code>port</code> 接口的形式来完成数据的输入输出，他可以主动向 <code>port</code> 请求数据，也可以主动向 <code>port</code> 输出数据。在 toffee 中，我们提供了两种接口来实现这一功能，分别是 <code>DriverPort</code> 和 <code>MonitorPort</code>。</p>
 <p>类似地，我们需要定义一系列的 <code>DriverPort</code> 使其与 Env 中的驱动函数匹配，同时定义一系列的 <code>MonitorPort</code> 使其与 Env 中的监测函数匹配。</p>
 <p>当 Env 中的驱动函数被调用时，调用数据将会被发送到 <code>DriverPort</code> 中，参考模型将会主动获取这些数据，并进行计算。计算结果将会被输出到 <code>MonitorPort</code> 中，当 Env 中的监测函数被调用时，比较器会自动从 <code>MonitorPort</code> 中获取数据，并与 Env 中的监测函数的返回值进行比较。</p>
 <h3 id="驱动方法接口匹配">驱动方法接口匹配</h3>
@@ -566,7 +566,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 <p>当参考模型中定义的 <code>DriverPort</code>, <code>AgentPort</code> 和 <code>MonitorPort</code> 能够与 <code>Env</code> 中所有接口匹配时，参考模型便能成功与 <code>Env</code> 建立匹配关系，此时可以直接通过 <code>Env</code> 中的 <code>attach</code> 方法将参考模型附加到 <code>Env</code> 上。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 31, 2024: <a href="https://github.com/XS-MLVP/course/commit/3b7f59d48ca51a87fcda67635a183e90459a6be1">change mlvp to toffee in eg-stack-async (3b7f59d)</a>
+  最后修改 January 2, 2025: <a href="https://github.com/XS-MLVP/course/commit/2f60f348abb61ece3d9af629da943f815fe00024">Rename &#39;mlvp&#39; to &#39;toffee&#39; (2f60f34)</a>
 </div>
 
 </div>

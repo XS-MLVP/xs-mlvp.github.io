@@ -18,40 +18,40 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
 <title>如何搭建 Env | 开放验证平台学习资源</title>
-<meta name="description" content="Env 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
+<meta name="description" content="Env 在 toffee 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
 创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。
-创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 mlvp 中的 Env 类。下面是一个简单的 Env 的定义示例：
-from mlvp.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
+创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 toffee 中的 Env 类。下面是一个简单的 Env 的定义示例：
+from toffee.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
 可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。
 此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：
 port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env.">
 <meta property="og:title" content="如何搭建 Env" />
-<meta property="og:description" content="Env 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
+<meta property="og:description" content="Env 在 toffee 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
 创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。
-创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 mlvp 中的 Env 类。下面是一个简单的 Env 的定义示例：
-from mlvp.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
+创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 toffee 中的 Env 类。下面是一个简单的 Env 的定义示例：
+from toffee.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
 可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。
 此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：
 port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/build_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-12-31T17:27:07+08:00" />
+<meta property="article:modified_time" content="2025-01-02T16:48:10+08:00" />
 <meta itemprop="name" content="如何搭建 Env">
-<meta itemprop="description" content="Env 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
+<meta itemprop="description" content="Env 在 toffee 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
 创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。
-创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 mlvp 中的 Env 类。下面是一个简单的 Env 的定义示例：
-from mlvp.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
+创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 toffee 中的 Env 类。下面是一个简单的 Env 的定义示例：
+from toffee.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
 可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。
 此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：
 port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env.">
-<meta itemprop="dateModified" content="2024-12-31T17:27:07+08:00" />
+<meta itemprop="dateModified" content="2025-01-02T16:48:10+08:00" />
 <meta itemprop="wordCount" content="124">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何搭建 Env"/>
-<meta name="twitter:description" content="Env 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
+<meta name="twitter:description" content="Env 在 toffee 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。
 创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。
-创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 mlvp 中的 Env 类。下面是一个简单的 Env 的定义示例：
-from mlvp.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
+创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 toffee 中的 Env 类。下面是一个简单的 Env 的定义示例：
+from toffee.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。
 可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。
 此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：
 port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env."/>
@@ -154,7 +154,7 @@ port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPort
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -178,7 +178,7 @@ port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPort
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.42b5a68010ee76649de83ae01cd6c103.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7c7f44ad38588aa56c39e9c5f6e1e6ff.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -389,11 +389,11 @@ port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPort
 	<header class="article-meta">
 		
   </header>
-	<p><code>Env</code> 在 mlvp 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。</p>
+	<p><code>Env</code> 在 toffee 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。</p>
 <p>创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。</p>
 <h2 id="创建-env">创建 Env</h2>
-<p>为了定义一个 <code>Env</code>，需要自定义一个新类，并继承 mlvp 中的 <code>Env</code> 类。下面是一个简单的 <code>Env</code> 的定义示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">mlvp.env</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<p>为了定义一个 <code>Env</code>，需要自定义一个新类，并继承 toffee 中的 <code>Env</code> 类。下面是一个简单的 <code>Env</code> 的定义示例：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">toffee.env</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">DualPortStackEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Env</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">port1_bundle</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">port2_bundle</span><span style="color:#000;font-weight:bold">):</span>
@@ -430,7 +430,7 @@ port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPort
 <p>参考模型的具体编写方式将在编写参考模型一节中详细介绍。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 December 31, 2024: <a href="https://github.com/XS-MLVP/course/commit/3b7f59d48ca51a87fcda67635a183e90459a6be1">change mlvp to toffee in eg-stack-async (3b7f59d)</a>
+  最后修改 January 2, 2025: <a href="https://github.com/XS-MLVP/course/commit/2f60f348abb61ece3d9af629da943f815fe00024">Rename &#39;mlvp&#39; to &#39;toffee&#39; (2f60f34)</a>
 </div>
 
 </div>
