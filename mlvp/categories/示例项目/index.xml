@@ -6,7 +6,7 @@
     <description>Recent content in 示例项目 on 开放验证平台学习资源</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 06 Jan 2025 10:31:18 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 08 Jan 2025 14:45:41 +0800</lastBuildDate>
     <atom:link href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>快速开始</title>
@@ -107,6 +107,13 @@
       <description>双端口栈简介 双端口栈是一种数据结构，支持两个端口同时进行操作。与传统单端口栈相比，双端口栈允许同时进行数据的读写操作，在例如多线程并发读写等场景下，双端口栈能够提供更好的性能。本例中，我们提供了一个简易的双端口栈实现，其源码如下：&#xA;module dual_port_stack ( input clk, input rst, // Interface 0 input in0_valid, output in0_ready, input [7:0] in0_data, input [1:0] in0_cmd, output out0_valid, input out0_ready, output [7:0] out0_data, output [1:0] out0_cmd, // Interface 1 input in1_valid, output in1_ready, input [7:0] in1_data, input [1:0] in1_cmd, output out1_valid, input out1_ready, output [7:0] out1_data, output [1:0] out1_cmd ); // Command definitions localparam CMD_PUSH = 2&amp;#39;b00; localparam CMD_POP = 2&amp;#39;b01; localparam CMD_PUSH_OKAY = 2&amp;#39;b10; localparam CMD_POP_OKAY = 2&amp;#39;b11; // Stack memory and pointer reg [7:0] stack_mem[0:255]; reg [7:0] sp; reg busy; reg [7:0] out0_data_reg, out1_data_reg; reg [1:0] out0_cmd_reg, out1_cmd_reg; reg out0_valid_reg, out1_valid_reg; assign out0_data = out0_data_reg; assign out0_cmd = out0_cmd_reg; assign out0_valid = out0_valid_reg; assign out1_data = out1_data_reg; assign out1_cmd = out1_cmd_reg; assign out1_valid = out1_valid_reg; always @(posedge clk or posedge rst) begin if (rst) begin sp &amp;lt;= 0; busy &amp;lt;= 0; end else begin // Interface 0 Request Handling if (!</description>
     </item>
     <item>
+      <title>多时钟</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/multiclock/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/multiclock/</guid>
+      <description>部分电路有多个时钟，XClock 类提供了分频功能，可以通过它实现对多时钟电路的驱动。&#xA;XClock 中的 FreqDivWith 接口 XClock 函数提供如下分频接口&#xA;void XClock::FreqDivWith(int div, // 分频数，，即绑定的XClock的频率为原时钟频率的div分之1 XClock &amp;amp;clk, // 绑定的XClock int shift=0) // 对波形进行 shift 个半周期的移位 XClock 的一般驱动流程 创建 XClock，绑定 DUT 的驱动函数 # 假设已经创建了DUT，并将其命名为dut # 创建XClock xclock = XClock(dut.dut.simStep) 绑定关联 clk 引脚 # clk是dut的时钟引脚 xclock.Add(dut.clk) # Add方法具有别名：AddPin 通过 XPort 绑定与 clk 关联的引脚 因为在我们的工具中，对于端口的读写是通过 xclock 来驱动的，所以如果不将与 clk 关联的引脚绑定到 XClock 上，那么在驱动时，相关的引脚数值不会发生变化。&#xA;比如，我们要进行复位操作，那么可以将 reset 绑定到 xclock 上。&#xA;方法：&#xA;class XClock: def Add(xport) #将Clock和XData进行绑定 举例：&#xA;# xclock.Add(dut.xport.Add(pin_name, XData)) xclock.</description>
+    </item>
+    <item>
       <title>案例四：双端口栈（协程）</title>
       <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-async/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -114,11 +121,25 @@
       <description>双端口栈简介与环境构建 本案例中使用的双端口栈与案例三中的实现完全相同，请查看案例三中的双端口栈简介及构建驱动环境。&#xA;利用协程驱动 DUT 在案例三中，我们使用了回调函数的方式来驱动DUT，回调函数虽然给我们提供了一种能够完成并行操作的方式，然而其却把完成的执行流程割裂为多次函数调用，并需要维护大量中间状态，导致代码的编写及调试变得较为复杂。&#xA;在本案例中，我们将会介绍一种通过协程驱动的方法，这种方法不仅能够做到并行操作，同时能够很好地避免回调函数所带来的问题。&#xA;协程简介 协程是一种“轻量级”的线程，通过协程，你可以实现与线程相似的并发执行的行为，但其开销却远小于线程。其实现原理是，协程库实现了一个运行于单线程之上的事件循环（EventLoop），程序员可以定义若干协程并且加入到事件循环，由事件循环负责这些协程的调度。&#xA;一般来说，我们定义的协程在执行过程中会持续执行，直到遇到一个需要等待的“事件”，此时事件循环就会暂停执行该协程，并调度其他协程运行。当事件发生后，事件循环会再次唤醒该协程，继续执行。&#xA;对于硬件验证中的并行执行来说，这种特性正是我们所需要的，我们可以创建多个协程，来完成验证中的多个驱动任务。我们可以将时钟的执行当做事件，在每个协程中等待这个事件，当时钟信号到来时，事件循环会唤醒所有等待的协程，使其继续执行，直到他们等待下一个时钟信号。&#xA;我们用 Python 中的 asyncio 来实现对协程的支持：&#xA;import asyncio from dual_port_stack import * async def my_coro(dut, name): for i in range(10): print(f&amp;#34;{name}: {i}&amp;#34;) await dut.AStep(1) async def test_dut(dut): asyncio.create_task(my_coro(dut, &amp;#34;coroutine 1&amp;#34;)) asyncio.create_task(my_coro(dut, &amp;#34;coroutine 2&amp;#34;)) await asyncio.create_task(dut.RunStep(10)) dut = DUTdual_port_stack() dut.InitClock(&amp;#34;clk&amp;#34;) asyncio.run(test_dut(dut)) dut.Finish() 你可以直接运行上述代码来观察协程的执行过程。在上述代码中我们用 create_task 创建了两个协程任务并加入到事件循环中，每个协程任务中，会不断打印一个数字并等待下一个时钟信号到来。&#xA;我们使用 dut.RunStep(10) 来创建一个后台时钟，它会不断产生时钟同步信号，使得其他协程能够在时钟信号到来时继续执行。&#xA;基于协程驱动的双端口栈 利用协程，我们就可以将驱动双端口栈中单个端口逻辑写成一个独立的执行流，不需要再去维护大量的中间状态。&#xA;下面是我们提供的一个简单的使用协程驱动的验证代码：&#xA;import asyncio import random from dual_port_stack import * from enum import Enum class StackModel: def __init__(self): self.</description>
     </item>
     <item>
+      <title>多实例</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/multiinstance/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/multiinstance/</guid>
+      <description>在Verilog中，一个module只有一个实例，但很多测试场景下需要实现多个module，为此picker提供了动态多实例和静态多实例的支持。&#xA;动态多实例 动态多实例相当于类的实例化，在创建dut的同时实例化对应的module，所以用户无感知。支持最大16个实例同时运行。&#xA;例子：&#xA;以Adder为例，我们可以在测试时根据需要在合适的位置创建多个dut，来动态创建多个Adder实例。 当需要销毁一个dut时，也不会影响后续创建新的dut。&#xA;创建一个名为 picker_out_adder 的文件夹，其中包含一个 Adder.v 文件。该文件的源码参考案例一：简单加法器。&#xA;运行下述命令将RTL导出为 Python Module：&#xA;picker export Adder.v --autobuild true -w Adder.fst --sname Adder 在picker_out_adder中添加 example.py，动态创建多个Adder实例：&#xA;from Adder import * import random def random_int(): return random.randint(-(2**127), 2**127 - 1) &amp;amp; ((1 &amp;lt;&amp;lt; 127) - 1) def main(): dut=[] # 可以通过创建多个dut，实例化多个Adder，理论上支持最大16个实例同时运行 for i in range(7): # 这里通过循环创建了7个dut dut.append(DUTAdder(waveform_filename=f&amp;#34;{i}.fst&amp;#34;)) for d in dut: d.a.value = random_int() d.b.value = random_int() d.cin.value = random_int() &amp;amp; 1 d.</description>
+    </item>
+    <item>
       <title>验证报告</title>
       <link>https://xs-mlvp.github.io/mlvp/docs/basic/report/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://xs-mlvp.github.io/mlvp/docs/basic/report/</guid>
       <description>在我们完成DUT验证后，编写验证报告是至关重要的一环。本节将从整体角度概述验证报告的结构以及报告所需覆盖的内容。&#xA;验证报告是对整个验证过程的回顾，是验证合理与否的重要支持文件。一般情况下，验证报告需要包含以下内容：&#xA;文档基本信息（作者、日志、版本等） 验证对象（验证目标） 功能点介绍 验证方案 测试点分解 测试用例 测试环境 结果分析 缺陷分析 测试结论 以下内容对列表进行进一步解释，具体示例可以参考nutshell_cache_report_demo.pdf&#xA;1. 基本信息 应当包括作者、日志、版本、日期等。&#xA;2. 验证对象（验证目标） 需要对您的验证对象做必要的介绍，可以包括其结构、基本功能、接口信息等。&#xA;3. 功能点介绍 通过阅读设计文档或者源码，您需要总结DUT的目标功能，并将其细化为各功能点。&#xA;4. 验证方案 应当包括您计划的验证流程以及验证框架。同时，您也应当接受您的框架各部分是如何协同工作的。&#xA;5. 测试点分解 针对功能点提出的测试方法。具体可以包括在怎样的信号输入下应当观测到怎样的信号输出。&#xA;6. 测试用例 测试点的具体实现。一个测试用例可以包括多个测试点。&#xA;7. 测试环境 包括硬件信息、软件版本信息等。&#xA;8. 结果分析 结果分析一般指覆盖率分析。通常来说应当考虑两类覆盖率：&#xA;1. 行覆盖率： 在测试用例中有多少RTL行代码被执行。一般来说我们要求行覆盖率在98%以上。&#xA;2. 功能覆盖率：根据相应的信号判断您提取的功能点是否被覆盖且被正确触发。一般我们要求测试用例覆盖每个功能点。&#xA;9. 缺陷分析 对DUT存在的缺陷进行分析。可以包括设计文档的规范性和详细性、DUT功能的正确性（是否存在bug）、DUT功能是否能被触发等方面。&#xA;10. 验证结论 验证结论是在完成芯片验证过程后得出的最终结论，是对以上内容的总结。</description>
+    </item>
+    <item>
+      <title>内部信号</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/internalsignal/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/internalsignal/</guid>
+      <description>内部信号指的是不在模块的IO端口中暴露，但会在模块内部发挥控制、数据传输、状态跟踪功能的信号。一般来说，在picker将rtl转换成dut的过程中，只有IO端口才会被暴露，这些信号不会被主动暴露。&#xA;然而，当验证人员需要寻求对模块内部逻辑更精细的验证，或者需要根据已知的bug进一步定位问题时，就需要接触硬件模块内部的信号，此时除了使用verilator和VCS这些传统工具以外，也可以采用picker提供的内部信号提取机制作为辅助。&#xA;动机 以一个自带上限的计数器为例：&#xA;module UpperCounter ( input wire clk, input wire reset, output reg [3:0] count ); wire upper; assign upper = (count == 4&amp;#39;b1111); always @(posedge clk) begin if (reset) begin count = 4&amp;#39;b0000; end else if (!upper) begin count = count + 1; end end endmodule 模块的IO信号指的是直接写在模块定义中的信号，也就是：&#xA;module UpperCounter ( input wire clk, input wire reset, output reg [3:0] count ); 该部分中的clk，reset和count即IO信号，是可以暴露出来的。&#xA;而紧接着的&amp;quot;wire upper;&amp;ldquo;也就是内部信号，其值是由模块的输入和模块内部的行为共同决定的。&#xA;本案例的计数器逻辑相对简单，然而，对于规模较大的硬件模块，则存在以下痛点：&#xA;当模块最终的输出和预期不符，存在问题的代码范围较大，亟需快速缩小问题范围的手段，&#xA;模块内部逻辑复杂，理解存在困难，此时也需要一些内部标记理清模块的关键逻辑。</description>
     </item>
     <item>
       <title>多语言支持</title>

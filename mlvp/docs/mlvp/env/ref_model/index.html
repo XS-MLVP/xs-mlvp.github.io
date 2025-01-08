@@ -44,7 +44,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/ref_model/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-01-06T10:31:18+08:00" />
+<meta property="article:modified_time" content="2025-01-08T14:45:41+08:00" />
 <meta itemprop="name" content="如何编写参考模型">
 <meta itemprop="description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 toffee 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
 参考模型的两种实现方式 toffee 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。
@@ -57,7 +57,7 @@ class AdderRefModel(): def add(self, a, b): return a &#43; b 在这个参考模�
 独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。
 我们用一段代码来说明这种模式，该示例中用到了 toffee 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。
 class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&#34;a&#34;] &#43; operands[&#34;b&#34;] await self.">
-<meta itemprop="dateModified" content="2025-01-06T10:31:18+08:00" />
+<meta itemprop="dateModified" content="2025-01-08T14:45:41+08:00" />
 <meta itemprop="wordCount" content="451">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="如何编写参考模型"/>
 <meta name="twitter:description" content="参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 toffee 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。
@@ -170,7 +170,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b15649bcec55b0149487b8c8e79f3a73.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.dc426760681868af9ec99301a2d9e938.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -194,7 +194,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b15649bcec55b0149487b8c8e79f3a73.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.dc426760681868af9ec99301a2d9e938.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -241,6 +241,12 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
   <a href="/mlvp/docs/env_usage/multifile/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemultifile"><span class="">多文件输入</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagecoverage-li">
   <a href="/mlvp/docs/env_usage/coverage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagecoverage"><span class="">覆盖率统计</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemulticlock-li">
+  <a href="/mlvp/docs/env_usage/multiclock/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemulticlock"><span class="">多时钟</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemultiinstance-li">
+  <a href="/mlvp/docs/env_usage/multiinstance/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemultiinstance"><span class="">多实例</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usageinternalsignal-li">
+  <a href="/mlvp/docs/env_usage/internalsignal/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usageinternalsignal"><span class="">内部信号</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usageframeworks-li">
   <a href="/mlvp/docs/env_usage/frameworks/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usageframeworks"><span class="">集成测试框架</span></a>
   <ul class="ul-3 foldable">
@@ -384,16 +390,16 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Tag Cloud</h5>
       <ul class="taxonomy-terms">
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">26</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">20</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">29</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">23</span></a></li>
         </ul>
     </div>
   <div class="taxonomy taxonomy-terms-cloud taxo-categories">
       <h5 class="taxonomy-title">Categories</h5>
       <ul class="taxonomy-terms">
         <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99/" data-taxonomy-term="%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99"><span class="taxonomy-label">学习材料</span><span class="taxonomy-count">3</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">23</span></a></li>
-        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">20</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">26</span></a></li>
+        <li><a class="taxonomy-term" href="https://xs-mlvp.github.io/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">23</span></a></li>
         </ul>
     </div>
   
@@ -566,7 +572,7 @@ class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port
 <p>当参考模型中定义的 <code>DriverPort</code>, <code>AgentPort</code> 和 <code>MonitorPort</code> 能够与 <code>Env</code> 中所有接口匹配时，参考模型便能成功与 <code>Env</code> 建立匹配关系，此时可以直接通过 <code>Env</code> 中的 <code>attach</code> 方法将参考模型附加到 <code>Env</code> 上。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 January 6, 2025: <a href="https://github.com/XS-MLVP/course/commit/f5cdd550ad2a9e106b9206965166b848aefb8b93">remove duplicated codes (f5cdd55)</a>
+  最后修改 January 8, 2025: <a href="https://github.com/XS-MLVP/course/commit/283f2f6b1f3bfc9bdae8adf4268780a193185255">remove multiclock, multiinstance and internalsignal from draft status (283f2f6)</a>
 </div>
 
 </div>

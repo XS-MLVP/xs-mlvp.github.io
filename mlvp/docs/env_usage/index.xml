@@ -35,5 +35,26 @@
       <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/coverage/</guid>
       <description>Picker 工具支持生成代码行覆盖率报告，toffee-test（https://github.com/XS-MLVP/toffee-test） 项目支持生成功能覆盖率报告。&#xA;代码行覆盖率 目前 Picker 工具支持基于 Verilator 仿真器生成的代码行覆盖率报告。&#xA;Verilator Verilator 仿真器提供了覆盖率支持功能。&#xA;该功能的实现方式是：&#xA;利用 verilator_coverage 工具处理或合并覆盖率数据库，最终针对多个 DUT 生成一个 coverage.info 文件。 利用 lcov 工具的 genhtml 命令基于coverage.info和 RTL 代码源文件，生成完整的代码覆盖率报告。 使用时的流程如下：&#xA;使用 Picker 生成 dut 时，使能 COVERAGE 功能 （添加-c选项）。 仿真器运行完成后，dut.finalize() 之后会生成覆盖率数据库文件 V{DUT_NAME}.dat。 基于 verilator_coverage 的 write-info 功能将其转换成 .info文件。 基于 lcov 的 genhtml 功能，使用.info文件和文件中指定的rtl 源文件，生成 html 报告。 注意： 文件中指定的rtl 源文件是指在生成的DUT时使用的源文件路径，需要保证这些路径在当前环境下是有效的。简单来说，需要编译时用到的所有.sv/.v文件都需要在当前环境下存在，并且目录不变。&#xA;verilator_coverage verilator_coverage 工具用于处理 DUT 运行后生成的 .dat 的覆盖率数据。该工具可以处理并合并多个 .dat 文件，同时具有两类功能：&#xA;基于 .dat 文件生成 .info 文件，用于后续生成网页报告。</description>
     </item>
+    <item>
+      <title>多时钟</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/multiclock/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/multiclock/</guid>
+      <description>部分电路有多个时钟，XClock 类提供了分频功能，可以通过它实现对多时钟电路的驱动。&#xA;XClock 中的 FreqDivWith 接口 XClock 函数提供如下分频接口&#xA;void XClock::FreqDivWith(int div, // 分频数，，即绑定的XClock的频率为原时钟频率的div分之1 XClock &amp;amp;clk, // 绑定的XClock int shift=0) // 对波形进行 shift 个半周期的移位 XClock 的一般驱动流程 创建 XClock，绑定 DUT 的驱动函数 # 假设已经创建了DUT，并将其命名为dut # 创建XClock xclock = XClock(dut.dut.simStep) 绑定关联 clk 引脚 # clk是dut的时钟引脚 xclock.Add(dut.clk) # Add方法具有别名：AddPin 通过 XPort 绑定与 clk 关联的引脚 因为在我们的工具中，对于端口的读写是通过 xclock 来驱动的，所以如果不将与 clk 关联的引脚绑定到 XClock 上，那么在驱动时，相关的引脚数值不会发生变化。&#xA;比如，我们要进行复位操作，那么可以将 reset 绑定到 xclock 上。&#xA;方法：&#xA;class XClock: def Add(xport) #将Clock和XData进行绑定 举例：&#xA;# xclock.Add(dut.xport.Add(pin_name, XData)) xclock.</description>
+    </item>
+    <item>
+      <title>多实例</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/multiinstance/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/multiinstance/</guid>
+      <description>在Verilog中，一个module只有一个实例，但很多测试场景下需要实现多个module，为此picker提供了动态多实例和静态多实例的支持。&#xA;动态多实例 动态多实例相当于类的实例化，在创建dut的同时实例化对应的module，所以用户无感知。支持最大16个实例同时运行。&#xA;例子：&#xA;以Adder为例，我们可以在测试时根据需要在合适的位置创建多个dut，来动态创建多个Adder实例。 当需要销毁一个dut时，也不会影响后续创建新的dut。&#xA;创建一个名为 picker_out_adder 的文件夹，其中包含一个 Adder.v 文件。该文件的源码参考案例一：简单加法器。&#xA;运行下述命令将RTL导出为 Python Module：&#xA;picker export Adder.v --autobuild true -w Adder.fst --sname Adder 在picker_out_adder中添加 example.py，动态创建多个Adder实例：&#xA;from Adder import * import random def random_int(): return random.randint(-(2**127), 2**127 - 1) &amp;amp; ((1 &amp;lt;&amp;lt; 127) - 1) def main(): dut=[] # 可以通过创建多个dut，实例化多个Adder，理论上支持最大16个实例同时运行 for i in range(7): # 这里通过循环创建了7个dut dut.append(DUTAdder(waveform_filename=f&amp;#34;{i}.fst&amp;#34;)) for d in dut: d.a.value = random_int() d.b.value = random_int() d.cin.value = random_int() &amp;amp; 1 d.</description>
+    </item>
+    <item>
+      <title>内部信号</title>
+      <link>https://xs-mlvp.github.io/mlvp/docs/env_usage/internalsignal/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://xs-mlvp.github.io/mlvp/docs/env_usage/internalsignal/</guid>
+      <description>内部信号指的是不在模块的IO端口中暴露，但会在模块内部发挥控制、数据传输、状态跟踪功能的信号。一般来说，在picker将rtl转换成dut的过程中，只有IO端口才会被暴露，这些信号不会被主动暴露。&#xA;然而，当验证人员需要寻求对模块内部逻辑更精细的验证，或者需要根据已知的bug进一步定位问题时，就需要接触硬件模块内部的信号，此时除了使用verilator和VCS这些传统工具以外，也可以采用picker提供的内部信号提取机制作为辅助。&#xA;动机 以一个自带上限的计数器为例：&#xA;module UpperCounter ( input wire clk, input wire reset, output reg [3:0] count ); wire upper; assign upper = (count == 4&amp;#39;b1111); always @(posedge clk) begin if (reset) begin count = 4&amp;#39;b0000; end else if (!upper) begin count = count + 1; end end endmodule 模块的IO信号指的是直接写在模块定义中的信号，也就是：&#xA;module UpperCounter ( input wire clk, input wire reset, output reg [3:0] count ); 该部分中的clk，reset和count即IO信号，是可以暴露出来的。&#xA;而紧接着的&amp;quot;wire upper;&amp;ldquo;也就是内部信号，其值是由模块的输入和模块内部的行为共同决定的。&#xA;本案例的计数器逻辑相对简单，然而，对于规模较大的硬件模块，则存在以下痛点：&#xA;当模块最终的输出和预期不符，存在问题的代码范围较大，亟需快速缩小问题范围的手段，&#xA;模块内部逻辑复杂，理解存在困难，此时也需要一些内部标记理清模块的关键逻辑。</description>
+    </item>
   </channel>
 </rss>

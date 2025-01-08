@@ -17,20 +17,20 @@
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
 
-<title>案例二：随机数生成器 | 开放验证平台学习资源</title>
-<meta name="description" content="基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。">
-<meta property="og:title" content="案例二：随机数生成器" />
-<meta property="og:description" content="基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。" />
+<title>多时钟 | 开放验证平台学习资源</title>
+<meta name="description" content="多时钟示例">
+<meta property="og:title" content="多时钟" />
+<meta property="og:description" content="多时钟示例" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://xs-mlvp.github.io/mlvp/docs/env_usage/multiclock/" /><meta property="article:section" content="docs" />
 
 <meta property="article:modified_time" content="2025-01-08T14:45:41+08:00" />
-<meta itemprop="name" content="案例二：随机数生成器">
-<meta itemprop="description" content="基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。">
+<meta itemprop="name" content="多时钟">
+<meta itemprop="description" content="多时钟示例">
 <meta itemprop="dateModified" content="2025-01-08T14:45:41+08:00" />
-<meta itemprop="wordCount" content="367">
-<meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="案例二：随机数生成器"/>
-<meta name="twitter:description" content="基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。"/>
+<meta itemprop="wordCount" content="346">
+<meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="多时钟"/>
+<meta name="twitter:description" content="多时钟示例"/>
 <link rel="preload" href="/mlvp/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" as="style" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.5e43f8574351718e9b44966c9f3a571202ed048c082f457fb574c10b1a1bc56c.css" rel="stylesheet" integrity="sha256-XkP4V0NRcY6bRJZsnzpXEgLtBIwIL0V/tXTBCxobxWw=" crossorigin="anonymous">
 <script
@@ -115,7 +115,7 @@
         <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/mlvp/en/docs/quick-start/eg-rmg/">English</a></li>
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
     </ul>
 </div></li>
       </ul>
@@ -167,7 +167,7 @@
       <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/mlvp/en/docs/quick-start/eg-rmg/">English</a></li>
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
     </ul>
 </div>
     </div>
@@ -175,22 +175,22 @@
       <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocs-li">
   <a href="/mlvp/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-mlvpdocs"><span class="">学习资源</span></a>
   <ul class="ul-1">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsquick-start-li">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsquick-start-li">
   <a href="/mlvp/docs/quick-start/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsquick-start"><span class="">快速开始</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-startinstaller-li">
   <a href="/mlvp/docs/quick-start/installer/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startinstaller"><span class="">搭建验证环境</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-adder-li">
   <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：简单加法器</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsquick-starteg-rmg-li">
-  <a href="/mlvp/docs/quick-start/eg-rmg/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-rmg"><span class="td-sidebar-nav-active-item">案例二：随机数生成器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-rmg-li">
+  <a href="/mlvp/docs/quick-start/eg-rmg/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-rmg"><span class="">案例二：随机数生成器</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-callback-li">
   <a href="/mlvp/docs/quick-start/eg-stack-callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-callback"><span class="">案例三：双端口栈（回调）</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-async-li">
   <a href="/mlvp/docs/quick-start/eg-stack-async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-async"><span class="">案例四：双端口栈（协程）</span></a>
 </li>
   </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usage-li">
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsenv_usage-li">
   <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">基础工具</span></a>
   <ul class="ul-2 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagepicker_usage-li">
@@ -201,8 +201,8 @@
   <a href="/mlvp/docs/env_usage/multifile/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemultifile"><span class="">多文件输入</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagecoverage-li">
   <a href="/mlvp/docs/env_usage/coverage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagecoverage"><span class="">覆盖率统计</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemulticlock-li">
-  <a href="/mlvp/docs/env_usage/multiclock/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemulticlock"><span class="">多时钟</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsenv_usagemulticlock-li">
+  <a href="/mlvp/docs/env_usage/multiclock/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemulticlock"><span class="td-sidebar-nav-active-item">多时钟</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemultiinstance-li">
   <a href="/mlvp/docs/env_usage/multiinstance/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemultiinstance"><span class="">多实例</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usageinternalsignal-li">
@@ -312,26 +312,21 @@
           </aside>
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
             <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/quick-start/eg-rmg.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/quick-start/eg-rmg.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
-  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/quick-start?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e6%a1%88%e4%be%8b%e4%ba%8c%ef%bc%9a%e9%9a%8f%e6%9c%ba%e6%95%b0%e7%94%9f%e6%88%90%e5%99%a8" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/env_usage/multiclock.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/env_usage/multiclock.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/env_usage?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e5%a4%9a%e6%97%b6%e9%92%9f" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
   <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
-  <a id="print" href="/mlvp/docs/quick-start/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+  <a id="print" href="/mlvp/docs/env_usage/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
 </div>
 
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#rtl源码">RTL源码</a></li>
-    <li><a href="#测试过程">测试过程</a>
-      <ul>
-        <li><a href="#将rtl构建为-python-module">将RTL构建为 Python Module</a></li>
-        <li><a href="#配置测试代码">配置测试代码</a></li>
-        <li><a href="#运行测试程序">运行测试程序</a></li>
-      </ul>
-    </li>
+    <li><a href="#xclock-中的-freqdivwith-接口">XClock 中的 FreqDivWith 接口</a></li>
+    <li><a href="#xclock-的一般驱动流程">XClock 的一般驱动流程</a></li>
+    <li><a href="#多时钟案例">多时钟案例</a></li>
   </ul>
 </nav>
       </div>
@@ -363,15 +358,15 @@
   <li class="breadcrumb-item">
     <a href="/mlvp/docs/">学习资源</a></li>
   <li class="breadcrumb-item">
-    <a href="/mlvp/docs/quick-start/">快速开始</a></li>
+    <a href="/mlvp/docs/env_usage/">基础工具</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    案例二：随机数生成器</li>
+    多时钟</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>案例二：随机数生成器</h1>
-	<div class="lead">基于一个16bit的LFSR随机数生成器展示工具的用法，该随机数生成器内部存在时钟信号、时序逻辑与寄存器。</div>
+	<h1>多时钟</h1>
+	<div class="lead">多时钟示例</div>
 	<header class="article-meta">
 		<div class="taxonomy taxonomy-terms-article taxo-tags">
   <h5 class="taxonomy-title">Tags:</h5>
@@ -389,117 +384,137 @@
 </div>
 
   </header>
-	<h2 id="rtl源码">RTL源码</h2>
-<p>在本案例中，我们驱动一个随机数生成器，其源码如下：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">RandomGenerator</span> <span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">reset</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">15</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">seed</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">15</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">random_number</span>
+	<p>部分电路有多个时钟，XClock 类提供了分频功能，可以通过它实现对多时钟电路的驱动。</p>
+<h2 id="xclock-中的-freqdivwith-接口">XClock 中的 FreqDivWith 接口</h2>
+<p>XClock 函数提供如下分频接口</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">void</span> <span style="color:#000">XClock</span><span style="color:#ce5c00;font-weight:bold">::</span><span style="color:#000">FreqDivWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">div</span><span style="color:#000;font-weight:bold">,</span>   <span style="color:#8f5902;font-style:italic">// 分频数，，即绑定的XClock的频率为原时钟频率的div分之1
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>                     <span style="color:#000">XClock</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span>   <span style="color:#8f5902;font-style:italic">// 绑定的XClock
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>                     <span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">shift</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>   <span style="color:#8f5902;font-style:italic">// 对波形进行 shift 个半周期的移位
+</span></span></span></code></pre></div><h2 id="xclock-的一般驱动流程">XClock 的一般驱动流程</h2>
+<ol>
+<li>创建 XClock，绑定 DUT 的驱动函数</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 假设已经创建了DUT，并将其命名为dut</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 创建XClock</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">xclock</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">XClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">simStep</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><ol start="2">
+<li>绑定关联 clk 引脚</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># clk是dut的时钟引脚</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">xclock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">clk</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Add方法具有别名：AddPin</span>
+</span></span></code></pre></div><ol start="3">
+<li>通过 XPort 绑定与 clk 关联的引脚</li>
+</ol>
+<p>因为在我们的工具中，对于端口的读写是通过 xclock 来驱动的，所以如果不将与 clk 关联的引脚绑定到 XClock 上，那么在驱动时，相关的引脚数值不会发生变化。<br>
+比如，我们要进行复位操作，那么可以将 reset 绑定到 xclock 上。</p>
+<p>方法：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">XClock</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">xport</span><span style="color:#000;font-weight:bold">)</span>       <span style="color:#8f5902;font-style:italic">#将Clock和XData进行绑定</span>
+</span></span></code></pre></div><p>举例：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># xclock.Add(dut.xport.Add(pin_name, XData))</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">xclock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xport</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;reset&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">reset</span><span style="color:#000;font-weight:bold">))</span>
+</span></span></code></pre></div><hr>
+<p>在经过了前面的绑定之后，接下来可以使用了。<br>
+我们根据需要来设置回调、设置分频。当然，时序电路肯定也要驱动时钟。<br>
+这些方法都可以参照<a href="https://xs-mlvp.github.io/mlvp/docs/env_usage/picker_usage/#xclock-%E7%B1%BB">工具介绍</a>。</p>
+<p>下面是举例：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># func为回调函数，args为自定义参数</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#设置上升沿回调函数</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">StepRis</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">func</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">args</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">(),</span> <span style="color:#000">kwargs</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">{})</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#设置下降沿回调函数</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">StepFal</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">func</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">args</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">(),</span> <span style="color:#000">kwargs</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">{})</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 假设xclock是XClock的实例</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">xclock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">FreqDivWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">half_clock</span><span style="color:#000;font-weight:bold">)</span>           <span style="color:#8f5902;font-style:italic"># 将xclock的频率分频为原来的一半</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">xclock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">FreqDivWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">left_clock</span><span style="color:#a40000">，</span> <span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">)</span>      <span style="color:#8f5902;font-style:italic"># 将xclock的频率不变，对波形进行一个周期的左移</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">10</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">#推进10个时钟周期</span>
+</span></span></code></pre></div><h2 id="多时钟案例">多时钟案例</h2>
+<p>例如多时钟电路有 6 个 clock，每个 clock 都有一个对应的计数器，设计代码如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">multi_clock</span> <span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk2</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk3</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk4</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk5</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk6</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">31</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">reg1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">31</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">reg2</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">31</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">reg3</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">31</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">reg4</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">31</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">reg5</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">31</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">reg6</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">15</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk</span> <span style="color:#204a87;font-weight:bold">or</span> <span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">reset</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">reset</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">lfsr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">seed</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">end</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#204a87;font-weight:bold">begin</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">lfsr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">14</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">],</span> <span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">15</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">^</span> <span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">14</span><span style="color:#000;font-weight:bold">]};</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">initial</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg1</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">32</span><span style="color:#0000cf;font-weight:bold">&#39;b0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg2</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">32</span><span style="color:#0000cf;font-weight:bold">&#39;b0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg3</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">32</span><span style="color:#0000cf;font-weight:bold">&#39;b0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg4</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">32</span><span style="color:#0000cf;font-weight:bold">&#39;b0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg5</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">32</span><span style="color:#0000cf;font-weight:bold">&#39;b0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg6</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">32</span><span style="color:#0000cf;font-weight:bold">&#39;b0</span><span style="color:#000;font-weight:bold">;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">random_number</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">lfsr</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk1</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg1</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">reg1</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk2</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg2</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">reg2</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk3</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg3</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">reg3</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk4</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg4</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">reg4</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk5</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg5</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">reg5</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk6</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">reg6</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">reg6</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">endmodule</span>
-</span></span></code></pre></div><p>该随机数生成器包含一个 16 位的 LFSR，其输入为一个 16 位的种子数，输出为一个 16 位的随机数。LFSR 的更新规则为：</p>
-<ol>
-<li>将当前的 LFSR 的最高位与次高位异或，称为new_bit。</li>
-<li>将原来的 LFSR 向左平移一位，将 new_bit 放在最低位。</li>
-<li>丢弃最高位。</li>
-</ol>
-<h2 id="测试过程">测试过程</h2>
-<p>在测试过程中，我们将创建一个名为 RandomGenerator 的文件夹，其中包含一个 RandomGenerator.v 文件。该文件内容即为上述的 RTL 源码。</p>
-<h3 id="将rtl构建为-python-module">将RTL构建为 Python Module</h3>
-<h4 id="生成中间文件">生成中间文件</h4>
-<p>进入 RandomGenerator 文件夹，执行如下命令：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">false</span> RandomGenerator.v -w RandomGenerator.fst --sname RandomGenerator --tdir picker_out_rmg/ --lang python -e --sim verilator
-</span></span></code></pre></div><p>该命令的含义是：</p>
-<ol>
-<li>将RandomGenerator.v作为 Top 文件，并将RandomGenerator作为 Top Module，基于 verilator 仿真器生成动态库，生成目标语言为 Python。</li>
-<li>启用波形输出，目标波形文件为RandomGenerator.fst</li>
-<li>包含用于驱动示例项目的文件(-e)，同时codegen完成后不自动编译(-autobuild=false)。</li>
-<li>最终的文件输出路径是 picker_out_rmg</li>
-</ol>
-<p>输出的目录类似<a href="/mlvp/docs/quick-start/eg-adder/#生成中间文件">加法器验证-生成中间文件</a>，这里不再赘述。</p>
-<h4 id="构建中间文件">构建中间文件</h4>
-<p>进入 <code>picker_out_rmg</code> 目录并执行 make 命令，即可生成最终的文件。</p>
-<blockquote>
-<p>备注：其编译过程类似于 <a href="/mlvp/docs/quick-start/eg-adder/#构建中间文件">加法器验证-编译流程</a>，这里不再赘述。</p>
-</blockquote>
-<p>最终目录结果为：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>picker_out_rmg
-</span></span><span style="display:flex;"><span>└── RandomGenerator
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst <span style="color:#8f5902;font-style:italic"># 测试的波形文件</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>-- UT_RandomGenerator
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst.hier
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- _UT_RandomGenerator.so <span style="color:#8f5902;font-style:italic"># Swig生成的wrapper动态库</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- __init__.py  <span style="color:#8f5902;font-style:italic"># Python Module的初始化文件，也是库的定义文件</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libDPIRandomGenerator.a <span style="color:#8f5902;font-style:italic"># 仿真器生成的库文件</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#000;font-weight:bold">|</span>-- libUTRandomGenerator.so <span style="color:#8f5902;font-style:italic"># 基于dut_base生成的libDPI动态库封装</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- libUT_RandomGenerator.py <span style="color:#8f5902;font-style:italic"># Swig生成的Python Module</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">|</span>   <span style="color:#4e9a06">`</span>-- xspcomm  <span style="color:#8f5902;font-style:italic"># xspcomm基础库，固定文件夹，不需要关注</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">`</span>-- example.py <span style="color:#8f5902;font-style:italic"># 示例代码</span>
-</span></span></code></pre></div><h3 id="配置测试代码">配置测试代码</h3>
-<blockquote>
-<p>在picker_out_rmg中创建 <code>example.py</code>：</p>
-</blockquote>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">RandomGenerator</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
+</span></span></code></pre></div><p>可以通过如下 Python 进行多时钟驱动：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">MultiClock</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">xspcomm</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">XClock</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 定义参考模型</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">LFSR_16</span><span style="color:#000;font-weight:bold">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">seed</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">seed</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">((</span><span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span> <span style="color:#0000cf;font-weight:bold">16</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">new_bit</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">&gt;&gt;</span> <span style="color:#0000cf;font-weight:bold">15</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">^</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">&gt;&gt;</span> <span style="color:#0000cf;font-weight:bold">14</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#0000cf;font-weight:bold">1</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">((</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span> <span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">|</span> <span style="color:#000">new_bit</span> <span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">((</span><span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span> <span style="color:#0000cf;font-weight:bold">16</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_multi_clock</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 创建DUT</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTmulti_clock</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 创建主时钟</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">main_clock</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">XClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">simStep</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 创建子时钟</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">clk1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk3</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">XClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000">XClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000">XClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">clk4</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk5</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk6</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">XClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000">XClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#000">XClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 给子时钟添加相关的clock引脚及关联端口</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">clk1</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xport</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">SelectPins</span><span style="color:#000;font-weight:bold">([</span><span style="color:#4e9a06">&#34;reg1&#34;</span><span style="color:#000;font-weight:bold">]))</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">AddPin</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">clk1</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xdata</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">clk2</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xport</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">SelectPins</span><span style="color:#000;font-weight:bold">([</span><span style="color:#4e9a06">&#34;reg2&#34;</span><span style="color:#000;font-weight:bold">]))</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">AddPin</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">clk2</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xdata</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">clk3</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xport</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">SelectPins</span><span style="color:#000;font-weight:bold">([</span><span style="color:#4e9a06">&#34;reg3&#34;</span><span style="color:#000;font-weight:bold">]))</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">AddPin</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">clk3</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xdata</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">clk4</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xport</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">SelectPins</span><span style="color:#000;font-weight:bold">([</span><span style="color:#4e9a06">&#34;reg4&#34;</span><span style="color:#000;font-weight:bold">]))</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">AddPin</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">clk4</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xdata</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">clk5</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xport</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">SelectPins</span><span style="color:#000;font-weight:bold">([</span><span style="color:#4e9a06">&#34;reg5&#34;</span><span style="color:#000;font-weight:bold">]))</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">AddPin</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">clk5</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xdata</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">clk6</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xport</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">SelectPins</span><span style="color:#000;font-weight:bold">([</span><span style="color:#4e9a06">&#34;reg6&#34;</span><span style="color:#000;font-weight:bold">]))</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">AddPin</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">clk6</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">xdata</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 将主时钟频率分频到子时钟</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">main_clock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">FreqDivWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">main_clock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">FreqDivWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk2</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">main_clock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">FreqDivWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">main_clock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">FreqDivWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk4</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">main_clock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">FreqDivWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk5</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">main_clock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">FreqDivWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">clk6</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 驱动时钟</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">main_clock</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">100</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">__name__</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#4e9a06">&#34;__main__&#34;</span><span style="color:#000;font-weight:bold">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTRandomGenerator</span><span style="color:#000;font-weight:bold">()</span>            <span style="color:#8f5902;font-style:italic"># 创建DUT </span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">InitClock</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;clk&#34;</span><span style="color:#000;font-weight:bold">)</span>                  <span style="color:#8f5902;font-style:italic"># 指定时钟引脚，初始化时钟</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">seed</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">random</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">randint</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#0000cf;font-weight:bold">16</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>   <span style="color:#8f5902;font-style:italic"># 生成随机种子</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">seed</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">seed</span>                 <span style="color:#8f5902;font-style:italic"># 设置DUT种子</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">ref</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">LFSR_16</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">seed</span><span style="color:#000;font-weight:bold">)</span>                   <span style="color:#8f5902;font-style:italic"># 创建参考模型用于对比</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># reset DUT</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">reset</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>                   <span style="color:#8f5902;font-style:italic"># reset 信号置1</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">()</span>                            <span style="color:#8f5902;font-style:italic"># 推进一个时钟周期（DUTRandomGenerator是时序电路，需要通过Step推进）</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">reset</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span>                   <span style="color:#8f5902;font-style:italic"># reset 信号置0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">()</span>                            <span style="color:#8f5902;font-style:italic"># 推进一个时钟周期</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">i</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#204a87">range</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">65536</span><span style="color:#000;font-weight:bold">):</span>                <span style="color:#8f5902;font-style:italic"># 循环65536次</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">()</span>                        <span style="color:#8f5902;font-style:italic"># dut 推进一个时钟周期，生成随机数</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">ref</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">()</span>                        <span style="color:#8f5902;font-style:italic"># ref 推进一个时钟周期，生成随机数</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">random_number</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">ref</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Mismatch&#34;</span>  <span style="color:#8f5902;font-style:italic"># 对比DUT和参考模型生成的随机数</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#34;Cycle </span><span style="color:#4e9a06">{</span><span style="color:#000">i</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">, DUT: </span><span style="color:#4e9a06">{</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">random_number</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#4e9a06">:</span><span style="color:#4e9a06">x</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">, REF: </span><span style="color:#4e9a06">{</span><span style="color:#000">ref</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">state</span><span style="color:#4e9a06">:</span><span style="color:#4e9a06">x</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic"># 打印结果</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 完成测试</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Test Passed&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span>    <span style="color:#8f5902;font-style:italic"># Finish函数会完成波形、覆盖率等文件的写入</span>
-</span></span></code></pre></div><h3 id="运行测试程序">运行测试程序</h3>
-<p>在 <code>picker_out_rmg</code> 目录下执行 <code>python example.py</code> 即可运行测试程序。在运行完成后，若输出 <code>Test Passed</code>，则表示测试通过。完成运行后，会生成波形文件：RandomGenerator.fst，可在bash中通过以下命令进行查看。</p>
-<blockquote>
-<p>gtkwave RandomGenerator.fst</p>
-</blockquote>
-<p>输出示例：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>···
-</span></span><span style="display:flex;"><span>Cycle 65529, DUT: d9ea, REF: d9ea
-</span></span><span style="display:flex;"><span>Cycle 65530, DUT: b3d4, REF: b3d4
-</span></span><span style="display:flex;"><span>Cycle 65531, DUT: 67a9, REF: 67a9
-</span></span><span style="display:flex;"><span>Cycle 65532, DUT: cf53, REF: cf53
-</span></span><span style="display:flex;"><span>Cycle 65533, DUT: 9ea6, REF: 9ea6
-</span></span><span style="display:flex;"><span>Cycle 65534, DUT: 3d4d, REF: 3d4d
-</span></span><span style="display:flex;"><span>Cycle 65535, DUT: 7a9a, REF: 7a9a
-</span></span><span style="display:flex;"><span>Test Passed, destroy UT_RandomGenerator
-</span></span></code></pre></div>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">test_multi_clock</span><span style="color:#000;font-weight:bold">()</span>
+</span></span></code></pre></div><p>上述代码输出的波形如下：</p>
+<p><img alt="multi_clock" src="multiclock.png"></p>
+<p>可以看到：</p>
+<ul>
+<li>clk2 的周期是 clk1 的 2 倍</li>
+<li>clk3 的周期是 clk1 的 3 倍，</li>
+<li>clk4 的周期和 clk1 相同，但是进行了半个周期的右移</li>
+<li>clk5 的周期和 clk2 相同，但是进行了半个周期的左移</li>
+<li>clk6 的周期和 clk3 相同，但是进行了一个周期的左移</li>
+</ul>
+
 	<div class="td-page-meta__lastmod">
   最后修改 January 8, 2025: <a href="https://github.com/XS-MLVP/course/commit/283f2f6b1f3bfc9bdae8adf4268780a193185255">remove multiclock, multiinstance and internalsignal from draft status (283f2f6)</a>
 </div>
