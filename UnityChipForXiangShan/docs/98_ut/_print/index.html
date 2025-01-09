@@ -129,7 +129,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.32010ff8b939e68d3adb110ce1fe31ce.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.bb4b5670aaffa190827cc94264f700fc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -363,6 +363,7 @@
 	<h1 id="pg-29667896f8d34faad3302168726a92b6">1.1 - IFU</h1>
     
 	<h1 id="ifu简介"><strong>IFU简介</strong></h1>
+<div class="ifu-ctx">
 <p>IFU(Instruction Fetch Unit)，取指令单元，负责从内存或ICache取出指令，经过预译码、扩展RVC和预检之后，将指令交给后续译码器进行进一步的译码。</p>
 <p>IFU的子模块包括PreDecode，F3PreDecoder，RVCExpander，PredChecker和FrontendTrigger。</p>
 <p>以下是IFU的架构简图：</p>
@@ -483,6 +484,410 @@ m_waitLastCmt，之后只要之前所有的指令都已完成提交——或者�
 <p>对于跨缓存行预测块，他们的mmio和pbmt状态应当等同。不匹配的错误应当只在后一个缓存行报告。</p>
 <h3 id="trigger实现对于pc的硬件断点功能">Trigger实现对于PC的硬件断点功能</h3>
 <p>该工作主要由FrontEndTrigger子模块完成。</p>
+<h2 id="ifu接口说明">IFU接口说明</h2>
+<p>为方便测试开展，需要对IFU的接口进行进一步的说明，以明确各个接口的含义。</p>
+<h3 id="ftq交互接口">FTQ交互接口</h3>
+<p>编译后可用的接口包括：</p>
+<h4 id="req-ftq取指请求">req FTQ取指请求</h4>
+<p>req是FTQ向IFU的取指令请求，编译后包含以下成员：</p>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ftqIdx</td>
+<td>指示当前预测块在FTQ中的位置。</td>
+</tr>
+<tr>
+<td>ftqOffset</td>
+<td>指示预测的跳转指令在预测块中的位置。如果valid为假表示这个预测块没有预测跳转指令。</td>
+</tr>
+<tr>
+<td>startAddr</td>
+<td>当前预测块的起始地址。</td>
+</tr>
+<tr>
+<td>nextlineStart</td>
+<td>起始地址所在cacheline的下一个cacheline的开始地址。</td>
+</tr>
+<tr>
+<td>nextStartAddr</td>
+<td>下一个预测块的起始地址</td>
+</tr>
+</tbody>
+</table>
+<h4 id="redirect-ftq重定向请求">redirect FTQ重定向请求</h4>
+<p>FTQ会向IFU发送重定向请求，这通过fromFtq.redirect完成，从而指示IFU应该冲刷的内容。</p>
+<p>编译后，redirect包含以下接口成员：</p>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ftqIdx</td>
+<td>需要冲刷的ftq预测块序号，包含flag和value两个量。</td>
+</tr>
+<tr>
+<td>level</td>
+<td>重定向等级</td>
+</tr>
+<tr>
+<td>ftq_offset</td>
+<td>ftq预测块中跳转指令的位置</td>
+</tr>
+</tbody>
+</table>
+<h4 id="toftq_pdwb-写回">toFtq_pdWb 写回</h4>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cfioffset</td>
+<td>经由PredChecker修复的跳转指令的预测位置。但经过编译后，cfioffset的数值已经被优化了，只剩下了cfioffset_valid表示是否存在编译优化。</td>
+</tr>
+<tr>
+<td>ftqIdx</td>
+<td>表明预测块在FTQ中的位置，这条信息主要是对FTQ有用，要和FTQ传入的请求保持一致。</td>
+</tr>
+<tr>
+<td>instrRange</td>
+<td>可以看作是一个bool数组，表示该条指令是不是在这个预测块的有效指令范围内（第一条有效跳转指令之后的指令）。</td>
+</tr>
+<tr>
+<td>jalTarget</td>
+<td>表明该预测块跳转指令的跳转目标。</td>
+</tr>
+<tr>
+<td>misOffset</td>
+<td>表明错误预测的指令在预测块中的位置。</td>
+</tr>
+<tr>
+<td>pc</td>
+<td>预测块中所有指令的PC指针。</td>
+</tr>
+<tr>
+<td>pd</td>
+<td>每条指令的预测信息，包括CFI指令的类型、isCall、isRet和isRVC。</td>
+</tr>
+<tr>
+<td>target</td>
+<td>该预测块最后一条指令的下一条指令的pc。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="icache交互接口">ICache交互接口</h3>
+<h4 id="控制信号">控制信号</h4>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>icache_ready</td>
+<td>ICache通知IFU自己已经准备好了，可以发送缓存行了。</td>
+</tr>
+<tr>
+<td>icache_stop</td>
+<td>IFU在F3流水级之前出现了问题，通知ICache停下。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="icacheinterresp-icache传送给ifu的信息">ICacheInter.resp ICache传送给IFU的信息</h4>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td>ICache传送的缓存行。</td>
+</tr>
+<tr>
+<td>doubleLine</td>
+<td>指示ICache传来的预测块是否跨缓存行。</td>
+</tr>
+<tr>
+<td>exception</td>
+<td>ICache向IFU报告每个缓存行上的异常情况，方便ICache生成每个指令的异常向量。</td>
+</tr>
+<tr>
+<td>backendException</td>
+<td>ICache向IFU报告后端是否存在异常</td>
+</tr>
+<tr>
+<td>gpaddr</td>
+<td>客户页地址</td>
+</tr>
+<tr>
+<td>isForVSnonLeafPTE</td>
+<td>是否为非叶的PTE，这个数据最终会流向写回gpaddrMem的信号</td>
+</tr>
+<tr>
+<td>itlb_pbmt</td>
+<td>ITLB基于客户页的内存类型，对MMIO状态有用</td>
+</tr>
+<tr>
+<td>paddr</td>
+<td>指令块的起始物理地址</td>
+</tr>
+<tr>
+<td>vaddr</td>
+<td>指令块起始虚拟地址、指令块起始物理地址</td>
+</tr>
+<tr>
+<td>pmp_mmio</td>
+<td>指示当前指令块是否在MMIO空间</td>
+</tr>
+</tbody>
+</table>
+<h3 id="性能相关接口">性能相关接口</h3>
+<p>ICachePerf和perf，可以先不关注。</p>
+<h3 id="itlbinter">ITLBInter</h3>
+<p>该接口仅在MMIO状态下，IFU重发请求时活跃。</p>
+<h4 id="req-ifu向itlb发送的请求">req IFU向ITLB发送的请求</h4>
+<p>这是IFU向ITLB发送的查询请求，只有一个量：bits_vaddr，传递需要让ITLB查询的虚拟地址。</p>
+<h4 id="resp-itlb返回给ifu的查询结果">resp ITLB返回给IFU的查询结果</h4>
+<p>这是ITLB返回给IFU的查询结果，包含如下接口：</p>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>excp</td>
+<td>指令的异常信息，包含三个量：访问异常指令af_instr、客户页错误指令gpf_instr、页错误指令pf_instr</td>
+</tr>
+<tr>
+<td>gpaddr</td>
+<td>客户页地址</td>
+</tr>
+<tr>
+<td>isForVSnonLeafPTE</td>
+<td>指示传入的是否是非叶PTE</td>
+</tr>
+<tr>
+<td>paddr</td>
+<td>指令物理地址</td>
+</tr>
+<tr>
+<td>pbmt</td>
+<td>指令的基于页的内存类型</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uncacheinter">UncacheInter</h3>
+<p>该接口在MMIO状态下活跃，负责接收IFU并返回指令码。</p>
+<h4 id="touncache">toUncache</h4>
+<p>这是IFU向Uncache发送的请求，除了ready和valid以外，还传送了一个48位数据，即需要获取的指令的物理地址。</p>
+<h4 id="fromuncache">fromUncache</h4>
+<p>这是Uncache给IFU的回复，除了valid以外，还传送一个32位数据，即指令码（可为RVC或RVI指令）</p>
+<h3 id="toibuffer">toIbuffer</h3>
+<p>IFU通过这个接口向Ibuffer写入取指结果。包含以下成员:</p>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>backendException</td>
+<td>是否存在后端异常</td>
+</tr>
+<tr>
+<td>crossPageIPFFix</td>
+<td>表示跨页异常向量</td>
+</tr>
+<tr>
+<td>valid</td>
+<td>和一般意义上的valid相区别，表示每条指令是否是合法指令的开始（RVI指令的上半条或者RVC指令）</td>
+</tr>
+<tr>
+<td>enqable</td>
+<td>对每条指令，其为valid并且在预测块的范围内</td>
+</tr>
+<tr>
+<td>exceptionType</td>
+<td>每个指令的异常类型</td>
+</tr>
+<tr>
+<td>foldpc</td>
+<td>压缩过后的pc</td>
+</tr>
+<tr>
+<td>ftqOffset</td>
+<td>是否是ftq指令</td>
+</tr>
+<tr>
+<td>ftqPtr</td>
+<td>ftq预测块在FTQ的位置</td>
+</tr>
+<tr>
+<td>illegalInstr</td>
+<td>这条指令是否为非法指令</td>
+</tr>
+<tr>
+<td>instrs</td>
+<td>拼接后的指令码</td>
+</tr>
+<tr>
+<td>isLastInFtqEntry</td>
+<td>判断该指令是否为这个预测块中最后一条有效指令的开始</td>
+</tr>
+<tr>
+<td>pd</td>
+<td>指令控制信息，包括CFI指令的类型和RVC指令的判定</td>
+</tr>
+<tr>
+<td>triggered</td>
+<td>指令是否触发前端的trigger</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tobackend_gpaddrmem">toBackend_gpaddrMem</h3>
+<p>这组接口在gpfault发生时使用，由IFU向gpaddrMem传递预测块指针和页错误地址。</p>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>waddr</td>
+<td>传递ftq指针</td>
+</tr>
+<tr>
+<td>wdata.gpaddr</td>
+<td>传递出错的客户页地址</td>
+</tr>
+<tr>
+<td>wdata.isForVSnonLeafPTE</td>
+<td>指示是否为非叶PTE</td>
+</tr>
+<tr>
+<td>wen</td>
+<td>类似valid，指示gpaddrMem存在gpfault需要处理</td>
+</tr>
+</tbody>
+</table>
+<h3 id="io_csr_fsisoff">io_csr_fsIsOff</h3>
+<p>指示是否使能了fs.CSR，对非法指令的判断很关键。</p>
+<h3 id="rob_commits-来自rob的提交信息">rob_commits 来自ROB的提交信息</h3>
+<p>共分为8个相同结构的rob_commit，包含以下成员</p>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ftqIdx</td>
+<td>预测块指针</td>
+</tr>
+<tr>
+<td>ftqOffset</td>
+<td>预测指令的位置，共4位，是一个数字</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pmp">pmp</h3>
+<p>和物理内存保护相关，在mmio状态下重发请求时使用。</p>
+<h4 id="req">req</h4>
+<p>IFU向pmp发起的请求，传递前一步从ITLB查询得到的物理地址。</p>
+<h4 id="resp">resp</h4>
+<p>PMP给IFU的回复结果，包含以下成员</p>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mmio</td>
+<td>在MMIO空间</td>
+</tr>
+<tr>
+<td>instr</td>
+<td>对指令的判断结果，当指令不可执行时，该值为true</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mmio_commits">mmio_commits</h3>
+<h4 id="mmioftqptr">mmioFtqPtr</h4>
+<p>IFU传递给FTQ的idx，用于查询上一个预测块的MMIO状态</p>
+<h4 id="mmiolastcommit">mmioLastCommit</h4>
+<p>上一个请求是MMIO请求</p>
+<h3 id="frontendtrigger">frontendTrigger</h3>
+<p>用于设置前端断点</p>
+<p>包含以下成员：</p>
+<h4 id="debugmode">debugMode</h4>
+<p>debug的模式</p>
+<h4 id="triggercanraisebpexp">triggerCanRaiseBpExp</h4>
+<p>trigger是否可以引起断点异常</p>
+<h4 id="tenablevec">tEnableVec</h4>
+<p>信号数组，表示是否使能对应的trigger</p>
+<h4 id="tupdate">tupdate</h4>
+<p>表示更新的断点信息，其中包含tdata和addr，addr是请求设置的断点idx。</p>
+<p>tdata包括下列成员：</p>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>matchType</td>
+<td>断点匹配类型，等于、大于、小于</td>
+</tr>
+<tr>
+<td>action</td>
+<td>触发执行的动作</td>
+</tr>
+<tr>
+<td>tdata2</td>
+<td>触发端点的基准数值</td>
+</tr>
+<tr>
+<td>select</td>
+<td>是否选择</td>
+</tr>
+<tr>
+<td>chain</td>
+<td>是否传导</td>
+</tr>
+</tbody>
+</table>
 <h2 id="ifu功能点和测试点">IFU功能点和测试点</h2>
 <h3 id="功能点1-接收ftq预测块请求">功能点1 接收FTQ预测块请求</h3>
 <h4 id="功能点11-f0流水级接收请求">功能点1.1 F0流水级接收请求</h4>
@@ -795,7 +1200,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </table>
 <h4 id="功能点72-客户页错误传送gpaddr信息">功能点7.2 客户页错误传送gpaddr信息</h4>
 <p>当且仅当发生guest page fault时，后端需要gpaddr信息，为了节省面积，gpaddr不走正常通路进入ibuffer，
-而是随ftqPtr被发送到gpaMem，后端需要时从gpaMem读出。IFU需要保证gpf发生时通向gpaMem的valid拉高、gpaddr正确。</p>
+而是随ftqPtr被发送到gpaMem，后端需要时从gpaMem读出。IFU需要保证gpf发生时通向gpaMem的valid拉高、gpaddr正确，同时还要传递预测块的ftqIdx（通过waddr传入）。</p>
 <p>这里我们只需要确保在客户页错误发生时通向gpaMem的valid为高，且gpaddr正确填入。</p>
 <table>
 <thead>
@@ -1080,7 +1485,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tbody>
 </table>
 <h4 id="功能点11-硬件断点">功能点11 硬件断点</h4>
-<p>该功能主要由FrontEndTrigger子模块完成。不需要为这一功能额外设置测试点</p>
+<p>该功能主要由FrontEndTrigger子模块完成。不需要为这一功能额外设置测试点（参照FrontendTrigger的测试点即可）</p>
 <h4 id="a-idifu_functions测试点汇总-a"><strong><a id="ifu_functions">测试点汇总 </a></strong></h4>
 <table>
 <thead>
@@ -1398,9 +1803,51 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <td>RVC指令重定向</td>
 <td>如果是RVC指令，传递给FTQ的冲刷请求应该重定向到PC+2</td>
 </tr>
+<tr>
+<td>11.1.1</td>
+<td>断点设置和检查</td>
+<td>select1判定</td>
+<td>给定tdata1的select位为1，随机构造其它输入，检查断点是否没有触发</td>
+</tr>
+<tr>
+<td>11.1.2.1</td>
+<td>断点设置和检查</td>
+<td>select0关系匹配判定</td>
+<td>给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位匹配的输入，检查断点是否触发</td>
+</tr>
+<tr>
+<td>11.1.2.2</td>
+<td>断点设置和检查</td>
+<td>select0关系不匹配判定</td>
+<td>给定tdata1的select位为0，构造PC与tdata2数据的关系同tdata2的match位不匹配的输入，检查断点是否触发</td>
+</tr>
+<tr>
+<td>11.2.1</td>
+<td>链式断点</td>
+<td>chain位测试</td>
+<td>对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发</td>
+</tr>
+<tr>
+<td>11.2.2</td>
+<td>链式断点</td>
+<td>timing测试</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发</td>
+</tr>
+<tr>
+<td>11.2.3.1</td>
+<td>链式断点</td>
+<td>未命中测试</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发</td>
+</tr>
+<tr>
+<td>11.2.3.2</td>
+<td>链式断点</td>
+<td>命中测试</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发</td>
+</tr>
 </tbody>
 </table>
-
+</div>
 </div>
 
 
