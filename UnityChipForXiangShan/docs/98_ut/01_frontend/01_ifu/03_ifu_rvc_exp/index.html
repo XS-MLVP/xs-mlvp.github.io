@@ -50,7 +50,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-01-17T17:21:15+08:00" />
+<meta property="article:modified_time" content="2025-01-18T16:42:12+08:00" />
 <meta itemprop="name" content="RVCExpander">
 <meta itemprop="description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
@@ -66,7 +66,7 @@
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
 序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。
 对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)">
-<meta itemprop="dateModified" content="2025-01-17T17:21:15+08:00" />
+<meta itemprop="dateModified" content="2025-01-18T16:42:12+08:00" />
 <meta itemprop="wordCount" content="908">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RVCExpander"/>
 <meta name="twitter:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
@@ -844,7 +844,7 @@ imm[12|10:5]rs2rs1001imm[4:1|11]1100011BNE</p>
 <p>RVI的SD格式形如：| imm[11:5]| rs2 | rs1 | 011 | imm[4:0] | 0100111 |</p>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 January 17, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/cddb17b0084e40f898880a1bbc63890bdfaf69f8">Fix: Fail to pass `Check changed files` step of PR-CHECK workflow (cddb17b)</a>
+  最后修改 January 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/3754c85810ec6d629b0610457aca6ed57780915c">Update self-hosted-ci-pr-checker.yaml (3754c85)</a>
 </div>
 
 </div>
