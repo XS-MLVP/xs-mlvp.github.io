@@ -133,7 +133,7 @@ DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.168605d5428ad9634e7d4efe36e2868e.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.3e4e7d9143d6f9255f1d2412c6a0d90d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -2481,6 +2481,34 @@ Please also list any relevant details for your test configuration</p>
 </span></span><span style="display:flex;"><span><span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">comm</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">module_name_with</span><span style="color:#000;font-weight:bold">([</span><span style="color:#4e9a06">&#34;X&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Y&#34;</span><span style="color:#000;font-weight:bold">],</span> <span style="color:#000;font-weight:bold">,</span><span style="color:#4e9a06">&#34;../../x&#34;</span><span style="color:#000;font-weight:bold">))</span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># out</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;a.b.c.x.X&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;a.b.c.x.Y&#34;</span><span style="color:#000;font-weight:bold">]</span>
+</span></span></code></pre></div><h4 id="get_all_rtl_filestop_module-cfg"><code>get_all_rtl_files(top_module, cfg)</code></h4>
+<p>获取名称为 <code>top_module</code> 的模块所依赖的所有 RTL 文件（<code>.v</code> 或 <code>.sv</code>）的列表，并确保列表的第一个元素是 <code>top_module</code> 所在文件的绝对路径。所有 RTL 文件均位于 <code>UnityChipForXiangShan/rtl/rtl</code> 目录下。</p>
+<ul>
+<li>
+<p>输入：</p>
+<ul>
+<li><code>top_module</code>：模块名称，类型为 <code>str</code>。</li>
+<li><code>cfg</code>：配置信息，类型为 <code>CfgObject</code>。</li>
+</ul>
+</li>
+<li>
+<p>输出：</p>
+<ul>
+<li>返回一个包含字符串的列表，列表中的每个字符串为模块依赖的 RTL 文件的绝对路径。列表的第一个元素为 <code>top_module</code> 所在文件的路径。</li>
+</ul>
+</li>
+</ul>
+<p>假设 <code>top_module</code> 为 <code>&quot;ALU&quot;</code>，且其依赖的 RTL 文件包括 <code>ALU.sv</code>、<code>adder.v</code> 和 <code>multiplier.v</code>：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">paths</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_all_rtl_files</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;ALU&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cfg</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#4e9a06">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">paths可能的内容：
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">[
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    &#34;/path/to/UnityChipForXiangShan/rtl/rtl/ALU.sv&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    &#34;/path/to/UnityChipForXiangShan/rtl/rtl/adder.v&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">    &#34;/path/to/UnityChipForXiangShan/rtl/rtl/multiplier.v&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">]
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">&#34;&#34;&#34;</span>
 </span></span></code></pre></div>
 </div>
 
