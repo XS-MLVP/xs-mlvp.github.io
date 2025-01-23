@@ -66,7 +66,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-01-21T09:41:14+08:00" />
+<meta property="article:modified_time" content="2025-01-23T15:15:37+08:00" />
 <meta itemprop="name" content="PreDecode">
 <meta itemprop="description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
 所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
@@ -90,7 +90,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 预译码器接受来自IFU完成指令切分的17 × 2字节的初始指令码，并以4字节为窗口，2字节为步进长度， 从第1个2字节开始，直到第16个2字节，选出总共16个4字节的指令码。 预译码信息生成
 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 预译码器从IFU接收完成指令切分的17 x 2 字节的初始指令码，以4字节为窗口，2字节为步进长度，选出16 x 4字节的指令码">
-<meta itemprop="dateModified" content="2025-01-21T09:41:14+08:00" />
+<meta itemprop="dateModified" content="2025-01-23T15:15:37+08:00" />
 <meta itemprop="wordCount" content="164">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PreDecode"/>
 <meta name="twitter:description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
@@ -216,7 +216,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.255f5921707c5d29b0601c67280c8cc7.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70fd00f5f14fa495619c7af18bde45c9.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -240,7 +240,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.255f5921707c5d29b0601c67280c8cc7.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70fd00f5f14fa495619c7af18bde45c9.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -663,7 +663,7 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 January 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/2f2073ab1f56cc01fed1da01d6ddc6ed52880693">[New Feature] fix decode PIN for latest RTL, sub make command etc. (#39) (2f2073a)</a>
+  最后修改 January 23, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/685a1743e09c2bc5f025c263fc884102cb74936b">Refine DUT build: make DUT build only for changed modules in PR (#42) (685a174)</a>
 </div>
 
 </div>
