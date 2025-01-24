@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>验证案例 on 开放验证平台学习资源</title>
-    <link>https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/</link>
+    <link>https://open-verify.cc/mlvp/docs/multi-lang/examples/</link>
     <description>Recent content in 验证案例 on 开放验证平台学习资源</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <atom:link href="https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://open-verify.cc/mlvp/docs/multi-lang/examples/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>加法器</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/adder/</link>
+      <link>https://open-verify.cc/mlvp/docs/multi-lang/examples/adder/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/adder/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/multi-lang/examples/adder/</guid>
       <description>以Adder为例，各语言的验证代码和注释如下：&#xA;Cpp Java Scala Python Go #include &#34;UT_Adder.hpp&#34; int64_t random_int64() { static std::random_device rd; static std::mt19937_64 generator(rd()); static std::uniform_int_distribution distribution(INT64_MIN, INT64_MAX); return distribution(generator); } int main() { UTAdder *dut = new UTAdder(); dut-&gt;Step(1); printf(&#34;Initialized UTAdder\n&#34;); struct input_t { uint64_t a; uint64_t b; uint64_t cin; }; struct output_t { uint64_t sum; uint64_t cout; }; for (int c = 0; c &lt; 114514; c++) { input_t i; output_t o_dut, o_ref; i.a = random_int64(); i.</description>
     </item>
     <item>
       <title>CoupledL2</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/coupledl2/</link>
+      <link>https://open-verify.cc/mlvp/docs/multi-lang/examples/coupledl2/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/multi-lang/examples/coupledl2/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/multi-lang/examples/coupledl2/</guid>
       <description>CoupledL2是一个非阻塞的L2 Cache。&#xA;下面的代码会对CoupledL2进行简单的验证，并使用数组作为参考模型，验证过程如下：&#xA;生成随机的地址addr、执行AcquireBlock，请求读取addr的数据。 执行GrantData，接收DUT响应的数据。 把接收到的数据和参考模型的内容进行比较，验证行为是否一致。 执行GrantAck，响应DUT。 执行ReleaseData，向DUT请求在addr写入随机数据data。 同步参考模型，把addr的数据更新为data。 执行ReleaseAck，接收DUT的写入响应。 上述步骤会重复4000次。&#xA;验证代码：&#xA;Cpp Java Python #include &#34;UT_CoupledL2.hpp&#34; using TLDataArray = std::array; enum class OpcodeA : uint32_t { PutFullData = 0x0, PutPartialData = 0x1, ArithmeticData = 0x2, LogicalData = 0x3, Get = 0x4, Hint = 0x5, AcquireBlock = 0x6, AcquirePerm = 0x7, }; enum class OpcodeB : uint32_t { ProbeBlock = 0x6, ProbePerm = 0x7 }; enum class OpcodeC : uint32_t { ProbeAck = 0x4, ProbeAckData = 0x5, Release = 0x6, ReleaseData = 0x7 }; enum class OpcodeD : uint32_t { AccessAck, AccessAckData, HintAck, Grant = 0x4, GrantData = 0x5, ReleaseAck = 0x6 }; enum class OpcodeE : uint32_t { GrantAck = 0x4 }; constexpr std::initializer_list ARGS = {&#34;</description>
     </item>
   </channel>

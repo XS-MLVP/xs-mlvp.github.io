@@ -2,44 +2,44 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>快速开始 on 开放验证平台学习资源</title>
-    <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/</link>
+    <link>https://open-verify.cc/mlvp/docs/quick-start/</link>
     <description>Recent content in 快速开始 on 开放验证平台学习资源</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <atom:link href="https://xs-mlvp.github.io/mlvp/docs/quick-start/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://open-verify.cc/mlvp/docs/quick-start/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>搭建验证环境</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/installer/</link>
+      <link>https://open-verify.cc/mlvp/docs/quick-start/installer/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/installer/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/quick-start/installer/</guid>
       <description>源码安装Picker工具 依赖安装 cmake ( &amp;gt;=3.11 ) gcc ( 支持c++20,至少为gcc版本10, 建议11及以上 ) python3 ( &amp;gt;=3.8 ) verilator ( &amp;gt;=4.218 ) verible-verilog-format ( &amp;gt;=0.0-3428-gcfcbb82b ) swig ( &amp;gt;=4.2.0, 用于多语言支持 ) 请注意，请确保verible-verilog-format等工具的路径已经添加到环境变量$PATH中，可以直接命令行调用。&#xA;下载源码 git clone https://github.com/XS-MLVP/picker.git --depth=1 cd picker make init 构建并安装 cd picker make # 可通过 make BUILD_XSPCOMM_SWIG=python,java,scala,golang 开启其他语言支持。 # 各语言需要自己的开发环境，需要自行配置，例如javac等 sudo -E make install 默认的安装的目标路径是 /usr/local， 二进制文件被置于 /usr/local/bin，模板文件被置于 /usr/local/share/picker。 如果需要修改安装目录，可以通过指定ARGS给cmake传递参数，例如make ARGS=&amp;quot;-DCMAKE_INSTALL_PREFIX=your_instal_dir&amp;quot; 安装时会自动安装 xspcomm基础库（https://github.com/XS-MLVP/xcomm），该基础库是用于封装 RTL 模块的基础类型，位于 /usr/local/lib/libxspcomm.so。 可能需要手动设置编译时的链接目录参数(-L)&#xA;如果开启了Java等语言支持，还会安装 xspcomm 对应的多语言软件包。&#xA;picker也可以编译为wheel文件，通过pip安装</description>
     </item>
     <item>
       <title>案例一：简单加法器</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-adder/</link>
+      <link>https://open-verify.cc/mlvp/docs/quick-start/eg-adder/</link>
       <pubDate>Thu, 05 Jan 2017 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-adder/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/quick-start/eg-adder/</guid>
       <description>RTL源码 在本案例中，我们驱动一个 64 位的加法器（组合电路），其源码如下：&#xA;// A verilog 64-bit full adder with carry in and carry out module Adder #( parameter WIDTH = 64 ) ( input [WIDTH-1:0] a, input [WIDTH-1:0] b, input cin, output [WIDTH-1:0] sum, output cout ); assign {cout, sum} = a + b + cin; endmodule 该加法器包含一个 64 位的加法器，其输入为两个 64 位的数和一个进位信号，输出为一个 64 位的和和一个进位信号。&#xA;测试过程 在测试过程中，我们将创建一个名为 Adder 的文件夹，其中包含一个 Adder.v 文件。该文件内容即为上述的 RTL 源码。&#xA;将RTL导出为 Python Module 生成中间文件 进入 Adder 文件夹，执行如下命令：</description>
     </item>
     <item>
       <title>案例二：随机数生成器</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/</link>
+      <link>https://open-verify.cc/mlvp/docs/quick-start/eg-rmg/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-rmg/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/quick-start/eg-rmg/</guid>
       <description>RTL源码 在本案例中，我们驱动一个随机数生成器，其源码如下：&#xA;module RandomGenerator ( input wire clk, input wire reset, input [15:0] seed, output [15:0] random_number ); reg [15:0] lfsr; always @(posedge clk or posedge reset) begin if (reset) begin lfsr &amp;lt;= seed; end else begin lfsr &amp;lt;= {lfsr[14:0], lfsr[15] ^ lfsr[14]}; end end assign random_number = lfsr; endmodule 该随机数生成器包含一个 16 位的 LFSR，其输入为一个 16 位的种子数，输出为一个 16 位的随机数。LFSR 的更新规则为：&#xA;将当前的 LFSR 的最高位与次高位异或，称为new_bit。 将原来的 LFSR 向左平移一位，将 new_bit 放在最低位。 丢弃最高位。 测试过程 在测试过程中，我们将创建一个名为 RandomGenerator 的文件夹，其中包含一个 RandomGenerator.</description>
     </item>
     <item>
       <title>案例三：双端口栈（回调）</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-callback/</link>
+      <link>https://open-verify.cc/mlvp/docs/quick-start/eg-stack-callback/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-callback/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/quick-start/eg-stack-callback/</guid>
       <description>双端口栈简介 双端口栈是一种数据结构，支持两个端口同时进行操作。与传统单端口栈相比，双端口栈允许同时进行数据的读写操作，在例如多线程并发读写等场景下，双端口栈能够提供更好的性能。本例中，我们提供了一个简易的双端口栈实现，其源码如下：&#xA;module dual_port_stack ( input clk, input rst, // Interface 0 input in0_valid, output in0_ready, input [7:0] in0_data, input [1:0] in0_cmd, output out0_valid, input out0_ready, output [7:0] out0_data, output [1:0] out0_cmd, // Interface 1 input in1_valid, output in1_ready, input [7:0] in1_data, input [1:0] in1_cmd, output out1_valid, input out1_ready, output [7:0] out1_data, output [1:0] out1_cmd ); // Command definitions localparam CMD_PUSH = 2&amp;#39;b00; localparam CMD_POP = 2&amp;#39;b01; localparam CMD_PUSH_OKAY = 2&amp;#39;b10; localparam CMD_POP_OKAY = 2&amp;#39;b11; // Stack memory and pointer reg [7:0] stack_mem[0:255]; reg [7:0] sp; reg busy; reg [7:0] out0_data_reg, out1_data_reg; reg [1:0] out0_cmd_reg, out1_cmd_reg; reg out0_valid_reg, out1_valid_reg; assign out0_data = out0_data_reg; assign out0_cmd = out0_cmd_reg; assign out0_valid = out0_valid_reg; assign out1_data = out1_data_reg; assign out1_cmd = out1_cmd_reg; assign out1_valid = out1_valid_reg; always @(posedge clk or posedge rst) begin if (rst) begin sp &amp;lt;= 0; busy &amp;lt;= 0; end else begin // Interface 0 Request Handling if (!</description>
     </item>
     <item>
       <title>案例四：双端口栈（协程）</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-async/</link>
+      <link>https://open-verify.cc/mlvp/docs/quick-start/eg-stack-async/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-stack-async/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/quick-start/eg-stack-async/</guid>
       <description>双端口栈简介与环境构建 本案例中使用的双端口栈与案例三中的实现完全相同，请查看案例三中的双端口栈简介及构建驱动环境。&#xA;利用协程驱动 DUT 在案例三中，我们使用了回调函数的方式来驱动DUT，回调函数虽然给我们提供了一种能够完成并行操作的方式，然而其却把完成的执行流程割裂为多次函数调用，并需要维护大量中间状态，导致代码的编写及调试变得较为复杂。&#xA;在本案例中，我们将会介绍一种通过协程驱动的方法，这种方法不仅能够做到并行操作，同时能够很好地避免回调函数所带来的问题。&#xA;协程简介 协程是一种“轻量级”的线程，通过协程，你可以实现与线程相似的并发执行的行为，但其开销却远小于线程。其实现原理是，协程库实现了一个运行于单线程之上的事件循环（EventLoop），程序员可以定义若干协程并且加入到事件循环，由事件循环负责这些协程的调度。&#xA;一般来说，我们定义的协程在执行过程中会持续执行，直到遇到一个需要等待的“事件”，此时事件循环就会暂停执行该协程，并调度其他协程运行。当事件发生后，事件循环会再次唤醒该协程，继续执行。&#xA;对于硬件验证中的并行执行来说，这种特性正是我们所需要的，我们可以创建多个协程，来完成验证中的多个驱动任务。我们可以将时钟的执行当做事件，在每个协程中等待这个事件，当时钟信号到来时，事件循环会唤醒所有等待的协程，使其继续执行，直到他们等待下一个时钟信号。&#xA;我们用 Python 中的 asyncio 来实现对协程的支持：&#xA;import asyncio from dual_port_stack import * async def my_coro(dut, name): for i in range(10): print(f&amp;#34;{name}: {i}&amp;#34;) await dut.AStep(1) async def test_dut(dut): asyncio.create_task(my_coro(dut, &amp;#34;coroutine 1&amp;#34;)) asyncio.create_task(my_coro(dut, &amp;#34;coroutine 2&amp;#34;)) await asyncio.create_task(dut.RunStep(10)) dut = DUTdual_port_stack() dut.InitClock(&amp;#34;clk&amp;#34;) asyncio.run(test_dut(dut)) dut.Finish() 你可以直接运行上述代码来观察协程的执行过程。在上述代码中我们用 create_task 创建了两个协程任务并加入到事件循环中，每个协程任务中，会不断打印一个数字并等待下一个时钟信号到来。&#xA;我们使用 dut.RunStep(10) 来创建一个后台时钟，它会不断产生时钟同步信号，使得其他协程能够在时钟信号到来时继续执行。&#xA;基于协程驱动的双端口栈 利用协程，我们就可以将驱动双端口栈中单个端口逻辑写成一个独立的执行流，不需要再去维护大量的中间状态。&#xA;下面是我们提供的一个简单的使用协程驱动的验证代码：&#xA;import asyncio import random from dual_port_stack import * from enum import Enum class StackModel: def __init__(self): self.</description>
     </item>
   </channel>

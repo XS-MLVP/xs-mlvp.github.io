@@ -54,7 +54,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 序号 名称 描述 2.1.1 误检测试1 预测块中没有RET指令且最终预测信息也没有取用任何跳转指令的输入，检查PredChecker是否会误报RET预测错误。 2.1.2 误检测试2 预测块中有RET指令且最终预测信息取用的正是本条跳转指令的输入，检查PredChecker是否会误报RET预测错误。 对于RET预测错误的正确检出，我们设计如下的测试点：
 序号 名称 描述 2.2.1 存在RET未预测 预测块中存在RET指令，但是最终预测信息未预测跳转，检查PredChecker是否能检测出RET预测错误。 2.2.2 预测的跳转并非第一条 预测块中存在RET指令，但是最终预测信息取的跳转指令在第一条RET指令之后，检查PredChecker是否能检测出RET预测错误。 功能点3 更新指令有效范围向量和预测跳转的指令 PredChecker在检查出Jal/Ret指令预测错误时，需要重新生成指令有效范围向量， 有效范围截取到Jal/Ret指令的位置，之后的bit全部置为0。 同时，还需要根据每条指令的预译码信息和最终的预测信息修复预测跳转的结果。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" /><meta property="article:section" content="docs" />
 
 <meta property="article:modified_time" content="2025-01-23T15:15:37+08:00" />
 <meta itemprop="name" content="PredChecker">

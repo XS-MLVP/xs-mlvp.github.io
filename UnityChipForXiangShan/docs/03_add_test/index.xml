@@ -2,44 +2,44 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>添加测试 on 万众一芯之香山处理器</title>
-    <link>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/</link>
+    <link>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/</link>
     <description>Recent content in 添加测试 on 万众一芯之香山处理器</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <atom:link href="https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>添加编译脚本</title>
-      <link>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/01_build_script/</link>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/01_build_script/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/01_build_script/</guid>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/01_build_script/</guid>
       <description>脚本目标 在scripts目录下使用python编写对应rtl的编译文件（例如build_ut_frontend_ifu_rvc_expander.py）。&#xA;该脚本的目标是提供 RTL 到 Python DUT 的编译、目标覆盖文件，以及自定义功能等内容。&#xA;创建过程 确定文件名称 在香山昆明湖 DUT 验证进展中选择需要验证的 UT，如果没有或者进一步细化，可通过编辑configs/dutree/xiangshan-kmh.yaml自行添加。&#xA;比如，我们要验证的是前端部分的ifu模块下的rvc_expander模块，那么需要在configs/dutree/xiangshan-kmh.yaml中添加对应的部分（目前yaml中已经有该模块了，此处为举例）：&#xA;name: &amp;#34;kmh_dut&amp;#34; desc: &amp;#34;所有昆明湖DUT&amp;#34; children: - name: &amp;#34;frontend&amp;#34; desc: &amp;#34;前端模块&amp;#34; children: - name: &amp;#34;ifu&amp;#34; desc: &amp;#34;指令单元 (Instruction Fetch Unit)&amp;#34; children: - name: &amp;#34;rvc_expander&amp;#34; desc: &amp;#34;RVC指令扩充器&amp;#34; 脚本文件的命名格式如下：&#xA;scripts/build_&amp;lt;顶层模块&amp;gt;_&amp;lt;下层模块名&amp;gt;_..._&amp;lt;目标模块名&amp;gt;.py 目前本项目内置了 4 个顶层模块：&#xA;ut_frontend 前端 ut_backend 后端 ut_mem_block 访存 ut_misc 其他 其中的子模块没有ut_前缀（顶层目录有该前缀是为了和其他目录区分开）。&#xA;例如验证目标 DUT 为rvc_expander模块：&#xA;该模块是属于前端的，所以顶级模块为ut_frontend，它的下层模块为ifu，目标模块为rvc_expander。&#xA;通过刚才我们打开的yaml文件也可以知道，frontend的children 为ifu，ifu的children 为rvc_expander。 所以，需要创建的脚本名称为build_ut_frontend_ifu_rvc_expander.py。&#xA;编写 build(cfg) -&amp;gt; bool 函数 build 函数定义如下：&#xA;def build(cfg) -&amp;gt; bool: &amp;#34;&amp;#34;&amp;#34;编译DUT Args: cfg: 运行时配置，可通过它访问配置项，例如 cfg.</description>
     </item>
     <item>
       <title>构建测试环境</title>
-      <link>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/02_build_env/</link>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/02_build_env/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/02_build_env/</guid>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/02_build_env/</guid>
       <description>确定目录结构 UT(Unit Test, 单元测试)所在的目录位置的层级结构应该与名称一致，例如frontend.ifu.rvc_expander应当位于ut_frontend/ifu/rvc_expander目录，且每层目录都需要有__init__.py，便于通过 python 进行import。&#xA;本章节的文件为your_module_wrapper.py（如果你的模块是rvc_expander，那么文件就是rvc_expander_wrapper.py）。&#xA;wrapper 是包装的意思，也就是我们测试中需要用到的方法封装成和dut解耦合的API提供给测试用例使用。&#xA;*注：解耦合是为了测试用例和 DUT 解耦，使得测试用例可以独立于 DUT 进行编写和调试，也就是在测试用例中，不需要知道 DUT 的具体实现细节，只需要知道如何使用 API 即可。可以参照将验证代码与DUT进行解耦&#xA;该文件应该放于ut_frontend_or_backend/top_module/your_module/env（这里依然以rvc_expander举例：rvc_expander属于前端，其顶层目录则应该是ut_frontend；rvc_expander的顶层模块是ifu，那么次级目录就是ifu;之后的就是rvc_expander自己了；最后，由于我们是在构建测试环境，再建一级env目录。将它们连起来就是：ut_frontend_or_backend/top_module/your_module/env）目录下。&#xA;ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │ │ ├── __init__.py │ │ └── rvc_expander_wrapper.py │ ├── __init__.py │ └── test_rvc_expander.py ├── __init__.py ├── README.md └── toffee_version ├── agent │ └── __init__.py ├── bundle │ └── __init__.py ├── env │ ├── __init__.py │ └── ref_rvc_expand.py ├── __init__.py └── test ├── __init__.py ├── rvc_expander_fixture.</description>
     </item>
     <item>
       <title>添加测试用例</title>
-      <link>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/03_add_test/</link>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/03_add_test/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/03_add_test/</guid>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/03_add_test/</guid>
       <description>命名要求 所有测试用例文件请以test_*.py的方式进行命名，*用测试目标替换（例如test_rvc_expander.py）。所有测试用例也需要以test_前缀开头。用例名称需要具有明确意义。&#xA;命名举例如下：&#xA;def test_a(): # 不合理，无法通过a判断测试目标 pass def test_rvc_expand_16bit_full(): # 合理，可以通过用例名称大体知道测试内容 pass 使用 Assert 在每个测试用例中，都需要通过assert来判断本测试是否通过。 pytest统计的是assert语句的结果，因此assert语句需要保证能够通过。&#xA;以下内容位于ut_frontend/ifu/rvc_expander/classical_version/test_rvc_expander.py中：&#xA;def rvc_expand(rvc_expander, ref_insts, is_32bit=False, fsIsOff=False): &amp;#34;&amp;#34;&amp;#34;compare the RVC expand result with the reference Args: rvc_expander (warpper): the fixture of the RVC expander ref_insts (list[int]]): the reference instruction list &amp;#34;&amp;#34;&amp;#34; find_error = 0 for insn in ref_insts: insn_disasm = disasmbly(insn) value, instr_ex = rvc_expander.expand(insn, fsIsOff) if is_32bit: assert value == insn, &amp;#34;RVC expand error, 32bit instruction need to be the same&amp;#34; if (insn_disasm == &amp;#34;unknown&amp;#34;) and (instr_ex == 0): debug(f&amp;#34;find bad inst:{insn}, ref: 1, dut: 0&amp;#34;) find_error +=1 elif (insn_disasm !</description>
     </item>
     <item>
       <title>代码覆盖率</title>
-      <link>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/04_cover_line/</link>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/04_cover_line/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/04_cover_line/</guid>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/04_cover_line/</guid>
       <description>代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。&#xA;代码覆盖率包括：&#xA;行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&amp;gt; 1 和 1 -&amp;gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if &amp;hellip; else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 *我们主要使用的模拟器是 Verilator,优先考虑行覆盖率。Verilator 支持覆盖率统计，因此我们在构建 DUT 时，如果要开启覆盖率统计，需要在编译选项中添加-c参数。&#xA;本项目中相关涉及位置 开启覆盖率需要在编译时（使用 picker 命令时）加上“-c”参数（参考 picker 的参数解释），同时在文件中设置启用行覆盖率，这样在使用 toffee 测试时，才能够生成覆盖率统计文件。&#xA;结合上面的描述，在本项目中也就是编译，编写和启用行覆盖率函数和测试的时候会涉及到代码覆盖率：&#xA;添加编译脚本部分 编写编译脚本&#xA;# 省略前面 if not os.path.exists(get_root_dir(&amp;#34;dut/RVCExpander&amp;#34;)): info(&amp;#34;Exporting RVCExpander.sv&amp;#34;) s, out, err = exe_cmd(f&amp;#39;picker export --cp_lib false {get_rtl_dir(&amp;#34;rtl/RVCExpander.</description>
     </item>
     <item>
       <title>功能覆盖率</title>
-      <link>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/05_cover_func/</link>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/05_cover_func/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/UnityChipForXiangShan/docs/03_add_test/05_cover_func/</guid>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/05_cover_func/</guid>
       <description>功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。&#xA;反标是指将功能点与测试用例对应起来。这样，在统计时，就能看到每个功能点对应了哪些测试用例，从而方便查看哪些功能点用的测试用例多，哪些功能点用的测试用例少，有利于后期的测试用例优化。&#xA;本项目中相关涉及位置 功能覆盖率需要我们先定义了才能统计，主要是在构建测试环境的时候涉及。&#xA;在构建测试环境中：&#xA;定义功能覆盖率： 创建了功能覆盖率组,添加观察点和反标 定义必要 fixture： 把统计结果传递给 toffee-report 统计覆盖率： 添加观察点和反标 其他：&#xA;在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py中进行如下调用：&#xA;from comm import UT_FCOV # 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper # 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper # UT_FCOV会默认去掉前缀 ut_ g = fc.CovGroup(UT_FCOV(&amp;#34;../../../CLASSIC&amp;#34;)) # name = UT_FCOV(&amp;#34;../../../CLASSIC&amp;#34;) name 的值为frontend.ifu.rvc_expander.CLASSIC，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）&#xA;创建覆盖率组 使用toffee的funcov可以创建覆盖率组。&#xA;import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&amp;quot;../../../CLASSIC&amp;quot;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。</description>
     </item>
   </channel>

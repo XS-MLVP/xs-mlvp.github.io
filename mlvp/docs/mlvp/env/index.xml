@@ -2,44 +2,44 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>搭建验证环境 on 开放验证平台学习资源</title>
-    <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/</link>
+    <link>https://open-verify.cc/mlvp/docs/mlvp/env/</link>
     <description>Recent content in 搭建验证环境 on 开放验证平台学习资源</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <atom:link href="https://xs-mlvp.github.io/mlvp/docs/mlvp/env/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://open-verify.cc/mlvp/docs/mlvp/env/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>如何使用异步环境</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/start_test/</link>
+      <link>https://open-verify.cc/mlvp/docs/mlvp/env/start_test/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/start_test/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/mlvp/env/start_test/</guid>
       <description>启动事件循环 在如前介绍的验证环境中，设计了一套规范的验证环境。但是如果尝试用朴素单线程程序编写，会发现会遇到较为复杂的实现问题。&#xA;例如，我们创建了两个驱动方法分别驱动两个接口，在每一个驱动方法内部，都需要等待 DUT 经过若干个时钟周期，并且这两个驱动方法需要同时运行。这时候，如果使用朴素的单线程程序，会发现很难同时让两个驱动方法同时运行，即便我们使用多线程强势使他们同时运行，也会发现缺乏一种机制，使他们能够等待 DUT 经过若干时钟周期。这是因为在 Picker 提供的接口中，我们只能去推动 DUT 向前执行一个周期，而无法去等待 DUT 执行一个周期。&#xA;更不用说我们还会遇到有众多环境组件需要同时运行的情况了，因此我们首先需要一个能够运行异步程序的环境。toffee 使用了 Python 的协程来完成对异步程序的管理，其在单线程之上建立了一个事件循环，用于管理多个同时运行的协程，协程之间可以相互等待并通过事件循环来进行切换。&#xA;在启动事件循环之前，我们首先需要了解两个关键字 async 和 await 来了解 Python 对与协程的管理。&#xA;当我们在函数前加上 async 关键字时，这个函数就变成了一个协程函数，例如&#xA;async def my_coro(): ... 当我们在协程函数内部使用 await 关键字时，我们就可以执行一个协程函数，并等待其执行完成并返回结果，例如&#xA;async def my_coro(): return &amp;#34;my_coro&amp;#34; async def my_coro2(): result = await my_coro() print(result) 如果不想等待一个协程函数完成，只想将这一函数加入到事件循环中放入后台运行，可以使用 toffee 提供的 create_task 方法，例如&#xA;import toffee async def my_coro(): return &amp;#34;my_coro&amp;#34; async def my_coro2(): toffee.create_task(my_coro()) 那么如何启动事件循环，并使事件循环开始运行 my_coro2 呢？在 toffee 中，我们使用 toffee.run 来启动事件循环，并运行异步程序。</description>
     </item>
     <item>
       <title>如何使用 Bundle</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/bundle/</link>
+      <link>https://open-verify.cc/mlvp/docs/mlvp/env/bundle/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/bundle/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/mlvp/env/bundle/</guid>
       <description>Bundle 在 toffee 验证环境中，用于构建 Agent 与 DUT 之间交互的中间层，以保证 Agent 与 DUT 之间的解耦。同时 Bundle 也起到了对 DUT 接口层次结构划分的作用，使得对 DUT 接口的访问变得更加清晰、方便。&#xA;一个简单的 Bundle 的定义 为了定义一个 Bundle，需要自定义一个新类，并继承 toffee 中的 Bundle 类。下面是一个简单的 Bundle 的定义示例：&#xA;from toffee import Bundle, Signals class AdderBundle(Bundle): a, b, sum, cin, cout = Signals(5) 该 Bundle 定义了一个简单的加法器接口，在 AdderBundle 类中，我们定义了五个信号 a, b, sum, cin, cout，这五个信号分别代表了加法器的输入端口 a, b，输出端口 sum，以及进位输入端口 cin 和进位输出端口 cout。&#xA;定义完成后，我们可以通过 AdderBundle 类的实例来访问这些信号，例如：&#xA;adder_bundle = AdderBundle() adder_bundle.a.value = 1 adder_bundle.b.value = 2 adder_bundle.</description>
     </item>
     <item>
       <title>如何编写 Agent</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/agent/</link>
+      <link>https://open-verify.cc/mlvp/docs/mlvp/env/agent/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/agent/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/mlvp/env/agent/</guid>
       <description>Agent 在 toffee 验证环境中实现了对一类 Bundle 中信号的高层封装，使得上层驱动代码可以在不关心具体信号赋值的情况下，完成对 Bundle 中信号的驱动及监测。&#xA;一个 Agent 由 驱动方法(driver_method) 和 监测方法(monitor_method) 组成，其中驱动方法用于主动驱动 Bundle 中的信号，而监测方法用于被动监测 Bundle 中的信号。&#xA;初始化 Agent 为了定义一个 Agent，需要自定义一个新类，并继承 toffee 中的 Agent 类。下面是一个简单的 Agent 的定义示例：&#xA;from toffee.agent import * class AdderAgent(Agent): def __init__(self, bundle): super().__init__(bundle.step) self.bundle = bundle 在 AdderAgent 类初始化时，需要外界传入该 Agent 需要驱动的 Bundle，并且需要向父类 Agent 中传入一个时钟同步函数，以便 Agent 使用这一函数来决定何时调用监测方法。一般来说，可以将其设置为 bundle.step，即 Bundle 中的时钟同步函数，Bundle 中的 step 与 DUT 中的时钟同步。&#xA;创建驱动方法 在 Agent 中，驱动方法是一个异步函数，用于主动驱动 Bundle 中的信号。驱动函数需要将函数的传入参数进行解析，并根据解析结果对 Bundle 中的信号进行赋值，赋值的过程可以跨越多个时钟周期。如果需要获取 Bundle 的信号值，那么在函数中编写相应的逻辑，并将其转换为需要的数据，通过函数返回值返回。</description>
     </item>
     <item>
       <title>如何搭建 Env</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/build_env/</link>
+      <link>https://open-verify.cc/mlvp/docs/mlvp/env/build_env/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/build_env/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/mlvp/env/build_env/</guid>
       <description>Env 在 toffee 验证环境中用于打包整个验证环境，Env 中直接实例化了验证环境中需要用的所有 agent，并负责将这些 Agent 需要的 bundle 传递给它们。&#xA;创建好 Env 后，参考模型的编写规范也随之确定，按照此规范编写的参考模型可直接附加到 Env 上，由 Env 来完成参考模型的自动同步。&#xA;创建 Env 为了定义一个 Env，需要自定义一个新类，并继承 toffee 中的 Env 类。下面是一个简单的 Env 的定义示例：&#xA;from toffee.env import * class DualPortStackEnv(Env): def __init__(self, port1_bundle, port2_bundle): super().__init__() self.port1_agent = StackAgent(port1_bundle) self.port2_agent = StackAgent(port2_bundle) 在这个例子中，我们定义了一个 DualPortStackEnv 类，该类中实例化了两个相同的 StackAgent，分别用于驱动两个不同的 Bundle。&#xA;可以选择在 Env 之外连接 Bundle，也可以在 Env 内部连接 Bundle，只要能保证向 Agent 中传入正确的 Bundle 即可。&#xA;此时，如果不需要编写额外的参考模型，那么整个验证环境的搭建就完成了，可以直接编写测试用例并且在测试用例中使用 Env 提供的接口，例如：&#xA;port1_bundle = StackPortBundle() port2_bundle = StackPortBundle() env = DualPortStackEnv(port1_bundle, port2_bundle) await env.</description>
     </item>
     <item>
       <title>如何编写参考模型</title>
-      <link>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/ref_model/</link>
+      <link>https://open-verify.cc/mlvp/docs/mlvp/env/ref_model/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://xs-mlvp.github.io/mlvp/docs/mlvp/env/ref_model/</guid>
+      <guid>https://open-verify.cc/mlvp/docs/mlvp/env/ref_model/</guid>
       <description>参考模型 用于模拟待验证设计的行为，以便在验证过程中对设计进行验证。在 toffee 验证环境中，参考模型需要遵循 Env 的接口规范，以便能够附加到 Env 上，由 Env 来完成参考模型的自动同步。&#xA;参考模型的两种实现方式 toffee 提供了两种参考模型的实现方式，这两种方式都可以被附加到 Env 上，并由 Env 来完成参考模型的自动同步。在不同的场景下，可以选择更适合的方式来实现参考模型。&#xA;这两种方式分别是 函数调用模式 与 独立执行流模式，下面将分别介绍这两种方式的具体概念。&#xA;函数调用模式 函数调用模式即是将参考模型的对外接口定义为一系列的函数，通过调用这些函数来驱动参考模型的行为。此时，我们通过输入参数向参考模型发送数据，并通过返回值获取参考模型的输出数据，参考模型通过函数体的逻辑来更新内部状态。&#xA;下面是一个简单的函数调用模式的参考模型的定义示例：&#xA;例如，这是一个简单的加法器参考模型：&#xA;class AdderRefModel(): def add(self, a, b): return a + b 在这个参考模型中，不需要任何内部状态，通过一个对外函数接口即可实现参考模型所有功能。&#xA;需要注意的是，使用函数调用模式编写的参考模型，只能通过外部主动调用的方式来执行，无法被动输出内部数据。因此，其无法与 Agent 中的监测方法进行匹配。在 Agent 中编写监测方法，在函数调用模式编写参考模型时是没有意义的。&#xA;独立执行流模式 独立执行流模式即是将参考模型的行为定义为一个独立的执行流，它不再受外部主动调用函数控制，而拥有了主动获取输入数据和主动输出数据的能力。当外部给参考模型发送数据时，参考模型不会立即响应，而是将这一数据保存起来，等待其执行逻辑主动获取该数据。&#xA;我们用一段代码来说明这种模式，该示例中用到了 toffee 中提供的相关概念来实现，但目前无需关心这些概念的使用细节。&#xA;class AdderRefModel(Model): def __init__(self): super().__init__() self.add_port = DriverPort() self.sum_port = MonitorPort() async def main(): while True: operands = await self.add_port() sum = operands[&amp;#34;a&amp;#34;] + operands[&amp;#34;b&amp;#34;] await self.</description>
     </item>
   </channel>
