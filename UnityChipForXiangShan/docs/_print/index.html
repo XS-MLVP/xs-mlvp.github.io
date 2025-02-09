@@ -133,7 +133,7 @@ DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.438849321f2af8becd7da11db3a5ce4b.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.63a27853d78aa90fe0ba5abc77d0c238.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -4804,7 +4804,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <h3 id="更新指令有效范围向量">更新指令有效范围向量</h3>
 <p>PredChecker在检查出Jal/Ret指令预测错误时，需要重新生成指令有效范围向量，有效范围截取到Jal/Ret指令的位置，之后的bit全部置为0。
 需要注意的是，jal和ret指令的错误检查都会导致指令有效范围的缩短，
-所以需要重新生成指令有效范伟fixedRange，同时修复预测结果（即将原来的预测结果取消，把这个指令块的预测结果根据jal指令的位置重新生成）</p>
+所以需要重新生成指令有效范伟fixedRange，同时修复预测结果。需要注意的是，这个修复只会针对RET预测错误和JAL预测错误导致的范围错误，对于后续要介绍的非CFI预测错误和无效指令预测错误，尽管他们会造成预测块的范围偏小，但是不会进行修复，而是直接在这里进行重定向。这样，重定向后重新取的指令会从这个出错的指令开始。</p>
 <h3 id="非cfi预测错误检查">非CFI预测错误检查</h3>
 <p>非CFI预测错误的条件是被预测跳转的指令根据预译码信息显示不是一条CFI指令。</p>
 <h3 id="无效指令预测错误检查">无效指令预测错误检查</h3>
@@ -4955,7 +4955,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <tr>
 <td>3.3</td>
 <td>非CFI和无效指令引起的预测范围偏小</td>
-<td>如果出现了非控制流指令和无效指令的误预测，应该将预测跳转的指令重新修正到预测块中第一条跳转指令</td>
+<td>如果出现了非控制流指令和无效指令的误预测，不应该将预测跳转的指令重新修正到预测块中第一条跳转指令，因为后续会直接冲刷并重新从重定向的位置取指令，如果这里修正的话，会导致下一预测块传入重复的指令</td>
 </tr>
 </tbody>
 </table>
@@ -5146,8 +5146,8 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <tr>
 <td>3.3</td>
 <td>更新指令有效范围向量和预测跳转的指令</td>
-<td>非CFI和无效指令引起的预测范围偏小</td>
-<td>如果出现了非控制流指令和无效指令的误预测，应该将预测跳转的指令重新修正到预测块中第一条跳转指令</td>
+<td>如果出现了非控制流指令和无效指令的误预测，不应该将预测跳转的指令重新修正到预测块中第一条跳转指令，因为后续会直接冲刷并重新从重定向的位置取指令，如果这里修正的话，会导致下一预测块传入重复的指令。</td>
+<td></td>
 </tr>
 <tr>
 <td>4.1.1</td>
