@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>功能详述 on 万众一芯之香山处理器</title>
+    <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/</link>
+    <description>Recent content in 功能详述 on 万众一芯之香山处理器</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <atom:link href="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>支持 SV48 分页机制</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/01_sv48/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/01_sv48/</guid>
+      <description>SV48 （Supervisor-mode Virtual Memory）是一种基于 RISC-V 的页表虚拟内存寻址模式，指定了 48 位虚拟地址空间的结构，支持 256TB 的虚拟内存地址空间。使用四级页表结构：&#xA;在 SV48 的一个 PTE 中包含了如下字段：&#xA;N:&#xA;指示是否为 NAPOT PTE。供 Svnapot 扩展使用，如果未实现 Svnapot 则该位必须由软件置 0，否则应当出现 Page Fault。目前香山昆明湖架构尚未支持此扩展。 PBMT:&#xA;Page-Based Memory Types，即基于页面的内存类型，供 Svpbmt 扩展使用，允许操作系统为每个页面指定不同的内存访问属性。 0: None，没有特定的内存属性。 1: NC，非缓存、幂等、弱序（RVWMO），适用于主存。 2: IO，非缓存、非幂等、强序（I/O 排序），适用于 I/O 设备。 3: Reserved，保留供将来标准使用。 同样的，如果未实现 Svpbmt 则这两位必须由软件置 0，否则应当出现 Page Fault。&#xA;Reserved:&#xA;保留位，供未来的标准使用。如果有任意一位不是 0 则会触发 PF 异常。 PPN:&#xA;表示物理页框号，指向实际的物理内存页。PPN 与页面内偏移结合形成完整的物理地址，用于地址转换。 RSW:&#xA;保留供软件使用的位，通常用于特定的标志或操作，以便在软件实现中提供灵活性。 D:&#xA;脏位，指示该页面是否被写入。如果该位为 1，表示该页的数据已被修改，需在换出时写回到存储设备。 A:&#xA;访问位，指示该页是否被访问过。如果该位为 1，表示该页已被读取或写入，用于页面替换算法。 G:&#xA;全局页位，指示该页是否是全局页。如果该位为 1，表示该页对所有进程可见，用于共享代码或数据。 U:</description>
+    </item>
+    <item>
+      <title>支持缓存映射条目</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/02_tlbstorage/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/02_tlbstorage/</guid>
+      <description>TLB 中存储的条目并不是页表项 PTE，而是一个映射，一个从虚拟地址（来自于请求）到物理地址（来自于查找结果）的映射，当然还有一些访问所必须的信息。在目前的香山中 TLB 所存储的条目包含 tag[35]、asid[16]、vmid[14]、level[2]、ppn[33]、8 × ppn_low[3]、8 × valididx、8 × pteidx、s2xlate、perm[6]、g_perm[4]。为供以后使用 svpbmt 扩展，还存储了 pbmt 与 g_pbmt 字段。&#xA;tag[34:0]&#xA;tag，用于匹配条目。来源于 VPN 的高 35 位，在匹配的过程中，输入一个 38 位的 VPN，通过将输入的 VPN 的前 35 位与 tag 比较找到对应的条目，可以看到在一个条目中存储了 PPN 的高位部分和 8 个 ppn_low，之后将 VPN 的后三位作为索引，可以索引这 8 个 ppn_low，即可将 ppn 与 ppn_low[vpn_low] 拼接得到物理页框号。 asid[15:0]&#xA;地址空间标识符，用于区分不同的进程地址空间。 vmid[13:0]&#xA;虚拟机标识符，用于区分不同的虚拟机。 level[1:0]&#xA;指示页面的大小。0：4KB，1：2MB，2：1GB，3：512GB。 ppn[32:0]&#xA;物理页框号的高 33 位。在 Sv48 要求下本该是 41 位，出于面积考虑优化至 33 位（见支持 Sv48 分页机制部分）。 ppn_low[2:0]×8&#xA;物理页框号的低 3 位。用于 TLB 压缩（见支持 TLB 压缩部分）。 valididx×8</description>
+    </item>
+    <item>
+      <title>支持保存全部大小页</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/03_pagesize/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/03_pagesize/</guid>
+      <description>在 RISC-V 架构中，大小页机制旨在优化虚拟内存的使用效率和性能。Sv48 支持多种页面大小，包括 4KB、2MB、1GB 页，在标准的设计中没有定义 512GB 的页，理论上可行，但目前并没有这样的需要，512GB 的页也无法加载进内存，因此标准不做要求。但是出于对完整性的考虑，香山中依然实现了对 512GB 大页的支持。&#xA;在一般的应用程序需求中，4KB 的页面足够满足日常的使用，可以存储较小的数据结构以及程序等，常用于大多数应用程序中。然而，有的程序可能会需要频繁访问大的数据结构或数据集，这时引入大页可以提升内存访问效率。每个大页覆盖的虚拟地址空间更大，可以显著减少页表条目的数量；在映射相同数量的内存时，所需的页表条目会大幅降低，这可以减少内存开销、减少页表查找频率，从而优化内存访问速度，尤其对频繁访问大块内存的应用，能够显著提升性能。大页通常包含连续的数据，可以提高命中率，更有效地利用缓存资源。&#xA;当然，由于大页覆盖的地址空间较大，可能导致内存碎片，而未被使用的大页空间无法被其他请求有效利用，也会浪费一定的内存资源。同时，管理不同大小的页面为内存管理带来了额外的复杂性。在混合使用小页和大页时，操作系统需要复杂的算法来优化内存分配和使用。现代操作系统通常采用混合使用大小页的模式以满足不同应用的不同需求。&#xA;在香山的 TLB 中，支持保存任意大小的页面，这是通过保存页面的 level 来实现的。根据不同的 level，可以决定最终生成物理地址的方法（index 为页内偏移，来源于 vaddr 的低 12 位；ppn、ppn_low、tag 来源于 TLB 中存储的映射条目）：&#xA;level 页面大小 paddr[47:0] 0 4KB ppn[32:0] + ppn_low[2:0] + index[11:0] 1 2MB ppn[32:6] + tag[8:0] + index[11:0] 2 1GB ppn[32:15] + tag[17:0] + index[11:0] 3 512GB ppn[32:24] + tag[26:0] + index[11:0] </description>
+    </item>
+    <item>
+      <title>支持 TLB 压缩</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/04_tlbcompression/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/04_tlbcompression/</guid>
+      <description>随着虚拟地址空间的不断扩展，传统 TLB 的大小和效率面临挑战，可能不足以覆盖应用程序的需求，导致频繁的缺失（TLB miss），从而影响系统性能，导致性能瓶颈。为了应对这一问题，TLB 压缩技术应运而生，旨在提高 TLB 的有效性和性能。&#xA;在操作系统分配内存的时候，由于使用伙伴地址分配策略等原因，会倾向于将连续的物理页分配给连续的虚拟页。虽然随着程序的不断运行，页分配逐渐的从有序趋向于无序，但是这种页的相连性普遍存在，因此可以通过将多个连续的页表项在 TLB 硬件中合成为一个 TLB 项，以增大 TLB 容量。TLB 压缩通过优化页表结构，支持连续的映射，通过引入范围映射（range mapping）机制，一个 TLB 条目可以映射一段连续的虚拟地址到一段连续的物理地址。&#xA;在实际中，以香山昆明湖架构为例，在 TLB 中存储 35 位的 vpn_high（即 tag），剩下的三位用于索引对应的 ppn_low（一共有 8 个所以需要 3 位来索引）。每次匹配中，TLB 用传入的 vaddr[49:15]（高 35 位）与 tag 进行匹配，找到对应的条目，这个条目中可以存储 8 个 PTE，再根据 vaddr[14:12] 找到对应的 ppn_low，之后检查对应的 valididx 是否有效，如果有效说明 hit，将 ppn_low 与 ppn_high 拼接得到 PPN，再与 vaddr[11:0] 拼接得到 paddr。&#xA;在支持了 H 扩展后（见支持两阶段虚实地址翻译），TLB 压缩仅在 OnlyStage1 和 noS2xlate 下启用，在其他情况下不启用。&#xA;支持 TLB 压缩后 TLB 中缓存的条目会有所变化（表中未提及的条目即没有变化）：&#xA;是否压缩 tag ppn valididx pteidx ppn_low 否 38位 36位 不保存 不保存 不保存 是 35位 33位 8位 8位 8×3位 在支持了大小页的情况下，TLB 压缩在大页情况下（2MB/1GB/512GB）不启用，仅在查询结果为小页（4KB）情况下启用。大页在返回时会将 valididx 的 8 位全部设置为 1，而由于大页的查询过程中只需要 PPN 的高位，大页下不使用 ppn_low，ppn_low 的值在此时是未定义的。</description>
+    </item>
+    <item>
+      <title>支持 Hypervisor 扩展与两阶段虚实地址翻译</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/05_hypervisor2leveltrans/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/05_hypervisor2leveltrans/</guid>
+      <description>在 RISC-V 特权指令手册中定义了虚实地址的翻译过程：&#xA;设 a 为 satp.ppn × PAGESIZE，并设 i = LEVELS - 1。（对于 Sv48，PAGESIZE = 2^{12}，LEVELS = 4）此时，satp 寄存器必须处于活动状态，即有效的特权模式必须是 S 模式或 U 模式。&#xA;设 pte 为地址 a + va.vpn[i] × PTESIZE 处的 PTE 值。（对于 Sv48，PTESIZE = 8）如果访问 pte 违反了 PMA 或 PMP 检查，则引发与原始访问类型相应的访问错误异常。&#xA;如果 pte.v = 0，或者 pte.r = 0 且 pte.w = 1，或者 pte 中设置了任何为未来标准使用保留的位或编码，则停止并引发与原始访问类型相应的页面错误异常。&#xA;否则，PTE 是有效的。如果 pte.r = 1 或 pte.x = 1，则转到步骤 5。否则，此 PTE 是指向下一级页面表的指针。设 i = i - 1。如果 i &amp;lt; 0，则停止并引发与原始访问类型相应的页面错误异常。否则，设 a = pte.</description>
+    </item>
+    <item>
+      <title>支持阻塞式与非阻塞式访问</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/06_blocknonblock/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/06_blocknonblock/</guid>
+      <description>阻塞式访问代表着 TLB 的端口同时仅支持一个请求，阻塞端口带 valid-ready 握手信号。在 TLB 准备好接收请求时，会将 ready 置 1，由外部检测到 ready 后会发送请求。请求到达 TLB 时 valid 为 1 则 TLB 接收请求并将 ready 置 0，不再接受新的请求。之后 TLB 会对请求进行匹配，查找结果，如果 miss 则发送 ptw 请求（同样为阻塞），等待直到 ptw 返回结果（物理地址或 pf 异常），然后 TLB 将结果保存并上报给请求方，再将 ready 置 1。&#xA;对于非阻塞式请求，仅带 valid 信号，每当 valid 置 1，TLB 即接受请求并在下一拍返回结果（hit/miss/异常），无论是否命中都能在请求下一拍得到结果。如果 miss 的话，TLB 在返回 miss 结果同时会发起 PTW 请求（非阻塞），PTW 接收到请求则进行处理，在处理完成后回填进 TLB 中，然后如果请求方再次发起请求就可以命中。在香山 ITLB 的具体实现中，TLB 本体虽然是非阻塞的，不存储请求的信息，但当前端发起的取指请求 miss 后，将会由前端进行调度不断发起相同取指请求直到 hit，才能将指令送到处理器进行处理，因此会体现出阻塞的效果。&#xA;请求来源 iCache IFU 请求数量 2 1 请求类型 非阻塞请求 阻塞请求 握手信号 仅带 valid 信号 带 valid 和 ready 信号 处理方式 可以继续处理其他指令 等待 iTLB 响应后继续处理指令 </description>
+    </item>
+    <item>
+      <title>支持读取 PTW 返回条目</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/07_refill_from_ptw/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/07_refill_from_ptw/</guid>
+      <description>每次 TLB 发生 miss 之后，会向 L2TLB 发送 Page Table Walk 请求。由于 TLB 与 L2TLB 之间有比较长的物理距离，需要在中间加拍，这项工作由 repeator 完成。同时，repeator 还需要对 PTW 请求进行过滤，以避免 TLB 中出现重复项，因此也被称为 filter。目前香山中 TLB 发出的 PTW 请求的内容包含 VPN、s2xlate、getGPA 三个信号以及必要的控制信号：&#xA;VPN：&#xA;虚拟页框号，TLB 在 miss 之后会将 VPN 发送给 PTW 用于索引对应的物理页，PTW 会将叶子页表的 PPN 返回给 TLB，下次 TLB 查询的时候就可以找到该页并可以通过页内偏移找到物理地址。 s2xlate：&#xA;两阶段地址转换标志，指示当前的两阶段地址转换模式。TLB 中该标志将通过 vsatp 与 hgatp 寄存器的 mode 域进行判断： s2xlate vsatp.mode hgatp.mode 0b00 0 0 0b01 1 0 0b10 0 1 0b11 1 1 getGPA：&#xA;指示当前 PTW 请求是否为请求客户机物理地址。用于客户机缺页等情况的处理（详见支持发生 GPF 时重新发起请求部分）。 在支持了 TLB 压缩后，PTW 返回的结果主要包括 resp_valid、tag[33:0]、asid[15:0]、perm[6:0]、level[1:0]、ppn[35:0]、addr_low[2:0]、ppn_low[2:0] × 8、valididx × 8、pteidx × 8、pf、af（各个信号的含义可见支持缓存映射条目部分）。TLB 接收到有效的 PTW resp 后即将这些条目存进自己的缓存中。</description>
+    </item>
+    <item>
+      <title>支持回填条目与两阶段条目融合</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/08_refill2stage_fusion/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/08_refill2stage_fusion/</guid>
+      <description>参照支持缓存映射条目与支持读取 PTW 返回条目，对于主机地址转换（nos2xlate）的情况对应填入 entry 中的对应表项即可，此时访客有关信号无效。注意大页时，即 level 不为 0 时，ppn_low 无效。&#xA;TLB entry 填入的来自 PTW 的信号 s2xlate[1:0] 0b00 (nos2xlate) tag[34:0] s1.tag[34:0] asid[15:0] s1.asid[15:0] vmid[13:0] 无效 level[1:0] s1.level[1:0] ppn[32:0] s1.ppn[32:0] ppn_low[2:0]×8 s1.ppn_low_* valididx×8 s1.valididx_* pteidx×8 s1.pteidx_* perm_pf s1.pf perm_af s1.af perm_a s1.perm.a perm_g s1.perm.g perm_u s1.perm.u perm_x s1.perm.x gperm_gpf 无效 gperm_gaf 无效 gperm_a 无效 gperm_x 无效 s2xlate=0b00 时填入 TLB entry 示意表 在 OnlyStage1 的情况下，主机的异常信号以及部分不可复用的权限位无效，其余均与主机地址转换一致。&#xA;TLB entry 填入的来自 PTW 的信号 s2xlate[1:0] 0b01 (OnlyStage1) tag[34:0] s1.</description>
+    </item>
+    <item>
+      <title>支持发生 GPF 时重新发起 PTW 请求</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/09_guest_page_fault/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/09_guest_page_fault/</guid>
+      <description>在香山的 TLB 中并不会保存中间物理地址。在两阶段地址转换过程中，如果第一阶段发生缺页异常，即 PTW 返回 gpf，此时 TLB 将 PTW 返回的结果存入 TLB 项内，请求方再次请求的时候发现 gpf，此时 TLB 会返回 miss，即使已经存储了这个映射。同时，TLB 将发起带 getGPA 标志的 PTW 请求，请求这个虚拟地址，并维护一组寄存器暂存相关信号：&#xA;信号 作用 need_gpa 表示此时有一个请求正在获取 gpaddr need_gpa_robidx 存储请求的 ROB（Reorder Buffer）索引，用于跟踪请求来源，目前未使用 need_gpa_vpn[37:0] 存储请求的 vpn，即 50 位虚拟地址的高 38 位 need_gpa_gvpn[43:0] 存储获取的 gpaddr 的 gvpn，虚拟机通过转换得到的 56 位虚拟机物理地址的高 44 位，前六位在第二阶段地址转换中被要求为全 0 need_gpa_refill 表示该请求的 gpaddr 已经被填入 need_gpa_gvpn 每当 TLB 发起带 getGPA 标志的请求时，就会将 need_gpa 置 1，并将请求的 vpn 填入到 need_gpa_vpn 中，同时将 need_gpa_refill 置 0。当 PTW 返回结果的时候，TLB 将 PTW resp 中的 vpn 提取出来与 need_gpa_vpn 进行比较，判断是否是对之前 getGPA 请求的回应。如果是，那么将 PTW resp 中的 s2 tag 填入到 need_gpa_gvpn 中并将 need_gpa_refill 置 1，表示已经获取到需要的 gvpn。下一次 TLB 接收到相同请求时就可以通过 need_gpa_gvpn 得到 gpaddr，之后 TLB 会将 need_gpa 置 0，但保留其它寄存器，因此下次其它的请求发生 gpf 时也可以再次使用相同的 need_gpa_vpn 找到 paddr 而无需再次发起 PTW 请求。</description>
+    </item>
+    <item>
+      <title>支持 PLRU 替换算法</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/10_plru/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/10_plru/</guid>
+      <description>LRU（Least Recently Used）算法核心思想就是替换掉最近最少使用的页，也就是最长时间没有访问的页。LRU 算法将内存中的每个页组织成了一个链表的形式，如图所示：&#xA;链表有两端，一端是最近最少使用的页，可以称为 LRU 端，另一端是最近刚刚使用的页，即最近使用最频繁的页，称之为 MRU（Most Recently Used）端。每次访问的时候如果命中，那么就将命中的页移动到 MRU 端，如果 miss 则触发缺页，此时需要加载页面。如果这时候内存已满，那么就需要进行页面替换，选择 LRU 端的页进行替换，并把新访问的页放在 MRU 端。这就是 LRU 替换算法，是 cache 替换的经典算法。&#xA;但是由于 LRU 需要为 cache 行维护一个链表数据结构，在多路组相联的 cache 行中需要为每一路配置链表并跟踪每一行的使用时间，LRU 算法有着巨大的开销。因此虽然 LRU 在页面替换中表现出色，也依然不常使用。&#xA;在香山的昆明湖架构中，TLB 采用 PLRU（pseudo-LRU）替换算法，详细来说是 tree-based PLRU 算法。假设当前 Cache 是 n 路组相联（n 一般是 2 的整数幂）的结构，那么需要定义 n-1 位用来进行二叉树索引，假设为 0 表示左，为 1 表示右，如图所示：&#xA;对目前的香山昆明湖架构来说，采用每路 48 cache 行的二路组相联结构下，PLRU 需要维护一个 48 项的链表和一个一级的二叉树（1 位），而采用 LRU 将需要维护一个 48 项的链表和 48 个 2 项的链表，有一定的开销优势，随着路数的增加，优势会更加明显；同时，对二叉树的维护成本也比链表更低。&#xA;当然，PLRU 多级二叉树的选择策略下并不能做到与 LRU 一样精确控制，每次二分地排除掉一半不一定能找到绝对 LRU 的条目。</description>
+    </item>
+    <item>
+      <title>支持 SFENCE.VMA 指令</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/11_sfence_vma/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/11_sfence_vma/</guid>
+      <description>SFENCE.VMA 指令（Supervisor Memory-Management Fence Instruction）是定义在 RISC-V 指令架构的指令：&#xA;在内存管理中，页表负责将虚拟地址映射到物理地址。当修改了页表后，这些修改不会自动在处理器的缓存中生效。为了确保后续的指令能使用更新后的页表，必须通过 SFENCE.VMA 指令来刷新这些缓存。此外，处理器在执行指令时，可能隐式地对内存管理数据结构进行读取和写入操作，但这些隐式操作和显式的内存操作通常是无序的。SFENCE.VMA 指令可以强制处理器将某些隐式操作在显式操作之前完成，从而确保操作的顺序性。&#xA;SFENCE.VMA 是 RISC-V 架构中的一条特权指令，用于刷新与地址翻译相关的本地硬件缓存，处理内存管理数据结构的同步，特别是当需要确保对这些数据结构的修改在不同的硬件组件之间保持一致时需要频繁使用该指令。SFENCE.VMA 只影响本地核心（hart），如果需要在多个核心之间同步，则需要核间中断等额外机制。虽然 SFENCE.VMA 指令对于维护一致性至关重要，但频繁调用可能会影响系统性能，因此，应根据实际需要合理使用，以平衡一致性和性能之间的关系。&#xA;SFENCE.VMA 的行为依赖于 rs1 和 rs2，在 RISC-V 特权指令集中如下所述：&#xA;条件 - 如果 rs1=x0 且 rs2=x0，栅栏会对所有地址空间的页面表的所有读写进行排序，并将所有地址翻译缓存条目标记为 invalid。 - 如果 rs1=x0 且 rs2 不是 x0，栅栏会对指定的地址空间的页面表的所有读写进行排序，但不对全局映射进行排序。它还会失效与指定地址空间匹配的地址翻译缓存条目，但不包括全局映射的条目。 - 如果 rs1 不是 x0 且 rs2=x0，栅栏会对所有地址空间的与 rs1 对应的虚拟地址的叶子页面表条目的读写进行排序，并失效包含该虚拟地址的所有叶子页面表条目的地址翻译缓存条目。 - 如果 rs1 不是 x0 且 rs2 不是 x0，栅栏会对与 rs1 对应的虚拟地址在指定地址空间的叶子页面表条目的读写进行排序，并失效与 rs1 对应的虚拟地址并匹配指定地址空间的所有叶子页面表条目的地址翻译缓存条目，但不包括全局映射的条目。 - 如果 rs1 中的值不是有效的虚拟地址，则 SFENCE.VMA 指令没有效果，且不会引发异常。 - 当 rs2=x0 时，rs2 中的值的 SXLEN-1:ASIDMAX 位保留供将来标准使用。在标准扩展定义其用法之前，这些位应由软件置为零并被当前实现忽略。此外，如果 ASIDLEN &amp;lt; ASIDMAX，则实现应忽略 rs2 中值的 ASIDMAX-1:ASIDLEN 位。 SFENCE.</description>
+    </item>
+    <item>
+      <title>支持 HFENCE.VVMA 与 HFENCE.GVMA 指令</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/12_hfence_v_gvma/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/12_hfence_v_gvma/</guid>
+      <description>事实上，对 hv（SFENCE Bundle 中的信号，用于刷新第一阶段地址转换的条目）和 hg（SFENCE Bundle 中的信号，用于刷新第二阶段地址转换的条目）信号不为 0 的情况执行的指令并不是 SFENCE.VMA，而是 HFENCE.VVMA 和 HFENCE.GVMA：&#xA;这两个指令与 SFENCE.VMA 功能很相似，区别在于 HFENCE.VVMA 适用于由 vsatp 控制的 VS 级别内存管理数据结构；HFENCE.GVMA 适用于由 hgatp 控制的虚拟机监管程序 G 阶段内存管理数据结构。&#xA;HFENCE.VVMA 仅在 M 模式或 HS 模式生效，类似于暂时进入 VS 模式并执行 SFENCE.VMA 指令，可以保证当前 hart 之前的所有存储操作在后续的隐式读取 VS 级别内存管理数据结构之前都已经排序；注意这里所说的隐式读取指的仅有在 HFENCE.VVMA 之后执行的，并且 hgatp.VMID 与执行 HFENCE.VVMA 相同的时候，简单来说就是仅对当前这一个虚拟机生效。rs1 与 rs2 的功能与 SFENCE.VMA 相同。&#xA;对 HFENCE.GVMA 来说，rs1 指定的是客机的物理地址。由于主机采用 SV48 而虚拟机采用 SV48x4，客机物理地址比主机物理地址多两位，因此此时需要将 rs1 对应的客机物理地址右移两位。如果某一个虚拟机的地址翻译模式更改了，也即 hgatp.MODE 对某个 VMID 更改了，则必须使用 HFENCE.GVMA 指令，将 rs1 设为 0，rs2 设为 0 或 VMID 进行刷新。</description>
+    </item>
+    <item>
+      <title>支持 SINVAL 扩展</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/13_sinval/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/13_sinval/</guid>
+      <description>在 RISC-V 特权指令集中定义了 Svinval 扩展（Supervisor Virtual Address Invalidation），在香山昆明湖架构实现了该扩展。Svinval 扩展的意义在于将 SFENCE.VMA 指令更加细化为 SFENCE.W.INVAL、SINVAL.VMA、SFENCE.INVAL.IR 三条指令（HFENCE.VVMA 和 HFENCE.GVMA 同理）。&#xA;SINVAL.VMA 指令事实上与 SFENCE.VMA 指令的功能基本一致，只是添加了对 SFENCE.W.INVAL 与 SFENCE.INVAL.IR 两个指令的相互排序，可以理解为需要在两个指令中间进行。SFENCE.W.INVAL 指令用于确保当前 RISC-V hart 可见的任何先前存储在后续由同一个 hart 执行的 SINVAL.VMA 指令之前被重新排序。SFENCE.INVAL.IR 指令确保当前 hart 执行的任何先前 SINVAL.VMA 指令在后续隐式引用内存管理数据结构之前被排序。当由单个 hart 按顺序（不一定连续）执行 SFENCE.W.INVAL、SINVAL.VMA 和 SFENCE.INVAL.IR 时，可以相当于执行了 SFENCE.VMA 指令。</description>
+    </item>
+    <item>
+      <title>支持软件更新 A/D 位</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/14_software_update_a_d/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/14_software_update_a_d/</guid>
+      <description>A 位（Access）用于指示某一页面是否被访问过。如果处理器对该页面进行任何形式的访问（读/写/取指），则 A 位会被设置为 1。每当 CPU 访问某个页面时，操作系统或硬件会自动将 A 位设置为 1，这种更新通常是硬件支持的，由处理器在地址转换时自动进行。&#xA;D 位（Dirty）指示页面是否被修改。如果页面在内存中被写入，则 D 位会被设置为 1，表示该页面的内容已被更改。当处理器对页面进行写操作时，通常会自动将 D 位设置为 1，这种更新通常也是由硬件支持的。在页面替换过程中，操作系统会检查 D 位，如果 D 位为 1，操作系统会将页面写回到磁盘，并在写回后清除 D 位，以表示页面已经被保存且不再是“脏”的。&#xA;在香山昆明湖架构中，并不支持硬件更新 A/D 位，而是在需要更新的时候通过 Page Fault 通知软件进行页表更新。具体来说，每当处理器访问某一页时检查该页 A 位如果是 0，那么会发生 PF；同样的，每当处理器写入某一页时检查该页的 D 位如果是 0，同样会发生 PF。在软件处理异常后，操作系统会允许处理器再次访问页面，只有在页表得到更新且相关状态位（A 和 D 位）被正确设置后，处理器才能继续进行后续的内存访问。</description>
+    </item>
+  </channel>
+</rss>
