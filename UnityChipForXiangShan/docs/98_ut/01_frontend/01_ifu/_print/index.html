@@ -152,7 +152,7 @@ CFI指令类型 brType类型编码 非CFI 00 branch指令 01 jal指令 10 jalr�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.397961065ecb5f1bd69c957e349feac7.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b4f0457bef8aeee4b218ab5beabaff52.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -2039,8 +2039,9 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 当指令的PC和tdata2寄存器内容的关系满足mcontrol的match位所指示的关系（香山支持match位为0、2、3，对应等于、大于、小于）时，
 该指令会被标记为Trigger命中，随着执行在后端产生断点异常，进入M-Mode或调试模式。</p>
 <h3 id="链式断点">链式断点</h3>
+<p>根据RISCV的debug spec，香山实现的是mcontrol6。</p>
 <p>前端的0、6、8号Trigger支持Chain功能。
-当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，且timing配置相同时，处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中</p>
+当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，<del>且timing配置相同时</del>（在最新的手册中，这一要求已被删除），处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中。</p>
 <h2 id="frontendtrigger-接口说明">FrontendTrigger 接口说明</h2>
 <p>设计上并没有提供一个或一组对外的接口来查询某个断点的状态，因此，要在测试中检查断点状态，要么需要检查内部信号的情况（仓库中提供的构建脚本已经暴露了所有内部信号），要么通过具体执行过程中，断点的触发情况来判定。</p>
 <h3 id="输入接口">输入接口</h3>
@@ -2103,7 +2104,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tbody>
 </table>
 <h3 id="功能点2-链式断点">功能点2 链式断点</h3>
-<p>当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中并且两个trigger的timing相同时，后一个trigger才会触发。</p>
+<p>当某一个trigger的chain位被置后，当其后的trigger的chain位未设置，且两个trigger均命中<del>并且两个trigger的timing相同</del>时，后一个trigger才会触发。</p>
 <p>对0号trigger，不需要考虑链式的情况</p>
 <p>由此，我们可以设置几种测试点：</p>
 <table>
@@ -2121,19 +2122,14 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <td>对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发。</td>
 </tr>
 <tr>
-<td>2.2</td>
-<td>timing测试</td>
-<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发。</td>
-</tr>
-<tr>
-<td>2.3.1</td>
+<td>2.2.1</td>
 <td>未命中测试</td>
-<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。</td>
+<td>对两个trigger，仅设置前一个trigger的chain位<del>且两trigger的timing位相同</del>，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发。</td>
 </tr>
 <tr>
-<td>2.3.2</td>
+<td>2.2.2</td>
 <td>命中测试</td>
-<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发。</td>
+<td>对两个trigger，仅设置前一个trigger的chain位<del>且两trigger的timing位相同</del>且均命中，检查后一个trigger是否触发。</td>
 </tr>
 </tbody>
 </table>
@@ -2173,22 +2169,16 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <td>对每个trigger，在满足PC断点触发条件的情况下，设置chain位，检查断点是否一定不触发</td>
 </tr>
 <tr>
-<td>2.2</td>
-<td>链式断点</td>
-<td>timing测试</td>
-<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位不同，随机设置PC等，测试后一个trigger是否一定不触发</td>
-</tr>
-<tr>
-<td>2.3.1</td>
+<td>2.2.1</td>
 <td>链式断点</td>
 <td>未命中测试</td>
-<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，设置后一个trigger命中而前一个未命中，检查后一个trigger是否一定不触发</td>
 </tr>
 <tr>
-<td>2.3.2</td>
+<td>2.2.2</td>
 <td>链式断点</td>
 <td>命中测试</td>
-<td>对两个trigger，仅设置前一个trigger的chain位，且两trigger的timing位相同且均命中，检查后一个trigger是否触发</td>
+<td>对两个trigger，仅设置前一个trigger的chain位，检查后一个trigger是否触发</td>
 </tr>
 </tbody>
 </table>

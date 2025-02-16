@@ -32,14 +32,14 @@ VPN：
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/07_refill_from_ptw/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-02-13T19:53:59+08:00" />
+<meta property="article:modified_time" content="2025-02-16T21:20:25+08:00" />
 <meta itemprop="name" content="支持读取 PTW 返回条目">
 <meta itemprop="description" content="每次 TLB 发生 miss 之后，会向 L2TLB 发送 Page Table Walk 请求。由于 TLB 与 L2TLB 之间有比较长的物理距离，需要在中间加拍，这项工作由 repeator 完成。同时，repeator 还需要对 PTW 请求进行过滤，以避免 TLB 中出现重复项，因此也被称为 filter。目前香山中 TLB 发出的 PTW 请求的内容包含 VPN、s2xlate、getGPA 三个信号以及必要的控制信号：
 VPN：
 虚拟页框号，TLB 在 miss 之后会将 VPN 发送给 PTW 用于索引对应的物理页，PTW 会将叶子页表的 PPN 返回给 TLB，下次 TLB 查询的时候就可以找到该页并可以通过页内偏移找到物理地址。 s2xlate：
 两阶段地址转换标志，指示当前的两阶段地址转换模式。TLB 中该标志将通过 vsatp 与 hgatp 寄存器的 mode 域进行判断： s2xlate vsatp.mode hgatp.mode 0b00 0 0 0b01 1 0 0b10 0 1 0b11 1 1 getGPA：
 指示当前 PTW 请求是否为请求客户机物理地址。用于客户机缺页等情况的处理（详见支持发生 GPF 时重新发起请求部分）。 在支持了 TLB 压缩后，PTW 返回的结果主要包括 resp_valid、tag[33:0]、asid[15:0]、perm[6:0]、level[1:0]、ppn[35:0]、addr_low[2:0]、ppn_low[2:0] × 8、valididx × 8、pteidx × 8、pf、af（各个信号的含义可见支持缓存映射条目部分）。TLB 接收到有效的 PTW resp 后即将这些条目存进自己的缓存中。">
-<meta itemprop="dateModified" content="2025-02-13T19:53:59+08:00" />
+<meta itemprop="dateModified" content="2025-02-16T21:20:25+08:00" />
 <meta itemprop="wordCount" content="249">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="支持读取 PTW 返回条目"/>
 <meta name="twitter:description" content="每次 TLB 发生 miss 之后，会向 L2TLB 发送 Page Table Walk 请求。由于 TLB 与 L2TLB 之间有比较长的物理距离，需要在中间加拍，这项工作由 repeator 完成。同时，repeator 还需要对 PTW 请求进行过滤，以避免 TLB 中出现重复项，因此也被称为 filter。目前香山中 TLB 发出的 PTW 请求的内容包含 VPN、s2xlate、getGPA 三个信号以及必要的控制信号：
@@ -148,7 +148,7 @@ VPN：
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.397961065ecb5f1bd69c957e349feac7.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b4f0457bef8aeee4b218ab5beabaff52.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -172,7 +172,7 @@ VPN：
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.397961065ecb5f1bd69c957e349feac7.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.b4f0457bef8aeee4b218ab5beabaff52.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -601,7 +601,7 @@ VPN：
 <p><img alt="PTW resp 结构示意图" src="PTW_resp%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F.png"></p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 February 13, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0f5808c11e2ddf8e405824cd79ee63796c9b076a">ADD itlb document. Modified zh-ch 01_verify_env.md: toffe-&gt;toffee &amp; download toffee link. (#68) (0f5808c)</a>
+  最后修改 February 16, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/98e19558c1b564259ebe27d5e4824faf287fa856">add xs friendly link at main page; frontend trigger doc fix: remove timing related things (#70) (98e1955)</a>
 </div>
 
 </div>
