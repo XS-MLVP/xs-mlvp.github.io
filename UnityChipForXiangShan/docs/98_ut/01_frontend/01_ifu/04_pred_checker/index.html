@@ -78,7 +78,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-02-16T21:20:25+08:00" />
+<meta property="article:modified_time" content="2025-02-18T10:52:31+08:00" />
 <meta itemprop="name" content="PredChecker">
 <meta itemprop="description" content="子模块：PredChecker简介 分支预测检查器PredChecker接收来自IFU的预测块信息（包括预测跳转指令在预测块的位置、预测的跳转目标、预译码得到的指令信息、指令PC以及预译码得到的跳转目标偏移等），在模块内部检查五种类型的分支预测错误。模块内部分为两个流水线stage，分别输出信息，第一个stage输出给f3阶段，用于修正预测块的指令范围和预测结果。第二个stage输出给wb阶段，用于在发现分支预测错误时产生前端重定向以及写回给FTQ正确的预测信息。
 PredChecker功能介绍 JAL预测错误检查 jal指令预测错误的条件是，预测块中有一条jal指令（由预译码信息给出），但是要么这个预测块没有预测跳转，要么此预测块预测跳转的指令在这条jal指令之后（即这条jal指令没有被预测跳转）。
@@ -108,7 +108,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 序号 名称 描述 1.2.1 存在JAL未预测 预测块中存在JAL指令，但是BPU预测信息未预测跳转，检查PredChecker是否能检测出JAL预测错误。 1.2.2 预测的JAL并非第一条 预测块中存在JAL指令，但是BPU预测信息取的跳转指令在第一条JAL指令之后，检查PredChecker是否能检测出JAL预测错误。 功能点2 BPU预测信息的RET预测错误检查 PredChecker会对传入的预测块进行RET预测错误预检查并修正指令有效范围向量和新的预测结果。
 和JAL预测错误类似，我们也按照误检和正检来构造。
 对于误检，我们设计如下的测试点：">
-<meta itemprop="dateModified" content="2025-02-16T21:20:25+08:00" />
+<meta itemprop="dateModified" content="2025-02-18T10:52:31+08:00" />
 <meta itemprop="wordCount" content="262">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PredChecker"/>
 <meta name="twitter:description" content="子模块：PredChecker简介 分支预测检查器PredChecker接收来自IFU的预测块信息（包括预测跳转指令在预测块的位置、预测的跳转目标、预译码得到的指令信息、指令PC以及预译码得到的跳转目标偏移等），在模块内部检查五种类型的分支预测错误。模块内部分为两个流水线stage，分别输出信息，第一个stage输出给f3阶段，用于修正预测块的指令范围和预测结果。第二个stage输出给wb阶段，用于在发现分支预测错误时产生前端重定向以及写回给FTQ正确的预测信息。
@@ -1023,7 +1023,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 February 16, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/98e19558c1b564259ebe27d5e4824faf287fa856">add xs friendly link at main page; frontend trigger doc fix: remove timing related things (#70) (98e1955)</a>
+  最后修改 February 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/370fcb174cff8896f761920eaf6d611864ef4508">refine: doc table display refinement (370fcb1)</a>
 </div>
 
 </div>

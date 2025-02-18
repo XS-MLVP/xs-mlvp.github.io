@@ -26,11 +26,11 @@ SINVAL.VMA 指令事实上与 SFENCE.VMA 指令的功能基本一致，只是添
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/13_sinval/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-02-16T21:20:25+08:00" />
+<meta property="article:modified_time" content="2025-02-18T10:52:31+08:00" />
 <meta itemprop="name" content="支持 SINVAL 扩展">
 <meta itemprop="description" content="在 RISC-V 特权指令集中定义了 Svinval 扩展（Supervisor Virtual Address Invalidation），在香山昆明湖架构实现了该扩展。Svinval 扩展的意义在于将 SFENCE.VMA 指令更加细化为 SFENCE.W.INVAL、SINVAL.VMA、SFENCE.INVAL.IR 三条指令（HFENCE.VVMA 和 HFENCE.GVMA 同理）。
 SINVAL.VMA 指令事实上与 SFENCE.VMA 指令的功能基本一致，只是添加了对 SFENCE.W.INVAL 与 SFENCE.INVAL.IR 两个指令的相互排序，可以理解为需要在两个指令中间进行。SFENCE.W.INVAL 指令用于确保当前 RISC-V hart 可见的任何先前存储在后续由同一个 hart 执行的 SINVAL.VMA 指令之前被重新排序。SFENCE.INVAL.IR 指令确保当前 hart 执行的任何先前 SINVAL.VMA 指令在后续隐式引用内存管理数据结构之前被排序。当由单个 hart 按顺序（不一定连续）执行 SFENCE.W.INVAL、SINVAL.VMA 和 SFENCE.INVAL.IR 时，可以相当于执行了 SFENCE.VMA 指令。">
-<meta itemprop="dateModified" content="2025-02-16T21:20:25+08:00" />
+<meta itemprop="dateModified" content="2025-02-18T10:52:31+08:00" />
 <meta itemprop="wordCount" content="45">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="支持 SINVAL 扩展"/>
 <meta name="twitter:description" content="在 RISC-V 特权指令集中定义了 Svinval 扩展（Supervisor Virtual Address Invalidation），在香山昆明湖架构实现了该扩展。Svinval 扩展的意义在于将 SFENCE.VMA 指令更加细化为 SFENCE.W.INVAL、SINVAL.VMA、SFENCE.INVAL.IR 三条指令（HFENCE.VVMA 和 HFENCE.GVMA 同理）。
@@ -466,7 +466,7 @@ SINVAL.VMA 指令事实上与 SFENCE.VMA 指令的功能基本一致，只是添
 <p><img alt="SFENCE.W.INVAL 和 SFENCE.INVAL.IR" src="SFENCE_W_INVAL&INVAL_IR.png"></p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 February 16, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/98e19558c1b564259ebe27d5e4824faf287fa856">add xs friendly link at main page; frontend trigger doc fix: remove timing related things (#70) (98e1955)</a>
+  最后修改 February 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/370fcb174cff8896f761920eaf6d611864ef4508">refine: doc table display refinement (370fcb1)</a>
 </div>
 
 </div>

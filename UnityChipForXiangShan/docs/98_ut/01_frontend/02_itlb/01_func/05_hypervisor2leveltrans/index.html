@@ -32,14 +32,14 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/05_hypervisor2leveltrans/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-02-16T21:20:25+08:00" />
+<meta property="article:modified_time" content="2025-02-18T10:52:31+08:00" />
 <meta itemprop="name" content="支持 Hypervisor 扩展与两阶段虚实地址翻译">
 <meta itemprop="description" content="在 RISC-V 特权指令手册中定义了虚实地址的翻译过程：
 设 a 为 satp.ppn × PAGESIZE，并设 i = LEVELS - 1。（对于 Sv48，PAGESIZE = 2^{12}，LEVELS = 4）此时，satp 寄存器必须处于活动状态，即有效的特权模式必须是 S 模式或 U 模式。
 设 pte 为地址 a &#43; va.vpn[i] × PTESIZE 处的 PTE 值。（对于 Sv48，PTESIZE = 8）如果访问 pte 违反了 PMA 或 PMP 检查，则引发与原始访问类型相应的访问错误异常。
 如果 pte.v = 0，或者 pte.r = 0 且 pte.w = 1，或者 pte 中设置了任何为未来标准使用保留的位或编码，则停止并引发与原始访问类型相应的页面错误异常。
 否则，PTE 是有效的。如果 pte.r = 1 或 pte.x = 1，则转到步骤 5。否则，此 PTE 是指向下一级页面表的指针。设 i = i - 1。如果 i &lt; 0，则停止并引发与原始访问类型相应的页面错误异常。否则，设 a = pte.">
-<meta itemprop="dateModified" content="2025-02-16T21:20:25+08:00" />
+<meta itemprop="dateModified" content="2025-02-18T10:52:31+08:00" />
 <meta itemprop="wordCount" content="308">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="支持 Hypervisor 扩展与两阶段虚实地址翻译"/>
 <meta name="twitter:description" content="在 RISC-V 特权指令手册中定义了虚实地址的翻译过程：
@@ -524,7 +524,7 @@
 <p><img alt="香山昆明湖架构 TLB 两阶段地址翻译过程" src="%E9%A6%99%E5%B1%B1%E5%9C%B0%E5%9D%80%E7%BF%BB%E8%AF%91%E8%BF%87%E7%A8%8B.png"></p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 February 16, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/98e19558c1b564259ebe27d5e4824faf287fa856">add xs friendly link at main page; frontend trigger doc fix: remove timing related things (#70) (98e1955)</a>
+  最后修改 February 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/370fcb174cff8896f761920eaf6d611864ef4508">refine: doc table display refinement (370fcb1)</a>
 </div>
 
 </div>

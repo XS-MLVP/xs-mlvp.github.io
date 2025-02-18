@@ -34,7 +34,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/04_tlbcompression/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-02-16T21:20:25+08:00" />
+<meta property="article:modified_time" content="2025-02-18T10:52:31+08:00" />
 <meta itemprop="name" content="支持 TLB 压缩">
 <meta itemprop="description" content="随着虚拟地址空间的不断扩展，传统 TLB 的大小和效率面临挑战，可能不足以覆盖应用程序的需求，导致频繁的缺失（TLB miss），从而影响系统性能，导致性能瓶颈。为了应对这一问题，TLB 压缩技术应运而生，旨在提高 TLB 的有效性和性能。
 在操作系统分配内存的时候，由于使用伙伴地址分配策略等原因，会倾向于将连续的物理页分配给连续的虚拟页。虽然随着程序的不断运行，页分配逐渐的从有序趋向于无序，但是这种页的相连性普遍存在，因此可以通过将多个连续的页表项在 TLB 硬件中合成为一个 TLB 项，以增大 TLB 容量。TLB 压缩通过优化页表结构，支持连续的映射，通过引入范围映射（range mapping）机制，一个 TLB 条目可以映射一段连续的虚拟地址到一段连续的物理地址。
@@ -42,7 +42,7 @@
 在支持了 H 扩展后（见支持两阶段虚实地址翻译），TLB 压缩仅在 OnlyStage1 和 noS2xlate 下启用，在其他情况下不启用。
 支持 TLB 压缩后 TLB 中缓存的条目会有所变化（表中未提及的条目即没有变化）：
 是否压缩 tag ppn valididx pteidx ppn_low 否 38位 36位 不保存 不保存 不保存 是 35位 33位 8位 8位 8×3位 在支持了大小页的情况下，TLB 压缩在大页情况下（2MB/1GB/512GB）不启用，仅在查询结果为小页（4KB）情况下启用。大页在返回时会将 valididx 的 8 位全部设置为 1，而由于大页的查询过程中只需要 PPN 的高位，大页下不使用 ppn_low，ppn_low 的值在此时是未定义的。">
-<meta itemprop="dateModified" content="2025-02-16T21:20:25+08:00" />
+<meta itemprop="dateModified" content="2025-02-18T10:52:31+08:00" />
 <meta itemprop="wordCount" content="95">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="支持 TLB 压缩"/>
 <meta name="twitter:description" content="随着虚拟地址空间的不断扩展，传统 TLB 的大小和效率面临挑战，可能不足以覆盖应用程序的需求，导致频繁的缺失（TLB miss），从而影响系统性能，导致性能瓶颈。为了应对这一问题，TLB 压缩技术应运而生，旨在提高 TLB 的有效性和性能。
@@ -515,7 +515,7 @@
 <p>在支持了大小页的情况下，<code>TLB</code> 压缩在大页情况下（<code>2MB/1GB/512GB</code>）不启用，仅在查询结果为小页（<code>4KB</code>）情况下启用。大页在返回时会将 <code>valididx</code> 的 <code>8</code> 位全部设置为 <code>1</code>，而由于大页的查询过程中只需要 <code>PPN</code> 的高位，大页下不使用 <code>ppn_low</code>，<code>ppn_low</code> 的值在此时是未定义的。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 February 16, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/98e19558c1b564259ebe27d5e4824faf287fa856">add xs friendly link at main page; frontend trigger doc fix: remove timing related things (#70) (98e1955)</a>
+  最后修改 February 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/370fcb174cff8896f761920eaf6d611864ef4508">refine: doc table display refinement (370fcb1)</a>
 </div>
 
 </div>
