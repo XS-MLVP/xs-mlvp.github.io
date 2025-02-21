@@ -2309,7 +2309,7 @@ CacheMeta.sv
 </span></span></code></pre></div><hr>
 <p>在经过了前面的绑定之后，接下来可以使用了。<br>
 我们根据需要来设置回调、设置分频。当然，时序电路肯定也要驱动时钟。<br>
-这些方法都可以参照<a href="https://xs-mlvp.github.io/mlvp/docs/env_usage/picker_usage/#xclock-%E7%B1%BB">工具介绍</a>。</p>
+这些方法都可以参照<a href="https://open-verify.cc/mlvp/docs/env_usage/picker_usage/#xclock-%E7%B1%BB">工具介绍</a>。</p>
 <p>下面是举例：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># func为回调函数，args为自定义参数</span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#设置上升沿回调函数</span>
@@ -2429,7 +2429,7 @@ CacheMeta.sv
 <p>例子：</p>
 <p>以Adder为例，我们可以在测试时根据需要在合适的位置创建多个dut，来动态创建多个Adder实例。
 当需要销毁一个dut时，也不会影响后续创建新的dut。</p>
-<p>创建一个名为 picker_out_adder 的文件夹，其中包含一个 Adder.v 文件。该文件的源码参考<a href="https://xs-mlvp.github.io/mlvp/docs/quick-start/eg-adder/">案例一：简单加法器</a>。</p>
+<p>创建一个名为 picker_out_adder 的文件夹，其中包含一个 Adder.v 文件。该文件的源码参考<a href="https://open-verify.cc/mlvp/docs/quick-start/eg-adder/">案例一：简单加法器</a>。</p>
 <p>运行下述命令将RTL导出为 Python Module：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> Adder.v --autobuild <span style="color:#204a87">true</span> -w Adder.fst --sname Adder
 </span></span></code></pre></div><p>在picker_out_adder中添加 <code>example.py</code>，动态创建多个Adder实例：</p>

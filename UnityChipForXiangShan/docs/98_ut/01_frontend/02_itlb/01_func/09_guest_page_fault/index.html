@@ -26,11 +26,11 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/09_guest_page_fault/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-02-19T13:02:11+08:00" />
+<meta property="article:modified_time" content="2025-02-21T10:45:08+08:00" />
 <meta itemprop="name" content="支持发生 GPF 时重新发起 PTW 请求">
 <meta itemprop="description" content="在香山的 TLB 中并不会保存中间物理地址。在两阶段地址转换过程中，如果第一阶段发生缺页异常，即 PTW 返回 gpf，此时 TLB 将 PTW 返回的结果存入 TLB 项内，请求方再次请求的时候发现 gpf，此时 TLB 会返回 miss，即使已经存储了这个映射。同时，TLB 将发起带 getGPA 标志的 PTW 请求，请求这个虚拟地址，并维护一组寄存器暂存相关信号：
 信号 作用 need_gpa 表示此时有一个请求正在获取 gpaddr need_gpa_robidx 存储请求的 ROB（Reorder Buffer）索引，用于跟踪请求来源，目前未使用 need_gpa_vpn[37:0] 存储请求的 vpn，即 50 位虚拟地址的高 38 位 need_gpa_gvpn[43:0] 存储获取的 gpaddr 的 gvpn，虚拟机通过转换得到的 56 位虚拟机物理地址的高 44 位，前六位在第二阶段地址转换中被要求为全 0 need_gpa_refill 表示该请求的 gpaddr 已经被填入 need_gpa_gvpn 每当 TLB 发起带 getGPA 标志的请求时，就会将 need_gpa 置 1，并将请求的 vpn 填入到 need_gpa_vpn 中，同时将 need_gpa_refill 置 0。当 PTW 返回结果的时候，TLB 将 PTW resp 中的 vpn 提取出来与 need_gpa_vpn 进行比较，判断是否是对之前 getGPA 请求的回应。如果是，那么将 PTW resp 中的 s2 tag 填入到 need_gpa_gvpn 中并将 need_gpa_refill 置 1，表示已经获取到需要的 gvpn。下一次 TLB 接收到相同请求时就可以通过 need_gpa_gvpn 得到 gpaddr，之后 TLB 会将 need_gpa 置 0，但保留其它寄存器，因此下次其它的请求发生 gpf 时也可以再次使用相同的 need_gpa_vpn 找到 paddr 而无需再次发起 PTW 请求。">
-<meta itemprop="dateModified" content="2025-02-19T13:02:11+08:00" />
+<meta itemprop="dateModified" content="2025-02-21T10:45:08+08:00" />
 <meta itemprop="wordCount" content="162">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="支持发生 GPF 时重新发起 PTW 请求"/>
 <meta name="twitter:description" content="在香山的 TLB 中并不会保存中间物理地址。在两阶段地址转换过程中，如果第一阶段发生缺页异常，即 PTW 返回 gpf，此时 TLB 将 PTW 返回的结果存入 TLB 项内，请求方再次请求的时候发现 gpf，此时 TLB 会返回 miss，即使已经存储了这个映射。同时，TLB 将发起带 getGPA 标志的 PTW 请求，请求这个虚拟地址，并维护一组寄存器暂存相关信号：
@@ -497,7 +497,7 @@
 <p><code>getGPA</code> 标志并不用于判断指令是否是请求 <code>gpaddr</code>，<code>PTW</code> 不需要关心请求是干什么的，只需要负责查找并返回结果；<code>TLB</code> 内会通过一系列寄存器的比较来判断。这个信号的作用在于防止 <code>TLB</code> 重填，每次 <code>TLB</code> 发送带 <code>getGPA</code> 标志的请求时，<code>PTW</code> 在返回时会将 <code>getGPA</code> 信号传递回 <code>TLB</code>，从而使 <code>TLB</code> 不进行重填，不存储此项 <code>gpaddr</code>。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 February 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0d929eeb6c6a5f8952e7f669cf577450598f6de4">readme: add template useage description (#73) (0d929ee)</a>
+  最后修改 February 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/aa11cd70911ac29456088016a2c17e598325ddd6">fix: rename xs-mlvp.github.io to open-verify.cc (aa11cd7)</a>
 </div>
 
 </div>

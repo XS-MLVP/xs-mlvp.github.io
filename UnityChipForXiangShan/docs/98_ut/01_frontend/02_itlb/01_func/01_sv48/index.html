@@ -46,7 +46,7 @@ Reserved:
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/01_sv48/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-02-19T13:02:11+08:00" />
+<meta property="article:modified_time" content="2025-02-21T10:45:08+08:00" />
 <meta itemprop="name" content="支持 SV48 分页机制">
 <meta itemprop="description" content="SV48 （Supervisor-mode Virtual Memory）是一种基于 RISC-V 的页表虚拟内存寻址模式，指定了 48 位虚拟地址空间的结构，支持 256TB 的虚拟内存地址空间。使用四级页表结构：
 在 SV48 的一个 PTE 中包含了如下字段：
@@ -60,7 +60,7 @@ Reserved:
 脏位，指示该页面是否被写入。如果该位为 1，表示该页的数据已被修改，需在换出时写回到存储设备。 A:
 访问位，指示该页是否被访问过。如果该位为 1，表示该页已被读取或写入，用于页面替换算法。 G:
 全局页位，指示该页是否是全局页。如果该位为 1，表示该页对所有进程可见，用于共享代码或数据。 U:">
-<meta itemprop="dateModified" content="2025-02-19T13:02:11+08:00" />
+<meta itemprop="dateModified" content="2025-02-21T10:45:08+08:00" />
 <meta itemprop="wordCount" content="190">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="支持 SV48 分页机制"/>
 <meta name="twitter:description" content="SV48 （Supervisor-mode Virtual Memory）是一种基于 RISC-V 的页表虚拟内存寻址模式，指定了 48 位虚拟地址空间的结构，支持 256TB 的虚拟内存地址空间。使用四级页表结构：
@@ -601,7 +601,7 @@ Reserved:
 <p>出于对面积等的优化考虑，在香山中采用 <code>48</code> 位的主机物理地址，而不是 <code>Sv48</code> 要求的 <code>56</code> 位物理地址，这是因为 <code>48</code> 位的物理地址已经可以索引 <code>256TB</code> 的物理地址空间，目前来说已经足够使用。但是由于 <code>TLB</code> 对虚拟机的支持，在虚拟机两阶段地址转换过程中（两阶段地址转换可见支持两阶段虚实地址翻译过程部分），虚拟机通过 <code>VS</code> 阶段转换的结果仍然是 <code>56</code> 位的虚拟机物理地址，只不过在进入 <code>G</code> 阶段地址转换时，<code>G</code> 阶段要求传入的 <code>GPA</code> 的高 <code>6</code> 位必须为 <code>0</code>，这是因为在 <code>Sv48x4</code> 中客户机物理地址要求为 <code>50</code> 位，而 <code>VS</code> 阶段得到的物理地址是 <code>56</code> 位。为了保持 <code>gpaddr</code> 的完整性，<code>PTW</code> 传入 <code>TLB</code> 的 <code>ppn</code> 信号的位宽依然为 <code>44</code> 位，然而由于 <code>TLB</code> 不存储中间转换结果（中间物理地址 <code>IPA</code>），也就不需要存储 <code>44</code> 位的 <code>ppn</code>，在 <code>TLB</code> 表项中存储的只有主机的 <code>ppn</code>，也即 <code>36</code> 位的 <code>ppn</code>。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 February 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0d929eeb6c6a5f8952e7f669cf577450598f6de4">readme: add template useage description (#73) (0d929ee)</a>
+  最后修改 February 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/aa11cd70911ac29456088016a2c17e598325ddd6">fix: rename xs-mlvp.github.io to open-verify.cc (aa11cd7)</a>
 </div>
 
 </div>

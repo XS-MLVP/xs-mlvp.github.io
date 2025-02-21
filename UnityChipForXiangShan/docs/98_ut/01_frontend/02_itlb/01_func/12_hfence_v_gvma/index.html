@@ -30,13 +30,13 @@ HFENCE.VVMA 仅在 M 模式或 HS 模式生效，类似于暂时进入 VS 模式
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_func/12_hfence_v_gvma/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-02-19T13:02:11+08:00" />
+<meta property="article:modified_time" content="2025-02-21T10:45:08+08:00" />
 <meta itemprop="name" content="支持 HFENCE.VVMA 与 HFENCE.GVMA 指令">
 <meta itemprop="description" content="事实上，对 hv（SFENCE Bundle 中的信号，用于刷新第一阶段地址转换的条目）和 hg（SFENCE Bundle 中的信号，用于刷新第二阶段地址转换的条目）信号不为 0 的情况执行的指令并不是 SFENCE.VMA，而是 HFENCE.VVMA 和 HFENCE.GVMA：
 这两个指令与 SFENCE.VMA 功能很相似，区别在于 HFENCE.VVMA 适用于由 vsatp 控制的 VS 级别内存管理数据结构；HFENCE.GVMA 适用于由 hgatp 控制的虚拟机监管程序 G 阶段内存管理数据结构。
 HFENCE.VVMA 仅在 M 模式或 HS 模式生效，类似于暂时进入 VS 模式并执行 SFENCE.VMA 指令，可以保证当前 hart 之前的所有存储操作在后续的隐式读取 VS 级别内存管理数据结构之前都已经排序；注意这里所说的隐式读取指的仅有在 HFENCE.VVMA 之后执行的，并且 hgatp.VMID 与执行 HFENCE.VVMA 相同的时候，简单来说就是仅对当前这一个虚拟机生效。rs1 与 rs2 的功能与 SFENCE.VMA 相同。
 对 HFENCE.GVMA 来说，rs1 指定的是客机的物理地址。由于主机采用 SV48 而虚拟机采用 SV48x4，客机物理地址比主机物理地址多两位，因此此时需要将 rs1 对应的客机物理地址右移两位。如果某一个虚拟机的地址翻译模式更改了，也即 hgatp.MODE 对某个 VMID 更改了，则必须使用 HFENCE.GVMA 指令，将 rs1 设为 0，rs2 设为 0 或 VMID 进行刷新。">
-<meta itemprop="dateModified" content="2025-02-19T13:02:11+08:00" />
+<meta itemprop="dateModified" content="2025-02-21T10:45:08+08:00" />
 <meta itemprop="wordCount" content="98">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="支持 HFENCE.VVMA 与 HFENCE.GVMA 指令"/>
 <meta name="twitter:description" content="事实上，对 hv（SFENCE Bundle 中的信号，用于刷新第一阶段地址转换的条目）和 hg（SFENCE Bundle 中的信号，用于刷新第二阶段地址转换的条目）信号不为 0 的情况执行的指令并不是 SFENCE.VMA，而是 HFENCE.VVMA 和 HFENCE.GVMA：
@@ -476,7 +476,7 @@ HFENCE.VVMA 仅在 M 模式或 HS 模式生效，类似于暂时进入 VS 模式
 <p>在香山中，由于 <code>TLB</code> 本身不存储中间物理地址，也即 <code>TLB</code> 并不存储 <code>VS</code> 阶段转换出来的虚拟机物理地址，也无法单独提供 <code>G</code> 阶段地址转换请求。在 <code>TLB</code> 中存储的是两阶段地址翻译的最终结果，因此 <code>HFENCE.VVMA</code> 与 <code>HFENCE.GVMA</code> 在 <code>TLB</code> 中作用相同，均为刷新掉两阶段地址翻译的结果。无论 <code>hv</code> 与 <code>hg</code> 哪一个信号为 <code>1</code> 都将刷新两阶段的条目。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 February 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0d929eeb6c6a5f8952e7f669cf577450598f6de4">readme: add template useage description (#73) (0d929ee)</a>
+  最后修改 February 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/aa11cd70911ac29456088016a2c17e598325ddd6">fix: rename xs-mlvp.github.io to open-verify.cc (aa11cd7)</a>
 </div>
 
 </div>
