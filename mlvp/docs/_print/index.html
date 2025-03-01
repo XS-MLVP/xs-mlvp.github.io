@@ -130,7 +130,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.a2223fb8e82b820c8ee7120cf29135ed.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -797,7 +797,7 @@
 </span></span></code></pre></div><blockquote>
 <p>默认的安装的目标路径是 <code>/usr/local</code>， 二进制文件被置于 <code>/usr/local/bin</code>，模板文件被置于 <code>/usr/local/share/picker</code>。
 如果需要修改安装目录，可以通过指定ARGS给cmake传递参数，例如<code>make ARGS=&quot;-DCMAKE_INSTALL_PREFIX=your_instal_dir&quot;</code>
-安装时会自动安装 <code>xspcomm</code>基础库（<a href="https://github.com/XS-MLVP/xcomm">https://github.com/XS-MLVP/xcomm</a>），该基础库是用于封装 <code>RTL</code> 模块的基础类型，位于 <code>/usr/local/lib/libxspcomm.so</code>。 <strong>可能需要手动设置编译时的链接目录参数(-L)</strong><br>
+安装时会自动安装 <code>xspcomm</code>基础库（<a href="https://github.com/XS-MLVP/xcomm">https://github.com/XS-MLVP/xcomm</a>），该基础库是用于封装 <code>RTL</code> 模块的基础类型，位于 <code>/usr/local/lib/libxspcomm.so</code>。 <strong>可能需要手动设置编译时的链接目录参数(-L)</strong>
 如果开启了Java等语言支持，还会安装 <code>xspcomm</code> 对应的多语言软件包。</p>
 </blockquote>
 <p><strong>picker也可以编译为wheel文件，通过pip安装</strong></p>
@@ -807,7 +807,7 @@
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pip install dist/xspcomm-0.0.1-cp311-cp311-linux_x86_64.whl
 </span></span><span style="display:flex;"><span>pip install dist/picker-0.0.1-cp311-cp311-linux_x86_64.whl
 </span></span></code></pre></div><p>安装完成后，执行<code>picker</code>命令可以得到以下输出:</p>
-<pre tabindex="0"><code>XDut Generate. 
+<pre tabindex="0"><code>XDut Generate.
 Convert DUT(*.v/*.sv) to C++ DUT libs.
 
 Usage: ./build/bin/picker [OPTIONS] [SUBCOMMAND]
@@ -835,55 +835,51 @@ Subcommands:
 </code></pre><h3 id="安装测试">安装测试</h3>
 <p>当前picker有export和pack两个子命令。</p>
 <p>export 子命令用于将RTL设计转换成其他高级编程语言对应的“库”，可以通过软件的方式进行驱动。</p>
-<blockquote>
-<p>picker export &ndash;help</p>
-</blockquote>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Export RTL Projects Sources as Software libraries such as C++/Python
-</span></span><span style="display:flex;"><span>Usage: picker <span style="color:#204a87">export</span> <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file...
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --help
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>Export RTL Projects Sources as Software libraries such as C++/Python
+</span></span><span style="display:flex;"><span>Usage: picker export [OPTIONS] file...
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Positionals:
-</span></span><span style="display:flex;"><span>  file TEXT ... REQUIRED      DUT .v/.sv <span style="color:#204a87">source</span> file, contain the top module
+</span></span><span style="display:flex;"><span>  file TEXT ... REQUIRED      DUT .v/.sv source file, contain the top module
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Options:
-</span></span><span style="display:flex;"><span>  -h,--help                   Print this <span style="color:#204a87">help</span> message and <span style="color:#204a87">exit</span>
-</span></span><span style="display:flex;"><span>  --fs,--filelist TEXT ...    DUT .v/.sv <span style="color:#204a87">source</span> files, contain the top module, split by comma.
-</span></span><span style="display:flex;"><span>                              Or use <span style="color:#4e9a06">&#39;*.txt&#39;</span> file  with one RTL file path per line to specify the file list
-</span></span><span style="display:flex;"><span>  --sim TEXT <span style="color:#ce5c00;font-weight:bold">[</span>verilator<span style="color:#ce5c00;font-weight:bold">]</span>      vcs or verilator as simulator, default is verilator
-</span></span><span style="display:flex;"><span>  --lang,--language TEXT:<span style="color:#ce5c00;font-weight:bold">{</span>python,cpp,java,scala,golang<span style="color:#ce5c00;font-weight:bold">}</span> <span style="color:#ce5c00;font-weight:bold">[</span>python<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>  -h,--help                   Print this help message and exit
+</span></span><span style="display:flex;"><span>  --fs,--filelist TEXT ...    DUT .v/.sv source files, contain the top module, split by comma.
+</span></span><span style="display:flex;"><span>                              Or use &#39;*.txt&#39; file  with one RTL file path per line to specify the file list
+</span></span><span style="display:flex;"><span>  --sim TEXT [verilator]      vcs or verilator as simulator, default is verilator
+</span></span><span style="display:flex;"><span>  --lang,--language TEXT:{python,cpp,java,scala,golang} [python]
 </span></span><span style="display:flex;"><span>                              Build example project, default is python, choose cpp, java or python
-</span></span><span style="display:flex;"><span>  --sdir,--source_dir TEXT    Template Files Dir, default is <span style="color:#4e9a06">${</span><span style="color:#000">picker_install_path</span><span style="color:#4e9a06">}</span>/../picker/template
+</span></span><span style="display:flex;"><span>  --sdir,--source_dir TEXT    Template Files Dir, default is ${picker_install_path}/../picker/template
 </span></span><span style="display:flex;"><span>  --sname,--source_module_name TEXT ...
 </span></span><span style="display:flex;"><span>                              Pick the module in DUT .v file, default is the last module in the -f marked file
 </span></span><span style="display:flex;"><span>  --tname,--target_module_name TEXT
 </span></span><span style="display:flex;"><span>                              Set the module name and file name of target DUT, default is the same as source.
 </span></span><span style="display:flex;"><span>                              For example, -T top, will generate UTtop.cpp and UTtop.hpp with UTtop class
-</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT    Target directory to store all the results. If it ends with <span style="color:#4e9a06">&#39;/&#39;</span> or is empty,
+</span></span><span style="display:flex;"><span>  --tdir,--target_dir TEXT    Target directory to store all the results. If it ends with &#39;/&#39; or is empty,
 </span></span><span style="display:flex;"><span>                              the directory name will be the same as the target module name
 </span></span><span style="display:flex;"><span>  --internal TEXT             Exported internal signal config file, default is empty, means no internal pin
-</span></span><span style="display:flex;"><span>  -F,--frequency TEXT <span style="color:#ce5c00;font-weight:bold">[</span>100MHz<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>  -F,--frequency TEXT [100MHz]
 </span></span><span style="display:flex;"><span>                              Set the frequency of the **only VCS** DUT, default is 100MHz, use Hz, KHz, MHz, GHz as unit
-</span></span><span style="display:flex;"><span>  -w,--wave_file_name TEXT    Wave file name, emtpy mean don<span style="color:#4e9a06">&#39;t dump wave
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -c,--coverage               Enable coverage, default is not selected as OFF
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  --cp_lib,--copy_xspcomm_lib BOOLEAN [1]
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                              Copy xspcomm lib to generated DUT dir, default is true
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -V,--vflag TEXT             User defined simulator compile args, passthrough.
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">                              Eg: &#39;</span>-v -x-assign<span style="color:#ce5c00;font-weight:bold">=</span>fast -Wall --trace<span style="color:#4e9a06">&#39; || &#39;</span>-C vcs -cc -f filelist.f<span style="color:#4e9a06">&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. Eg:&#39;</span>-O3 -std<span style="color:#ce5c00;font-weight:bold">=</span>c++17 -I./include<span style="color:#a40000">&#39;</span>
+</span></span><span style="display:flex;"><span>  -w,--wave_file_name TEXT    Wave file name, emtpy mean don&#39;t dump wave
+</span></span><span style="display:flex;"><span>  -c,--coverage               Enable coverage, default is not selected as OFF
+</span></span><span style="display:flex;"><span>  --cp_lib,--copy_xspcomm_lib BOOLEAN [1]
+</span></span><span style="display:flex;"><span>                              Copy xspcomm lib to generated DUT dir, default is true
+</span></span><span style="display:flex;"><span>  -V,--vflag TEXT             User defined simulator compile args, passthrough.
+</span></span><span style="display:flex;"><span>                              Eg: &#39;-v -x-assign=fast -Wall --trace&#39; || &#39;-C vcs -cc -f filelist.f&#39;
+</span></span><span style="display:flex;"><span>  -C,--cflag TEXT             User defined gcc/clang compile command, passthrough. Eg:&#39;-O3 -std=c++17 -I./include&#39;
 </span></span><span style="display:flex;"><span>  --verbose                   Verbose mode
 </span></span><span style="display:flex;"><span>  -e,--example                Build example project, default is OFF
-</span></span><span style="display:flex;"><span>  --autobuild BOOLEAN <span style="color:#ce5c00;font-weight:bold">[</span>1<span style="color:#ce5c00;font-weight:bold">]</span>     Auto build the generated project, default is <span style="color:#204a87">true</span>
+</span></span><span style="display:flex;"><span>  --autobuild BOOLEAN [1]     Auto build the generated project, default is true
 </span></span></code></pre></div><p>pack子命令用于将UVM中的 sequence_item 转换为其他语言，然后通过TLM进行通信（目前支持Python，其他语言在开发中）</p>
-<blockquote>
-<p>picker pack &ndash;help</p>
-</blockquote>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Pack uvm transaction as a uvm agent and python class
-</span></span><span style="display:flex;"><span>Usage: picker pack <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file...
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker pack --help
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex;"><span>Pack uvm transaction as a uvm agent and python class
+</span></span><span style="display:flex;"><span>Usage: picker pack [OPTIONS] file...
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Positionals:
-</span></span><span style="display:flex;"><span>  file TEXT ... REQUIRED      Sv <span style="color:#204a87">source</span> file, contain the transaction define
+</span></span><span style="display:flex;"><span>  file TEXT ... REQUIRED      Sv source file, contain the transaction define
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Options:
-</span></span><span style="display:flex;"><span>  -h,--help                   Print this <span style="color:#204a87">help</span> message and <span style="color:#204a87">exit</span>
+</span></span><span style="display:flex;"><span>  -h,--help                   Print this help message and exit
 </span></span><span style="display:flex;"><span>  -e,--example                Generate example project based on transaction, default is OFF
 </span></span><span style="display:flex;"><span>  -c,--force                  Force delete folder when the code has already generated by picker
 </span></span><span style="display:flex;"><span>  -r,--rename TEXT ...        Rename transaction name in picker generate code
@@ -1059,7 +1055,7 @@ bash example/RandomGenerator/release-verilator.sh --lang java
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">random</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">randint</span><span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">-</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#0000cf;font-weight:bold">63</span><span style="color:#000;font-weight:bold">),</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#0000cf;font-weight:bold">63</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">((</span><span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span> <span style="color:#0000cf;font-weight:bold">63</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 通过python实现的加法器参考模型</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">referce_adder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">reference_adder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87">sum</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">((</span><span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#ce5c00;font-weight:bold">&lt;&lt;</span> <span style="color:#0000cf;font-weight:bold">64</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">carry</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87">sum</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#000">a</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87">sum</span> <span style="color:#ce5c00;font-weight:bold">+=</span> <span style="color:#000">cin</span>
@@ -1081,7 +1077,7 @@ bash example/RandomGenerator/release-verilator.sh --lang java
 </span></span><span style="display:flex;"><span>        <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">RefreshComb</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># 参考模型：计算结果</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">ref_sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">ref_cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">referce_adder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">ref_sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">ref_cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">reference_adder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># 检查结果</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">ref_sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;sum mismatch: 0x</span><span style="color:#4e9a06">{dut.sum.value:x}</span><span style="color:#4e9a06"> != 0x</span><span style="color:#4e9a06">{ref_sum:x}</span><span style="color:#4e9a06">&#34;</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">ref_cout</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;cout mismatch: 0x</span><span style="color:#4e9a06">{dut.cout.value:x}</span><span style="color:#4e9a06"> != 0x</span><span style="color:#4e9a06">{ref_cout:x}</span><span style="color:#4e9a06">&#34;</span>
