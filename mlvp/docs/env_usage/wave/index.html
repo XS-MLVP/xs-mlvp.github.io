@@ -24,10 +24,10 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/mlvp/docs/env_usage/wave/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-01T19:50:39+08:00" />
+<meta property="article:modified_time" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="name" content="波形生成">
 <meta itemprop="description" content="生成电路波形">
-<meta itemprop="dateModified" content="2025-03-01T19:50:39+08:00" />
+<meta itemprop="dateModified" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="wordCount" content="77">
 <meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="波形生成"/>
 <meta name="twitter:description" content="生成电路波形"/>
@@ -130,7 +130,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +154,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -411,9 +411,9 @@
 <p>需要注意的是，如果你选择自行生成 <code>libDPI_____.so</code> 文件，那么波形文件格式不受上述约束的限制。因为波形文件是在仿真器构建 <code>libDPI.so</code> 时决定的，如果你自行生成，那么波形文件格式也需要自行用对应仿真器的配置指定。</p>
 <h3 id="python-示例">Python 示例</h3>
 <p>正常情况下，dut需要被<strong>显式地声明完成任务</strong>，以通知进行模拟器的后处理工作（写入波形、覆盖率等文件）。
-在Python中，需要在完成所有测试后，<strong>调用dut的<code>.finalize()</code>方法</strong>以通知模拟器任务已完成，进而将文件flush到磁盘。</p>
+在Python中，需要在完成所有测试后，<strong>调用dut的<code>.Finish()</code>方法</strong>以通知模拟器任务已完成，进而将文件flush到磁盘。</p>
 <p>以<a href="/mlvp/docs/quick-start/eg-adder/">加法器</a>为例，以下为测试程序：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">__name__</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#4e9a06">&#34;__main__&#34;</span><span style="color:#000;font-weight:bold">:</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">()</span>
@@ -424,7 +424,7 @@
 </span></span><span style="display:flex;"><span>        <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">finalize</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#8f5902;font-style:italic"># flush the wave file to disk</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#8f5902;font-style:italic"># flush the wave file to disk</span>
 </span></span></code></pre></div><p>运行结束后即可生成指定文件名的波形文件。</p>
 <h2 id="查看结果">查看结果</h2>
 <h3 id="gtkwave">GTKWave</h3>
@@ -435,7 +435,7 @@
 <p><img alt="Verdi" src="verdiwave.png"></p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 1, 2025: <a href="https://github.com/XS-MLVP/course/commit/b80bf21f284b11d30afcbddcf9c67b3e914e799c">Merge pull request #33 from LucasLan666666/dev_lyz (b80bf21)</a>
+  最后修改 March 5, 2025: <a href="https://github.com/XS-MLVP/course/commit/c2d19d99420bbf4960f7c4758afab5d20136ba01">fix: modify out-of-date python code for picker updating and remove some tailing spaces as well (c2d19d9)</a>
 </div>
 
 </div>

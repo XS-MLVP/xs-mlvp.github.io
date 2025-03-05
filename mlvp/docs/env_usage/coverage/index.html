@@ -24,10 +24,10 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/mlvp/docs/env_usage/coverage/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-01T19:50:39+08:00" />
+<meta property="article:modified_time" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="name" content="覆盖率统计">
 <meta itemprop="description" content="覆盖率工具">
-<meta itemprop="dateModified" content="2025-03-01T19:50:39+08:00" />
+<meta itemprop="dateModified" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="wordCount" content="171">
 <meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="覆盖率统计"/>
 <meta name="twitter:description" content="覆盖率工具"/>
@@ -130,7 +130,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +154,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -394,7 +394,7 @@
 <h2 id="代码行覆盖率">代码行覆盖率</h2>
 <p>目前 Picker 工具支持基于 Verilator 仿真器生成的代码行覆盖率报告。</p>
 <h3 id="verilator">Verilator</h3>
-<p>Verilator 仿真器提供了<a href="https://verilator.org/guide/latest/exe_verilator_coverage.html">覆盖率支持</a>功能。<br>
+<p>Verilator 仿真器提供了<a href="https://verilator.org/guide/latest/exe_verilator_coverage.html">覆盖率支持</a>功能。
 该功能的实现方式是：</p>
 <ol>
 <li>利用 <code>verilator_coverage</code> 工具处理或合并覆盖率数据库，最终针对多个 DUT 生成一个 <code>coverage.info</code> 文件。</li>
@@ -403,7 +403,7 @@
 <p>使用时的流程如下：</p>
 <ol>
 <li>使用 Picker 生成 dut 时，使能 COVERAGE 功能 （添加<code>-c</code>选项）。</li>
-<li>仿真器运行完成后，<code>dut.finalize()</code> 之后会生成覆盖率数据库文件 <code>V{DUT_NAME}.dat</code>。</li>
+<li>仿真器运行完成后，<code>dut.Finish()</code> 之后会生成覆盖率数据库文件 <code>V{DUT_NAME}.dat</code>。</li>
 <li>基于 <code>verilator_coverage</code> 的 write-info 功能将其转换成 <code>.info</code>文件。</li>
 <li>基于 <code>lcov</code> 的 <code>genhtml</code> 功能，使用<code>.info</code>文件和文件中指定的<strong>rtl 源文件</strong>，生成 html 报告。</li>
 </ol>
@@ -454,7 +454,7 @@
 <p>VCS 对应的文档正在完善当中。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 1, 2025: <a href="https://github.com/XS-MLVP/course/commit/b80bf21f284b11d30afcbddcf9c67b3e914e799c">Merge pull request #33 from LucasLan666666/dev_lyz (b80bf21)</a>
+  最后修改 March 5, 2025: <a href="https://github.com/XS-MLVP/course/commit/c2d19d99420bbf4960f7c4758afab5d20136ba01">fix: modify out-of-date python code for picker updating and remove some tailing spaces as well (c2d19d9)</a>
 </div>
 
 </div>

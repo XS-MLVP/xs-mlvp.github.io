@@ -127,7 +127,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -558,9 +558,9 @@
 <p>需要注意的是，如果你选择自行生成 <code>libDPI_____.so</code> 文件，那么波形文件格式不受上述约束的限制。因为波形文件是在仿真器构建 <code>libDPI.so</code> 时决定的，如果你自行生成，那么波形文件格式也需要自行用对应仿真器的配置指定。</p>
 <h3 id="python-示例">Python 示例</h3>
 <p>正常情况下，dut需要被<strong>显式地声明完成任务</strong>，以通知进行模拟器的后处理工作（写入波形、覆盖率等文件）。
-在Python中，需要在完成所有测试后，<strong>调用dut的<code>.finalize()</code>方法</strong>以通知模拟器任务已完成，进而将文件flush到磁盘。</p>
+在Python中，需要在完成所有测试后，<strong>调用dut的<code>.Finish()</code>方法</strong>以通知模拟器任务已完成，进而将文件flush到磁盘。</p>
 <p>以<a href="/mlvp/docs/quick-start/eg-adder/">加法器</a>为例，以下为测试程序：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">__name__</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#4e9a06">&#34;__main__&#34;</span><span style="color:#000;font-weight:bold">:</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">()</span>
@@ -571,7 +571,7 @@
 </span></span><span style="display:flex;"><span>        <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">finalize</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#8f5902;font-style:italic"># flush the wave file to disk</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#8f5902;font-style:italic"># flush the wave file to disk</span>
 </span></span></code></pre></div><p>运行结束后即可生成指定文件名的波形文件。</p>
 <h2 id="查看结果">查看结果</h2>
 <h3 id="gtkwave">GTKWave</h3>
@@ -673,7 +673,7 @@ CacheMeta.sv
 <h2 id="代码行覆盖率">代码行覆盖率</h2>
 <p>目前 Picker 工具支持基于 Verilator 仿真器生成的代码行覆盖率报告。</p>
 <h3 id="verilator">Verilator</h3>
-<p>Verilator 仿真器提供了<a href="https://verilator.org/guide/latest/exe_verilator_coverage.html">覆盖率支持</a>功能。<br>
+<p>Verilator 仿真器提供了<a href="https://verilator.org/guide/latest/exe_verilator_coverage.html">覆盖率支持</a>功能。
 该功能的实现方式是：</p>
 <ol>
 <li>利用 <code>verilator_coverage</code> 工具处理或合并覆盖率数据库，最终针对多个 DUT 生成一个 <code>coverage.info</code> 文件。</li>
@@ -682,7 +682,7 @@ CacheMeta.sv
 <p>使用时的流程如下：</p>
 <ol>
 <li>使用 Picker 生成 dut 时，使能 COVERAGE 功能 （添加<code>-c</code>选项）。</li>
-<li>仿真器运行完成后，<code>dut.finalize()</code> 之后会生成覆盖率数据库文件 <code>V{DUT_NAME}.dat</code>。</li>
+<li>仿真器运行完成后，<code>dut.Finish()</code> 之后会生成覆盖率数据库文件 <code>V{DUT_NAME}.dat</code>。</li>
 <li>基于 <code>verilator_coverage</code> 的 write-info 功能将其转换成 <code>.info</code>文件。</li>
 <li>基于 <code>lcov</code> 的 <code>genhtml</code> 功能，使用<code>.info</code>文件和文件中指定的<strong>rtl 源文件</strong>，生成 html 报告。</li>
 </ol>
@@ -1369,7 +1369,7 @@ DPI直接导出和VPI动态导出。</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 测试方法执行，必须以如下格式：</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">pytest</span> <span style="color:#000">文件名</span> <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">py</span><span style="color:#000;font-weight:bold">::</span> <span style="color:#000">测试类</span> <span style="color:#000;font-weight:bold">::</span> <span style="color:#000">测试方法</span><span style="color:#a40000">，</span><span style="color:#000">其中</span> <span style="color:#a40000">“</span><span style="color:#000;font-weight:bold">::</span><span style="color:#a40000">”</span> <span style="color:#000">是分隔符</span><span style="color:#a40000">，</span><span style="color:#000">用于分割测试module</span><span style="color:#a40000">、</span><span style="color:#000">测试类</span><span style="color:#a40000">，</span><span style="color:#000">以及测试方法</span><span style="color:#a40000">。</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 运行test_se.py文件下的，类名是TestSE下的，名字为test_get_new_message的测试用例 </span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 运行test_se.py文件下的，类名是TestSE下的，名字为test_get_new_message的测试用例</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">pytest</span> <span style="color:#000">test_se</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">py</span><span style="color:#000;font-weight:bold">::</span><span style="color:#000">TestSE</span><span style="color:#000;font-weight:bold">::</span><span style="color:#000">test_get_new_message</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 以上选择测试用例的方法均是在**命令行**，如果您想直接在测试程序里执行可以直接在main函数中**调用pytest.main()**,其格式为：</span>
@@ -1382,7 +1382,7 @@ DPI直接导出和VPI动态导出。</p>
 <li>在测试过程中，我们使用之前验证过的加法器，进入Adder文件夹，在picker_out_adder目录下新建一个test_adder.py文件，内容如下：</li>
 </ul>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 导入测试模块和所需的库</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">pytest</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">ctypes</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
@@ -1437,7 +1437,7 @@ DPI直接导出和VPI动态导出。</p>
 </span></span></code></pre></div><ul>
 <li>运行测试之后输出如下：</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>collected <span style="color:#0000cf;font-weight:bold">1</span> item                                                               
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>collected <span style="color:#0000cf;font-weight:bold">1</span> item
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> test_adder.py ✓                                                 100% ██████████
 </span></span><span style="display:flex;"><span>

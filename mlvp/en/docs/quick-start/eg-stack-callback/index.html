@@ -24,10 +24,10 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/quick-start/eg-stack-callback/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-01T19:50:39+08:00" />
+<meta property="article:modified_time" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="name" content="Case 3: Dual-Port Stack (Callback)">
 <meta itemprop="description" content="A dual-port stack is a stack with two ports, each supporting push and pop operations. This case study uses a dual-port stack as an example to demonstrate how to use callback functions to drive the DUT.">
-<meta itemprop="dateModified" content="2025-03-01T19:50:39+08:00" />
+<meta itemprop="dateModified" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="wordCount" content="2129">
 <meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Case 3: Dual-Port Stack (Callback)"/>
 <meta name="twitter:description" content="A dual-port stack is a stack with two ports, each supporting push and pop operations. This case study uses a dual-port stack as an example to demonstrate how to use callback functions to drive the DUT."/>
@@ -130,7 +130,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +154,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -554,7 +554,7 @@ You can run the test script with the following commands:</p>
 <p>Therefore, in this case, we will use the dual-port stack as an example to introduce a callback function-based driving method to handle such DUTs.</p>
 <h3 id="introduction-to-callback-functions">Introduction to Callback Functions</h3>
 <p>A callback function is a common programming technique that allows us to pass a function as an argument, which is then called when a certain condition is met. In the generated Python Module, we provide an interface <code>StepRis</code> for registering callback functions with the internal execution environment. Here&rsquo;s how it works:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">DUTdual_port_stack</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">DUTdual_port_stack</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">callback</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cycles</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#34;The current clock cycle is </span><span style="color:#4e9a06">{</span><span style="color:#000">cycles</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">)</span>
@@ -569,7 +569,7 @@ Using this approach, we can write different execution logics as callback functio
 <p>To complete a full execution logic using callback functions, we typically write it in the form of a state machine. Each callback function invocation triggers a state change within the state machine, and multiple invocations complete a full execution logic.</p>
 <p>Below is an example code for driving a dual-port stack using callback functions:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dual_port_stack</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">enum</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Enum</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">StackModel</span><span style="color:#000;font-weight:bold">:</span>
@@ -746,7 +746,7 @@ Using this approach, we can write different execution logics as callback functio
 <p>However, as shown in this example, even implementing a simple &ldquo;request-response&rdquo; flow requires maintaining a significant amount of internal state. Callbacks break down what should be a cohesive execution logic into multiple function calls, adding considerable complexity to both the code writing and debugging processes.</p>
 
 	<div class="td-page-meta__lastmod">
-  Last modified March 1, 2025: <a href="https://github.com/XS-MLVP/course/commit/b80bf21f284b11d30afcbddcf9c67b3e914e799c">Merge pull request #33 from LucasLan666666/dev_lyz (b80bf21)</a>
+  Last modified March 5, 2025: <a href="https://github.com/XS-MLVP/course/commit/c2d19d99420bbf4960f7c4758afab5d20136ba01">fix: modify out-of-date python code for picker updating and remove some tailing spaces as well (c2d19d9)</a>
 </div>
 
 </div>

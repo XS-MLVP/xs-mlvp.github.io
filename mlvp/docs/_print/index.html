@@ -130,7 +130,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -2082,9 +2082,9 @@ Test Passed
 <p>需要注意的是，如果你选择自行生成 <code>libDPI_____.so</code> 文件，那么波形文件格式不受上述约束的限制。因为波形文件是在仿真器构建 <code>libDPI.so</code> 时决定的，如果你自行生成，那么波形文件格式也需要自行用对应仿真器的配置指定。</p>
 <h3 id="python-示例">Python 示例</h3>
 <p>正常情况下，dut需要被<strong>显式地声明完成任务</strong>，以通知进行模拟器的后处理工作（写入波形、覆盖率等文件）。
-在Python中，需要在完成所有测试后，<strong>调用dut的<code>.finalize()</code>方法</strong>以通知模拟器任务已完成，进而将文件flush到磁盘。</p>
+在Python中，需要在完成所有测试后，<strong>调用dut的<code>.Finish()</code>方法</strong>以通知模拟器任务已完成，进而将文件flush到磁盘。</p>
 <p>以<a href="/mlvp/docs/quick-start/eg-adder/">加法器</a>为例，以下为测试程序：</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">__name__</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#4e9a06">&#34;__main__&#34;</span><span style="color:#000;font-weight:bold">:</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">()</span>
@@ -2095,7 +2095,7 @@ Test Passed
 </span></span><span style="display:flex;"><span>        <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">finalize</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#8f5902;font-style:italic"># flush the wave file to disk</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#8f5902;font-style:italic"># flush the wave file to disk</span>
 </span></span></code></pre></div><p>运行结束后即可生成指定文件名的波形文件。</p>
 <h2 id="查看结果">查看结果</h2>
 <h3 id="gtkwave">GTKWave</h3>
@@ -2197,7 +2197,7 @@ CacheMeta.sv
 <h2 id="代码行覆盖率">代码行覆盖率</h2>
 <p>目前 Picker 工具支持基于 Verilator 仿真器生成的代码行覆盖率报告。</p>
 <h3 id="verilator">Verilator</h3>
-<p>Verilator 仿真器提供了<a href="https://verilator.org/guide/latest/exe_verilator_coverage.html">覆盖率支持</a>功能。<br>
+<p>Verilator 仿真器提供了<a href="https://verilator.org/guide/latest/exe_verilator_coverage.html">覆盖率支持</a>功能。
 该功能的实现方式是：</p>
 <ol>
 <li>利用 <code>verilator_coverage</code> 工具处理或合并覆盖率数据库，最终针对多个 DUT 生成一个 <code>coverage.info</code> 文件。</li>
@@ -2206,7 +2206,7 @@ CacheMeta.sv
 <p>使用时的流程如下：</p>
 <ol>
 <li>使用 Picker 生成 dut 时，使能 COVERAGE 功能 （添加<code>-c</code>选项）。</li>
-<li>仿真器运行完成后，<code>dut.finalize()</code> 之后会生成覆盖率数据库文件 <code>V{DUT_NAME}.dat</code>。</li>
+<li>仿真器运行完成后，<code>dut.Finish()</code> 之后会生成覆盖率数据库文件 <code>V{DUT_NAME}.dat</code>。</li>
 <li>基于 <code>verilator_coverage</code> 的 write-info 功能将其转换成 <code>.info</code>文件。</li>
 <li>基于 <code>lcov</code> 的 <code>genhtml</code> 功能，使用<code>.info</code>文件和文件中指定的<strong>rtl 源文件</strong>，生成 html 报告。</li>
 </ol>
@@ -2893,7 +2893,7 @@ DPI直接导出和VPI动态导出。</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 测试方法执行，必须以如下格式：</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">pytest</span> <span style="color:#000">文件名</span> <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">py</span><span style="color:#000;font-weight:bold">::</span> <span style="color:#000">测试类</span> <span style="color:#000;font-weight:bold">::</span> <span style="color:#000">测试方法</span><span style="color:#a40000">，</span><span style="color:#000">其中</span> <span style="color:#a40000">“</span><span style="color:#000;font-weight:bold">::</span><span style="color:#a40000">”</span> <span style="color:#000">是分隔符</span><span style="color:#a40000">，</span><span style="color:#000">用于分割测试module</span><span style="color:#a40000">、</span><span style="color:#000">测试类</span><span style="color:#a40000">，</span><span style="color:#000">以及测试方法</span><span style="color:#a40000">。</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 运行test_se.py文件下的，类名是TestSE下的，名字为test_get_new_message的测试用例 </span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 运行test_se.py文件下的，类名是TestSE下的，名字为test_get_new_message的测试用例</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">pytest</span> <span style="color:#000">test_se</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">py</span><span style="color:#000;font-weight:bold">::</span><span style="color:#000">TestSE</span><span style="color:#000;font-weight:bold">::</span><span style="color:#000">test_get_new_message</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 以上选择测试用例的方法均是在**命令行**，如果您想直接在测试程序里执行可以直接在main函数中**调用pytest.main()**,其格式为：</span>
@@ -2906,7 +2906,7 @@ DPI直接导出和VPI动态导出。</p>
 <li>在测试过程中，我们使用之前验证过的加法器，进入Adder文件夹，在picker_out_adder目录下新建一个test_adder.py文件，内容如下：</li>
 </ul>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 导入测试模块和所需的库</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">pytest</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">ctypes</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
@@ -2961,7 +2961,7 @@ DPI直接导出和VPI动态导出。</p>
 </span></span></code></pre></div><ul>
 <li>运行测试之后输出如下：</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>collected <span style="color:#0000cf;font-weight:bold">1</span> item                                                               
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>collected <span style="color:#0000cf;font-weight:bold">1</span> item
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> test_adder.py ✓                                                 100% ██████████
 </span></span><span style="display:flex;"><span>
@@ -3506,35 +3506,35 @@ DPI直接导出和VPI动态导出。</p>
 <p>最后您需要评估得到的结果，如是否存在错误的设计、某功能是否无法被触发、设计文档表述是否与DUT行为一致、设计文档是否表述清晰等。</p>
 <hr>
 <p>接下来我们以<strong>果壳Cache的MMIO读写为例</strong>，介绍一般验证流程：</p>
-<p><strong>1 确定验证对象和目标</strong>：<br>
+<p><strong>1 确定验证对象和目标</strong>：
 果壳Cache的MMIO读写功能。MMIO是一类特殊的IO映射，其支持通过访问内存地址的方式访问IO设备寄存器。由于IO设备的寄存器状态是随时可能改变的，因此不适合将其缓存在cache中。当收到MMIO请求时，果壳cache不会在普通的cache行中查询命中/缺失情况，而是会直接访问MMIO的内存区域来读取或者写入数据。</p>
-<p><strong>2 构建基本验证环境</strong>：<br>
-我们可以将验证环境大致分为五个部分：<br>
+<p><strong>2 构建基本验证环境</strong>：
+我们可以将验证环境大致分为五个部分：
 <img src="env.png" alt="env" width="800" height="600"></p>
 <blockquote>
-<p><strong>1. Testcase Driver</strong>：负责由用例产生相应的信号驱动<br>
-<strong>2. Monitor</strong>：监听信号，判断功能是否被覆盖以及功能是否正确<br>
-<strong>3. Ref Cache</strong>：一个简单的参考模型<br>
-<strong>4. Memory/MMIO Ram</strong>：外围设备的模拟，用于模拟相应cache的请求<br>
+<p><strong>1. Testcase Driver</strong>：负责由用例产生相应的信号驱动
+<strong>2. Monitor</strong>：监听信号，判断功能是否被覆盖以及功能是否正确
+<strong>3. Ref Cache</strong>：一个简单的参考模型
+<strong>4. Memory/MMIO Ram</strong>：外围设备的模拟，用于模拟相应cache的请求
 <strong>5. Nutshell Cache Dut</strong>：由Picker生成的DUT</p>
 </blockquote>
 <p>此外，您可能还需要对DUT的接口做进一步封装以实现更方便的读写请求操作，具体可以参考<a href="https://github.com/yzcccccccccc/XS-MLVP-NutShellCache/blob/master/UT_Cache/util/cachewrapper.py">Nutshll cachewrapper</a>。</p>
-<p><strong>3 功能点与测试点分解</strong>：<br>
+<p><strong>3 功能点与测试点分解</strong>：
 果壳cache可以响应MMIO请求，进一步分解可以得到一下测试点：</p>
 <blockquote>
-<p><strong>测试点1</strong>：MMIO请求会被转发到MMIO端口上<br>
-<strong>测试点2</strong>：cache响应MMIO请求时，不会发出突发传输（Burst Transfer）的请求<br>
+<p><strong>测试点1</strong>：MMIO请求会被转发到MMIO端口上
+<strong>测试点2</strong>：cache响应MMIO请求时，不会发出突发传输（Burst Transfer）的请求
 <strong>测试点3</strong>：cache响应MMIO请求时，会阻塞流水线</p>
 </blockquote>
 <p><strong>4 构造测试用例</strong>：
-测试用例的构造是简单的，已知通过<a href="/zh-cn/docs/basic/create_dut">创建DUT</a>得到的Nutshell cache的MMIO地址范围是<code>0x30000000</code>~<code>0x7fffffff</code>，则我们只需访问这段内存区间，应当就能获得MMIO的预期结果。需要注意的是，为了触发阻塞流水线的测试点，您可能需要连续地发起请求。<br>
+测试用例的构造是简单的，已知通过<a href="/zh-cn/docs/basic/create_dut">创建DUT</a>得到的Nutshell cache的MMIO地址范围是<code>0x30000000</code>~<code>0x7fffffff</code>，则我们只需访问这段内存区间，应当就能获得MMIO的预期结果。需要注意的是，为了触发阻塞流水线的测试点，您可能需要连续地发起请求。
 以下是一个简单的测试用例：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># import CacheWrapper here</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">mmio_test</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cache</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">CacheWrapper</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#000">mmio_lb</span>	<span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0x30000000</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#000">mmio_rb</span>	<span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0x30001000</span>
-</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">[MMIO Test]: Start MMIO Serial Test&#34;</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">addr</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#204a87">range</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">mmio_lb</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">mmio_rb</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">16</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>		<span style="color:#000">addr</span> <span style="color:#ce5c00;font-weight:bold">&amp;=</span> <span style="color:#ce5c00;font-weight:bold">~</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">0xf</span><span style="color:#000;font-weight:bold">)</span>
@@ -3549,7 +3549,7 @@ DPI直接导出和VPI动态导出。</p>
 </span></span><span style="display:flex;"><span>		<span style="color:#000">cache</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">recv</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>		<span style="color:#000">cache</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">recv</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>		<span style="color:#000">cache</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">recv</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>		
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;[MMIO Test]: Finish MMIO Serial Test&#34;</span><span style="color:#000;font-weight:bold">)</span>
 </span></span></code></pre></div><p><strong>5 收集测试结果</strong>：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#4e9a06">&#39;&#39;&#39;
@@ -3569,14 +3569,14 @@ DPI直接导出和VPI动态导出。</p>
 </span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># ...</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">testlist</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;mmio_serial&#34;</span><span style="color:#000;font-weight:bold">]</span>
-</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">teardown_class</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">finalize</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">Finish</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#000">color</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">print_blue</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">Cache Test End&#34;</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__reset</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># Reset cache and devices</span>
-</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># MMIO Test</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test_mmio</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;mmio_serial&#34;</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">testlist</span><span style="color:#000;font-weight:bold">):</span>
@@ -3588,7 +3588,7 @@ DPI直接导出和VPI动态导出。</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">run</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">setup_class</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># test</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">test_mmio</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span>
@@ -3601,11 +3601,11 @@ DPI直接导出和VPI动态导出。</p>
 </span></span></code></pre></div><p>运行：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>    python3 tb_cache.py
 </span></span></code></pre></div><p>以上仅为大致的运行流程，具体可以参考：<a href="https://github.com/yzcccccccccc/XS-MLVP-NutShellCache">Nutshell Cache Verify</a>。</p>
-<p><strong>6 评估运行结果</strong><br>
-运行结束之后可以得到以下数据：<br>
-行覆盖率：<br>
+<p><strong>6 评估运行结果</strong>
+运行结束之后可以得到以下数据：
+行覆盖率：
 <img src="line_cov.png" alt="line_cov" width="800" height="600"></p>
-<p>功能覆盖率：<br>
+<p>功能覆盖率：
 <img src="func_cov.png" alt="func_cov" width="400" height="300"></p>
 <p>可以看到预设的MMIO功能均被覆盖且被正确触发。</p>
 
@@ -5647,7 +5647,7 @@ object example {
   
 
 
-<pre name="group-lang-code-python" class="language-python line-numbers" style="display:none;"><code class="language-python">from UT_Adder import *
+<pre name="group-lang-code-python" class="language-python line-numbers" style="display:none;"><code class="language-python">from Adder import *
 
 import random
 
@@ -5670,35 +5670,35 @@ def as_uint(x, nbits):
 
 def main():
     dut = DUTAdder()  # Assuming USE_VERILATOR
-    
+
     print("Initialized UTAdder")
-    
+
     for c in range(11451):
         i = input_t(random_int(), random_int(), random_int() & 1)
         o_dut, o_ref = output_t(), output_t()
-        
+
         def dut_cal():
             dut.a.value, dut.b.value, dut.cin.value = i.a, i.b, i.cin
             dut.Step(1)
             o_dut.sum = dut.sum.value
             o_dut.cout = dut.cout.value
-        
+
         def ref_cal():
             sum = as_uint( i.a + i.b + i.cin, 128+1)
             o_ref.sum = as_uint(sum, 128)
             o_ref.cout = as_uint(sum >> 128, 1)
-        
+
         dut_cal()
         ref_cal()
-        
+
         print(f"[cycle {dut.xclock.clk}] a=0x{i.a:x}, b=0x{i.b:x}, cin=0x{i.cin:x}")
         print(f"DUT: sum=0x{o_dut.sum:x}, cout=0x{o_dut.cout:x}")
         print(f"REF: sum=0x{o_ref.sum:x}, cout=0x{o_ref.cout:x}")
-        
+
         assert o_dut.sum == o_ref.sum, "sum mismatch"
 
     dut.Finish()
-    
+
     print("Test Passed, destroy UTAdder")
 
 if __name__ == "__main__":
@@ -5755,7 +5755,7 @@ func main() {
 
         // assert
         assert(adder.Sum.U64() == uint64(sum), fmt.Sprintf("sum mismatch: %d != %d\n", adder.Sum.U64(), uint64(sum)))
-        
+
         var carry_bool uint64
         if carry {
             carry_bool = 1
@@ -6024,67 +6024,67 @@ class Opcode {
         AcquirePerm(0x7);
 
         private final int value;
-    
+
         A(int value) {
             this.value = value;
         }
-    
+
         public int getValue() {
             return value;
         }
     }
-    
+
     public enum B {
         ProbeBlock(0x6), ProbePerm(0x7);
-    
+
         private final int value;
-    
+
         B(int value) {
             this.value = value;
         }
-    
+
         public int getValue() {
             return value;
         }
     }
-    
+
     public enum C {
         ProbeAck(0x4), ProbeAckData(0x5), Release(0x6), ReleaseData(0x7);
-    
+
         private final int value;
-    
+
         C(int value) {
             this.value = value;
         }
-    
+
         public int getValue() {
             return value;
         }
     }
-    
+
     public enum D {
         AccessAck(0x0), AccessAckData(0x1), HintAck(0x2), Grant(0x4), GrantData(0x5), ReleaseAck(0x6);
-    
+
         private final int value;
-    
+
         D(int value) {
             this.value = value;
         }
-    
+
         public int getValue() {
             return value;
         }
     }
-    
+
     public enum E {
         GrantAck(0x4);
-    
+
         private final int value;
-    
+
         E(int value) {
             this.value = value;
         }
-    
+
         public int getValue() {
             return value;
         }
@@ -6106,7 +6106,7 @@ public class TestCoupledL2 {
         dut.xclock.Step();
         valid.Set(0);
     }
-    
+
     static void getB() {
         var valid = dut.master_port_0_0_b_valid;
         var ready = dut.master_port_0_0_b_ready;
@@ -6114,11 +6114,11 @@ public class TestCoupledL2 {
         while (!valid.B()) dut.xclock.Step();
         ready.Set(0);
     }
-    
+
     static void sendC(int opcode, int size, int address, long data) {
         var valid = dut.master_port_0_0_c_valid;
         var ready = dut.master_port_0_0_c_ready;
-    
+
         while (!ready.B()) dut.xclock.Step();
         valid.Set(1);
         dut.master_port_0_0_c_bits_opcode.Set(opcode);
@@ -6128,7 +6128,7 @@ public class TestCoupledL2 {
         dut.xclock.Step();
         valid.Set(0);
     }
-    
+
     static void getD() {
         var valid = dut.master_port_0_0_d_valid;
         var ready = dut.master_port_0_0_d_ready;
@@ -6137,7 +6137,7 @@ public class TestCoupledL2 {
         while (!valid.B()) dut.xclock.Step();
         ready.Set(0);
     }
-    
+
     static void sendE(int sink) {
         var valid = dut.master_port_0_0_e_valid;
         var ready = dut.master_port_0_0_e_ready;
@@ -6147,15 +6147,15 @@ public class TestCoupledL2 {
         dut.xclock.Step();
         valid.Set(0);
     }
-    
+
     static void AcquireBlock(int address) {
         sendA(Opcode.A.AcquireBlock.getValue(), 0x6, address);
     }
-    
+
     static BigInteger GrantData() {
         var opcode = dut.master_port_0_0_d_bits_opcode;
         var data = dut.master_port_0_0_d_bits_data;
-    
+
         do {
             getD();
         } while (opcode.Get().intValue() != Opcode.D.GrantData.getValue());
@@ -6165,23 +6165,23 @@ public class TestCoupledL2 {
         } while (opcode.Get().intValue() != Opcode.D.GrantData.getValue());
         return r_data.or(data.U64());
     }
-    
+
     static void GrantAck(int sink) {
         sendE(sink);
     }
-    
+
     static void ReleaseData(int address, BigInteger data) {
         sendC(Opcode.C.ReleaseData.getValue(), 0x6, address, data.longValue());
         sendC(Opcode.C.ReleaseData.getValue(), 0x6, address, data.shiftRight(64).longValue());
     }
-    
+
     static void ReleaseAck() {
         var opcode = dut.master_port_0_0_d_bits_opcode;
         do {
             getD();
         } while (opcode.Get().intValue() != Opcode.D.ReleaseAck.getValue());
     }
-    
+
     public static void main(String[] args) throws IOException {
         /* Random Generator */
         var gen_rand = RandomGenerator.getDefault();
@@ -6195,22 +6195,22 @@ public class TestCoupledL2 {
         dut.reset.Set(0);
         for (int i = 0; i < 100; i++) dut.xclock.Step();
         dut.xclock.Step();
-    
+
         /* Ref */
         BigInteger[] ref_data = new BigInteger[16];
         Arrays.fill(ref_data, BigInteger.ZERO);
-    
+
         /* Test loop */
         for (int test_loop = 0; test_loop < 4000; test_loop++) {
             var address = gen_rand.nextInt(0xf) << 6;
             var data = new BigInteger(128, Random.from(gen_rand));
-    
+
             pwOut.print("[CoupledL2 Test%d]: At address(%#03x), ".formatted(test_loop + 1, address));
             /* Read */
             AcquireBlock(address);
             var r_data = GrantData();
             assert (r_data.equals(ref_data[address >> 6]));
-    
+
             var sink = dut.master_port_0_0_d_bits_sink.Get().intValue();
             GrantAck(sink);
 
@@ -6219,7 +6219,7 @@ public class TestCoupledL2 {
             ReleaseData(address, data);
             ref_data[address >> 6] = data;
             ReleaseAck();
-    
+
             pwOut.println("Read: %s, Write: %s".formatted(r_data.toString(), data.toString()));
             pwOut.flush();
         }
@@ -6404,7 +6404,7 @@ class TileLinkAgent(Agent):
 import toffee
 import random
 from toffee.triggers import ClockCycles
-from UT_CoupledL2 import DUTCoupledL2
+from CoupledL2 import DUTCoupledL2
 from bundle import TileLinkBundle
 from agent import TileLinkAgent
 

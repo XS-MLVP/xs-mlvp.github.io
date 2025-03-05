@@ -24,10 +24,10 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/env_usage/picker_usage/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-01T19:50:39+08:00" />
+<meta property="article:modified_time" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="name" content="Tool Introduction">
 <meta itemprop="description" content="Basic usage of the verification tool.">
-<meta itemprop="dateModified" content="2025-03-01T19:50:39+08:00" />
+<meta itemprop="dateModified" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="wordCount" content="1999">
 <meta itemprop="keywords" content="docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Tool Introduction"/>
 <meta name="twitter:description" content="Basic usage of the verification tool."/>
@@ -130,7 +130,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +154,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -488,7 +488,7 @@ For information on how Picker generates C++ classes, please refer to <a href="ht
 </span></span></code></pre></div><ul>
 <li>Pins corresponding to the DUT, such as reset and clock, are represented as member variables in the DUTAdder class. As shown below, pin values can be read and written via the <code>value</code> attribute.</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span> 
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTAdder</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>  <span style="color:#8f5902;font-style:italic"># Assign value to the pin by setting the .value attribute</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">12</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span>    <span style="color:#8f5902;font-style:italic"># Assign value to the 12th bit of the input pin a</span>
@@ -519,7 +519,7 @@ For information on how Picker generates C++ classes, please refer to <a href="ht
 </li>
 </ol>
 <p>The corresponding pseudocode is as follows:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UT_DUT</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">DUT</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 1 Create</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUT</span><span style="color:#000;font-weight:bold">()</span>
@@ -639,7 +639,7 @@ In the DUT class generated by Picker, in addition to <strong>XData type pin memb
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">StepRis</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">func</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">args</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">(),</span> <span style="color:#000">kwargs</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">{})</span>
 </span></span></code></pre></div>
 	<div class="td-page-meta__lastmod">
-  Last modified March 1, 2025: <a href="https://github.com/XS-MLVP/course/commit/b80bf21f284b11d30afcbddcf9c67b3e914e799c">Merge pull request #33 from LucasLan666666/dev_lyz (b80bf21)</a>
+  Last modified March 5, 2025: <a href="https://github.com/XS-MLVP/course/commit/c2d19d99420bbf4960f7c4758afab5d20136ba01">fix: modify out-of-date python code for picker updating and remove some tailing spaces as well (c2d19d9)</a>
 </div>
 
 </div>

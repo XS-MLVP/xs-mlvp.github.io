@@ -32,14 +32,14 @@ def rvc_expand(rvc_expander, ref_insts, is_32bit=False, fsIsOff=False): &#34;&#3
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/03_add_test/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-03T14:23:59+08:00" />
+<meta property="article:modified_time" content="2025-03-04T12:49:24+08:00" />
 <meta itemprop="name" content="添加测试用例">
 <meta itemprop="description" content="命名要求 所有测试用例文件请以test_*.py的方式进行命名，*用测试目标替换（例如test_rvc_expander.py）。所有测试用例也需要以test_前缀开头。用例名称需要具有明确意义。
 命名举例如下：
 def test_a(): # 不合理，无法通过a判断测试目标 pass def test_rvc_expand_16bit_full(): # 合理，可以通过用例名称大体知道测试内容 pass 使用 Assert 在每个测试用例中，都需要通过assert来判断本测试是否通过。 pytest统计的是assert语句的结果，因此assert语句需要保证能够通过。
 以下内容位于ut_frontend/ifu/rvc_expander/classical_version/test_rvc_expander.py中：
 def rvc_expand(rvc_expander, ref_insts, is_32bit=False, fsIsOff=False): &#34;&#34;&#34;compare the RVC expand result with the reference Args: rvc_expander (warpper): the fixture of the RVC expander ref_insts (list[int]]): the reference instruction list &#34;&#34;&#34; find_error = 0 for insn in ref_insts: insn_disasm = disasmbly(insn) value, instr_ex = rvc_expander.expand(insn, fsIsOff) if is_32bit: assert value == insn, &#34;RVC expand error, 32bit instruction need to be the same&#34; if (insn_disasm == &#34;unknown&#34;) and (instr_ex == 0): debug(f&#34;find bad inst:{insn}, ref: 1, dut: 0&#34;) find_error &#43;=1 elif (insn_disasm !">
-<meta itemprop="dateModified" content="2025-03-03T14:23:59+08:00" />
+<meta itemprop="dateModified" content="2025-03-04T12:49:24+08:00" />
 <meta itemprop="wordCount" content="434">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="添加测试用例"/>
 <meta name="twitter:description" content="命名要求 所有测试用例文件请以test_*.py的方式进行命名，*用测试目标替换（例如test_rvc_expander.py）。所有测试用例也需要以test_前缀开头。用例名称需要具有明确意义。
@@ -148,7 +148,7 @@ def rvc_expand(rvc_expander, ref_insts, is_32bit=False, fsIsOff=False): &#34;&#3
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cb6fc5e37d4bdd4925cc3ba6d4a63e06.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f7ececdb876f700fcc17dd211bafc381.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -172,7 +172,7 @@ def rvc_expand(rvc_expander, ref_insts, is_32bit=False, fsIsOff=False): &#34;&#3
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cb6fc5e37d4bdd4925cc3ba6d4a63e06.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f7ececdb876f700fcc17dd211bafc381.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -502,7 +502,7 @@ def rvc_expand(rvc_expander, ref_insts, is_32bit=False, fsIsOff=False): &#34;&#3
 </span></span></code></pre></div><p>在上述用例中定义了参数化参数<code>start</code>, <code>end</code>，用来指定压缩指令的开始值和结束值，然后通过装饰器<code>@pytest.mark.parametrize</code>对他们进行分组赋值。变量 N 可以指定将目标数据进行分组的组数，默认设置为 10 组。在运行时用例<code>test_rvc_expand_16bit_full</code>会展开为<code>test_rvc_expand_16bit_full[0-6553]</code>至<code>test_rvc_expand_16bit_full[58977-65536]</code>10 个测试用例运行。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/3baa11d910f8949c77dadf50b0f8d95fd78cfc08">add Itlb submodule (#82) (3baa11d)</a>
+  最后修改 March 4, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c4e598914dd8ca6c859a968db81743abad72c8b0">ifu predchecker module desc improved (#84) (c4e5989)</a>
 </div>
 
 </div>

@@ -24,10 +24,10 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/env_usage/coverage/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-01T19:50:39+08:00" />
+<meta property="article:modified_time" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="name" content="Coverage Statistics">
 <meta itemprop="description" content="Coverage tools">
-<meta itemprop="dateModified" content="2025-03-01T19:50:39+08:00" />
+<meta itemprop="dateModified" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="wordCount" content="515">
 <meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Coverage Statistics"/>
 <meta name="twitter:description" content="Coverage tools"/>
@@ -130,7 +130,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +154,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -383,7 +383,7 @@
 <h2 id="code-line-coverage">Code Line Coverage</h2>
 <p>Currently, the Picker tool supports generating code line coverage reports based on the Verilator simulator.</p>
 <h3 id="verilator">Verilator</h3>
-<p>The Verilator simulator provides <a href="https://verilator.org/guide/latest/exe_verilator_coverage.html">coverage support</a>.<br>
+<p>The Verilator simulator provides <a href="https://verilator.org/guide/latest/exe_verilator_coverage.html">coverage support</a>.
 The implementation is as follows:</p>
 <ol>
 <li>Use the <code>verilator_coverage</code> tool to process or merge coverage databases, ultimately generating a <code>coverage.info</code> file for multiple DUTs.</li>
@@ -392,7 +392,7 @@ The implementation is as follows:</p>
 <p>The process is as follows:</p>
 <ol>
 <li>Enable the COVERAGE feature when generating the DUT with Picker (add the <code>-c</code> option).</li>
-<li>After the simulator runs, a coverage database file <code>V{DUT_NAME}.dat</code> will be generated after <code>dut.finalize()</code> is called.</li>
+<li>After the simulator runs, a coverage database file <code>V{DUT_NAME}.dat</code> will be generated after <code>dut.Finish()</code> is called.</li>
 <li>Use the write-info function of <code>verilator_coverage</code> to convert it to a <code>.info</code> file.</li>
 <li>Use the <code>genhtml</code> function of <code>lcov</code> to generate an HTML report using the <code>.info</code> file and the <strong>RTL source files</strong> specified in the file.</li>
 </ol>
@@ -443,7 +443,7 @@ It is recommended to use the <code>-o &lt;outputdir&gt;</code> option to output 
 <p>Documentation for VCS is currently being finalized.</p>
 
 	<div class="td-page-meta__lastmod">
-  Last modified March 1, 2025: <a href="https://github.com/XS-MLVP/course/commit/b80bf21f284b11d30afcbddcf9c67b3e914e799c">Merge pull request #33 from LucasLan666666/dev_lyz (b80bf21)</a>
+  Last modified March 5, 2025: <a href="https://github.com/XS-MLVP/course/commit/c2d19d99420bbf4960f7c4758afab5d20136ba01">fix: modify out-of-date python code for picker updating and remove some tailing spaces as well (c2d19d9)</a>
 </div>
 
 </div>

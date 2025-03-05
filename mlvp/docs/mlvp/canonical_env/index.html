@@ -46,7 +46,7 @@ def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) retur
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/mlvp/docs/mlvp/canonical_env/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-01T19:50:39+08:00" />
+<meta property="article:modified_time" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="name" content="编写规范的验证环境">
 <meta itemprop="description" content="概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。
 验证环境的搭建 旨在完成对待测设计（DUT）的封装，使得验证人员在驱动 DUT 时，不必面临繁杂的接口信号，而是可以直接使用验证环境中提供的高级接口。如果需要编写参考模型，则参考模型也应是验证环境的一部分。
@@ -60,7 +60,7 @@ def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) retur
 一个加法器尚且如此，倘若我们拿到了一个拥有繁杂接口的 DUT，费尽心思为其编写了驱动代码。当后续发现驱动代码需要迁移至另一个相似结构的接口上时，我们将会面临巨大的工作量。例如出现接口名称改变、部分接口缺少但驱动代码中却有引用，部分接口新增等等一系列的问题。
 出现这种问题的根本原因在于，我们在验证代码中直接对 DUT 的接口信号进行操作，如下图所示，这种做法是不可取的。
 &#43;-----------&#43; &#43;-----------&#43; | |--&gt;| | | Test Code | | DUT | | |&lt;--| | &#43;-----------&#43; &#43;-----------&#43; 将验证代码与 DUT 进行解耦 为了解决上述问题，我们需要将验证代码与 DUT 进行解耦，使得验证代码不再直接操作 DUT 的接口信号，而是通过一个中间层来与 DUT 进行交互。这个中间层是人为定义的一个接口结构，在 toffee 中，我们将这个中间层定义为 Bundle，下文也将会使用 Bundle 来代指这个中间层。">
-<meta itemprop="dateModified" content="2025-03-01T19:50:39+08:00" />
+<meta itemprop="dateModified" content="2025-03-05T19:21:24+08:00" />
 <meta itemprop="wordCount" content="620">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="编写规范的验证环境"/>
 <meta name="twitter:description" content="概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。
@@ -174,7 +174,7 @@ def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) retur
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -198,7 +198,7 @@ def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) retur
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.758335675597c43cd25dafab5dfca2c2.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.5a4d806196ca9896ddbd3589036deecb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -591,7 +591,7 @@ bundle.sum &lt;-&gt; dut.io_sum_0
 <p>这是 toffee 中验证环境的搭建思想，toffee 中提供了大量的功能，来帮助你建立起这样一个规范的验证环境。同时，它提供了测试用例的管理方法，使得测试用例更易于编写和管理。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 1, 2025: <a href="https://github.com/XS-MLVP/course/commit/b80bf21f284b11d30afcbddcf9c67b3e914e799c">Merge pull request #33 from LucasLan666666/dev_lyz (b80bf21)</a>
+  最后修改 March 5, 2025: <a href="https://github.com/XS-MLVP/course/commit/c2d19d99420bbf4960f7c4758afab5d20136ba01">fix: modify out-of-date python code for picker updating and remove some tailing spaces as well (c2d19d9)</a>
 </div>
 
 </div>

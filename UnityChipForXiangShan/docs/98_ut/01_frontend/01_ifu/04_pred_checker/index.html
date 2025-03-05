@@ -27,13 +27,13 @@ RET预测错误检查 ret指令预测错误的条件是，预测块中有一条r
 目标地址预测错误检查 目标地址预测错误的条件是，被预测的是一条有效的jal或者branch指令，同时预测的跳转目标地址和由指令码计算得到的跳转目标不一致。
 分级输出检查结果 以上PredChecker检查结果会分为两级分别输出，前面已经提到，Jal/Ret指令由于需要重新生成指令有效范围向量和重新指定预测位置， 所以需要在错误产生的当拍（F3）直接输出结果到Ibuffer用于及时更正进入后端的指令 。而由于时序的考虑，其他错误信息（比如五种错误的错误位置、正确的跳转地址等）则是等到下一拍（WB）阶段才返回给IFU做前端重定向。
 PredChecker接口说明 输入接口 fire_in：这个信号可以简单认为是模块有效性的控制信号。
-ftqOffset：表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。
-instrRange：对每条指令，表示该指令是否在预测块的有效指令范围内。
-instrValid：表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。
-jumpOffset：如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。
+ftqOffset：来自BPU的预测信息，表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。
+instrRange：来自PreDecode的预译码信息，对每条指令，表示该指令是否在预测块的有效指令范围内。
+instrValid：来自PreDecode的预译码信息，表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。
+jumpOffset：来自PreDecode的预译码信息，如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。
 pc：指令的pc。
-pds：预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。
-target：下个预测块的开始地址。
+pds：来自PreDecode模块的预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。
+target：来自BPU，下个预测块的开始地址。
 输出接口 第一阶段输出 fixedRange：修复的指令有效范围向量，对每条指令i，fixedRange_i为真表示这条指令是否在当前预测块的有效指令范围内
 fixedTaken：修复过后的CFI指令选取情况，对每条指令，fixedTaken_i为真表示这条指令是否是这个预测块的第一条CFI指令
 第二阶段输出 fixedMissPred：对每条指令，PredChecker检查出的存在预测错误的情况，fixedMissPred_i为真表示这条指令存在预测错误
@@ -56,13 +56,13 @@ RET预测错误检查 ret指令预测错误的条件是，预测块中有一条r
 目标地址预测错误检查 目标地址预测错误的条件是，被预测的是一条有效的jal或者branch指令，同时预测的跳转目标地址和由指令码计算得到的跳转目标不一致。
 分级输出检查结果 以上PredChecker检查结果会分为两级分别输出，前面已经提到，Jal/Ret指令由于需要重新生成指令有效范围向量和重新指定预测位置， 所以需要在错误产生的当拍（F3）直接输出结果到Ibuffer用于及时更正进入后端的指令 。而由于时序的考虑，其他错误信息（比如五种错误的错误位置、正确的跳转地址等）则是等到下一拍（WB）阶段才返回给IFU做前端重定向。
 PredChecker接口说明 输入接口 fire_in：这个信号可以简单认为是模块有效性的控制信号。
-ftqOffset：表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。
-instrRange：对每条指令，表示该指令是否在预测块的有效指令范围内。
-instrValid：表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。
-jumpOffset：如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。
+ftqOffset：来自BPU的预测信息，表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。
+instrRange：来自PreDecode的预译码信息，对每条指令，表示该指令是否在预测块的有效指令范围内。
+instrValid：来自PreDecode的预译码信息，表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。
+jumpOffset：来自PreDecode的预译码信息，如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。
 pc：指令的pc。
-pds：预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。
-target：下个预测块的开始地址。
+pds：来自PreDecode模块的预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。
+target：来自BPU，下个预测块的开始地址。
 输出接口 第一阶段输出 fixedRange：修复的指令有效范围向量，对每条指令i，fixedRange_i为真表示这条指令是否在当前预测块的有效指令范围内
 fixedTaken：修复过后的CFI指令选取情况，对每条指令，fixedTaken_i为真表示这条指令是否是这个预测块的第一条CFI指令
 第二阶段输出 fixedMissPred：对每条指令，PredChecker检查出的存在预测错误的情况，fixedMissPred_i为真表示这条指令存在预测错误
@@ -78,7 +78,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-03T14:23:59+08:00" />
+<meta property="article:modified_time" content="2025-03-04T12:49:24+08:00" />
 <meta itemprop="name" content="PredChecker">
 <meta itemprop="description" content="子模块：PredChecker简介 分支预测检查器PredChecker接收来自IFU的预测块信息（包括预测跳转指令在预测块的位置、预测的跳转目标、预译码得到的指令信息、指令PC以及预译码得到的跳转目标偏移等），在模块内部检查五种类型的分支预测错误。模块内部分为两个流水线stage，分别输出信息，第一个stage输出给f3阶段，用于修正预测块的指令范围和预测结果。第二个stage输出给wb阶段，用于在发现分支预测错误时产生前端重定向以及写回给FTQ正确的预测信息。
 PredChecker功能介绍 JAL预测错误检查 jal指令预测错误的条件是，预测块中有一条jal指令（由预译码信息给出），但是要么这个预测块没有预测跳转，要么此预测块预测跳转的指令在这条jal指令之后（即这条jal指令没有被预测跳转）。
@@ -89,13 +89,13 @@ RET预测错误检查 ret指令预测错误的条件是，预测块中有一条r
 目标地址预测错误检查 目标地址预测错误的条件是，被预测的是一条有效的jal或者branch指令，同时预测的跳转目标地址和由指令码计算得到的跳转目标不一致。
 分级输出检查结果 以上PredChecker检查结果会分为两级分别输出，前面已经提到，Jal/Ret指令由于需要重新生成指令有效范围向量和重新指定预测位置， 所以需要在错误产生的当拍（F3）直接输出结果到Ibuffer用于及时更正进入后端的指令 。而由于时序的考虑，其他错误信息（比如五种错误的错误位置、正确的跳转地址等）则是等到下一拍（WB）阶段才返回给IFU做前端重定向。
 PredChecker接口说明 输入接口 fire_in：这个信号可以简单认为是模块有效性的控制信号。
-ftqOffset：表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。
-instrRange：对每条指令，表示该指令是否在预测块的有效指令范围内。
-instrValid：表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。
-jumpOffset：如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。
+ftqOffset：来自BPU的预测信息，表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。
+instrRange：来自PreDecode的预译码信息，对每条指令，表示该指令是否在预测块的有效指令范围内。
+instrValid：来自PreDecode的预译码信息，表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。
+jumpOffset：来自PreDecode的预译码信息，如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。
 pc：指令的pc。
-pds：预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。
-target：下个预测块的开始地址。
+pds：来自PreDecode模块的预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。
+target：来自BPU，下个预测块的开始地址。
 输出接口 第一阶段输出 fixedRange：修复的指令有效范围向量，对每条指令i，fixedRange_i为真表示这条指令是否在当前预测块的有效指令范围内
 fixedTaken：修复过后的CFI指令选取情况，对每条指令，fixedTaken_i为真表示这条指令是否是这个预测块的第一条CFI指令
 第二阶段输出 fixedMissPred：对每条指令，PredChecker检查出的存在预测错误的情况，fixedMissPred_i为真表示这条指令存在预测错误
@@ -108,8 +108,8 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 序号 名称 描述 1.2.1 存在JAL未预测 预测块中存在JAL指令，但是BPU预测信息未预测跳转，检查PredChecker是否能检测出JAL预测错误。 1.2.2 预测的JAL并非第一条 预测块中存在JAL指令，但是BPU预测信息取的跳转指令在第一条JAL指令之后，检查PredChecker是否能检测出JAL预测错误。 功能点2 BPU预测信息的RET预测错误检查 PredChecker会对传入的预测块进行RET预测错误预检查并修正指令有效范围向量和新的预测结果。
 和JAL预测错误类似，我们也按照误检和正检来构造。
 对于误检，我们设计如下的测试点：">
-<meta itemprop="dateModified" content="2025-03-03T14:23:59+08:00" />
-<meta itemprop="wordCount" content="262">
+<meta itemprop="dateModified" content="2025-03-04T12:49:24+08:00" />
+<meta itemprop="wordCount" content="263">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PredChecker"/>
 <meta name="twitter:description" content="子模块：PredChecker简介 分支预测检查器PredChecker接收来自IFU的预测块信息（包括预测跳转指令在预测块的位置、预测的跳转目标、预译码得到的指令信息、指令PC以及预译码得到的跳转目标偏移等），在模块内部检查五种类型的分支预测错误。模块内部分为两个流水线stage，分别输出信息，第一个stage输出给f3阶段，用于修正预测块的指令范围和预测结果。第二个stage输出给wb阶段，用于在发现分支预测错误时产生前端重定向以及写回给FTQ正确的预测信息。
 PredChecker功能介绍 JAL预测错误检查 jal指令预测错误的条件是，预测块中有一条jal指令（由预译码信息给出），但是要么这个预测块没有预测跳转，要么此预测块预测跳转的指令在这条jal指令之后（即这条jal指令没有被预测跳转）。
@@ -120,13 +120,13 @@ RET预测错误检查 ret指令预测错误的条件是，预测块中有一条r
 目标地址预测错误检查 目标地址预测错误的条件是，被预测的是一条有效的jal或者branch指令，同时预测的跳转目标地址和由指令码计算得到的跳转目标不一致。
 分级输出检查结果 以上PredChecker检查结果会分为两级分别输出，前面已经提到，Jal/Ret指令由于需要重新生成指令有效范围向量和重新指定预测位置， 所以需要在错误产生的当拍（F3）直接输出结果到Ibuffer用于及时更正进入后端的指令 。而由于时序的考虑，其他错误信息（比如五种错误的错误位置、正确的跳转地址等）则是等到下一拍（WB）阶段才返回给IFU做前端重定向。
 PredChecker接口说明 输入接口 fire_in：这个信号可以简单认为是模块有效性的控制信号。
-ftqOffset：表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。
-instrRange：对每条指令，表示该指令是否在预测块的有效指令范围内。
-instrValid：表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。
-jumpOffset：如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。
+ftqOffset：来自BPU的预测信息，表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。
+instrRange：来自PreDecode的预译码信息，对每条指令，表示该指令是否在预测块的有效指令范围内。
+instrValid：来自PreDecode的预译码信息，表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。
+jumpOffset：来自PreDecode的预译码信息，如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。
 pc：指令的pc。
-pds：预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。
-target：下个预测块的开始地址。
+pds：来自PreDecode模块的预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。
+target：来自BPU，下个预测块的开始地址。
 输出接口 第一阶段输出 fixedRange：修复的指令有效范围向量，对每条指令i，fixedRange_i为真表示这条指令是否在当前预测块的有效指令范围内
 fixedTaken：修复过后的CFI指令选取情况，对每条指令，fixedTaken_i为真表示这条指令是否是这个预测块的第一条CFI指令
 第二阶段输出 fixedMissPred：对每条指令，PredChecker检查出的存在预测错误的情况，fixedMissPred_i为真表示这条指令存在预测错误
@@ -240,7 +240,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cb6fc5e37d4bdd4925cc3ba6d4a63e06.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f7ececdb876f700fcc17dd211bafc381.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -264,7 +264,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cb6fc5e37d4bdd4925cc3ba6d4a63e06.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f7ececdb876f700fcc17dd211bafc381.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -539,13 +539,13 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 <h2 id="predchecker接口说明">PredChecker接口说明</h2>
 <h3 id="输入接口">输入接口</h3>
 <p>fire_in：这个信号可以简单认为是模块有效性的控制信号。</p>
-<p>ftqOffset：表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。</p>
-<p>instrRange：对每条指令，表示该指令是否在预测块的有效指令范围内。</p>
-<p>instrValid：表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。</p>
-<p>jumpOffset：如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。</p>
+<p>ftqOffset：来自BPU的预测信息，表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。</p>
+<p>instrRange：来自PreDecode的预译码信息，对每条指令，表示该指令是否在预测块的有效指令范围内。</p>
+<p>instrValid：来自PreDecode的预译码信息，表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。</p>
+<p>jumpOffset：来自PreDecode的预译码信息，如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。</p>
 <p>pc：指令的pc。</p>
-<p>pds：预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。</p>
-<p>target：下个预测块的开始地址。</p>
+<p>pds：来自PreDecode模块的预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。</p>
+<p>target：来自BPU，下个预测块的开始地址。</p>
 <h3 id="输出接口">输出接口</h3>
 <h4 id="第一阶段输出">第一阶段输出</h4>
 <p>fixedRange：修复的指令有效范围向量，对每条指令i，fixedRange_i为真表示这条指令是否在当前预测块的有效指令范围内</p>
@@ -868,8 +868,8 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 <tr>
 <td>3.3</td>
 <td>更新指令有效范围向量和预测跳转的指令</td>
+<td>范围偏小不修正</td>
 <td>如果出现了非控制流指令和无效指令的误预测，不应该将预测跳转的指令重新修正到预测块中第一条跳转指令，因为后续会直接冲刷并重新从重定向的位置取指令，如果这里修正的话，会导致下一预测块传入重复的指令。</td>
-<td></td>
 </tr>
 <tr>
 <td>4.1.1</td>
@@ -941,7 +941,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 March 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/3baa11d910f8949c77dadf50b0f8d95fd78cfc08">add Itlb submodule (#82) (3baa11d)</a>
+  最后修改 March 4, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c4e598914dd8ca6c859a968db81743abad72c8b0">ifu predchecker module desc improved (#84) (c4e5989)</a>
 </div>
 
 </div>

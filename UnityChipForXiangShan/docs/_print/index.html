@@ -133,7 +133,7 @@ DUT文档与功能 待确认bug列表 已发现bug列表 已修复bug列表 正�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cb6fc5e37d4bdd4925cc3ba6d4a63e06.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f7ececdb876f700fcc17dd211bafc381.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -4689,8 +4689,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 该指令会被标记为Trigger命中，随着执行在后端产生断点异常，进入M-Mode或调试模式。</p>
 <h3 id="链式断点">链式断点</h3>
 <p>根据RISCV的debug spec，香山实现的是mcontrol6。</p>
-<p>前端的0、6、8号Trigger支持Chain功能。
-当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，<del>且timing配置相同时</del>（在最新的手册中，这一要求已被删除），处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中。</p>
+<p>当它们对应的Chain位被置时，只有当该Trigger和编号在它后面一位的Trigger同时命中，<del>且timing配置相同时</del>（在最新的手册中，这一要求已被删除），处理器才会产生异常。其中可以和6,8号trigger实现chain功能的7,9号trigger在后端访存部件中。</p>
 <h2 id="frontendtrigger-接口说明">FrontendTrigger 接口说明</h2>
 <p>设计上并没有提供一个或一组对外的接口来查询某个断点的状态，因此，要在测试中检查断点状态，要么需要检查内部信号的情况（仓库中提供的构建脚本已经暴露了所有内部信号），要么通过具体执行过程中，断点的触发情况来判定。</p>
 <h3 id="输入接口">输入接口</h3>
@@ -4872,13 +4871,13 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <h2 id="predchecker接口说明">PredChecker接口说明</h2>
 <h3 id="输入接口">输入接口</h3>
 <p>fire_in：这个信号可以简单认为是模块有效性的控制信号。</p>
-<p>ftqOffset：表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。</p>
-<p>instrRange：对每条指令，表示该指令是否在预测块的有效指令范围内。</p>
-<p>instrValid：表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。</p>
-<p>jumpOffset：如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。</p>
+<p>ftqOffset：来自BPU的预测信息，表示该预测块的跳转指令是否存在（valid），以及跳转指令的序号（bits）。</p>
+<p>instrRange：来自PreDecode的预译码信息，对每条指令，表示该指令是否在预测块的有效指令范围内。</p>
+<p>instrValid：来自PreDecode的预译码信息，表示的是对于每条32位的拼接指令，其是否为一条有效的指令（即低16位为一条RVC指令，或者整个32位为一条RVI指令）。</p>
+<p>jumpOffset：来自PreDecode的预译码信息，如果某一指令为跳转指令，jumpOffset表示这个指令的跳转目标。</p>
 <p>pc：指令的pc。</p>
-<p>pds：预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。</p>
-<p>target：下个预测块的开始地址。</p>
+<p>pds：来自PreDecode模块的预译码信息，包含指令的brType、是否为Ret（isRet）、是否为RVC指令（isRVC）。</p>
+<p>target：来自BPU，下个预测块的开始地址。</p>
 <h3 id="输出接口">输出接口</h3>
 <h4 id="第一阶段输出">第一阶段输出</h4>
 <p>fixedRange：修复的指令有效范围向量，对每条指令i，fixedRange_i为真表示这条指令是否在当前预测块的有效指令范围内</p>
@@ -5201,8 +5200,8 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <tr>
 <td>3.3</td>
 <td>更新指令有效范围向量和预测跳转的指令</td>
+<td>范围偏小不修正</td>
 <td>如果出现了非控制流指令和无效指令的误预测，不应该将预测跳转的指令重新修正到预测块中第一条跳转指令，因为后续会直接冲刷并重新从重定向的位置取指令，如果这里修正的话，会导致下一预测块传入重复的指令。</td>
-<td></td>
 </tr>
 <tr>
 <td>4.1.1</td>
