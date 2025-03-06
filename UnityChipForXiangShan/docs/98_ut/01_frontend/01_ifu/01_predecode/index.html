@@ -25,7 +25,7 @@
 预译码信息生成 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 首先是判断是否是RVC指令，RVC指令的具体格式参阅RISCV手册的描述：
 其中，决定指令是否为RVC的部分在于指令的[1, 0]两位，不为3的情况下都是RVC指令。
-其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分。
+其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分，可以设置测试点进行测试
 最后比较麻烦的是CFI指令的目标地址计算偏移，主要是对J和BR分支指令进行的计算，这需要综合RVI和RVC中jal和br指令的结构。 首先，是手册中对于C.J的描述
 这里对imm立即数的注解是，立即数的每一位最后对应到的是偏移的哪一位。
 所以，可以认为立即数是这么重组的：
@@ -36,7 +36,7 @@ instr(12) &#43; instr(8) &#43; instr(10, 9) &#43; instr(6) &#43; instr(7) &#43; 
 PreDecode接口说明 输入接口 in_bits_data 17 x 2B的初始指令码，其中，每2个字节既可以代表一条RVC指令，也可以代表一个RVI指令的一半。
 输出接口 instr：拼接后的 16 x 4B的初始指令码
 jumpOffset：如果这条指令是跳转指令，则jumpOffset表示其跳转偏移
-pd：每条指令预译码信息，在时序优化之后，PreDecode模块的控制信息只剩下了valid和isRVC，后者表示这条指令是否为RVC指令
+pd：每条指令预译码信息，包括valid、isRVC、brType、isRet、isCall。其中第0条指令的valid已经被优化了
 hasHalfValid：这个信号需要和pd的valid结合起来看，PreDecode的一个功能是求出指令开始向量，也就是对每个4B的拼接指令，判断其低2B是否为一条有效指令的开始（即一条RVI指令的前半部分，或者一条RVC指令），但是需要分类讨论该预测块的第一个2B是否为一条有效指令的开始。hasHalfValid表示的是当前预测块的第一个2B指令为一条RVI指令的后半部分时，给出的指令开始向量。类似地，pd中的valid指的是当前预测块的第一个2B指令为一条指令的开始时，给出的指令开始向量。
 PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecoder简介
 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
@@ -50,7 +50,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 预译码信息生成 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 首先是判断是否是RVC指令，RVC指令的具体格式参阅RISCV手册的描述：
 其中，决定指令是否为RVC的部分在于指令的[1, 0]两位，不为3的情况下都是RVC指令。
-其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分。
+其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分，可以设置测试点进行测试
 最后比较麻烦的是CFI指令的目标地址计算偏移，主要是对J和BR分支指令进行的计算，这需要综合RVI和RVC中jal和br指令的结构。 首先，是手册中对于C.J的描述
 这里对imm立即数的注解是，立即数的每一位最后对应到的是偏移的哪一位。
 所以，可以认为立即数是这么重组的：
@@ -61,7 +61,7 @@ instr(12) &#43; instr(8) &#43; instr(10, 9) &#43; instr(6) &#43; instr(7) &#43; 
 PreDecode接口说明 输入接口 in_bits_data 17 x 2B的初始指令码，其中，每2个字节既可以代表一条RVC指令，也可以代表一个RVI指令的一半。
 输出接口 instr：拼接后的 16 x 4B的初始指令码
 jumpOffset：如果这条指令是跳转指令，则jumpOffset表示其跳转偏移
-pd：每条指令预译码信息，在时序优化之后，PreDecode模块的控制信息只剩下了valid和isRVC，后者表示这条指令是否为RVC指令
+pd：每条指令预译码信息，包括valid、isRVC、brType、isRet、isCall。其中第0条指令的valid已经被优化了
 hasHalfValid：这个信号需要和pd的valid结合起来看，PreDecode的一个功能是求出指令开始向量，也就是对每个4B的拼接指令，判断其低2B是否为一条有效指令的开始（即一条RVI指令的前半部分，或者一条RVC指令），但是需要分类讨论该预测块的第一个2B是否为一条有效指令的开始。hasHalfValid表示的是当前预测块的第一个2B指令为一条RVI指令的后半部分时，给出的指令开始向量。类似地，pd中的valid指的是当前预测块的第一个2B指令为一条指令的开始时，给出的指令开始向量。
 PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecoder简介
 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
@@ -70,7 +70,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-04T12:49:24+08:00" />
+<meta property="article:modified_time" content="2025-03-06T09:59:17+08:00" />
 <meta itemprop="name" content="PreDecode">
 <meta itemprop="description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
 所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
@@ -79,7 +79,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 预译码信息生成 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 首先是判断是否是RVC指令，RVC指令的具体格式参阅RISCV手册的描述：
 其中，决定指令是否为RVC的部分在于指令的[1, 0]两位，不为3的情况下都是RVC指令。
-其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分。
+其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分，可以设置测试点进行测试
 最后比较麻烦的是CFI指令的目标地址计算偏移，主要是对J和BR分支指令进行的计算，这需要综合RVI和RVC中jal和br指令的结构。 首先，是手册中对于C.J的描述
 这里对imm立即数的注解是，立即数的每一位最后对应到的是偏移的哪一位。
 所以，可以认为立即数是这么重组的：
@@ -90,14 +90,14 @@ instr(12) &#43; instr(8) &#43; instr(10, 9) &#43; instr(6) &#43; instr(7) &#43; 
 PreDecode接口说明 输入接口 in_bits_data 17 x 2B的初始指令码，其中，每2个字节既可以代表一条RVC指令，也可以代表一个RVI指令的一半。
 输出接口 instr：拼接后的 16 x 4B的初始指令码
 jumpOffset：如果这条指令是跳转指令，则jumpOffset表示其跳转偏移
-pd：每条指令预译码信息，在时序优化之后，PreDecode模块的控制信息只剩下了valid和isRVC，后者表示这条指令是否为RVC指令
+pd：每条指令预译码信息，包括valid、isRVC、brType、isRet、isCall。其中第0条指令的valid已经被优化了
 hasHalfValid：这个信号需要和pd的valid结合起来看，PreDecode的一个功能是求出指令开始向量，也就是对每个4B的拼接指令，判断其低2B是否为一条有效指令的开始（即一条RVI指令的前半部分，或者一条RVC指令），但是需要分类讨论该预测块的第一个2B是否为一条有效指令的开始。hasHalfValid表示的是当前预测块的第一个2B指令为一条RVI指令的后半部分时，给出的指令开始向量。类似地，pd中的valid指的是当前预测块的第一个2B指令为一条指令的开始时，给出的指令开始向量。
 PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecoder简介
 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
 所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
 预译码器的输出是：16x4B的拼接指令码；对每个4B指令码，该条指令是否为RVI或RVC指令（RVC指令只考虑该4B的低2B）；对每个4B指令码，该条指令的跳转偏移；两个16位的有效指令开始向量，其中第一种向量假定当前预测块的起始2字节为一条有效指令的开始，而第二种向量假定当前预测块的起始2字节为一条有效RVI指令的结束（但是由于第二种向量的前两位必然为0和1,所以编译优化后，第二种向量实际只有14个信号，表示2-15位；同理，第1种向量的第0位因为恒为1,所以也被优化） 功能介绍 指令码生成">
-<meta itemprop="dateModified" content="2025-03-04T12:49:24+08:00" />
-<meta itemprop="wordCount" content="178">
+<meta itemprop="dateModified" content="2025-03-06T09:59:17+08:00" />
+<meta itemprop="wordCount" content="283">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PreDecode"/>
 <meta name="twitter:description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
 所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
@@ -106,7 +106,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 预译码信息生成 预译码器根据指令码产生预译码信息，主要包括：是否是RVC指令、是否是CFI指令、 CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算偏移。
 首先是判断是否是RVC指令，RVC指令的具体格式参阅RISCV手册的描述：
 其中，决定指令是否为RVC的部分在于指令的[1, 0]两位，不为3的情况下都是RVC指令。
-其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分。
+其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分，可以设置测试点进行测试
 最后比较麻烦的是CFI指令的目标地址计算偏移，主要是对J和BR分支指令进行的计算，这需要综合RVI和RVC中jal和br指令的结构。 首先，是手册中对于C.J的描述
 这里对imm立即数的注解是，立即数的每一位最后对应到的是偏移的哪一位。
 所以，可以认为立即数是这么重组的：
@@ -117,7 +117,7 @@ instr(12) &#43; instr(8) &#43; instr(10, 9) &#43; instr(6) &#43; instr(7) &#43; 
 PreDecode接口说明 输入接口 in_bits_data 17 x 2B的初始指令码，其中，每2个字节既可以代表一条RVC指令，也可以代表一个RVI指令的一半。
 输出接口 instr：拼接后的 16 x 4B的初始指令码
 jumpOffset：如果这条指令是跳转指令，则jumpOffset表示其跳转偏移
-pd：每条指令预译码信息，在时序优化之后，PreDecode模块的控制信息只剩下了valid和isRVC，后者表示这条指令是否为RVC指令
+pd：每条指令预译码信息，包括valid、isRVC、brType、isRet、isCall。其中第0条指令的valid已经被优化了
 hasHalfValid：这个信号需要和pd的valid结合起来看，PreDecode的一个功能是求出指令开始向量，也就是对每个4B的拼接指令，判断其低2B是否为一条有效指令的开始（即一条RVI指令的前半部分，或者一条RVC指令），但是需要分类讨论该预测块的第一个2B是否为一条有效指令的开始。hasHalfValid表示的是当前预测块的第一个2B指令为一条RVI指令的后半部分时，给出的指令开始向量。类似地，pd中的valid指的是当前预测块的第一个2B指令为一条指令的开始时，给出的指令开始向量。
 PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecoder简介
 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
@@ -224,7 +224,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f7ececdb876f700fcc17dd211bafc381.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.71a71c0267b29f17ec2220d369537327.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -248,7 +248,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f7ececdb876f700fcc17dd211bafc381.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.71a71c0267b29f17ec2220d369537327.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -506,7 +506,7 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 <p>首先是判断是否是RVC指令，RVC指令的具体格式参阅RISCV手册的描述：</p>
 <p><img alt="RVC" src="RVCtable.png"></p>
 <p>其中，决定指令是否为RVC的部分在于指令的[1, 0]两位，不为3的情况下都是RVC指令。</p>
-<p>其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分。</p>
+<p>其余的指令性质判定功能（CFI类型、是否为call和ret）被时序优化到了F3PreDecoder中，不过也可以认为是PreDecoder的一部分，可以设置测试点进行测试</p>
 <p>最后比较麻烦的是CFI指令的目标地址计算偏移，主要是对J和BR分支指令进行的计算，这需要综合RVI和RVC中jal和br指令的结构。
 首先，是手册中对于C.J的描述</p>
 <p><img alt="JOP" src="JOP.png"></p>
@@ -525,7 +525,7 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 <h3 id="输出接口">输出接口</h3>
 <p>instr：拼接后的 16 x 4B的初始指令码</p>
 <p>jumpOffset：如果这条指令是跳转指令，则jumpOffset表示其跳转偏移</p>
-<p>pd：每条指令预译码信息，在时序优化之后，PreDecode模块的控制信息只剩下了valid和isRVC，后者表示这条指令是否为RVC指令</p>
+<p>pd：每条指令预译码信息，包括valid、isRVC、brType、isRet、isCall。其中第0条指令的valid已经被优化了</p>
 <p>hasHalfValid：这个信号需要和pd的valid结合起来看，PreDecode的一个功能是求出指令开始向量，也就是对每个4B的拼接指令，判断其低2B是否为一条有效指令的开始（即一条RVI指令的前半部分，或者一条RVC指令），但是需要分类讨论该预测块的第一个2B是否为一条有效指令的开始。hasHalfValid表示的是当前预测块的第一个2B指令为一条RVI指令的后半部分时，给出的指令开始向量。类似地，pd中的valid指的是当前预测块的第一个2B指令为一条指令的开始时，给出的指令开始向量。</p>
 <h2 id="predecoder测试点和功能点">PreDecoder测试点和功能点</h2>
 <h3 id="功能点1-生成指令码">功能点1 生成指令码</h3>
@@ -558,7 +558,8 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 </table>
 <h3 id="功能点2-生成预译码信息">功能点2 生成预译码信息</h3>
 <p>预译码器会根据指令码产生预译码信息，包括RVC指令的判定和CFI指令的目标地址计算偏移。</p>
-<p>CFI类型的判定则时序优化到了F3PreDecoder中。</p>
+<p>CFI类型的判定则时序优化到了F3PreDecoder中。
+可以设计测试点测试PreDecode对F3PreDecoder的使用。</p>
 <p>据此，我们可以设计下述测试点。</p>
 <p>首先是判定RVC指令，我们随机生成输入初始指令码，对返回的16位RVC判定结果进行检验。
 具体来说，对每32位指令，考虑RVC和RVI两种情况。</p>
@@ -612,6 +613,88 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 <td>2.2.4</td>
 <td>RVI.BR计算</td>
 <td>对传入RVI扩展的BR指令，检查计算的偏移</td>
+</tr>
+</tbody>
+</table>
+<p>参照F3PreDecoder的测试点，设计如下测试点：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.3.1</td>
+<td>非CFI判定</td>
+<td>对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0</td>
+</tr>
+<tr>
+<td>2.3.2</td>
+<td>BR判定</td>
+<td>对传入的BR指令，应该判定为类型1</td>
+</tr>
+<tr>
+<td>2.3.3</td>
+<td>JAL判定</td>
+<td>对传入的JAL指令，应该判定为类型2</td>
+</tr>
+<tr>
+<td>2.3.4</td>
+<td>JALR判定</td>
+<td>对传入的JALR指令，应该判定为类型3</td>
+</tr>
+<tr>
+<td>2.4.1</td>
+<td>非CFI和BR不判定</td>
+<td>对传入的非CFI和BR指令，都不应判定为call或者ret</td>
+</tr>
+<tr>
+<td>2.4.2.1.1</td>
+<td>RVI.JAL判定call</td>
+<td>对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call</td>
+</tr>
+<tr>
+<td>2.4.2.1.2</td>
+<td>RVI.JAL例外</td>
+<td>对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret</td>
+</tr>
+<tr>
+<td>2.4.2.2</td>
+<td>RVC.JAL不判定</td>
+<td>对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret</td>
+</tr>
+<tr>
+<td>2.4.3.1.1</td>
+<td>RVI.JALR和rd为link</td>
+<td>传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call</td>
+</tr>
+<tr>
+<td>2.4.3.1.2</td>
+<td>RVI.JALR且仅rs为link</td>
+<td>传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret</td>
+</tr>
+<tr>
+<td>2.4.3.1.3</td>
+<td>RVI.JALR无link</td>
+<td>对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal</td>
+</tr>
+<tr>
+<td>2.4.3.2.1</td>
+<td>RVC.JALR为Ret</td>
+<td>传入RVC.JALR指令，必定为call</td>
+</tr>
+<tr>
+<td>2.4.3.2.2.1</td>
+<td>RVC.JR且rs为link</td>
+<td>传入RVC.JR指令，rs为1或5，应判定为ret</td>
+</tr>
+<tr>
+<td>2.4.3.2.2.2</td>
+<td>RVC.JR且rs不为link</td>
+<td>传入RVC.JR指令，rs不为1或5，不应判定为ret</td>
 </tr>
 </tbody>
 </table>
@@ -694,21 +777,105 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 </tr>
 <tr>
 <td>2.3.1</td>
-<td>有效指令开始向量计算1</td>
-<td>对预测块，假定第一条指令为一条有效指令的开始，对每条指令计算其是否为有效指令开始</td>
-<td></td>
+<td>CFI指令类型判定</td>
+<td>非CFI判定</td>
+<td>对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0</td>
 </tr>
 <tr>
 <td>2.3.2</td>
+<td>CFI指令类型判定</td>
+<td>BR判定</td>
+<td>对传入的BR指令，应该判定为类型1</td>
+</tr>
+<tr>
+<td>2.3.3</td>
+<td>CFI指令类型判定</td>
+<td>JAL判定</td>
+<td>对传入的JAL指令，应该判定为类型2</td>
+</tr>
+<tr>
+<td>2.3.4</td>
+<td>CFI指令类型判定</td>
+<td>JALR判定</td>
+<td>对传入的JALR指令，应该判定为类型3</td>
+</tr>
+<tr>
+<td>2.4.1</td>
+<td>ret、call判定</td>
+<td>非CFI和BR不判定</td>
+<td>对传入的非CFI和BR指令，都不应判定为call或者ret</td>
+</tr>
+<tr>
+<td>2.4.2.1.1</td>
+<td>ret、call判定</td>
+<td>RVI.JAL判定call</td>
+<td>对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call</td>
+</tr>
+<tr>
+<td>2.4.2.1.2</td>
+<td>ret、call判定</td>
+<td>RVI.JAL例外</td>
+<td>对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret</td>
+</tr>
+<tr>
+<td>2.4.2.2</td>
+<td>ret、call判定</td>
+<td>RVC.JAL不判定</td>
+<td>对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret</td>
+</tr>
+<tr>
+<td>2.4.3.1.1</td>
+<td>ret、call判定</td>
+<td>RVI.JALR和rd为link</td>
+<td>传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call</td>
+</tr>
+<tr>
+<td>2.4.3.1.2</td>
+<td>ret、call判定</td>
+<td>RVI.JALR且仅rs为link</td>
+<td>传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret</td>
+</tr>
+<tr>
+<td>2.4.3.1.3</td>
+<td>ret、call判定</td>
+<td>RVI.JALR无link</td>
+<td>对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal</td>
+</tr>
+<tr>
+<td>2.4.3.2.1</td>
+<td>ret、call判定</td>
+<td>RVC.JALR为Ret</td>
+<td>传入RVC.JALR指令，必定为call</td>
+</tr>
+<tr>
+<td>2.4.3.2.2.1</td>
+<td>ret、call判定</td>
+<td>RVC.JR且rs为link</td>
+<td>传入RVC.JR指令，rs为1或5，应判定为ret</td>
+</tr>
+<tr>
+<td>2.4.3.2.2.2</td>
+<td>ret、call判定</td>
+<td>RVC.JR且rs不为link</td>
+<td>传入RVC.JR指令，rs不为1或5，不应判定为ret</td>
+</tr>
+<tr>
+<td>2.3.1</td>
+<td>计算有效指令开始向量</td>
+<td>有效指令开始向量计算1</td>
+<td>对预测块，假定第一条指令为一条有效指令的开始，对每条指令计算其是否为有效指令开始</td>
+</tr>
+<tr>
+<td>2.3.2</td>
+<td>计算有效指令开始向量</td>
 <td>有效指令开始向量计算2</td>
 <td>对预测块，假定第一条指令为一条有效指令的结束，对每条指令计算其是否为有效指令开始</td>
-<td></td>
 </tr>
 </tbody>
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 March 4, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c4e598914dd8ca6c859a968db81743abad72c8b0">ifu predchecker module desc improved (#84) (c4e5989)</a>
+  最后修改 March 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/8fcdd79da758da0a651aa1a763732a98d640589e">adapt to the new rtl and keep up with the pred checker changings (#86) (8fcdd79)</a>
 </div>
 
 </div>
