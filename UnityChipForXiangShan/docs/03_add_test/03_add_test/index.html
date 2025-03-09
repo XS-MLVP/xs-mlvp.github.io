@@ -47,8 +47,8 @@ def rvc_expand(rvc_expander, ref_insts, is_32bit=False, fsIsOff=False): &#34;&#3
 def test_a(): # 不合理，无法通过a判断测试目标 pass def test_rvc_expand_16bit_full(): # 合理，可以通过用例名称大体知道测试内容 pass 使用 Assert 在每个测试用例中，都需要通过assert来判断本测试是否通过。 pytest统计的是assert语句的结果，因此assert语句需要保证能够通过。
 以下内容位于ut_frontend/ifu/rvc_expander/classical_version/test_rvc_expander.py中：
 def rvc_expand(rvc_expander, ref_insts, is_32bit=False, fsIsOff=False): &#34;&#34;&#34;compare the RVC expand result with the reference Args: rvc_expander (warpper): the fixture of the RVC expander ref_insts (list[int]]): the reference instruction list &#34;&#34;&#34; find_error = 0 for insn in ref_insts: insn_disasm = disasmbly(insn) value, instr_ex = rvc_expander.expand(insn, fsIsOff) if is_32bit: assert value == insn, &#34;RVC expand error, 32bit instruction need to be the same&#34; if (insn_disasm == &#34;unknown&#34;) and (instr_ex == 0): debug(f&#34;find bad inst:{insn}, ref: 1, dut: 0&#34;) find_error &#43;=1 elif (insn_disasm !"/>
-<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.28dee116d76198cd41791ec8d9adf684b9621dd93c371caac3e05359925d5d62.css" as="style" integrity="sha256-KN7hFtdhmM1BeR7I2a32hLliHdk8Nxyqw&#43;BTWZJdXWI=" crossorigin="anonymous">
-<link href="/UnityChipForXiangShan/scss/main.min.28dee116d76198cd41791ec8d9adf684b9621dd93c371caac3e05359925d5d62.css" rel="stylesheet" integrity="sha256-KN7hFtdhmM1BeR7I2a32hLliHdk8Nxyqw&#43;BTWZJdXWI=" crossorigin="anonymous">
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
   integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
