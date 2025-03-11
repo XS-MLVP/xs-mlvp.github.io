@@ -17,20 +17,112 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
-<title>模板-UT-README | 万众一芯之香山处理器</title>
-<meta name="description" content="# 模块名称 ## 测试目标 &lt;测试目标、测试方法描述&gt; ## 测试环境 &lt;测试环境描述，依赖描述&gt; ## 功能检测 &lt;给出目标待测功能与对应的检测方法&gt; |序号|所属模块|功能描述|检查点描述|检查标识|检查项| |-|-|-|-|-|-| |-|-|-|-|-|-| ## 验证接口 &lt;接口的描述&gt; ## 用例说明 #### 测试用例1 |步骤|操作内容|预期结果|覆盖功能点| |-|-|-|-| |-|-|-|-| #### 测试用例2 |步骤|操作内容|预期结果|覆盖功能点| |-|-|-|-| |-|-|-|-| ## 目录结构 &lt;对本模块的目录结构进行描述&gt; ## 检测列表 - [ ] 本文档符合指定[模板]()要求 - [ ] Env提供的API不包含任何DUT引脚和时序信息 - [ ] Env的API保持稳定（共有[ X ]个） - [ ] Env中对所支持的RTL版本（支持版本[ X ]）进行了检查 - [ ] 功能点（共有[ X ]个）与[设计文档]()一致 - [ ] 检查点（共有[ X ]个）覆盖所有功能点 - [ ] 检查点的输入不依赖任何DUT引脚，仅依赖Env的标准API - [ ] 所有测试用例（共有[ X ]个）都对功能检查点进行了反标 - [ ] 所有测试用例都是通过 assert 进行的结果判断 - [ ] 所有DUT或对应wrapper都是通过fixture创建 - [ ] 在上述fixture中对RTL版本进行了检查 - [ ] 创建DUT或对应wrapper的fixture进行了功能和代码行覆盖率统计 - [ ] 设置代码行覆盖率时对过滤需求进行了检查 展示效果如下：">
-<meta property="og:title" content="模板-UT-README" />
-<meta property="og:description" content="# 模块名称 ## 测试目标 &lt;测试目标、测试方法描述&gt; ## 测试环境 &lt;测试环境描述，依赖描述&gt; ## 功能检测 &lt;给出目标待测功能与对应的检测方法&gt; |序号|所属模块|功能描述|检查点描述|检查标识|检查项| |-|-|-|-|-|-| |-|-|-|-|-|-| ## 验证接口 &lt;接口的描述&gt; ## 用例说明 #### 测试用例1 |步骤|操作内容|预期结果|覆盖功能点| |-|-|-|-| |-|-|-|-| #### 测试用例2 |步骤|操作内容|预期结果|覆盖功能点| |-|-|-|-| |-|-|-|-| ## 目录结构 &lt;对本模块的目录结构进行描述&gt; ## 检测列表 - [ ] 本文档符合指定[模板]()要求 - [ ] Env提供的API不包含任何DUT引脚和时序信息 - [ ] Env的API保持稳定（共有[ X ]个） - [ ] Env中对所支持的RTL版本（支持版本[ X ]）进行了检查 - [ ] 功能点（共有[ X ]个）与[设计文档]()一致 - [ ] 检查点（共有[ X ]个）覆盖所有功能点 - [ ] 检查点的输入不依赖任何DUT引脚，仅依赖Env的标准API - [ ] 所有测试用例（共有[ X ]个）都对功能检查点进行了反标 - [ ] 所有测试用例都是通过 assert 进行的结果判断 - [ ] 所有DUT或对应wrapper都是通过fixture创建 - [ ] 在上述fixture中对RTL版本进行了检查 - [ ] 创建DUT或对应wrapper的fixture进行了功能和代码行覆盖率统计 - [ ] 设置代码行覆盖率时对过滤需求进行了检查 展示效果如下：" />
+<title>验证文档规范 | 万众一芯之香山处理器</title>
+<meta name="description" content="本规范规定了“万众一芯”的文档模板（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+以下是文档模板：
+验证文档 术语说明 [可选项]列出术语和关键概念解释，方便读者参考，如果没有或比较简单可以没有
+整体框图 [可选项]如果特别复杂的模块，可以加入一张整体框图
+流水级示意图 [可选项]如果模块存在多流水级，则可以加入一张流水级示意图
+子模块列表 [可选项]如果有的话，请在这里列出
+模块功能说明 简述功能
+简述功能划分，复杂的可以以表格形式呈现
+功能1说明 针对功能1分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+功能2说明 针对功能2分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+功能3说明 针对功能3分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+…
+常量说明 说明本模块中需要用到的关键常量。（可省略）
+接口说明 详细解释各种接口的含义、来源
+接口时序 [可选项] 复杂的模块可以考虑添加接口时序说明
+测试点总表 请用&lt;mrs-testpoints&gt;&lt;/mrs-testpoints&gt;标签包裹下面的测试点总表
+请用&lt;mrs-pn&gt;&lt;/mrs-pn&gt;标签包裹您的每个测试点名称
+完成上述两步主要是方便我们后续用脚本提取测试点
+序号 功能名称 测试点名称 解释 1.x.x 用英文大写 用英文大写？需要链接相应测试点 简单解释输入输出需要的信息 子模块的文档格式类似
+以下以FIFO为例，展示了一个简单的文档案例
+`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!">
+<meta property="og:title" content="验证文档规范" />
+<meta property="og:description" content="本规范规定了“万众一芯”的文档模板（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+以下是文档模板：
+验证文档 术语说明 [可选项]列出术语和关键概念解释，方便读者参考，如果没有或比较简单可以没有
+整体框图 [可选项]如果特别复杂的模块，可以加入一张整体框图
+流水级示意图 [可选项]如果模块存在多流水级，则可以加入一张流水级示意图
+子模块列表 [可选项]如果有的话，请在这里列出
+模块功能说明 简述功能
+简述功能划分，复杂的可以以表格形式呈现
+功能1说明 针对功能1分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+功能2说明 针对功能2分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+功能3说明 针对功能3分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+&hellip;
+常量说明 说明本模块中需要用到的关键常量。（可省略）
+接口说明 详细解释各种接口的含义、来源
+接口时序 [可选项] 复杂的模块可以考虑添加接口时序说明
+测试点总表 请用&lt;mrs-testpoints&gt;&lt;/mrs-testpoints&gt;标签包裹下面的测试点总表
+请用&lt;mrs-pn&gt;&lt;/mrs-pn&gt;标签包裹您的每个测试点名称
+完成上述两步主要是方便我们后续用脚本提取测试点
+序号 功能名称 测试点名称 解释 1.x.x 用英文大写 用英文大写？需要链接相应测试点 简单解释输入输出需要的信息 子模块的文档格式类似
+以下以FIFO为例，展示了一个简单的文档案例
+`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/10_template_ut_readme/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/" /><meta property="article:section" content="docs" />
 
 <meta property="article:modified_time" content="2025-03-11T14:33:36+08:00" />
-<meta itemprop="name" content="模板-UT-README">
-<meta itemprop="description" content="# 模块名称 ## 测试目标 &lt;测试目标、测试方法描述&gt; ## 测试环境 &lt;测试环境描述，依赖描述&gt; ## 功能检测 &lt;给出目标待测功能与对应的检测方法&gt; |序号|所属模块|功能描述|检查点描述|检查标识|检查项| |-|-|-|-|-|-| |-|-|-|-|-|-| ## 验证接口 &lt;接口的描述&gt; ## 用例说明 #### 测试用例1 |步骤|操作内容|预期结果|覆盖功能点| |-|-|-|-| |-|-|-|-| #### 测试用例2 |步骤|操作内容|预期结果|覆盖功能点| |-|-|-|-| |-|-|-|-| ## 目录结构 &lt;对本模块的目录结构进行描述&gt; ## 检测列表 - [ ] 本文档符合指定[模板]()要求 - [ ] Env提供的API不包含任何DUT引脚和时序信息 - [ ] Env的API保持稳定（共有[ X ]个） - [ ] Env中对所支持的RTL版本（支持版本[ X ]）进行了检查 - [ ] 功能点（共有[ X ]个）与[设计文档]()一致 - [ ] 检查点（共有[ X ]个）覆盖所有功能点 - [ ] 检查点的输入不依赖任何DUT引脚，仅依赖Env的标准API - [ ] 所有测试用例（共有[ X ]个）都对功能检查点进行了反标 - [ ] 所有测试用例都是通过 assert 进行的结果判断 - [ ] 所有DUT或对应wrapper都是通过fixture创建 - [ ] 在上述fixture中对RTL版本进行了检查 - [ ] 创建DUT或对应wrapper的fixture进行了功能和代码行覆盖率统计 - [ ] 设置代码行覆盖率时对过滤需求进行了检查 展示效果如下：">
+<meta itemprop="name" content="验证文档规范">
+<meta itemprop="description" content="本规范规定了“万众一芯”的文档模板（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+以下是文档模板：
+验证文档 术语说明 [可选项]列出术语和关键概念解释，方便读者参考，如果没有或比较简单可以没有
+整体框图 [可选项]如果特别复杂的模块，可以加入一张整体框图
+流水级示意图 [可选项]如果模块存在多流水级，则可以加入一张流水级示意图
+子模块列表 [可选项]如果有的话，请在这里列出
+模块功能说明 简述功能
+简述功能划分，复杂的可以以表格形式呈现
+功能1说明 针对功能1分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+功能2说明 针对功能2分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+功能3说明 针对功能3分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+&hellip;
+常量说明 说明本模块中需要用到的关键常量。（可省略）
+接口说明 详细解释各种接口的含义、来源
+接口时序 [可选项] 复杂的模块可以考虑添加接口时序说明
+测试点总表 请用&lt;mrs-testpoints&gt;&lt;/mrs-testpoints&gt;标签包裹下面的测试点总表
+请用&lt;mrs-pn&gt;&lt;/mrs-pn&gt;标签包裹您的每个测试点名称
+完成上述两步主要是方便我们后续用脚本提取测试点
+序号 功能名称 测试点名称 解释 1.x.x 用英文大写 用英文大写？需要链接相应测试点 简单解释输入输出需要的信息 子模块的文档格式类似
+以下以FIFO为例，展示了一个简单的文档案例
+`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!">
 <meta itemprop="dateModified" content="2025-03-11T14:33:36+08:00" />
-<meta itemprop="wordCount" content="167">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="模板-UT-README"/>
-<meta name="twitter:description" content="# 模块名称 ## 测试目标 &lt;测试目标、测试方法描述&gt; ## 测试环境 &lt;测试环境描述，依赖描述&gt; ## 功能检测 &lt;给出目标待测功能与对应的检测方法&gt; |序号|所属模块|功能描述|检查点描述|检查标识|检查项| |-|-|-|-|-|-| |-|-|-|-|-|-| ## 验证接口 &lt;接口的描述&gt; ## 用例说明 #### 测试用例1 |步骤|操作内容|预期结果|覆盖功能点| |-|-|-|-| |-|-|-|-| #### 测试用例2 |步骤|操作内容|预期结果|覆盖功能点| |-|-|-|-| |-|-|-|-| ## 目录结构 &lt;对本模块的目录结构进行描述&gt; ## 检测列表 - [ ] 本文档符合指定[模板]()要求 - [ ] Env提供的API不包含任何DUT引脚和时序信息 - [ ] Env的API保持稳定（共有[ X ]个） - [ ] Env中对所支持的RTL版本（支持版本[ X ]）进行了检查 - [ ] 功能点（共有[ X ]个）与[设计文档]()一致 - [ ] 检查点（共有[ X ]个）覆盖所有功能点 - [ ] 检查点的输入不依赖任何DUT引脚，仅依赖Env的标准API - [ ] 所有测试用例（共有[ X ]个）都对功能检查点进行了反标 - [ ] 所有测试用例都是通过 assert 进行的结果判断 - [ ] 所有DUT或对应wrapper都是通过fixture创建 - [ ] 在上述fixture中对RTL版本进行了检查 - [ ] 创建DUT或对应wrapper的fixture进行了功能和代码行覆盖率统计 - [ ] 设置代码行覆盖率时对过滤需求进行了检查 展示效果如下："/>
+<meta itemprop="wordCount" content="269">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="验证文档规范"/>
+<meta name="twitter:description" content="本规范规定了“万众一芯”的文档模板（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+以下是文档模板：
+验证文档 术语说明 [可选项]列出术语和关键概念解释，方便读者参考，如果没有或比较简单可以没有
+整体框图 [可选项]如果特别复杂的模块，可以加入一张整体框图
+流水级示意图 [可选项]如果模块存在多流水级，则可以加入一张流水级示意图
+子模块列表 [可选项]如果有的话，请在这里列出
+模块功能说明 简述功能
+简述功能划分，复杂的可以以表格形式呈现
+功能1说明 针对功能1分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+功能2说明 针对功能2分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+功能3说明 针对功能3分解测试点
+如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议
+&hellip;
+常量说明 说明本模块中需要用到的关键常量。（可省略）
+接口说明 详细解释各种接口的含义、来源
+接口时序 [可选项] 复杂的模块可以考虑添加接口时序说明
+测试点总表 请用&lt;mrs-testpoints&gt;&lt;/mrs-testpoints&gt;标签包裹下面的测试点总表
+请用&lt;mrs-pn&gt;&lt;/mrs-pn&gt;标签包裹您的每个测试点名称
+完成上述两步主要是方便我们后续用脚本提取测试点
+序号 功能名称 测试点名称 解释 1.x.x 用英文大写 用英文大写？需要链接相应测试点 简单解释输入输出需要的信息 子模块的文档格式类似
+以下以FIFO为例，展示了一个简单的文档案例
+`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!"/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -228,9 +320,9 @@
   <input type="checkbox" id="m-unitychipforxiangshandocs09_template_issue-check"/>
   <label for="m-unitychipforxiangshandocs09_template_issue-check"><a href="/UnityChipForXiangShan/docs/09_template_issue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs09_template_issue"><span class="">模板-ISSUE</span></a></label>
   
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs10_template_ut_readme-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs10_template_ut_readme-check" checked/>
-  <label for="m-unitychipforxiangshandocs10_template_ut_readme-check"><a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="td-sidebar-nav-active-item">模板-UT-README</span></a></label>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs10_template_ut_readme-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs10_template_ut_readme-check"/>
+  <label for="m-unitychipforxiangshandocs10_template_ut_readme-check"><a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-README</span></a></label>
   
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs95_api-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs95_api-check"/>
@@ -244,14 +336,14 @@
   <input type="checkbox" id="m-unitychipforxiangshandocs97_constraint-check"/>
   <label for="m-unitychipforxiangshandocs97_constraint-check"><a href="/UnityChipForXiangShan/docs/97_constraint/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs97_constraint"><span class="">必要规范</span></a></label>
   
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut-check"/>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut-check" checked/>
   <label for="m-unitychipforxiangshandocs98_ut-check"><a href="/UnityChipForXiangShan/docs/98_ut/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut"><span class="">验证文档</span></a></label>
   
   <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="">验证文档规范</span></a></label>
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut00_standard-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="td-sidebar-nav-active-item">验证文档规范</span></a></label>
   
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend-check"/>
@@ -338,29 +430,51 @@
           </aside>
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
             <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/10_template_ut_readme.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/10_template_ut_readme.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=%e6%a8%a1%e6%9d%bf-UT-README" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_UT/00_standard.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_UT/00_standard.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs/98_UT?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=%e9%aa%8c%e8%af%81%e6%96%87%e6%a1%a3%e8%a7%84%e8%8c%83" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
   <a href="https://github.com/XS-MLVP/UnityChipForXiangShan//issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
-  <a id="print" href="/UnityChipForXiangShan/docs/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+  <a id="print" href="/UnityChipForXiangShan/docs/98_ut/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
 
 </div>
 
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#测试目标">测试目标</a></li>
-    <li><a href="#测试环境">测试环境</a></li>
-    <li><a href="#功能检测">功能检测</a></li>
-    <li><a href="#验证接口">验证接口</a></li>
-    <li><a href="#用例说明">用例说明</a>
+    <li><a href="#术语说明">术语说明</a></li>
+    <li><a href="#整体框图">整体框图</a></li>
+    <li><a href="#流水级示意图">流水级示意图</a></li>
+    <li><a href="#子模块列表">子模块列表</a></li>
+    <li><a href="#模块功能说明">模块功能说明</a>
       <ul>
-        <li></li>
+        <li><a href="#功能1说明">功能1说明</a></li>
+        <li><a href="#功能2说明">功能2说明</a></li>
+        <li><a href="#功能3说明">功能3说明</a></li>
       </ul>
     </li>
-    <li><a href="#目录结构">目录结构</a></li>
-    <li><a href="#检测列表">检测列表</a></li>
+    <li><a href="#常量说明">常量说明</a></li>
+    <li><a href="#接口说明">接口说明</a></li>
+    <li><a href="#接口时序">接口时序</a></li>
+    <li><a href="#测试点总表">测试点总表</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#功能说明">功能说明</a>
+      <ul>
+        <li><a href="#功能1读fifo">功能1：读FIFO</a></li>
+        <li><a href="#功能2写fifo">功能2：写FIFO</a></li>
+        <li><a href="#功能3重置">功能3：重置</a></li>
+      </ul>
+    </li>
+    <li><a href="#常量说明-1">常量说明</a></li>
+    <li><a href="#接口说明-1">接口说明</a>
+      <ul>
+        <li><a href="#输入接口">输入接口</a></li>
+        <li><a href="#输出接口">输出接口</a></li>
+      </ul>
+    </li>
+    <li><a href="#测试点总表-1">测试点总表</a></li>
   </ul>
 </nav>
       </div>
@@ -376,168 +490,219 @@
   <ol class="breadcrumb">
   <li class="breadcrumb-item">
     <a href="/UnityChipForXiangShan/docs/">进度概述</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/">验证文档</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    模板-UT-README</li>
+    验证文档规范</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>模板-UT-README</h1>
+	<h1>验证文档规范</h1>
 	
 	<header class="article-meta">
 		
   </header>
-	<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"># 模块名称
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">## 测试目标
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">测试目标</span><span style="color:#a40000">、</span><span style="color:#c4a000">测试方法描述</span><span style="color:#000;font-weight:bold">&gt;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">## 测试环境
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">测试环境描述</span><span style="color:#a40000">，</span><span style="color:#c4a000">依赖描述</span><span style="color:#000;font-weight:bold">&gt;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">## 功能检测
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">给出目标待测功能与对应的检测方法</span><span style="color:#000;font-weight:bold">&gt;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>|序号|所属模块|功能描述|检查点描述|检查标识|检查项|
-</span></span><span style="display:flex;"><span>|-|-|-|-|-|-|
-</span></span><span style="display:flex;"><span>|-|-|-|-|-|-|
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">## 验证接口
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">接口的描述</span><span style="color:#000;font-weight:bold">&gt;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">## 用例说明
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">#### 测试用例1
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span>|步骤|操作内容|预期结果|覆盖功能点|
-</span></span><span style="display:flex;"><span>|-|-|-|-|
-</span></span><span style="display:flex;"><span>|-|-|-|-|
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">#### 测试用例2
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span>|步骤|操作内容|预期结果|覆盖功能点|
-</span></span><span style="display:flex;"><span>|-|-|-|-|
-</span></span><span style="display:flex;"><span>|-|-|-|-|
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">## 目录结构
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">对本模块的目录结构进行描述</span><span style="color:#000;font-weight:bold">&gt;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">## 检测列表
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 本文档符合指定[模板]()要求
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> Env提供的API不包含任何DUT引脚和时序信息
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> Env的API保持稳定（共有[ X ]个）
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> Env中对所支持的RTL版本（支持版本[ X ]）进行了检查
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 功能点（共有[ X ]个）与[设计文档]()一致
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 检查点（共有[ X ]个）覆盖所有功能点
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 检查点的输入不依赖任何DUT引脚，仅依赖Env的标准API
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 所有测试用例（共有[ X ]个）都对功能检查点进行了反标
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 所有测试用例都是通过 assert 进行的结果判断
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 所有DUT或对应wrapper都是通过fixture创建
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 在上述fixture中对RTL版本进行了检查
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 创建DUT或对应wrapper的fixture进行了功能和代码行覆盖率统计
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">- [ ]</span> 设置代码行覆盖率时对过滤需求进行了检查
-</span></span></code></pre></div><p>展示效果如下：</p>
-<h1 id="模块名称">模块名称</h1>
-<h2 id="测试目标">测试目标</h2>
-<p>&lt;测试目标、测试方法描述&gt;</p>
-<h2 id="测试环境">测试环境</h2>
-<p>&lt;测试环境描述，依赖描述&gt;</p>
-<h2 id="功能检测">功能检测</h2>
-<p>&lt;给出目标待测功能与对应的检测方法&gt;</p>
+	<p>本规范规定了“万众一芯”的文档模板（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。</p>
+<p>以下是文档模板：</p>
+<h1 id="验证文档">验证文档</h1>
+<h2 id="术语说明">术语说明</h2>
+<p><em>[可选项]列出术语和关键概念解释，方便读者参考，如果没有或比较简单可以没有</em></p>
+<h2 id="整体框图">整体框图</h2>
+<p><em>[可选项]如果特别复杂的模块，可以加入一张整体框图</em></p>
+<h2 id="流水级示意图">流水级示意图</h2>
+<p><em>[可选项]如果模块存在多流水级，则可以加入一张流水级示意图</em></p>
+<h2 id="子模块列表">子模块列表</h2>
+<p><em>[可选项]如果有的话，请在这里列出</em></p>
+<h2 id="模块功能说明">模块功能说明</h2>
+<p><em>简述功能</em></p>
+<p><em>简述功能划分，复杂的可以以表格形式呈现</em></p>
+<h3 id="功能1说明">功能1说明</h3>
+<p><em>针对功能1分解测试点</em></p>
+<p><em>如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议</em></p>
+<h3 id="功能2说明">功能2说明</h3>
+<p><em>针对功能2分解测试点</em></p>
+<p><em>如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议</em></p>
+<h3 id="功能3说明">功能3说明</h3>
+<p><em>针对功能3分解测试点</em></p>
+<p><em>如果测试点较多可以先列一个小表格；针对每个测试点，给出设置cov_group的建议</em></p>
+<p>&hellip;</p>
+<h2 id="常量说明">常量说明</h2>
+<p><em>说明本模块中需要用到的关键常量。（可省略）</em></p>
+<h2 id="接口说明">接口说明</h2>
+<p><em>详细解释各种接口的含义、来源</em></p>
+<h2 id="接口时序">接口时序</h2>
+<p><em>[可选项] 复杂的模块可以考虑添加接口时序说明</em></p>
+<h2 id="测试点总表">测试点总表</h2>
+<p><em>请用<code>&lt;mrs-testpoints&gt;&lt;/mrs-testpoints&gt;</code>标签包裹下面的测试点总表</em></p>
+<p><em>请用<code>&lt;mrs-pn&gt;&lt;/mrs-pn&gt;</code>标签包裹您的每个测试点名称</em></p>
+<p><em>完成上述两步主要是方便我们后续用脚本提取测试点</em></p>
+<mrs-testpoints>
 <table>
 <thead>
 <tr>
 <th>序号</th>
-<th>所属模块</th>
-<th>功能描述</th>
-<th>检查点描述</th>
-<th>检查标识</th>
-<th>检查项</th>
+<th>功能名称</th>
+<th>测试点名称</th>
+<th>解释</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>-</td>
-<td>-</td>
-<td>-</td>
-<td>-</td>
-<td>-</td>
-<td>-</td>
+<td>1.x.x</td>
+<td>用英文大写</td>
+<td><mrs-pn> 用英文大写？需要链接相应测试点</mrs-pn></td>
+<td>简单解释输入输出需要的信息</td>
 </tr>
 </tbody>
 </table>
-<h2 id="验证接口">验证接口</h2>
-<p>&lt;接口的描述&gt;</p>
-<h2 id="用例说明">用例说明</h2>
-<h4 id="测试用例1">测试用例1</h4>
+</mrs-testpoints>
+<p>子模块的文档格式类似</p>
+<p>以下以FIFO为例，展示了一个简单的文档案例</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#000">`timescale</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000">ns</span> <span style="color:#ce5c00;font-weight:bold">/</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000">ps</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">FIFO</span> <span style="color:#000;font-weight:bold">(</span> <span style="color:#8f5902;font-style:italic">//data_width = 8  data depth =8
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000">wr_en</span><span style="color:#000;font-weight:bold">,</span>          <span style="color:#8f5902;font-style:italic">//写使能
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000">rd_en</span><span style="color:#000;font-weight:bold">,</span>          <span style="color:#8f5902;font-style:italic">//读使能
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span><span style="color:#000">wdata</span><span style="color:#000;font-weight:bold">,</span>     <span style="color:#8f5902;font-style:italic">//写入数据输入
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span><span style="color:#000">rdata</span><span style="color:#000;font-weight:bold">,</span>    <span style="color:#8f5902;font-style:italic">//读取数据输出
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#000">empty</span><span style="color:#000;font-weight:bold">,</span>         <span style="color:#8f5902;font-style:italic">//读空标志信号
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#000">full</span>           <span style="color:#8f5902;font-style:italic">//写满标志信号
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">rdata_reg</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">8</span><span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">rdata</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">rdata_reg</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">reg</span>  <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">data</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">];</span>     <span style="color:#8f5902;font-style:italic">//数据存储单元(8bit数据8个)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">reg</span>  <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>  <span style="color:#8f5902;font-style:italic">//写指针
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">reg</span>  <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">rd_ptr</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>  <span style="color:#8f5902;font-style:italic">//读指针
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">wr_addr</span><span style="color:#000;font-weight:bold">;</span>        <span style="color:#8f5902;font-style:italic">//写地址(写指针的低3位)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">rd_addr</span><span style="color:#000;font-weight:bold">;</span>        <span style="color:#8f5902;font-style:italic">//读地址(读指针的低3位)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">wr_addr</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">wr_ptr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">];</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">rd_addr</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">rd_ptr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">];</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">always</span><span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk</span> <span style="color:#204a87;font-weight:bold">or</span> <span style="color:#204a87;font-weight:bold">negedge</span> <span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">)</span><span style="color:#204a87;font-weight:bold">begin</span> <span style="color:#8f5902;font-style:italic">//写数据
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">if</span><span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">)</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#204a87;font-weight:bold">if</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">wr_en</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> <span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">full</span><span style="color:#000;font-weight:bold">)</span><span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">data</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000">wr_addr</span><span style="color:#000;font-weight:bold">]</span>  <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">wdata</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">always</span><span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk</span> <span style="color:#204a87;font-weight:bold">or</span> <span style="color:#204a87;font-weight:bold">negedge</span> <span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">)</span><span style="color:#204a87;font-weight:bold">begin</span> <span style="color:#8f5902;font-style:italic">//读数据
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">if</span><span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">rd_ptr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#204a87;font-weight:bold">if</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">rd_en</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> <span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">empty</span><span style="color:#000;font-weight:bold">)</span><span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">rdata_reg</span>  <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">data</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000">rd_addr</span><span style="color:#000;font-weight:bold">];</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">rd_ptr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">rd_ptr</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">empty</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">rd_ptr</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#8f5902;font-style:italic">//读空
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">full</span>  <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#ce5c00;font-weight:bold">~</span><span style="color:#000">rd_ptr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">],</span><span style="color:#000">rd_ptr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]});</span> <span style="color:#8f5902;font-style:italic">//写满
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">endmodule</span>
+</span></span></code></pre></div><h1 id="fifo-验证文档">FIFO 验证文档</h1>
+<h2 id="功能说明">功能说明</h2>
+<p>本次需要验证的是FIFO，一种常见的硬件缓冲模块，在硬件电路中临时存储数据，并按照数据到达的顺序进行处理。</p>
+<p>本次需要验证的FIFO每次可写可读8位数据，容量为8。</p>
+<h3 id="功能1读fifo">功能1：读FIFO</h3>
+<p>设置FIFO读使能之后，并且FIFO不为空时，可以从FIFO中读取数据。</p>
+<h4 id="测试点11-常规读取a-idfifo_read_normal-a">测试点1.1 常规读取<a id="FIFO_READ_NORMAL"> </a></h4>
+<p>当FIFO中已有数据时，设置读使能，从中读出一个数据。</p>
+<p>建议对栈的状态进行观测。</p>
+<h4 id="测试点12-空读a-idfifo_read_empty-a">测试点1.2 空读<a id="FIFO_READ_EMPTY"> </a></h4>
+<p>当FIFO中无数据，设置读使能，不读取数据。</p>
+<p>建议对栈的状态进行观测。</p>
+<h4 id="测试点13-无读使能不读a-idfifo_read_no_en-a">测试点1.3 无读使能不读<a id="FIFO_READ_NO_EN"> </a></h4>
+<p>当FIFO中有数据，不设置读使能，不应该读取数据（建议判断方法：多次写之后设置读使能，读指针的数据应和第一次写入的数据一致）。</p>
+<h3 id="功能2写fifo">功能2：写FIFO</h3>
+<p>设置FIFO写使能之后，并且FIFO尚有空位时，可以向FIFO写入一个数据。</p>
+<h4 id="测试点21-常规写入a-idfifo_write_normal-a">测试点2.1 常规写入<a id="FIFO_WRITE_NORMAL"> </a></h4>
+<p>当FIFO中尚有空间时，设置写使能，可向FIFO写入一个数据。</p>
+<p>建议对栈的状态进行观测。</p>
+<h4 id="测试点22-fifo已满无法写入a-idfifo_write_full-a">测试点2.2 FIFO已满无法写入<a id="FIFO_WRITE_FULL"> </a></h4>
+<p>当FIFO中数据已满，设置写使能，无法写入数据。</p>
+<p>建议监测栈整体的状态。</p>
+<h4 id="测试点23-无写使能不写a-idfifo_write_no_en-a">测试点2.3 无写使能不写<a id="FIFO_WRITE_NO_EN"> </a></h4>
+<p>当FIFO中有空间，不设置写使能，即使设置了待写入的数据，也不应该写入数据（建议判断方法：在保持写使能为假的情况下，连续读应该为空读）。</p>
+<h3 id="功能3重置">功能3：重置</h3>
+<p>设置rst为假后，清空队列。</p>
+<h4 id="测试点31-重置-a-idfifo_reset_reset-a">测试点3.1 重置 <a id="FIFO_RESET_RESET"> </a></h4>
+<p>设置rst为假后，下一周期时，队列应为空</p>
+<h2 id="常量说明-1">常量说明</h2>
+<p>FIFO的容量为8。</p>
+<h2 id="接口说明-1">接口说明</h2>
+<h3 id="输入接口">输入接口</h3>
+<p>rst_n：1位信号，设置重置</p>
+<p>wr_en：1位信号，表示写使能</p>
+<p>wdata：8位信号，表示写入的数据</p>
+<p>rd_en：1位信号，表示读使能</p>
+<h3 id="输出接口">输出接口</h3>
+<p>rdata：8位信号，表示读出的数据</p>
+<p>empty：1位信号，表示栈已经空了</p>
+<p>full：1位信号，表示栈已经满了</p>
+<h2 id="测试点总表-1">测试点总表</h2>
+<p>建议各个测试点的覆盖组使用下表描述的功能和测试点名称进行命名。</p>
+<p>比如FIFO_READ的测试点覆盖点可以命名为FIFO_READ_NORMAL</p>
+<mrs-testpoints>
 <table>
 <thead>
 <tr>
-<th>步骤</th>
-<th>操作内容</th>
-<th>预期结果</th>
-<th>覆盖功能点</th>
+<th>序号</th>
+<th>功能名称</th>
+<th>测试点名称</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>-</td>
-<td>-</td>
-<td>-</td>
-<td>-</td>
+<td>1.1</td>
+<td>FIFO_READ</td>
+<td><a href="#FIFO_READ_NORMAL"><mrs-pn>NORMAL</mrs-pn></a></td>
+<td>fifo有数据时，设置读使能，可以读出数据</td>
+</tr>
+<tr>
+<td>1.2</td>
+<td>FIFO_READ</td>
+<td><a href="#FIFO_READ_EMPTY"><mrs-pn>EMPTY</mrs-pn></a></td>
+<td>fifo为空时，设置读使能，无法读出数据</td>
+</tr>
+<tr>
+<td>1.3</td>
+<td>FIFO_READ</td>
+<td><a href="#FIFO_READ_NO_EN"><mrs-pn>NO_EN</mrs-pn></a></td>
+<td>fifo有数据时，不设置读使能，无法读出数据</td>
+</tr>
+<tr>
+<td>2.1</td>
+<td>FIFO_WRITE</td>
+<td><a href="#FIFO_WRITE_NORMAL"><mrs-pn>NORMAL</mrs-pn></a></td>
+<td>fifo未满时，设置写使能，可以写入数据</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td>FIFO_WRITE</td>
+<td><a href="#FIFO_WRITE_FULL"><mrs-pn>FULL</mrs-pn></a></td>
+<td>fifo已满时，设置写使能，可以写入数据</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td>FIFO_WRITE</td>
+<td><a href="#FIFO_WRITE_NO_EN"><mrs-pn>NO_EN</mrs-pn></a></td>
+<td>fifo未满时，不设置写使能，无法写入数据</td>
+</tr>
+<tr>
+<td>3.1</td>
+<td>FIFO_RESET</td>
+<td><a href="#FIFO_RESET_RESET"><mrs-pn>RESET</mrs-pn></a></td>
+<td>重置后，栈为空</td>
 </tr>
 </tbody>
 </table>
-<h4 id="测试用例2">测试用例2</h4>
-<table>
-<thead>
-<tr>
-<th>步骤</th>
-<th>操作内容</th>
-<th>预期结果</th>
-<th>覆盖功能点</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>-</td>
-<td>-</td>
-<td>-</td>
-<td>-</td>
-</tr>
-</tbody>
-</table>
-<h2 id="目录结构">目录结构</h2>
-<p>&lt;对本模块的目录结构进行描述&gt;</p>
-<h2 id="检测列表">检测列表</h2>
-<ul>
-<li><input disabled="" type="checkbox"> 本文档符合指定<a href="/UnityChipForXiangShan/">模板</a>要求</li>
-<li><input disabled="" type="checkbox"> Env提供的API不包含任何DUT引脚和时序信息</li>
-<li><input disabled="" type="checkbox"> Env的API保持稳定（共有[ X ]个）</li>
-<li><input disabled="" type="checkbox"> Env中对所支持的RTL版本（支持版本[ X ]）进行了检查</li>
-<li><input disabled="" type="checkbox"> 功能点（共有[ X ]个）与<a href="/UnityChipForXiangShan/">设计文档</a>一致</li>
-<li><input disabled="" type="checkbox"> 检查点（共有[ X ]个）覆盖所有功能点</li>
-<li><input disabled="" type="checkbox"> 检查点的输入不依赖任何DUT引脚，仅依赖Env的标准API</li>
-<li><input disabled="" type="checkbox"> 所有测试用例（共有[ X ]个）都对功能检查点进行了反标</li>
-<li><input disabled="" type="checkbox"> 所有测试用例都是通过 assert 进行的结果判断</li>
-<li><input disabled="" type="checkbox"> 所有DUT或对应wrapper都是通过fixture创建</li>
-<li><input disabled="" type="checkbox"> 在上述fixture中对RTL版本进行了检查</li>
-<li><input disabled="" type="checkbox"> 创建DUT或对应wrapper的fixture进行了功能和代码行覆盖率统计</li>
-<li><input disabled="" type="checkbox"> 设置代码行覆盖率时对过滤需求进行了检查</li>
-</ul>
-
+</mrs-testpoints>
 	<div class="td-page-meta__lastmod">
   最后修改 March 11, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/6fee10b560dba2a7050d6e3653dca351995031f1">add doc format options (#88) (6fee10b)</a>
 </div>

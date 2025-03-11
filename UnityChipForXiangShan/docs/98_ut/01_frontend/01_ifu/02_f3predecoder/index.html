@@ -42,7 +42,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-06T15:34:00+08:00" />
+<meta property="article:modified_time" content="2025-03-11T14:33:36+08:00" />
 <meta itemprop="name" content="F3PreDecoder">
 <meta itemprop="description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
 F3PreDecoder功能介绍 CFI指令类型判定 要想确定CFI指令类型，只需要分别尝试匹配JAL、JALR、BR和他们的RVC版本即可，注意，RVC的EBREAK 不应该被视为CFI指令。在匹配的过程中，自然CFI指令的类型就被甄别出来了。在这一步中，我们将所有指令分到如下四类brType中：
@@ -54,7 +54,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 对于类型2，只有不为RVC指令且目的寄存器rd为link寄存器（x1或x5）时，才为Call。
 对于类型3，在RVI指令下，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。 在RVC指令下，对C.JALR指令，为call，对C.JR指令，当rs1为link时，为Ret
 序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.">
-<meta itemprop="dateModified" content="2025-03-06T15:34:00+08:00" />
+<meta itemprop="dateModified" content="2025-03-11T14:33:36+08:00" />
 <meta itemprop="wordCount" content="146">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="F3PreDecoder"/>
 <meta name="twitter:description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
@@ -168,7 +168,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cc7454367f8352efdba6878f3fdc798c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.dda6383ab2729c149632884c3205cdfc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -192,7 +192,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cc7454367f8352efdba6878f3fdc798c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.dda6383ab2729c149632884c3205cdfc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -285,7 +285,11 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
   <label for="m-unitychipforxiangshandocs98_ut-check"><a href="/UnityChipForXiangShan/docs/98_ut/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut"><span class="">验证文档</span></a></label>
   
   <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="">验证文档规范</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend-check" checked/>
   <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
   
@@ -668,7 +672,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 March 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0ca85ce5acfa0894762be5d008a2bf85bed08101">update makefile &amp; /scripts/: rtl links &amp; itlb funcov (#85) (0ca85ce)</a>
+  最后修改 March 11, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/6fee10b560dba2a7050d6e3653dca351995031f1">add doc format options (#88) (6fee10b)</a>
 </div>
 
 </div>

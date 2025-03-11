@@ -56,7 +56,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-06T15:34:00+08:00" />
+<meta property="article:modified_time" content="2025-03-11T14:33:36+08:00" />
 <meta itemprop="name" content="RVCExpander">
 <meta itemprop="description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
@@ -75,7 +75,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
 序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.">
-<meta itemprop="dateModified" content="2025-03-06T15:34:00+08:00" />
+<meta itemprop="dateModified" content="2025-03-11T14:33:36+08:00" />
 <meta itemprop="wordCount" content="915">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RVCExpander"/>
 <meta name="twitter:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
@@ -196,7 +196,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cc7454367f8352efdba6878f3fdc798c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.dda6383ab2729c149632884c3205cdfc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -220,7 +220,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cc7454367f8352efdba6878f3fdc798c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.dda6383ab2729c149632884c3205cdfc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -313,7 +313,11 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
   <label for="m-unitychipforxiangshandocs98_ut-check"><a href="/UnityChipForXiangShan/docs/98_ut/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut"><span class="">验证文档</span></a></label>
   
   <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="">验证文档规范</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend-check" checked/>
   <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
   
@@ -892,7 +896,7 @@ imm[12|10:5]rs2rs1001imm[4:1|11]1100011BNE</p>
 <p>RVI的SD格式形如：| imm[11:5]| rs2 | rs1 | 011 | imm[4:0] | 0100111 |</p>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 March 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0ca85ce5acfa0894762be5d008a2bf85bed08101">update makefile &amp; /scripts/: rtl links &amp; itlb funcov (#85) (0ca85ce)</a>
+  最后修改 March 11, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/6fee10b560dba2a7050d6e3653dca351995031f1">add doc format options (#88) (6fee10b)</a>
 </div>
 
 </div>

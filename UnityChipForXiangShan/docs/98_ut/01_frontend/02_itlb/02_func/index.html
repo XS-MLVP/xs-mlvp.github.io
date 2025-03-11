@@ -44,7 +44,7 @@ Reserved:
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/02_func/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-06T15:34:00+08:00" />
+<meta property="article:modified_time" content="2025-03-11T14:33:36+08:00" />
 <meta itemprop="name" content="功能详述">
 <meta itemprop="description" content="支持 SV48 分页机制 SV48 （Supervisor-mode Virtual Memory）是一种基于 RISC-V 的页表虚拟内存寻址模式，指定了 48 位虚拟地址空间的结构，支持 256TB 的虚拟内存地址空间。使用四级页表结构：
 在 SV48 的一个 PTE 中包含了如下字段：
@@ -57,7 +57,7 @@ Reserved:
 保留供软件使用的位，通常用于特定的标志或操作，以便在软件实现中提供灵活性。 D:
 脏位，指示该页面是否被写入。如果该位为 1，表示该页的数据已被修改，需在换出时写回到存储设备。 A:
 访问位，指示该页是否被访问过。如果该位为 1，表示该页已被读取或写入，用于页面替换算法。 G:">
-<meta itemprop="dateModified" content="2025-03-06T15:34:00+08:00" />
+<meta itemprop="dateModified" content="2025-03-11T14:33:36+08:00" />
 <meta itemprop="wordCount" content="2084">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="功能详述"/>
 <meta name="twitter:description" content="支持 SV48 分页机制 SV48 （Supervisor-mode Virtual Memory）是一种基于 RISC-V 的页表虚拟内存寻址模式，指定了 48 位虚拟地址空间的结构，支持 256TB 的虚拟内存地址空间。使用四级页表结构：
@@ -172,7 +172,7 @@ Reserved:
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cc7454367f8352efdba6878f3fdc798c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.dda6383ab2729c149632884c3205cdfc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -196,7 +196,7 @@ Reserved:
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.cc7454367f8352efdba6878f3fdc798c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.dda6383ab2729c149632884c3205cdfc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -289,7 +289,11 @@ Reserved:
   <label for="m-unitychipforxiangshandocs98_ut-check"><a href="/UnityChipForXiangShan/docs/98_ut/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut"><span class="">验证文档</span></a></label>
   
   <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="">验证文档规范</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend-check" checked/>
   <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
   
@@ -1443,7 +1447,7 @@ Reserved:
 <p>在香山昆明湖架构中，并不支持硬件更新 <code>A/D</code> 位，而是在需要更新的时候通过 <code>Page Fault</code> 通知软件进行页表更新。具体来说，每当处理器访问某一页时检查该页 <code>A</code> 位如果是 <code>0</code>，那么会发生 <code>PF</code>；同样的，每当处理器写入某一页时检查该页的 <code>D</code> 位如果是 <code>0</code>，同样会发生 <code>PF</code>。在软件处理异常后，操作系统会允许处理器再次访问页面，只有在页表得到更新且相关状态位（<code>A</code> 和 <code>D</code> 位）被正确设置后，处理器才能继续进行后续的内存访问。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0ca85ce5acfa0894762be5d008a2bf85bed08101">update makefile &amp; /scripts/: rtl links &amp; itlb funcov (#85) (0ca85ce)</a>
+  最后修改 March 11, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/6fee10b560dba2a7050d6e3653dca351995031f1">add doc format options (#88) (6fee10b)</a>
 </div>
 
 </div>
