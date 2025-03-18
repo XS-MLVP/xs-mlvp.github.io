@@ -1,0 +1,913 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-cn" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="canonical" type="text/html" href="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/">
+<link rel="alternate" type="application/rss&#43;xml" href="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/index.xml">
+<meta name="robots" content="noindex, nofollow">
+
+
+<link rel="shortcut icon" href="/UnityChipForXiangShan/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/UnityChipForXiangShan/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
+
+<title>验证文档规范 | 万众一芯之香山处理器</title>
+<meta name="description" content="本规范规定了“万众一芯”验证文档的必要形式和结构（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+万众一芯验证文档格式规范 验证文档标题请用一号标题格式（一个#），以加法器验证文档为例，其标题可以为：进位加法器设计与验证。
+文档概述 文档概述标题请用二号标题格式（两个#）。
+【必填项】 在该部分对整个文档进行简约描述，例如内容概述，待验证模块的基本功能、特殊需求、特定规格、目标读者、知识前置等。目的是通过对该部分，读者便了解是否具有其感兴趣的内容。例如本文档是对验证文档的编写要求进行描述，便于多文档协作，规范验证的数据输入，特定数据标签等。
+术语说明 术语说明标题请用二号标题格式（两个#）。
+【必填项】 该部分需要列出术语和关键概念解释，方便读者参考。
+优先解释模块专有缩写（如TLB， FIFO等） 对容易混淆的概念请务必明确（如虚拟地址和物理地址等） 示例格式如下： 缩写 全称 定义 TLB Translation Lookaside Buffer 地址转换的缓存单元，用于加速虚拟地址到物理的转换 FIFO First In First Out 先进先出队列 QoS Quality of Service 服务质量，用于总线仲裁中优先级控制机制 如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。
+前置知识 前置知识标题请用二号标题格式（两个#）。
+【可选项】 在阅读文档或进行验证之前，建议掌握一些关键前置知识，以便更深入理解相关内容。例如，在撰写LoadStoreQueue（LSQ）文档时，讲述RAW（Read After Write）违例有助于理解操作之间的依赖关系。在撰写Icache或L2Cache文档时，介绍缓存层级、替换策略和一致性模型等基本概念也有助于读者理解。如果涉及复杂算法，也应对其进行简要描述。
+基本要求：
+该部分内容应简洁，易于理解。如篇幅较长，可将内容移至附录。 针对较为复杂的内容，可以通过图像、伪代码和案例进行解释，以降低理解难度。 下面是一个举例：
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。">
+<meta property="og:title" content="验证文档规范" />
+<meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/" />
+<meta itemprop="name" content="验证文档规范">
+<meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="验证文档规范"/>
+<meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."/>
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/UnityChipForXiangShan/css/prism.css"/>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
+  </head>
+  <body class="td-section">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/UnityChipForXiangShan/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">万众一芯之香山处理器</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f52e8061f74486f53ca37d0c16a0d38c.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+
+
+
+
+<div class="td-content">
+<div class="pageinfo pageinfo-primary d-print-none">
+<p>
+这是本节的多页打印视图。
+<a href="#" onclick="print();return false;">点击此处打印</a>.
+</p><p>
+<a href="/UnityChipForXiangShan/docs/98_ut/00_standard/">返回本页常规视图</a>.
+</p>
+</div>
+
+
+
+<h1 class="title">验证文档规范</h1>
+
+
+
+
+
+    <ul>
+    
+  
+  
+  
+  
+
+  
+    
+    
+	
+<li>1: <a href="#pg-2f0743d2b0ca7749ffb137a4b226880f">FIFO文档案例</a></li>
+
+
+    
+  
+
+    </ul>
+
+
+<div class="content">
+      
+
+<div class="pageinfo pageinfo-primary">
+<p>本规范规定了“万众一芯”验证文档的必要形式和结构（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。</p>
+
+</div>
+
+<h1 id="万众一芯验证文档格式规范">万众一芯验证文档格式规范</h1>
+<p>验证文档标题请用一号标题格式（一个#），以加法器验证文档为例，其标题可以为：进位加法器设计与验证。</p>
+<h2 id="文档概述">文档概述</h2>
+<p>文档概述标题请用二号标题格式（两个#）。</p>
+<p><strong>【必填项】</strong> 在该部分对整个文档进行简约描述，例如内容概述，待验证模块的基本功能、特殊需求、特定规格、目标读者、知识前置等。目的是通过对该部分，读者便了解是否具有其感兴趣的内容。例如本文档是对验证文档的编写要求进行描述，便于多文档协作，规范验证的数据输入，特定数据标签等。</p>
+<h2 id="术语说明">术语说明</h2>
+<p>术语说明标题请用二号标题格式（两个#）。</p>
+<p><strong>【必填项】</strong> 该部分需要列出术语和关键概念解释，方便读者参考。</p>
+<ol>
+<li>优先解释模块专有缩写（如TLB， FIFO等）</li>
+<li>对容易混淆的概念请务必明确（如虚拟地址和物理地址等）</li>
+<li>示例格式如下：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TLB</td>
+<td>Translation Lookaside Buffer</td>
+<td>地址转换的缓存单元，用于加速虚拟地址到物理的转换</td>
+</tr>
+<tr>
+<td>FIFO</td>
+<td>First In First Out</td>
+<td>先进先出队列</td>
+</tr>
+<tr>
+<td>QoS</td>
+<td>Quality of Service</td>
+<td>服务质量，用于总线仲裁中优先级控制机制</td>
+</tr>
+</tbody>
+</table>
+<p>如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。</p>
+<h2 id="前置知识">前置知识</h2>
+<p>前置知识标题请用二号标题格式（两个#）。</p>
+<p><strong>【可选项】</strong> 在阅读文档或进行验证之前，建议掌握一些关键前置知识，以便更深入理解相关内容。例如，在撰写LoadStoreQueue（LSQ）文档时，讲述RAW（Read After Write）违例有助于理解操作之间的依赖关系。在撰写Icache或L2Cache文档时，介绍缓存层级、替换策略和一致性模型等基本概念也有助于读者理解。如果涉及复杂算法，也应对其进行简要描述。</p>
+<p>基本要求：</p>
+<ol>
+<li>该部分内容应简洁，易于理解。如篇幅较长，可将内容移至附录。</li>
+<li>针对较为复杂的内容，可以通过图像、伪代码和案例进行解释，以降低理解难度。</li>
+</ol>
+<p>下面是一个举例：</p>
+<h3 id="st-ld违例">st-ld违例</h3>
+<p>在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。</p>
+<p>考虑以下伪代码示例：</p>
+<pre tabindex="0"><code class="language-mips" data-lang="mips">ST R1, 0(R2)  ; 将 R1 的值存储到 R2 指向的内存地址
+LD R3, 0(R2)  ; 从 R2 指向的内存地址加载值到 R3
+ADD R4, R3, R5 ; 使用 R3 的值进行计算
+</code></pre><p>假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 <code>0</code>）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。</p>
+<p>通过上述例子，可以清楚地看到 Store-to-Load 违例如何在乱序执行的环境中导致数据一致性问题。这种问题强调了在指令调度和执行过程中，确保正确的数据流动的重要性。现代处理器通过多种机制来检测和解决这种违例，以维护程序的正确性和稳定性。</p>
+<h2 id="整体框图">整体框图</h2>
+<p>整体框图标题请用二号标题格式（两个#）。</p>
+<p><strong>【可选项】</strong> 该部分为可选章节，若模块含多个子模块或复杂数据流，需提供框图辅助说明，便于读者理解。</p>
+<p>基本要求：</p>
+<ol>
+<li>图必须清晰，最好为矢量图，可使用Visio/Draw.io等工具绘制，导出为PNG/SVG格式；</li>
+<li>图中需标注关键信号流向；</li>
+<li>框图中子模块命名需与“子模块列表”章节严格一致；</li>
+<li>图像和图表标题的位置需要居中；</li>
+<li>如果有多个图表，图表题目需要添加相应标号，如图1、图2等；</li>
+</ol>
+<p>示例：</p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/XS-MLVP/XiangShan-Design-Doc/master/docs/frontend/figure/IFU/IFU/structure.png" alt="示例图像">
+</p>
+<p align="center">示例图1：IFU 整体框图</p>
+<h2 id="流水级示意图">流水级示意图</h2>
+<p>流水级示意图标题请用二号标题格式（两个#）。</p>
+<p><strong>【可选项】</strong> 若为流水线型模块，需说明各级流水功能与时序关系。</p>
+<p><strong>编写要求</strong>：</p>
+<ol>
+<li>图必须清晰，最好为矢量图，可使用Visio/Draw.io等工具绘制，导出为PNG/SVG格式；</li>
+<li>涉及到的模块名称需要与上下文保持一致；</li>
+<li>重要信号除了列出信号名称以外，还需要标明位宽等信息；</li>
+<li>图像和图表标题的位置需要居中；</li>
+<li>如果有多个图表，图表题目需要添加相应标号，如图1、图2等。</li>
+</ol>
+<p>示例：</p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/XS-MLVP/XiangShan-Design-Doc/master/docs/memblock/LSU/figure/LSU-LoadUnit.svg" alt="示例图像">
+</p>
+<p align="center">示例图2：LSU-LoadUnit 流水线架构图</p>
+<h2 id="子模块列表">子模块列表</h2>
+<p>子模块列表标题请用二号标题格式（两个#）。</p>
+<p><strong>【可选项】</strong> 如果一个模块由多个子模块组成，则需要在此处列出所有相关的子模块，并进行简要说明。这有助于清晰地展示模块的结构和功能，便于读者理解各个子模块之间的关系及其在整体系统中的作用。</p>
+<p>以下是IFU top文档中的一个示例：</p>
+<table>
+<thead>
+<tr>
+<th>子模块</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="01_predecode.md">PreDecoder</a></td>
+<td>预译码模块，用于生成有效指令标识和类型信息</td>
+</tr>
+<tr>
+<td><a href="02_f3predecoder.md">F3Predecoder</a></td>
+<td>F3阶段预译码模块，从PreDecoder中时序优化出来的模块，负责判定CFI指令的类型</td>
+</tr>
+<tr>
+<td><a href="03_ifu_rvc_exp.md">RVCExpander</a></td>
+<td>RVC指令扩展模块，负责对传入的指令进行指令扩展，并解码计算非法信息</td>
+</tr>
+<tr>
+<td><a href="04_pred_checker.md">PredChecker</a></td>
+<td>预检查模块，校验并修正预测信息</td>
+</tr>
+<tr>
+<td><a href="05_frontend_trigger.md">FrontendTrigger</a></td>
+<td>前端断点模块，用于在前端设置硬件断点和检查</td>
+</tr>
+</tbody>
+</table>
+<h2 id="模块功能说明">模块功能说明</h2>
+<p>模块功能说明标题请用二号标题格式（两个#）。</p>
+<p><strong>【必填项】</strong> 需采用功能树形式逐级分解DUT的各项功能，并对所有功能进行描述，确保每个功能点都对应相应的测试点。这种结构化的方法不仅有助于全面覆盖所有功能，还便于后续文档的维护和更新。</p>
+<p><strong>编写规则：</strong></p>
+<ol>
+<li>请使用 <mrs-functions></mrs-functions> 标签包裹整个“模块功能说明”部分；</li>
+<li>采用 X.Y.Z 多级编号（如 1.2.3 表示主功能 1 → 子功能 2 → 测试点 3，且可进一步细分）；</li>
+<li>多级编号的标题格式按照级别增加，例如：“1. 读FIFO操作”应为三号标题格式 “1.1. 常规读取”应为四号标题格式；</li>
+<li>功能描述应清晰列出输入条件、处理过程和输出结果。</li>
+<li>针对每个功能进行测试点分解，应详细列出每个测试点，明确其目的和预期结果。</li>
+<li>如果测试点较多可以先列一个小表格。</li>
+</ol>
+<p>具体来说，可以按照如下的格式写作（示例内容仅供参考，并不代表实际逻辑或内容）：</p>
+<mrs-functions>
+<h2 id="示例fifo模块功能说明">示例：FIFO模块功能说明</h2>
+<h3 id="示例1-读fifo操作">示例1. 读FIFO操作</h3>
+<h4 id="示例11-常规读取">示例1.1. 常规读取</h4>
+<p><strong>功能描述</strong>：当rd_en=1且empty=0时，在时钟上升沿输出rdata</p>
+<p><strong>建议观测点</strong>：</p>
+<ul>
+<li>读指针递增逻辑</li>
+<li>rdata与预期数据匹配</li>
+</ul>
+<h3 id="示例2-写fifo操作">示例2. 写FIFO操作</h3>
+<h4 id="示例21-常规写入">示例2.1. 常规写入</h4>
+<p><strong>功能描述</strong>：当wr_en=1且full=0时，在时钟上升沿存储wdata</p>
+<p><strong>观测点</strong>：</p>
+<ul>
+<li>写指针递增逻辑</li>
+<li>存储阵列数据更新</li>
+</ul>
+<h3 id="示例3-接收ftq取指令请求f0流水级">示例3. 接收FTQ取指令请求（F0流水级）</h3>
+<p>​在F0流水级，IFU接收来自FTQ以预测块为单位的取指令请求。请求内容包括预测块起始地址、起始地址所在cache line的下一个cache line开始地址、下一个预测块的起始地址、该预测块在FTQ里的队列指针、该预测块有无taken的CFI指令（控制流指令）和该taken的CFI指令在预测块里的位置以及请求控制信号（请求是否有效和IFU是否ready）。每个预测块最多包含32字节指令码，最多为16条指令。IFU需要置位ready驱动FTQ向ICache发送请求。</p>
+<h4 id="示例31-f0流水级接收请求">示例3.1. F0流水级接收请求</h4>
+<p>IFU应当能向FTQ报告自己已ready。</p>
+<p>所以，对于这一测试点我们只需要在发送请求后检查和ftq相关的的ready情况即可。</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>功能名称</th>
+<th>测试点名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td>IFU_RCV_REQ</td>
+<td>READY</td>
+<td>IFU接收FTQ请求后，设置ready</td>
+</tr>
+</tbody>
+</table>
+</mrs-functions>
+<h2 id="常量说明">常量说明</h2>
+<p>常量说明标题请用二号标题格式（两个#）。</p>
+<p><strong>【可选项】</strong> 需要列出模块中所有可配置参数及其物理意义，以便于用户理解各参数的作用和影响。</p>
+<p><strong>示例：</strong></p>
+<table>
+<thead>
+<tr>
+<th>常量名</th>
+<th>常量值</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADDR_WIDTH</td>
+<td>64</td>
+<td>地址总线位宽</td>
+</tr>
+<tr>
+<td>FIFO_DEPTH</td>
+<td>8</td>
+<td>深度配置</td>
+</tr>
+</tbody>
+</table>
+<h2 id="接口说明">接口说明</h2>
+<p>接口说明标题请用二号标题格式（两个#）。</p>
+<p><strong>【必填项】</strong> 详细解释各种接口的含义和来源，包括接口的功能、用途。这有助于用户理解各接口的工作原理和应用场景，从而更有效地使用这些接口。</p>
+<p><strong>编写规则</strong></p>
+<ol>
+<li>信号按功能（如时钟复位、数据输入、控制信号等）或来源（其他模块）分组；</li>
+<li>可以将一些同质的信号一起解释；</li>
+<li>特殊协议信号需注明时序要求（如AXI的VALID/READY握手）。</li>
+</ol>
+<h2 id="接口时序">接口时序</h2>
+<p>接口时序标题请用二号标题格式（两个#）。</p>
+<p><strong>【可选项】</strong> 针对复杂接口，可以提供波形图案例，以直观展示信号变化和时间关系。</p>
+<p>以下是节选自IFU top文档的一个例子：</p>
+<h2 id="接口时序-1">接口时序</h2>
+<h3 id="ftq-请求接口时序示例">FTQ 请求接口时序示例</h3>
+<p align="center">
+    <img src="port1.png" alt="port1" />
+</p>
+<p>上图示意了三个 FTQ 请求的示例，req1 只请求缓存行 line0，紧接着 req2 请求 line1 和 line2，当到 req3 时，由于指令缓存 SRAM 写优先，此时指令缓存的读请求 ready 被指低，req3 请求的 valid 和地址保持直到请求被接收。</p>
+<h3 id="icache-返回接口以及到-ibuffer-和写回-ftq-接口时序示例">ICache 返回接口以及到 Ibuffer 和写回 FTQ 接口时序示例</h3>
+<p align="center">
+    <img src="port2.png" alt="port2" />
+</p>
+<p>上图展示了指令缓存返回数据到 IFU 发现误预测直到 FTQ 发送正确地址的时序，group0 对应的请求在 f2 阶段了两个缓存行 line0 和 line1，下一拍 IFU 做误预测检查并同时把指令给 Ibuffer，但此时后端流水线阻塞导致 Ibuffer 满，Ibuffer 接收端的 ready 置低，goup0 相关信号保持直到请求被 Ibuffer 接收。但是 IFU 到 FTQ 的写回在 tio_toIbuffer_valid 有效的下一拍就拉高，因为此时请求已经无阻塞地进入 wb 阶段，这个阶段锁存的了 PredChecker 的检查结果，报告 group0 第 4（从 0 开始）个 2 字节位置对应的指令发生了错误预测，应该重定向到 vaddrA，之后经过 4 拍（冲刷和重新走预测器流水线），FTQ 重新发送给 IFU 以 vaddrA 为起始地址的预测块。</p>
+<h2 id="测试点总表">测试点总表</h2>
+<p>测试点总表标题请用二号标题格式（两个#）。</p>
+<p><strong>【必填项】</strong> 对模块功能说明中细分的测试点进行综合整理，采用表格形式列出，便于用户快速查阅和理解。</p>
+<p><strong>表格规范</strong>：</p>
+<ol>
+<li>请用<code>&lt;mrs-testpoints&gt;&lt;/mrs-testpoints&gt;</code>标签包裹测试点总表，方便我们后续使用脚本提取测试点</li>
+<li>表格共列四项，序号，功能名称，测试点名称和解释
+<ol>
+<li><strong>序号</strong>：测试点的序号格式和功能点类似。即，即测试点1.2.3.4 可能是功能点1.2.3的第4个测试点</li>
+<li><strong>功能名称</strong>：用英文大写命名，可用下划线分割单词，可以使用markdown语法为功能名称添加到具体功能点解释的链接，即形如<code>[文本](跳转目标)</code></li>
+<li><strong>测试点名称</strong>：用英文大写命名，可用下划线分割单词</li>
+<li><strong>解释</strong>：简单描述测试点所需的输入和输出需求，明确判断条件</li>
+</ol>
+</li>
+</ol>
+<p><strong>表格示例</strong>：</p>
+<p>以下是节选自IFU top文档的一个例子:</p>
+<mrs-testpoints>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>功能名称</th>
+<th>测试点名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td>IFU_RCV_REQ</td>
+<td>READY</td>
+<td>IFU接收FTQ请求后，设置ready</td>
+</tr>
+<tr>
+<td>2.1.1</td>
+<td>IFU_F1_INFOS</td>
+<td>PC</td>
+<td>IFU接收FTQ请求后，在F1流水级生成PC</td>
+</tr>
+<tr>
+<td>2.1.2</td>
+<td>IFU_F1_INFOS</td>
+<td>CUT_PTR</td>
+<td>IFU接收FTQ请求后，在F1流水级生成后续切取缓存行的指针</td>
+</tr>
+<tr>
+<td>2.2.1</td>
+<td>IFU_F2_INFOS</td>
+<td>EXCP_VEC</td>
+<td>IFU接收ICache内容后，会根据ICache的结果生成属于每个指令的异常向量</td>
+</tr>
+</tbody>
+</table>
+</mrs-testpoints>
+<h2 id="附录">附录</h2>
+<p>附录标题请用二号标题格式（两个#）。</p>
+<p><strong>【可选项】</strong> 此部分用于存放正文的补充内容，以便进行扩展和详细说明，旨在使文档格式更加清晰，排版更加合理。</p>
+<p>以下是节选自IFU RVCExpander文档的一个例子:</p>
+<h2 id="rvc扩展辅助阅读材料">RVC扩展辅助阅读材料</h2>
+<p>为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。</p>
+<p>对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)</p>
+<table>
+<thead>
+<tr>
+<th>op\funct</th>
+<th>000</th>
+<th>001</th>
+<th>010</th>
+<th>011</th>
+<th>100</th>
+<th>101</th>
+<th>110</th>
+<th>111</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00</td>
+<td>addi4spn</td>
+<td>fld</td>
+<td>lw</td>
+<td>ld</td>
+<td>lbu<br>lhu;lh<br>sb;sh</td>
+<td>fsd</td>
+<td>sw</td>
+<td>sd</td>
+</tr>
+<tr>
+<td>01</td>
+<td>addi</td>
+<td>addiw</td>
+<td>li</td>
+<td>lui<br>addi16sp<br>zcmop</td>
+<td>ARITHs<br>zcb</td>
+<td>j</td>
+<td>beqz</td>
+<td>bnez</td>
+</tr>
+<tr>
+<td>10</td>
+<td>slli</td>
+<td>fldsp</td>
+<td>lwsp</td>
+<td>ldsp</td>
+<td>jr;mv<br>ebreak<br>jalr;add</td>
+<td>fsdsp</td>
+<td>fwsp</td>
+<td>sdsp</td>
+</tr>
+</tbody>
+</table>
+<p>在开始阅读各指令的扩展规则时，需要了解一些RVC扩展的前置知识，比如：</p>
+<p>rd&rsquo;, rs1&rsquo;和rs2&rsquo;寄存器：受限于16位指令的位宽限制，这几个寄存器只有3位来表示，他们对应到x8~x15寄存器。</p>
+<h3 id="op--b00">op = b'00'</h3>
+<h4 id="funct--b000-addi4spn">funct = b'000&rsquo;: ADDI4SPN</h4>
+<p align="center">
+    <img src="Caddi4spn.png" alt="addi4spn" />
+</p>
+<p>该指令将一个0扩展的非0立即数加到栈指针寄存器x2上，并将结果写入rd'</p>
+<p>其中，nzuimm[5:4|9:6|2|3]的含义是：
+···</p>
+
+</div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+  
+
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-2f0743d2b0ca7749ffb137a4b226880f">1 - FIFO文档案例</h1>
+    
+	<p>以下以FIFO为例，展示了一个简单的文档案例</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#000">`timescale</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000">ns</span> <span style="color:#ce5c00;font-weight:bold">/</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000">ps</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">FIFO</span> <span style="color:#000;font-weight:bold">(</span> <span style="color:#8f5902;font-style:italic">//data_width = 8  data depth =8
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000">wr_en</span><span style="color:#000;font-weight:bold">,</span>          <span style="color:#8f5902;font-style:italic">//写使能
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000">rd_en</span><span style="color:#000;font-weight:bold">,</span>          <span style="color:#8f5902;font-style:italic">//读使能
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span><span style="color:#000">wdata</span><span style="color:#000;font-weight:bold">,</span>     <span style="color:#8f5902;font-style:italic">//写入数据输入
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span><span style="color:#000">rdata</span><span style="color:#000;font-weight:bold">,</span>    <span style="color:#8f5902;font-style:italic">//读取数据输出
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#000">empty</span><span style="color:#000;font-weight:bold">,</span>         <span style="color:#8f5902;font-style:italic">//读空标志信号
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#000">full</span>           <span style="color:#8f5902;font-style:italic">//写满标志信号
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">rdata_reg</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">8</span><span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">rdata</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">rdata_reg</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">reg</span>  <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">data</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">7</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">];</span>     <span style="color:#8f5902;font-style:italic">//数据存储单元(8bit数据8个)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">reg</span>  <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>  <span style="color:#8f5902;font-style:italic">//写指针
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">reg</span>  <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">rd_ptr</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>  <span style="color:#8f5902;font-style:italic">//读指针
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">wr_addr</span><span style="color:#000;font-weight:bold">;</span>        <span style="color:#8f5902;font-style:italic">//写地址(写指针的低3位)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">rd_addr</span><span style="color:#000;font-weight:bold">;</span>        <span style="color:#8f5902;font-style:italic">//读地址(读指针的低3位)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">wr_addr</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">wr_ptr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">];</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">rd_addr</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">rd_ptr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">];</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">always</span><span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk</span> <span style="color:#204a87;font-weight:bold">or</span> <span style="color:#204a87;font-weight:bold">negedge</span> <span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">)</span><span style="color:#204a87;font-weight:bold">begin</span> <span style="color:#8f5902;font-style:italic">//写数据
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">if</span><span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">)</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#204a87;font-weight:bold">if</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">wr_en</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> <span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">full</span><span style="color:#000;font-weight:bold">)</span><span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">data</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000">wr_addr</span><span style="color:#000;font-weight:bold">]</span>  <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">wdata</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">always</span><span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk</span> <span style="color:#204a87;font-weight:bold">or</span> <span style="color:#204a87;font-weight:bold">negedge</span> <span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">)</span><span style="color:#204a87;font-weight:bold">begin</span> <span style="color:#8f5902;font-style:italic">//读数据
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">if</span><span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">rst_n</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">rd_ptr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#0000cf;font-weight:bold">&#39;d0</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#204a87;font-weight:bold">if</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">rd_en</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> <span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">empty</span><span style="color:#000;font-weight:bold">)</span><span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">rdata_reg</span>  <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">data</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000">rd_addr</span><span style="color:#000;font-weight:bold">];</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">rd_ptr</span> <span style="color:#ce5c00;font-weight:bold">&lt;=</span> <span style="color:#000">rd_ptr</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;d1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">empty</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">rd_ptr</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#8f5902;font-style:italic">//读空
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">full</span>  <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">wr_ptr</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#ce5c00;font-weight:bold">~</span><span style="color:#000">rd_ptr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">],</span><span style="color:#000">rd_ptr</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]});</span> <span style="color:#8f5902;font-style:italic">//写满
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">endmodule</span>
+</span></span></code></pre></div><h1 id="fifo-模块验证文档">FIFO 模块验证文档</h1>
+<h2 id="术语说明">术语说明</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FIFO</td>
+<td>First In First Out</td>
+<td>先进先出的数据缓冲队列</td>
+</tr>
+</tbody>
+</table>
+<h2 id="功能说明">功能说明</h2>
+<p>本次需要验证的是FIFO，一种常见的硬件缓冲模块，在硬件电路中临时存储数据，并按照数据到达的顺序进行处理。</p>
+<p>本次需要验证的FIFO每次可写可读8位数据，容量为8。</p>
+<h3 id="1-读fifo操作">1. 读FIFO操作</h3>
+<h4 id="11-常规读取">1.1. 常规读取</h4>
+<p><strong>功能描述</strong>：当rd_en=1且empty=0时，在时钟上升沿输出rdata</p>
+<p><strong>建议观测点</strong>：</p>
+<ul>
+<li>读指针递增逻辑</li>
+<li>rdata与预期数据匹配</li>
+</ul>
+<h4 id="12-读空栈">1.2. 读空栈</h4>
+<p><strong>功能描述</strong>：当empty=1且rd_en=1时，rdata保持无效值</p>
+<p><strong>建议观测点</strong>：</p>
+<ul>
+<li>empty信号持续为高</li>
+<li>读指针无变化</li>
+</ul>
+<h4 id="13-无读使能不读">1.3. 无读使能不读</h4>
+<p><strong>功能描述</strong>：当rd_en=0时，无论FIFO状态如何均不更新rdata</p>
+<p><strong>建议观测点</strong>：</p>
+<ul>
+<li>连续写入后关闭读使能，验证读指针冻结</li>
+</ul>
+<h3 id="2-写fifo操作">2. 写FIFO操作</h3>
+<h4 id="21-常规写入">2.1. 常规写入</h4>
+<p><strong>功能描述</strong>：当wr_en=1且full=0时，在时钟上升沿存储wdata</p>
+<p><strong>观测点</strong>：</p>
+<ul>
+<li>写指针递增逻辑</li>
+<li>存储阵列数据更新</li>
+</ul>
+<h4 id="22-fifo已满无法写入">2.2. FIFO已满无法写入</h4>
+<p><strong>功能描述</strong>：当full=1且wr_en=1时，wdata被丢弃</p>
+<p><strong>观测点</strong>：</p>
+<ul>
+<li>full信号持续为高</li>
+<li>存储阵列内容不变</li>
+</ul>
+<h4 id="23-无写使能不写">2.3. 无写使能不写</h4>
+<p><strong>功能描述</strong>：当wr_en=0时，无论FIFO状态如何均不写入数据</p>
+<p><strong>观测点</strong>：</p>
+<ul>
+<li>写指针冻结</li>
+<li>存储阵列内容保持不变</li>
+</ul>
+<h3 id="3-复位操作">3. 复位操作</h3>
+<h4 id="31-复位控制">3.1. 复位控制</h4>
+<p><strong>功能描述</strong>：当rst_n=0时，清空FIFO并重置指针</p>
+<p><strong>观测点</strong>：</p>
+<ul>
+<li>复位后empty=1且full=0</li>
+<li>读写指针归零</li>
+</ul>
+<h2 id="常量说明">常量说明</h2>
+<table>
+<thead>
+<tr>
+<th>常量名</th>
+<th>常量值</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FIFO_DEPTH</td>
+<td>8</td>
+<td>FIFO存储单元数量</td>
+</tr>
+<tr>
+<td>DATA_WIDTH</td>
+<td>8</td>
+<td>数据总线位宽</td>
+</tr>
+</tbody>
+</table>
+<h2 id="接口说明">接口说明</h2>
+<h3 id="输入接口">输入接口</h3>
+<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>clk</td>
+<td>Input</td>
+<td>1</td>
+<td>主时钟</td>
+<td></td>
+</tr>
+<tr>
+<td>rst_n</td>
+<td>Input</td>
+<td>1</td>
+<td>异步复位</td>
+<td></td>
+</tr>
+<tr>
+<td>wr_en</td>
+<td>Input</td>
+<td>1</td>
+<td>写使能</td>
+<td></td>
+</tr>
+<tr>
+<td>wdata</td>
+<td>Input</td>
+<td>8</td>
+<td>写入数据</td>
+<td></td>
+</tr>
+<tr>
+<td>rd_en</td>
+<td>Input</td>
+<td>1</td>
+<td>读使能</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="输出接口">输出接口</h3>
+<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rdata</td>
+<td>Output</td>
+<td>8</td>
+<td>读出数据</td>
+</tr>
+<tr>
+<td>empty</td>
+<td>Output</td>
+<td>1</td>
+<td>FIFO空标志（高有效）</td>
+</tr>
+<tr>
+<td>full</td>
+<td>Output</td>
+<td>1</td>
+<td>FIFO满标志（高有效）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="测试点总表">测试点总表</h2>
+<p>建议各个测试点的覆盖组使用下表描述的功能和测试点名称进行命名。</p>
+<p>比如FIFO_READ的测试点NORMAL，其覆盖点建议命名为FIFO_READ_NORMAL</p>
+<mrs-testpoints>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>功能名称</th>
+<th>测试点名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#1-读fifo操作">FIFO_READ</a></td>
+<td>NORMAL</td>
+<td>fifo有数据时，设置读使能，可以读出数据</td>
+</tr>
+<tr>
+<td>1.2</td>
+<td>FIFO_READ</td>
+<td>EMPTY</td>
+<td>fifo为空时，设置读使能，无法读出数据</td>
+</tr>
+<tr>
+<td>1.3</td>
+<td>FIFO_READ</td>
+<td>NO_EN</td>
+<td>fifo有数据时，不设置读使能，无法读出数据</td>
+</tr>
+<tr>
+<td>2.1</td>
+<td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#2-写fifo操作">FIFO_WRITE</a></td>
+<td>NORMAL</td>
+<td>fifo未满时，设置写使能，可以写入数据</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td>FIFO_WRITE</td>
+<td>FULL</td>
+<td>fifo已满时，设置写使能，可以写入数据</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td>FIFO_WRITE</td>
+<td>NO_EN</td>
+<td>fifo未满时，不设置写使能，无法写入数据</td>
+</tr>
+<tr>
+<td>3.1</td>
+<td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#3-复位操作">FIFO_RESET</a></td>
+<td>RESET</td>
+<td>重置后，栈为空</td>
+</tr>
+</tbody>
+</table>
+</mrs-testpoints>
+
+</div>
+
+
+
+    
+	
+  
+
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2025
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">保留所有权利</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+<script src='/UnityChipForXiangShan/js/prism.js'></script>
+<script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

@@ -136,7 +136,7 @@ F2 stage：从icache获取响应数据（缓存行）并校验，提取出异常
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c7fa24f9995e70e8655e6d9fdf1b6fdf.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f52e8061f74486f53ca37d0c16a0d38c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -160,7 +160,7 @@ F2 stage：从icache获取响应数据（缓存行）并校验，提取出异常
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c7fa24f9995e70e8655e6d9fdf1b6fdf.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f52e8061f74486f53ca37d0c16a0d38c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -253,7 +253,18 @@ F2 stage：从icache获取响应数据（缓存行）并校验，提取出异常
   <label for="m-unitychipforxiangshandocs98_ut-check"><a href="/UnityChipForXiangShan/docs/98_ut/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut"><span class="">验证文档</span></a></label>
   
   <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut00_standard-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="">验证文档规范</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo"><span class="">FIFO文档案例</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend-check" checked/>
   <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
   
@@ -1892,6 +1903,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <h3 id="ftq交互接口">FTQ交互接口</h3>
 <p>编译后可用的接口包括：</p>
 <h4 id="req-ftq取指请求">req FTQ取指请求</h4>
+<p>在f0流水级传入</p>
 <p>req是FTQ向IFU的取指令请求，编译后包含以下成员：</p>
 <table>
 <thead>
@@ -1924,6 +1936,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tbody>
 </table>
 <h4 id="redirect-ftq重定向请求">redirect FTQ重定向请求</h4>
+<p>在f0流水级传入</p>
 <p>FTQ会向IFU发送重定向请求，这通过fromFtq.redirect完成，从而指示IFU应该冲刷的内容。</p>
 <p>编译后，redirect包含以下接口成员：</p>
 <table>
@@ -1950,6 +1963,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </table>
 <p>此外，还有valid变量指示是否需要重定向。</p>
 <h4 id="frombpuflush">fromBPUFlush</h4>
+<p>在f0流水级传入</p>
 <p>来自BPU的冲刷请求，这是预测错误引起的，包括s3和s2两个同构成员，指示是否在BPU的s3和s2流水级发现了问题，s3的详细结构如下</p>
 <table>
 <thead>
@@ -1970,6 +1984,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tbody>
 </table>
 <h4 id="toftq_pdwb-写回">toFtq_pdWb 写回</h4>
+<p>在WB阶段传出</p>
 <table>
 <thead>
 <tr>
@@ -2024,7 +2039,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <tbody>
 <tr>
 <td>icache_ready</td>
-<td>ICache通知IFU自己已经准备好了，可以发送缓存行了。</td>
+<td>ICache通知IFU自己已经准备好了，可以发送缓存行了。f0流水级就要设置。</td>
 </tr>
 <tr>
 <td>icache_stop</td>
@@ -2033,6 +2048,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tbody>
 </table>
 <h4 id="icacheinterresp-icache传送给ifu的信息">ICacheInter.resp ICache传送给IFU的信息</h4>
+<p>在f2流水级使用</p>
 <table>
 <thead>
 <tr>
@@ -2086,7 +2102,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <h3 id="性能相关接口">性能相关接口</h3>
 <p>ICachePerf和perf，可以先不关注。</p>
 <h3 id="itlbinter">ITLBInter</h3>
-<p>该接口仅在MMIO状态下，IFU重发请求时活跃。</p>
+<p>该接口仅在MMIO状态下，IFU重发请求时活跃（f3流水级用到）。</p>
 <h4 id="req-ifu向itlb发送的请求">req IFU向ITLB发送的请求</h4>
 <p>这是IFU向ITLB发送的查询请求，只有一个量：bits_vaddr，传递需要让ITLB查询的虚拟地址。</p>
 <h4 id="resp-itlb返回给ifu的查询结果">resp ITLB返回给IFU的查询结果</h4>
@@ -3032,7 +3048,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 March 13, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/18d323fe759c26243051cf28f03fb62ef3542785">modify standard doc and modify ifu top document as a demo (#90) (18d323f)</a>
+  最后修改 March 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/2eb4fd1378bb957db14afbae18a0f9ca0eb36523">update itlb env (#92) (2eb4fd1)</a>
 </div>
 </div>
 

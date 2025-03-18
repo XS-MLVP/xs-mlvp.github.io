@@ -129,7 +129,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c7fa24f9995e70e8655e6d9fdf1b6fdf.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f52e8061f74486f53ca37d0c16a0d38c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -1770,6 +1770,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <h3 id="ftq交互接口">FTQ交互接口</h3>
 <p>编译后可用的接口包括：</p>
 <h4 id="req-ftq取指请求">req FTQ取指请求</h4>
+<p>在f0流水级传入</p>
 <p>req是FTQ向IFU的取指令请求，编译后包含以下成员：</p>
 <table>
 <thead>
@@ -1802,6 +1803,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tbody>
 </table>
 <h4 id="redirect-ftq重定向请求">redirect FTQ重定向请求</h4>
+<p>在f0流水级传入</p>
 <p>FTQ会向IFU发送重定向请求，这通过fromFtq.redirect完成，从而指示IFU应该冲刷的内容。</p>
 <p>编译后，redirect包含以下接口成员：</p>
 <table>
@@ -1828,6 +1830,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </table>
 <p>此外，还有valid变量指示是否需要重定向。</p>
 <h4 id="frombpuflush">fromBPUFlush</h4>
+<p>在f0流水级传入</p>
 <p>来自BPU的冲刷请求，这是预测错误引起的，包括s3和s2两个同构成员，指示是否在BPU的s3和s2流水级发现了问题，s3的详细结构如下</p>
 <table>
 <thead>
@@ -1848,6 +1851,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tbody>
 </table>
 <h4 id="toftq_pdwb-写回">toFtq_pdWb 写回</h4>
+<p>在WB阶段传出</p>
 <table>
 <thead>
 <tr>
@@ -1902,7 +1906,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <tbody>
 <tr>
 <td>icache_ready</td>
-<td>ICache通知IFU自己已经准备好了，可以发送缓存行了。</td>
+<td>ICache通知IFU自己已经准备好了，可以发送缓存行了。f0流水级就要设置。</td>
 </tr>
 <tr>
 <td>icache_stop</td>
@@ -1911,6 +1915,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tbody>
 </table>
 <h4 id="icacheinterresp-icache传送给ifu的信息">ICacheInter.resp ICache传送给IFU的信息</h4>
+<p>在f2流水级使用</p>
 <table>
 <thead>
 <tr>
@@ -1964,7 +1969,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <h3 id="性能相关接口">性能相关接口</h3>
 <p>ICachePerf和perf，可以先不关注。</p>
 <h3 id="itlbinter">ITLBInter</h3>
-<p>该接口仅在MMIO状态下，IFU重发请求时活跃。</p>
+<p>该接口仅在MMIO状态下，IFU重发请求时活跃（f3流水级用到）。</p>
 <h4 id="req-ifu向itlb发送的请求">req IFU向ITLB发送的请求</h4>
 <p>这是IFU向ITLB发送的查询请求，只有一个量：bits_vaddr，传递需要让ITLB查询的虚拟地址。</p>
 <h4 id="resp-itlb返回给ifu的查询结果">resp ITLB返回给IFU的查询结果</h4>
@@ -4060,12 +4065,12 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 </thead>
 <tbody>
 <tr>
-<td>2.3.1</td>
+<td>3.1</td>
 <td>有效指令开始向量计算1</td>
 <td>对预测块，假定第一条指令为一条有效指令的开始，对每条指令计算其是否为有效指令开始</td>
 </tr>
 <tr>
-<td>2.3.2</td>
+<td>3.2</td>
 <td>有效指令开始向量计算2</td>
 <td>对预测块，假定第一条指令为一条有效指令的结束，对每条指令计算其是否为有效指令开始</td>
 </tr>
@@ -4210,13 +4215,13 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 <td>传入RVC.JR指令，rs不为1或5，不应判定为ret</td>
 </tr>
 <tr>
-<td>2.3.1</td>
+<td>3.1</td>
 <td>计算有效指令开始向量</td>
 <td>有效指令开始向量计算1</td>
 <td>对预测块，假定第一条指令为一条有效指令的开始，对每条指令计算其是否为有效指令开始</td>
 </tr>
 <tr>
-<td>2.3.2</td>
+<td>3.2</td>
 <td>计算有效指令开始向量</td>
 <td>有效指令开始向量计算2</td>
 <td>对预测块，假定第一条指令为一条有效指令的结束，对每条指令计算其是否为有效指令开始</td>
