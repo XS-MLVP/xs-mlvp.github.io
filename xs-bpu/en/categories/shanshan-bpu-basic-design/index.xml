@@ -1,180 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>OpenVerify Courses – Shanshan BPU Basic Design</title>
+    <title>Shanshan BPU Basic Design on OpenVerify Courses</title>
     <link>https://open-verify.cc/xs-bpu/en/categories/shanshan-bpu-basic-design/</link>
     <description>Recent content in Shanshan BPU Basic Design on OpenVerify Courses</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    
-	  <atom:link href="https://open-verify.cc/xs-bpu/en/categories/shanshan-bpu-basic-design/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-      
-        
-      
-    
-    
+    <atom:link href="https://open-verify.cc/xs-bpu/en/categories/shanshan-bpu-basic-design/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Docs: Basic Design of Shanshan Branch Prediction Unit (BPU)</title>
+      <title>Basic Design of Shanshan Branch Prediction Unit (BPU)</title>
       <link>https://open-verify.cc/xs-bpu/en/docs/basic/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
       <guid>https://open-verify.cc/xs-bpu/en/docs/basic/</guid>
-      <description>
-        
-        
-        &lt;p&gt;In processor design, a well-designed branch predictor (BPU) is a key component for improving processor performance. It is responsible for guiding the processor&amp;rsquo;s fetch, determining where the next instruction should be fetched and executed. The BPU is the starting point of an instruction&amp;rsquo;s lifecycle, so exploring a high-performance processor from the BPU is a good starting point.&lt;/p&gt;
-&lt;p&gt;This is also true for Shanshan, a high-performance processor with out-of-order six-issue execution, which naturally requires a branch prediction unit with high accuracy and efficiency. The design of a branch prediction unit often needs to consider many factors, such as timing, complexity of structure, silicon area occupation, prediction accuracy, and speed of recovery from prediction errors. The branch prediction unit of the Shanshan processor has achieved a good balance among these factors through many clever designs, giving it high branch prediction efficiency and accuracy, providing a basic guarantee for the supply of instructions to the backend.&lt;/p&gt;
-&lt;p&gt;In this section, we will introduce the basic design of the Shanshan prediction unit. By reading this section, you can learn the following:&lt;/p&gt;
-
-
-&lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;ul&gt;
-&lt;li&gt;Basic concepts of branch prediction&lt;/li&gt;
-&lt;li&gt;Basic prediction unit of the Shanshan branch prediction unit - branch prediction block&lt;/li&gt;
-&lt;li&gt;External interfaces of the Shanshan branch prediction unit&lt;/li&gt;
-&lt;li&gt;Basic structure of the Shanshan branch prediction unit&lt;/li&gt;
-&lt;li&gt;Basic timing of the Shanshan branch prediction unit&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Anyone participating in the BPU crowdsourcing verification work should read this section first to have a basic understanding of the Shanshan branch prediction unit.&lt;/p&gt;
-
-      </description>
+      <description>In processor design, a well-designed branch predictor (BPU) is a key component for improving processor performance. It is responsible for guiding the processor&amp;rsquo;s fetch, determining where the next instruction should be fetched and executed. The BPU is the starting point of an instruction&amp;rsquo;s lifecycle, so exploring a high-performance processor from the BPU is a good starting point.&#xA;This is also true for Shanshan, a high-performance processor with out-of-order six-issue execution, which naturally requires a branch prediction unit with high accuracy and efficiency.</description>
     </item>
-    
     <item>
-      <title>Docs: What is Branch Prediction</title>
+      <title>What is Branch Prediction</title>
       <link>https://open-verify.cc/xs-bpu/en/docs/basic/00_bp/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
       <guid>https://open-verify.cc/xs-bpu/en/docs/basic/00_bp/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;why-do-we-need-branch-prediction&#34;&gt;Why Do We Need Branch Prediction?&lt;/h2&gt;
-&lt;p&gt;There are mainly two reasons for branch prediction: one is that &lt;strong&gt;the program&amp;rsquo;s execution flow contains branch instructions&lt;/strong&gt;, and the other is that &lt;strong&gt;high-performance processors use pipeline design&lt;/strong&gt;.&lt;/p&gt;
-&lt;h3 id=&#34;programs-execution-flow-contains-branch-instructions&#34;&gt;Program&amp;rsquo;s Execution Flow Contains Branch Instructions&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;result&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;result&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;else&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;result&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The above is a piece of C code. It first defines three variables x, y, and result, and then assigns a value to result based on the comparison of x and y. It can be observed that the program assigns values to variables in sequence in the first three lines. However, in the 5th line, due to the presence of the if instruction, the program branches, jumping directly from the 5th line to the 8th line to continue execution, which causes a &lt;strong&gt;branch&lt;/strong&gt; in the program&amp;rsquo;s execution.&lt;/p&gt;
-&lt;p&gt;After translating into RISC-V assembly code, the code is as follows:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-asm&#34; data-lang=&#34;asm&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;li&lt;/span&gt;  &lt;span style=&#34;color:#000&#34;&gt;a0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;               &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# x = 10
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;li&lt;/span&gt;  &lt;span style=&#34;color:#000&#34;&gt;a1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;               &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# y = 20
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;li&lt;/span&gt;  &lt;span style=&#34;color:#000&#34;&gt;a2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;                &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# result = 0
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;blt&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;else_branch&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Jump to else_branch if x &amp;lt; y
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;add&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a1&lt;/span&gt;           &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Execute result = x + y
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;j&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;end&lt;/span&gt;                    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Jump to end
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;else_branch:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;sub&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;a1&lt;/span&gt;           &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Execute result = x - y
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;end:&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It can be seen that the program still maintains the previous branching behavior. In the first three lines of the code, instructions are executed in sequence. Then, in the 5th line of the program, a special instruction blt appears, which we call a branch instruction. It will determine whether to execute the next instruction based on the relationship between x and y, and the appearance of this instruction causes a branch in the program&amp;rsquo;s execution.&lt;/p&gt;
-&lt;h3 id=&#34;high-performance-processors-use-pipeline-design&#34;&gt;High-performance Processors Use Pipeline Design&lt;/h3&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;f4669877-a9f9-4f5d-9fe3-8ba976973513.png&#34; width=&#34;400px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;Therefore, the concept of &lt;strong&gt;branch prediction&lt;/strong&gt; arises. If we can accurately predict the address of the next instruction before the execution result is generated, the processor can continue to run efficiently.&lt;/p&gt;
-&lt;h2 id=&#34;feasibility-of-branch-prediction&#34;&gt;Feasibility of Branch Prediction&lt;/h2&gt;
-&lt;p&gt;Why can branch prediction be done? Let&amp;rsquo;s look at an example:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-C&#34; data-lang=&#34;C&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;data&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;128&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;sum&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;data&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Assuming that this instruction will be executed repeatedly, and data is incremented from 0, i.e., data = 0, 1, 2, 3 &amp;hellip; 128, 129&amp;hellip;, let&amp;rsquo;s analyze the behavior of executing this instruction each time.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-Plain&#34; data-lang=&#34;Plain&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;T = branch taken
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;N = branch not taken
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;data   = 0, 1, 2, 3, s, ... 126, 127, 128, 129, 130, ... 250, 251, 252, ...
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;branch = N  N  N  N  N  ...   N    N    T    T    T  ...   T    T    T  ...
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       = NNNNNNNNNNNN ... NNNNNNNTTTTTTTTT ... TTTTTTTTTT  (easy to predict)
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It can be seen that in the first 128 times, the branch is always Not Taken (the condition is not met), but after 128 times, the branch is always Taken (the condition is met). If we predict whether it is Taken based on whether it was Taken last time, we will only make one prediction error throughout the prediction process.&lt;/p&gt;
-&lt;p&gt;The occurrence of the above phenomenon is due to a basic fact—&lt;strong&gt;whether a branch instruction jumps is related to the past jumping behavior of that instruction&lt;/strong&gt;. By summarizing the past jumping rules, we can make a relatively accurate prediction for this jump, which also makes branch prediction possible.&lt;/p&gt;
-&lt;p&gt;In fact, the jump of branch instructions is also related to factors such as the jumping situation of other branch instructions. Fully exploiting effective information to produce accurate prediction results is one of the main tasks of branch prediction.&lt;/p&gt;
-&lt;h2 id=&#34;basic-types-of-branch-prediction&#34;&gt;Basic Types of Branch Prediction&lt;/h2&gt;
-&lt;p&gt;In RISC-V, branch instructions include two types:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;Conditional Branch Instructions (beq, bne, blt, bge, bltu, bgeu)&lt;/strong&gt; For these instructions, whether to jump is determined by the condition in the instruction, and the jump target can be obtained from the instruction. Therefore, we need to predict whether the instruction will jump.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Unconditional Jump Instructions (jal, jalr)&lt;/strong&gt; For these instructions, the jump is always executed when encountered, but the jump target may be specified by a register. Therefore, we need to predict the jump target of the instruction.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Fortunately, due to the concise design of the RISC-V architecture, we do not need to handle conditional jump instructions. Every jump instruction we need to predict is unconditional, which is also convenient for our design.&lt;/p&gt;
-&lt;p&gt;From the above analysis, we can summarize the two basic types of branch prediction—&lt;strong&gt;direction prediction&lt;/strong&gt; and &lt;strong&gt;target address prediction&lt;/strong&gt;.&lt;/p&gt;
-&lt;h3 id=&#34;direction-prediction-of-branch-instructions&#34;&gt;Direction Prediction of Branch Instructions&lt;/h3&gt;
-&lt;p&gt;Direction prediction of branch instructions corresponds to conditional branch instructions in RISC-V instructions. We need to predict whether it needs to jump, which is called direction prediction.&lt;/p&gt;
-&lt;h4 id=&#34;two-bit-saturation-counters&#34;&gt;Two-Bit Saturation Counters&lt;/h4&gt;
-&lt;p&gt;Direction prediction has a very simple and efficient prediction method called two-bit saturation counter. The basic idea can be seen in the figure below.&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;c7e5cf3e-8131-430b-a728-659fb7775f53.png&#34; width=&#34;700px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;The two-bit saturating counter is regarded as a state machine, and we maintain such a state machine for each branch instruction. When a branch instruction is taken, the corresponding state in the diagram moves to the right; otherwise, it moves to the left. So, the next time we encounter this branch instruction, we first look up its two-bit saturating counter. If the state is more biased to the right, we predict it to be taken; otherwise, we predict it not to be taken.&lt;/p&gt;
-&lt;p&gt;Of course, it&amp;rsquo;s impractical to maintain a two-bit saturating counter for each branch instruction. Therefore, in practice, we usually use part of the PC or a hash method to index the two-bit saturating counter, as shown in the diagram below.&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;e2cf0e6d-f050-4aff-bee3-c72a2b9004e1.png&#34; width=&#34;700px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;h4 id=&#34;branch-history&#34;&gt;Branch History&lt;/h4&gt;
-&lt;p&gt;Branch history is a very commonly used data in branch prediction and the basis of most branch prediction algorithms because it directly shows the past jumping behavior of instructions.&lt;/p&gt;
-&lt;p&gt;There are two basic types of branch history:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Local Branch History&lt;/strong&gt; Maintain a set of registers for each branch instruction, recording the historical jumping behavior of that instruction.
-&lt;ul&gt;
-&lt;li&gt;For example: 0101000000101 (0 means not taken, 1 means taken)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;全Global Branch History&lt;/strong&gt; All instructions share a set of registers, recording the branching behavior during program execution.
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;For example:&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;    beg a0, a1, label1          not taken  record 0
-    bne a1, a2, label2          not taken  record 0
--&amp;gt;  beq a2, a3, label4          taken      record 1
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;After executing these three different branch instructions, the global branch history becomes 001.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;branch-target-address-prediction&#34;&gt;Branch Target Address Prediction&lt;/h3&gt;
-&lt;p&gt;In the RISC-V architecture, branch target address prediction refers to predicting the target address of unconditional jump instructions (e.g., jal, jalr). Since these instructions always perform a jump operation, we need to predict their target address.&lt;/p&gt;
-&lt;h4 id=&#34;branch-target-buffer-btb&#34;&gt;Branch Target Buffer (BTB)&lt;/h4&gt;
-&lt;p&gt;BTB is a common method for predicting target addresses. Its core idea is to use a cache to store the target addresses of past unconditional jump instructions. When encountering the same unconditional jump instruction again, the BTB can be checked to see if there is a record for that instruction. If so, the recorded target address is used as the predicted target address for the current execution.&lt;/p&gt;
-&lt;p&gt;The diagram below illustrates this:&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;540d418a-2760-4724-aad4-502bd0775185.png&#34; width=&#34;500px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;h3 id=&#34;predicting-instruction-types&#34;&gt;Predicting Instruction Types&lt;/h3&gt;
-&lt;p&gt;As we know, in branch prediction, for conditional branch instructions, we need to predict their direction, and for unconditional jump instructions, we need to predict their target. However, there is a problem: when we get a PC that needs to be predicted, we don&amp;rsquo;t know whether the corresponding instruction is a normal instruction or a branch instruction. Therefore, we cannot predict it.&lt;/p&gt;
-&lt;p&gt;How to solve this? One way is to predict the behavior of the instruction after fetching it. But fetching from ICache or Memory may take several cycles, which is a major drawback of this method.&lt;/p&gt;
-&lt;p&gt;A better way is to directly predict the type of instruction. After getting a PC, we can directly predict whether this instruction is a branch instruction and predict its behavior. In this way, we don&amp;rsquo;t have to wait for fetching to complete, and the predicted result can also guide the CPU to fetch from the correct location.&lt;/p&gt;
-&lt;p&gt;The method of type prediction can be similar to BTB, where a field in the cache contains the type of instruction for use in the next prediction.&lt;/p&gt;
-&lt;h2 id=&#34;general-steps-of-branch-prediction&#34;&gt;General Steps of Branch Prediction&lt;/h2&gt;
-&lt;p&gt;Through the introduction in this section, we can summarize the general steps of branch prediction:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Get the PC.&lt;/li&gt;
-&lt;li&gt;Predict whether it is a branch instruction.
-&lt;ol&gt;
-&lt;li&gt;If it is a conditional branch instruction, predict its direction and target.&lt;/li&gt;
-&lt;li&gt;If it is an unconditional jump instruction, predict its target.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Note that since predicting the type of instruction is required in prediction, and we haven&amp;rsquo;t obtained the specific content of the instruction, predicting the target of a conditional branch instruction also becomes our task.&lt;/p&gt;
-
-      </description>
+      <description>Why Do We Need Branch Prediction? There are mainly two reasons for branch prediction: one is that the program&amp;rsquo;s execution flow contains branch instructions, and the other is that high-performance processors use pipeline design.&#xA;Program&amp;rsquo;s Execution Flow Contains Branch Instructions int x = 10; int y = 20; int result = 0; if (x &amp;gt;= y) { result = x + y; } else { result = x - y; } The above is a piece of C code.</description>
     </item>
-    
   </channel>
 </rss>

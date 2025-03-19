@@ -1,17 +1,158 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>香山微架构开放验证第一期：昆明湖BPU模块UT验证实战 – 项目文档</title>
+    <title>项目文档 on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
     <link>https://open-verify.cc/xs-bpu/</link>
     <description>Recent content in 项目文档 on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    
-	  <atom:link href="https://open-verify.cc/xs-bpu/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-      
-      
-    
-    
+    <atom:link href="https://open-verify.cc/xs-bpu/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>BPU Top 功能列表</title>
+      <link>https://open-verify.cc/xs-bpu/docs/feature/00_bpufeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/feature/00_bpufeature/</guid>
+      <description>功能列表（Feature List） 支持 uFTB 子预测器 支持 TAGE-SC 子预测器 支持 FTB 子预测器 支持 ITTAGE 子预测器 支持 RAS 子预测器 支持三阶段预测结果及其他信息输出 支持预测结果重定向信号生成 支持流水线控制信号生成 支持 PC 生成 支持全局分支历史维护 支持分支折叠历史维护 支持重定向请求响应，恢复状态 支持更新请求响应 </description>
+    </item>
+    <item>
+      <title>BPU 顶层模块</title>
+      <link>https://open-verify.cc/xs-bpu/docs/modules/00_bpu_top/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/modules/00_bpu_top/</guid>
+      <description>BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。&#xA;生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。&#xA;BPU 顶层中所有的生成器共有 6 个：&#xA;npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全局历史写入数据 foledGhGen 维护折叠历史 lastBrNumOHGen 维护上周期最后一个生效的分支指令位置 aheadFhObGen 维护分支历史最老位 其中，除了 npcGen 以外，其余生成器都会在本文档中进行介绍。本节中我们着重探讨一下生成器的产生下一次预测的方法。&#xA;在代码中你可以看到生成器用类似下面这种方式进行定义：&#xA;val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：&#xA;npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：&#xA;s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。</description>
+    </item>
+    <item>
+      <title>FTB项与完整预测结果接口</title>
+      <link>https://open-verify.cc/xs-bpu/docs/ports/00_ftb/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/ports/00_ftb/</guid>
+      <description>FTB 项 FTB 项是香山中分支预测块的核心数据结构，它存储了生成一个分支预测块所需的信息。在BPU进行预测时，初始的分支预测块首先由一个读出的 FTB 项生成。然后，这个分支预测块会传递到后续的预测器中，后续的预测器会读取其中的信息并加以修改，生成最终的预测结果。&#xA;因此，要理解分支预测块的结构，首先需要理解FTB项的结构。一个FTB项对应着一个分支预测块，其大致结构如下：&#xA;首先，需要明确一个信息：无论是分支预测块还是FTB项，它们可以容纳的指令数量都被设定为一个特定的上限（在香山当前版本中为16条RVC指令），被称为最大预测长度。这意味着，如果我们需要记录分支预测块内某一条指令的位置，可以使用一个固定长度的位向量，来指定这条指令相对于预测块起始地址的偏移量。&#xA;分支预测块执行流程的决定因素是其中的分支指令信息。其余的指令都被视为普通指令，不影响程序的执行流。因此，在一个分支预测块中，我们只需记录下其中的分支指令位置即可，而普通指令的位置我们并不关心。&#xA;因此，FTB项中定义了两种类型的分支指令槽（slot）——brSlots和tailSlot，用于存储分支预测块中的分支指令。目前香山版本中，brSlots只含有一个 slot，而 tailSlot 则是一个单独的 slot，总计含有两个 slot。&#xA;在最大预测长度内的指令中，如果出现了分支指令，FTB项会将其记录在对应的slot内，并将该slot置为有效。如果分支指令出现过多，达到了FTB项的容纳上限，那么超出上限的分支指令则会交给下一个FTB项来存储。在每个 slot中，我们会记录一条分支指令相对于预测块起始地址的偏移量（offset），同时还会记录其跳转目标地址等信息。&#xA;唯一的 tailSlot 在RISC-V中，分支指令主要分为两种类型：条件分支和无条件跳转。因此，对于一个分支预测块来说，最多只会包含一条无条件跳转指令。因为一旦执行到这条指令，程序的执行流就会发生改变，后续的指令将不再执行。因此，我们定义了一种类型的 slot 叫做 tailSlot，专门用来存储这条无条件跳转指令。而对于条件分支指令，则将它们存储在brSlots中。&#xA;tailSlot如其名，位于整个预测块中的最后一个 slot。这也是因为一旦填充了无条件跳转指令，程序必定跳转，之后的指令就由其他预测块进行处理，因此后续的指令情况我们无需关心。但在无条件跳转指令之前的指令中，我们需要关心是否存在条件分支指令，因为条件分支指令既有可能跳转，也有可能不跳转。因此，我们需要记录下条件分支指令的相关信息。&#xA;tailSlot 共享 考虑一种情况：如果从预测块起始PC开始直到最大预测长度，都没有出现无条件跳转指令，反而出现了两条条件分支指令，这样一来，tailSlot 就会空闲，而第二条条件分支指令又无法存储，造成空间的浪费。&#xA;为了解决这个问题，香山采用了一种方法：设置一个 sharing 标记。我们可以直接将第二条分支指令存储到tailSlot 中，并将sharing标记设置为真，表示第二条条件分支指令共享了无条件跳转指令的 tailSlot。这样，就有效利用了tailSlot的空间。&#xA;预测块中的 isCall、isRet和isJalr字段是为tailSlot服务的。如果tailSlot中记录的是无条件跳转指令，这几个字段会进一步指示该跳转指令的类型。在FTB项中还有一个字段 always_taken，用来记录每个Slot中存储的条件分支指令是否总是被预测为跳转。如果是的话，后续的预测器可以直接采用这一预测结果。&#xA;通过FTB项，我们可以得知一个分支预测块中的指令情况，包括分支指令的位置、类型等。这些信息会交给后续的预测器，由后续的预测器来预测更为精确的跳转目标、是否跳转等信息。&#xA;FTB 项完整结构 （FTBEntry） 接口定义: src/main/scala/xiangshan/frontend/FTB.scala&#xA;本节中描述了 FTB 项的完整结构定义，其所含的信号如下：&#xA;valid: FTB表项是否有效。 接口类型: Bool brSlots: 条件分支指令槽。 接口类型: Vec(numBrSlot, new FtbSlot(BR_OFFSET_LEN)) （接口列表详见FtbSlot） tailSlot: 无条件跳转指令槽。 接口类型: new FtbSlot(JMP_OFFSET_LEN, Some(BR_OFFSET_LEN)) （接口列表详见FtbSlot） pftAddr: 预测块的结束地址。 接口类型: UInt(log2Up(PredictWidth).W) carry: 预测块的结束地址进位。 接口类型: Bool() isCall: 无条件跳转指令槽中的指令为 call 指令。 接口类型: Bool() isRet: 无条件跳转指令槽中的指令为 ret 指令。 接口类型: Bool() isJalr: 无条件跳转指令槽中的指令为 jalr 指令。 接口类型: Bool() last_may_be_rvi_call: 无条件跳转指令槽中的指令可能为一个 RVI 类型的 call 指令信号。 接口类型: Bool() always_taken: 该预测块中的每个分支指令是否总是被预测为 Taken。 接口类型: Vec(numBr, Bool()) 说明：pftAddr 和 carry</description>
+    </item>
+    <item>
+      <title>何为分支预测</title>
+      <link>https://open-verify.cc/xs-bpu/docs/basic/00_bp/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/basic/00_bp/</guid>
+      <description>为何需要分支预测？ 分支预测主要有两方面的原因：一是程序的执行流中含有分支指令，二是高性能处理器使用流水线设计。&#xA;程序的执行流中含有分支指令 int x = 10; int y = 20; int result = 0; if (x &amp;gt;= y) { result = x + y; } else { result = x - y; } 上述是一段C语言代码，这段代码首先定义了三个变量 x, y 和 result，然后根据 x 和 y 值的大小情况对result进行赋值。可以发现，程序在前三行对变量进行赋值时是顺序往下执行的，而在第 5 行时，由于 if 指令的出现，程序产生了分支，从第 5 行直接跳转到了第 8 行继续运行，这就造成了程序执行的分支。&#xA;翻译成 RISC-V 汇编之后的代码如下：&#xA;li a0, 10 # x = 10 li a1, 20 # y = 20 li a2, 0 # result = 0 blt a0, a1, else_branch # 如果 x &amp;lt; y，则跳转到 else_branch add a2, a0, a1 # 否则执行 result = x + y j end # 跳转到 end else_branch: sub a2, a0, a1 # result = x - y end: 可以发现程序依然保持着先前的分支行为，在代码的前三行，指令顺序执行，之后，在程序的第 5 行，出现了一条特殊指令blt ，我们称之为分支指令，它会根据 x 和 y 的大小关系决定指令流顺序往下执行还是跳转到其他地方，该指令的出现导致程序的执行出现了分支。</description>
+    </item>
+    <item>
+      <title>uFTB 分支预测器</title>
+      <link>https://open-verify.cc/xs-bpu/docs/modules/01_uftb/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/modules/01_uftb/</guid>
+      <description>uFTB 简介 uFTB 是香山所有预测器中第一个预测器，也是其他预测器产生预测结果的基石。uFTB 工作在 s1 阶段，它获取到 s1_pc 后能在本周期内产生预测结果，并在 s1 通道输出，其他通道不予更改。分支指令的位置、指令的跳转目标都是由它来提供，后续预测器也将会根据这一预测结果进行进一步的预测。&#xA;而其本质则是一个 FTB 项缓存，其中存储了 FTB 项，基础的预测结果将直接由读出的 FTB 项生成。&#xA;因此，在你开始文档的阅读之前，请确保你理解了 FTB 项和含义以及预测结果接口的具体细节。&#xA;uFTB 功能简介 缓存FTB项，生成一周期预测结果 uFTB 中维护了一个小型的 FTB 项缓存，拿到 PC 之后，会在一周期之内读出 PC 所对应的 FTB 项，并从 FTB 项生成 s1 阶段预测结果。 维护两比特饱和计数器，提供基础条件分支结果 uFTB 中为 FTB项缓存的每一行都维护了对应的两比特饱和计数器，其方向预测结果会反映在 uFTB 的预测结果输出中。 根据更新请求更新 FTB 缓存和两比特饱和计数器 uFTB 缓存结构 如上所述，uFTB 本质上是一个存储了 FTB 项的小型缓存，其大致结构如下图所示。&#xA;在当前版本的香山中，uFTB 共有 32 个缓存行，每个缓存行被称作 FauFTBWay，一个缓存行中可以存储一个 FTB 项。&#xA;当 s1 流水有效时，uFTB 会使用 s1_pc 来决定读出 uFTB 缓存的哪一项。缓存是根据 PC 中的 tag 字段来索引，tag 字段被定义为 pc[16: 1]，即在 PC 中截取了 16 比特作为标识来匹配缓存中的某一行。</description>
+    </item>
+    <item>
+      <title>uFTB 功能列表</title>
+      <link>https://open-verify.cc/xs-bpu/docs/feature/01_uftbfeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/feature/01_uftbfeature/</guid>
+      <description>功能列表（Feature List） 支持基于 FTB 项的预测 支持两比特饱和计数器 支持 s1 通道基础预测结果输出及 meta 信息输出 支持更新请求响应，更新内部 FTB 及两比特饱和计数器。 </description>
+    </item>
+    <item>
+      <title>香山分支预测单元基础</title>
+      <link>https://open-verify.cc/xs-bpu/docs/basic/01_xsbpu_basic/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/basic/01_xsbpu_basic/</guid>
+      <description>分支预测块思想 对于一般的分支预测器来说，通常会根据给定的 PC 预测出该 PC 所对应的指令的相关信息，如是否是条件分支指令、是否是跳转指令。对于条件分支指令，会预测出是否会跳转，而对于跳转指令，则会预测出跳转目标。然而，这种一条一条地预测指令的方法效率较低，导致前端指令供给过慢。&#xA;相比之下，香山采用的预测方法是每次预测一个指令块。也就是说，给定一个 PC，香山会预测出以这个PC开始的一个分支预测块，包括了接下来若干条指令的情况，如是否存在分支指令、分支指令的位置、是否跳转以及跳转目标等信息。&#xA;这样的预测方法可以一次性地预测出多条指令，并将预测结果送往取指单元（IFU），指导IFU进行取指。此外，由于IFU需要考虑缓存行的性能问题，它可以根据预测块一次性地取出多条指令，从而提高吞吐效率。&#xA;在预测块产生后，分支预测块还会生成执行完本预测块后跳转到的 PC，接着 BPU 会根据该 PC 继续产生下一个分支预测块。&#xA;举个简单的例子&#xA;如上图所示，当 PC 执行到 0x20000118 时，BPU会经历如下几个步骤：&#xA;BPU得知PC 0x20000118 BPU产生以 0x20000118 为开始的分支预测块，内容大致如下 在接下来的若干条指令中 第三条是一个条件分支指令 对于这个条件分支指令，预测他将会跳转 跳转后的地址为 0x20000110 BPU将PC设置为 0x20000110，并继续产生下一个分支预测块 这便是采用了分支预测块的香山 BPU 的基本预测流程&#xA;多预测器、多流水线结构 上图展示了香山BPU的总体架构，其中我们需要关注两个主要方面：&#xA;多预测器 为了确保预测的准确性，香山 BPU 采用了多个预测器，并且这些预测器共同产生 BPU 的预测结果。例如，FTB 会生成基础的预测结果供后续预测器使用，而 TAGE 则对条件分支指令产生更精准的预测结果等。 多流水线 为了满足高性能的需求，香山 BPU 采用了流水线设计。各个预测器处于不同的流水线级别。其中，uFTB（即图中的uBTB）预测器位于第一流水线级别，能够在一个周期内产生预测结果。而其余预测器则需要2-3个周期才能生成预测结果，尽管预测时间较长，但预测结果相对更精确。 但是，如果在第三个周期才能获取到预测结果，并基于新的结果重新开始预测，这样的设计难免导致性能损失。因为这样一来，需要耗费三个时钟周期才可以完成一次预测。&#xA;为了在第一和第二周期就能够获取到某些预测器的预测结果，我们设置了三个预测结果通道，并将三个流水线级别的预测结果同时输出，如下图所示。&#xA;取指目标队列（FTQ） 分支预测结果暂存 尽管 BPU 可以以分支预测块的形式提供预测结果，IFU 也可以一次性取指多条指令，但它们之间仍然存在性能上的差距。通常情况下，BPU产生预测结果的速度更快。&#xA;因此，在 BPU 与 IFU 之间添加了一个取指目标队列（FTQ）作为缓冲。FTQ 本质上是一个队列，用于存储一个个数据项。BPU产生的预测结果会先暂存到FTQ中，然后由 IFU 从 FTQ 中获取预测结果，如下图所示。&#xA;每当 BPU 产生一个预测块，该预测块会被放入 FTQ 的队首。当 IFU 处于空闲状态时，它会从 FTQ 队尾获取下一个预测块。下方的示意图展示了这一过程。</description>
+    </item>
+    <item>
+      <title>重定向与更新接口</title>
+      <link>https://open-verify.cc/xs-bpu/docs/ports/01_redirect_and_update/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/ports/01_redirect_and_update/</guid>
+      <description>分支预测重定向（BranchPredictionRedirect） 接口定义：src/main/scala/xiangshan/frontend/FrontendBundle.scala&#xA;接口类型：BranchPredictionRedirect&#xA;该接口定义了分支预测单元的重定向请求，主要用于重定向分支预测器的状态。&#xA;BranchPredictionRedirct 接口继承自 Redirct 接口，所含信号较多，BPU 重定向只会用到其中一部分接口，文档描述的结构中只包含 BPU 用到的接口内容。&#xA;重定向请求有两种来源，与 IFU 预译码信息对比生成的重定向请求，后端执行过程中的重定向请求。&#xA;在重定向请求中，关键信息是cfiUpdate，即控制流指令信息。这一信息对应着一条指令，也就是BPU发生预测错误的指令。举例来说，如果 BPU 在预测块中指示第三条指令为普通指令不发生跳转，但预译码显示第三条指令是一条无条件跳转指令，必定会跳转。在这种情况下，BPU 发生了预测错误，FTQ 产生了重定向请求。在重定向请求中，cfiUpdate 将会对应这条无条件跳转指令。&#xA;cfiUpdate 中的信息可大致分为三种类型的信息：&#xA;对应指令的信息及执行情况。其中会说明该指令在预测块中位于那个槽 (shift) 及 pc； 会指示这条指令的类型相关信息 (pd)；还有这条指令的执行情况，例如跳转目标、是否跳转等 历史维护相关信息。重定向请求中包含了该条指令所处的预测块对应的分支历史信息，以帮助BPU恢复分支历史信息。foleded_hist 代表全局折叠历史，histPtr 代表全局历史指针，而其余信息则是维护分支历史的辅助信息。要详细了解这些信息的含义，请参阅 BPU顶层模块。 RAS维护相关信息。详细含义请参阅 RAS 子预测器文档。 level 信息的含义是，重定向是否包含本条指令，如果不包含，重定向请求的接收方将认为这条指令已经被执行了，下次预测将从下一条指令开始。BPU 顶层会默认不包含本条指令，收到重定向请求后，会将本条指令的执行情况统计到分支历史当中。&#xA;以下为重定向接口的详细信号列表：&#xA;level: 重定向请求是否包括本位置，低表示在本位置后重定向，高表示在本位置重定向。&#xA;接口类型: UInt(1.W) cfiUpdate: 控制流指令更新信息&#xA;接口类型: CfiUpdateInfo&#xA;接口列表&#xA;pc: 重定向请求对应的指令 PC 接口类型: UInt(VaddrBits.W) pd: 重定向指令的预译码信息 isRVC: 是否是压缩指令 接口类型: Bool isCall: 是否是函数调用 接口类型: Bool isRet: 是否是函数返回 接口类型: Bool target: 重定向请求指令的目标地址。 接口类型: UInt(VaddrBits.</description>
+    </item>
+    <item>
+      <title>BPU 全局接口</title>
+      <link>https://open-verify.cc/xs-bpu/docs/ports/02_global_ports/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/ports/02_global_ports/</guid>
+      <description>BPU 模块整体对外接口 (PredirectIO) 接口定义: src/main/scala/xiangshan/frontend/BPU.scala&#xA;PredirectIO 是分支预测器整体的对外接口，它主要处理了分支预测器（BPU）与取指目标队列（FTQ）之间的交互，主要包含以下几个部分：&#xA;bpu_to_ftq: BPU 向 FTQ 发送的信息，主要用于 BPU 向 FTQ 发送分支预测结果 接口类型： BpuToFtqIO 信号列表： resp: BPU 向 FTQ 发送的全局分支预测信息 接口类型：DecoupledIO(new BpuToFtqBundle()) BpuToFtqBundle 继承自 BranchPredictionResp，没有额外的信号 信号列表：详见 (BranchPredictionResp) ftq_to_bpu: FTQ 向 BPU 发送的信息，主要用于处理重定向及更新请求 接口类型： FtqToBpuIO 信号列表： redirect: FTQ 向 BPU 发送的重定向请求 接口类型： Valid(new BranchPredictionRedirect) 接口列表：详见（BranchPredictionRedirect） update: FTQ 向 BPU 发送的更新请求 接口类型：Valid(new BranchPredictionUpdate) 接口列表：详见（BranchPredictionUpdate） enq_ptr: FTQ发送给BPU的FTQ指针，告诉BPU下一次需要写到哪个FTQ表项 接口类型：FtqPtr ctrl: BPU 控制信号，主要用于控制各预测器的使能 接口类型：BPUCtrl 接口列表： ubtb_enable: UBTB 预测器使能 接口类型：Bool() btb_enable: BTB 预测器使能 接口类型：Bool() bim_enable: BIM 预测器使能 接口类型：Bool() tage_enable: TAGE 预测器使能 接口类型：Bool() sc_enable: SC 预测器使能 接口类型：Bool() ras_enable: RAS 预测器使能 接口类型：Bool() loop_enable: LOOP 预测器使能 接口类型：Bool() reset_vector: 重置向量，reset 时 BPU 的 pc 会被重置为该值 接口类型：UInt(PAddrBits.</description>
+    </item>
+    <item>
+      <title>FTB 功能列表</title>
+      <link>https://open-verify.cc/xs-bpu/docs/feature/02_ftbfeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/feature/02_ftbfeature/</guid>
+      <description>功能列表（Feature List） 支持 FTB 项存储 支持 s2, s3 通道基础预测结果输出以及 meta 信息输出 支持更新请求响应，更新内部 FTB 项 </description>
+    </item>
+    <item>
+      <title>TAGE-SC 分支预测器</title>
+      <link>https://open-verify.cc/xs-bpu/docs/modules/02_tage_sc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/modules/02_tage_sc/</guid>
+      <description>功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。&#xA;标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。&#xA;昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1+N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。&#xA;基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。&#xA;对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。&#xA;对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。&#xA;如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。</description>
+    </item>
+    <item>
+      <title>香山分支预测单元结构介绍</title>
+      <link>https://open-verify.cc/xs-bpu/docs/basic/02_xsbpu_structure/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/basic/02_xsbpu_structure/</guid>
+      <description>BPU 是如何整合内部子预测器的？ 我们已经知道香山 BPU 采用的是多预测器，多流水线方案。其中为了适配多流水线，BPU 采用了三通道结果输出接口。但是又是如何适配多预测器的呢？这就要求我们进一步深入 BPU，探究其内部结构。&#xA;上图为香山文档中的 BPU 架构图，目前我们只需要关心这样一个信息，内部的所有子预测器都被包在了一个叫做 Composer 的结构中。BPU只需要和 Composer 交互。&#xA;Composer 是什么？我们不妨先看一下香山代码中对于他们的定义。&#xA;可以发现，Composer 以及五个子预测器有一个共同的特点，他们全部继承于 BasePredictor 基类。并且接口已经在 BasePredictor 类中定义好。换句话说就是，Composer和五个子预测器都拥有相同的接口！BPU 顶层可以直接把 Composer 也当做一个子预测器，而无需关心内部是怎么连接子预测器的。&#xA;子预测器接口 接下来我们会查看子预测器接口是怎样的。该接口将涉及到 Composer 与 BPU 顶层的交互，还会涉及到各子预测器与 Composer 的交互。&#xA;我们先以 Composer 为例，说明子预测器接口的结构&#xA;如上图所示，Composer 的三通道预测结果被直接输出至 BPU 外部，并且还有一组三通道预测结果从BPU内部连接至 Composer ，但由于预测结果是由 Composer 产生，因此 BPU 会将一个空的预测结果传递给 Composer ，这样做的意义是，使子预测器形成了一个“加工”的作用，子预测器会将输入的预测结果进行加工，然后再输出加工过后的预测结果。&#xA;接下来，BPU 顶层会为流水线提供预测所需要的信息。首先是 PC 和分支历史记录（包括全局历史和全局折叠历史），接下来 BPU 会和 Composer 之间连接一些流水线控制信号，最后 BPU 将外部输入的重定向请求接口和更新接口直接连接至 Composer。&#xA;最终可以简单给出子预测器接口的定义（详细定义请前往接口文档进行查看）：&#xA;in (s1, s2, s3) 预测信息输入 s0_pc 需要预测的PC ghist 全局分支历史 folded_hist 全局折叠历史 out (s1, s2, s3) 预测信息输出 流水线控制信号 s0_fire, s1_fire, s2_fire, s3_fire 相应流水级是否工作 s2_redirect, s3_redirect 后续流水级发现预测错误时重定向信号 s1_ready, s2_ready, s3_ready 子预测器相应流水级是否就绪 update 更新请求 redirect 重定向请求 子预测器之间的连接 我们已经清楚各个子预测器之间的接口与Composer 的接口是相同的，并且我们也已经知道了 Composer是如何连向顶层 BPU 的，本小节将会说明子预测器是如何在 Composer 内部进行连接的。</description>
+    </item>
+    <item>
+      <title>FTB 分支预测器</title>
+      <link>https://open-verify.cc/xs-bpu/docs/modules/03_ftb/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/modules/03_ftb/</guid>
+      <description>FTB 简介 FTB 是香山 BPU 的第三个子预测器，它也能一并获取到 uFTB 和 TAGE-SC 的输出。在 FTB 的输入接口中，s1 通道含有 uFTB 的基础预测结果，s2 通道和 s3 通道中仅有 br_taken_mask 一组信号被 TAGE-SC 填充，并无 FTB 项生成的基础预测结果。FTB 的工作便是为 s2 和 s3 通道提供基础预测结果。&#xA;FTB 在功能和结构上都与 uFTB 类似，其主要区别就是 FTB 能够容纳更多的 FTB 项，并且 FTB 的预测结果是在 s2 与 s3 通道输出。正是由于容量大，其读出的速度上会比 uFTB 慢，无法被放置在第一周期产生预测结果，但大容量也使它能够获得更加精准的预测结果。&#xA;uFTB 功能简介 缓存更多 FTB 项，为 s2 和 s3 通道提供基础预测结果。 FTB 预测器的本质是一个较大容量的存储器，其会根据当前预测的 PC 读出对应的 FTB 项，并在 s2 阶段产出预测结果。与此同时该 FTB 项还会被再保存一个周期，生成 s3 阶段预测结果。生成结果需要注意的点是要考虑到上一预测器输入的 br_taken_mask 字段，避免在生成时丢失。 根据更新请求，更新存储中的 FTB 项。 FTB 存储结构 FTB 预测器中 FTB 项被放置在了一个专门的存储结构中，叫做 FTBBank ，在进一步查看 FTBBank 的结构之前，我们先来看一下 FTBBank 是怎样使用的。</description>
+    </item>
+    <item>
+      <title>TAGE-SC 功能列表</title>
+      <link>https://open-verify.cc/xs-bpu/docs/feature/03_tagescfeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/feature/03_tagescfeature/</guid>
+      <description>功能列表（Feature List） s2 TAGE 输出预测结果 s3 SC 输出预测结果 s2 TAGE 输出meta信息 s3 SC 输出meta信息 TAGE 进行更新训练 检查申请新表项 全局重置useful SC 进行更新训练 </description>
+    </item>
+    <item>
+      <title>香山分支预测单元时序介绍</title>
+      <link>https://open-verify.cc/xs-bpu/docs/basic/03_xsbpu_timing/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/basic/03_xsbpu_timing/</guid>
+      <description>一周期无空泡预测 uFTB 是香山 BPU 中唯一一个可以在一周期便可以产生预测结果的预测器，上图中展示了 uFTB 的预测过程。s0_pc 由 BPU 顶层送入，s1 周期生效时，s1_pc 保存了上一周期 s0_pc 的值，依次类推。也就是说传入的 s0_pc 的值会随流水线向下移动。&#xA;在 s1 周期生效时，uFTB 会接收到本周期传来的 s1_fire 信号，并根据 s1_pc 指示的地址，在本周期生成预测结果，在预测结果中可以获取新的 PC 值。&#xA;如图所示，BPU 顶层根据 s1 预测结果通道，分析出下一个 PC 值的位置（即图中的 target），并将其送往 npc_Gen （即新PC生成器）中，用于产生下一个周期的 s0_pc。&#xA;于是下一周期，uFTB 获取到了新的 PC 值，并开始了新 PC 值预测块的产生。由此可见，仅凭借 s1 周期，便可以以一周期一个预测块的速度来产生预测结果。&#xA;预测结果重定向 但除了 uFTB 以外，其他预测器都需要 2-3 个周期才可以产生预测结果，如何利用起他们的预测结果？又如何生成预测结果重定向信号呢？&#xA;如图中所示，一个两周期产生预测结果的 Predirector 2 ，可以在 s2 周期，向 s2 预测结果通道内输出它的预测结果。BPU 顶层拿到预测结果后，分析出预测块的跳转目标地址 target 并连向 npc_Gen。&#xA;此时连向 npc_Gen 的信号中，既有 s2 产生的旧 PC 的预测结果，又有 s1 产生的新 PC 的预测结果，该如何抉择新 PC 用哪一个呢？</description>
+    </item>
+    <item>
+      <title>子预测器基类与子预测器接口</title>
+      <link>https://open-verify.cc/xs-bpu/docs/ports/03_subpredictor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/ports/03_subpredictor/</guid>
+      <description>在香山分支预测单元中，其所有子预测器以及 Composer 的类实现都是继承自子预测器基类（BasePredictor），并且子预测器接口（BasePredictorIO）也是在子预测器基类中进行定义。因此我们可以认为，Compser 和所有子预测器都含有相同的接口。&#xA;在子预测的理解及验证当中，我们最直接的外界交互是发生在子预测器接口，以及子预测器基类中定义的一些变量，因此在子预测器的验证之前，强烈建议你阅读并理解本节文档。&#xA;子分支预测器接口的大致内容及使用方法，已在香山分支预测单元（BPU）基础设计中进行了介绍，本节文档将专注于接口的信号细节。&#xA;子分支预测器接口 (BasePredictorIO) 接口定义: src/main/scala/xiangshan/frontend/BPU.scala&#xA;每个子分支预测器都需要实现该接口，该接口定义了子分支预测器的输入输出接口。&#xA;注意：其中某些信号被定义为了 numDup 个数量，其中每个信号完全一样，多个相同信号是为其他因素考虑。&#xA;详细的信号列表如下：&#xA;reset_vector 重置向量，reset 时 BPU 的 pc 会被重置为该值&#xA;接口类型：UInt(PAddrBits.W) in BPU 向子分支预测器发送的信息&#xA;接口类型：DecoupledIO(new BasePredictorInput) 信号列表： s0_pc s0流水级的pc 接口类型：Vec(numDup, UInt(VAddrBits.W)) folded_hist 全局折叠历史信息 接口类型：Vec(numDup, new AllFoldedHistories(foldedGHistInfos)) 信号列表：详见（AllFoldedHistories） ghist 全局分支历史信息 接口类型：UInt(HistoryLength.W) resp_in 全局分支预测信息（包含s1, s2, s3 预测结果信息） 接口类型：BranchPredictionResp 信号列表：详见（BranchPredictionResp） out 子分支预测器向 BPU 发送的信息（包含s1, s2, s3 预测结果信息）&#xA;接口类型：new BasePredictorOutput 继承自 BranchPredictionResp 信号列表：详见（BranchPredictionResp） ctrl BPU 子预测器使能控制信号，主要用于控制各预测器是否开启&#xA;接口类型：BPUCtrl 接口列表： ubtb_enable: UBTB 预测器使能 接口类型：Bool() btb_enable: BTB 预测器使能 接口类型：Bool() bim_enable: BIM 预测器使能 接口类型：Bool() tage_enable: TAGE 预测器使能 接口类型：Bool() sc_enable: SC 预测器使能 接口类型：Bool() ras_enable: RAS 预测器使能 接口类型：Bool() loop_enable: LOOP 预测器使能 接口类型：Bool() s0_fire s0阶段握手成功信号</description>
+    </item>
+    <item>
+      <title>ITTAGE 分支预测器</title>
+      <link>https://open-verify.cc/xs-bpu/docs/modules/04_ittage/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/modules/04_ittage/</guid>
+      <description>功能介绍 对于一般条件分支指令，只需要预测跳转（taken），或者不跳转（no taken），但是对于间接跳转，如call/jump等指令，需要预测跳转到哪里去（Target）。为了让TAGE支持预测跳转地址，ITTAGE（Indirect Target TAGE）应运而生。&#xA;ITTAGE 与 TAGE 的主要区别在于，在T0和Tn表中，多了 Target PC 数据。预测时，ITTAGE选择匹配到的、历史最长的表项中的 Target 作为预测结果，并利用 2bit 饱和计数器决定是否输出该结果，或选用替代预测结果。TAGE 预测器说明，请参考 TAGE-SC分支预测器。&#xA;昆明湖 ITTAGE 分支预测器 由于在昆明湖的BPU设计中，采用多预测器级联的方式进行预测，因此在子预测器实现上，会与原始预测器有所不同，其中多数表现在默认预测结果上。&#xA;基本功能 ITTAGE基本功能类似 TAGE 分支预测器，但存在以下不同点：&#xA;在表项中增加了 Target 作为跳转的目标地址项，用于预测跳转目标地址。 饱和计数器ctr也不再提供预测方向，而改为决定是否输出结果（只是预测信息）。 由于每个分支预测块中只有一个间接跳转指令，所以ITTAGE也只考虑一条指令。 流水线 ITTAGE 内含三个流水级，第一级计算索引，第二级通过索引读出SRAM表中的结果&#xA;第0拍，s0：第一个流水级的输入，一般是pc和折叠历史。 第一流水级运行：计算index。通过寄存器输出到s1&#xA;第1拍，s1：第二个流水级的输入，为第一级阶段计算好的index等数据。 第二流水级运行：访存SRAM，读取预测用信息。通过寄存器输出到s2&#xA;第2拍，s2：第三个流水级的输入，为第二级从SRAM中读出的原始预测信息。 **第三流水级运行：**处理原始预测信息，决定是否输出预测结果。&#xA;第3拍，s3：预测结果就绪，此时已经可以使用预测结果。 数据结构 在昆明湖的实现中，T0与Tn的表结构如下所示：&#xA;预测器 作用 表项构成 项数 基准预测器T0 用于在其他预测器的预测结果都无效时输出预测结果 虚表，不存在。 直接将上级预测器FTB 的预测结果作为表项结果 虚表，不存在。 直接将上级预测器FTB结果作为索引到的结果 预测表T1-T2 对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为 原始预测信息。历史记录长度由输入的H决定 target: 41 bits; valid: 1bit; tag: 9bits; ctr: 2bits; us: 1bit（usefulness计数器） 256项 预测表T3-T5 512项 T0，Tn表的检索方法 检索方法与 TAGE 分支预测器一致，只是各表的配置选项不同。</description>
+    </item>
+    <item>
+      <title>ITTAGE 功能列表</title>
+      <link>https://open-verify.cc/xs-bpu/docs/feature/04_ittagefeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/feature/04_ittagefeature/</guid>
+      <description>功能列表（Feature List） s2 ITTAGE 决定是否产生预测结果 s3 ITTAGE 读取预测的跳转目标 s3 ITTAGE 输出meta信息 ITTAGE 进行更新训练 检查申请新表项 全局重置useful 预测方向 </description>
+    </item>
+    <item>
+      <title>RAS 分支预测器</title>
+      <link>https://open-verify.cc/xs-bpu/docs/modules/05_ras/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/modules/05_ras/</guid>
+      <description>RAS介绍 RAS 指的是 &amp;ldquo;Return Address Stack&amp;rdquo;，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return&#xA;等。RAS分支预测器则专门针对 call/return类型。&#xA;function _add(a, b){ return (a &amp;gt; 0 ? a : 0) + (b &amp;gt; 0? b : 0); } function add(a, b){ return a + b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } 如上图所示，在main函数中调用了add和sub，add又调用了函数_add。在该过程中，每次调用（call）的跳转地址和返回的地址固定，且在call的时候，就可以同时得到返回地址。函数的调用过程是一个“栈的出入”过程，因此可以通过“栈”结构进行分支预测：每遇到call指令，把当前PC+4（压缩指令和普通指令的偏移不同）进行压栈push操作；遇到return指令，则进行进行pop操作，得到的地址即为目标跳转地址。在基于“预测块”的BPU中，RAS无法知道当前块是否是call或者ret，因此需要依赖其他预测器，利用前级预测器的结果进行RAS操作。&#xA;具体的，在香山的RAS预测器中，其s2阶段，需要判断上一级s2的输出是否预测为call或者ret（即输入信号io.s2_full_pred.hit_taken_on_call/ret有效 ），如果是call则push其后续指令地址入栈，是ret则从栈中pop出地址作为预测结果。因为在BPU的预测器中，人为假定s3阶段得到的结果比s2阶段好，所以RAS预测器在s3阶段需要进行检查，如果上一级的s3预测结果与s2不一致，则采信s3的结果，并按需求判断是否需要撤销或者补齐之前s2阶段的栈操作。例如s2阶段预测为call指令，进行了push操作，而s3为普通分支指令，不需要进行任何操作，此时就需要撤销push；如果s2预测为普通分支指令，s3预测为call，则需要进行push操作补齐。&#xA;RAS的栈操作 在普通的RAS设计中，通过栈进行预测函数返回地址。在理想情况下，本节假定RAS可进行随时备份，栈顶指针用sp表示，预测地址用paddr表示。RAS的基本操作有以下4种：&#xA;PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc + 4（如果是压缩指令则addr = pc+2），然后压栈：sp = addr；sp += 1。</description>
+    </item>
+    <item>
+      <title>RAS 功能列表</title>
+      <link>https://open-verify.cc/xs-bpu/docs/feature/05_rasfeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/docs/feature/05_rasfeature/</guid>
+      <description>功能列表（Feature List） 支持预测器的开启关闭操作 支持s3预测结果覆盖s2预测结果 支持ras栈的push、pop操作 支持ras栈的redirect操作 支持ras栈的update操作 支持base predictor接口 符合标准RAS预测器预测流程 </description>
+    </item>
+    <item>
+      <title>搜索结果</title>
+      <link>https://open-verify.cc/xs-bpu/search/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/search/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>

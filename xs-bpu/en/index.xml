@@ -1,17 +1,158 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>OpenVerify Courses – Project Documentation</title>
+    <title>Project Documentation on OpenVerify Courses</title>
     <link>https://open-verify.cc/xs-bpu/en/</link>
     <description>Recent content in Project Documentation on OpenVerify Courses</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    
-	  <atom:link href="https://open-verify.cc/xs-bpu/en/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-      
-      
-    
-    
+    <atom:link href="https://open-verify.cc/xs-bpu/en/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>BPU Top Feature List</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/feature/00_bpufeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/feature/00_bpufeature/</guid>
+      <description>Feature List upport uFTB sub-predictor Support TAGE-SC sub-predictor Support FTB sub-predictor Support ITTAGE sub-predictor Support RAS sub-predictor Support three-stage prediction result and other information output Support prediction result redirection signal generation Support pipeline control signal generation Support PC generation Support global branch history maintenance Support branch folding history maintenance Support redirection request response, state restoration Support update request response </description>
+    </item>
+    <item>
+      <title>BPU Top Module</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/modules/00_bpu_top/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/modules/00_bpu_top/</guid>
+      <description>The overall function and structure of the BPU top level have been roughly described in previous documents. For those verifying the BPU top level, a more detailed description might be needed. Due to the many functions of the BPU top level, this section divides the BPU into several major functional points for further description. However, since there are too many details at the BPU top level, further details need to be understood by referring to the code.</description>
+    </item>
+    <item>
+      <title>FTB Item and Complete Prediction Result Interface</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/ports/00_ftb/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/ports/00_ftb/</guid>
+      <description>FTB item The FTB item is the core data structure of branch prediction blocks in Xiangshan. It stores the information needed to generate a branch prediction block. When BPU performs predictions, the initial branch prediction block is first generated from a read-out FTB item. Then, this branch prediction block is passed to subsequent predictors, which read and modify the information to generate the final prediction result.&#xA;Therefore, to understand the structure of a branch prediction block, we first need to understand the structure of an FTB item.</description>
+    </item>
+    <item>
+      <title>What is Branch Prediction</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/basic/00_bp/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/basic/00_bp/</guid>
+      <description>Why Do We Need Branch Prediction? There are mainly two reasons for branch prediction: one is that the program&amp;rsquo;s execution flow contains branch instructions, and the other is that high-performance processors use pipeline design.&#xA;Program&amp;rsquo;s Execution Flow Contains Branch Instructions int x = 10; int y = 20; int result = 0; if (x &amp;gt;= y) { result = x + y; } else { result = x - y; } The above is a piece of C code.</description>
+    </item>
+    <item>
+      <title>Basic of the Xiangshan Branch Prediction Unit (BPU)</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/basic/01_xsbpu_basic/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/basic/01_xsbpu_basic/</guid>
+      <description>Branch Prediction Block Concept For a general branch predictor, it usually predicts the relevant information of an instruction corresponding to a given PC, such as whether it is a conditional branch instruction or a jump instruction. For conditional branch instructions, it predicts whether it will jump, while for jump instructions, it predicts the jump target. However, predicting instructions one by one is inefficient, leading to slow instruction supply in the frontend.</description>
+    </item>
+    <item>
+      <title>Redirection and Update Interfaces</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/ports/01_redirect_and_update/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/ports/01_redirect_and_update/</guid>
+      <description>Branch Prediction Redirection（BranchPredictionRedirect） Interface Definition：src/main/scala/xiangshan/frontend/FrontendBundle.scala&#xA;Interface Type：BranchPredictionRedirect&#xA;This interface defines the redirection requests from the branch prediction unit, mainly used to redirect the state of the branch predictor.&#xA;The BranchPredictionRedirect interface inherits from the Redirect interface and includes many signals, only a subset of which are used by the BPU redirection. The documented structure contains only the interfaces used by the BPU.&#xA;Redirection requests have two sources: those generated by comparing IFU pre-decode information and those generated during the backend execution process.</description>
+    </item>
+    <item>
+      <title>uFTB Branch Predictor</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/modules/01_uftb/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/modules/01_uftb/</guid>
+      <description>Introduction to uFTB uFTB is the first predictor among all the predictors in Xiangshan, and it serves as the cornerstone for other predictors to generate prediction results. uFTB works in the s1 stage. It can generate prediction results within the current cycle after obtaining s1_pc and output them in the s1 channel, without modifying other channels. It provides the position of the branch instruction and the target of the instruction. Subsequent predictors will further predict based on this result.</description>
+    </item>
+    <item>
+      <title>uFTB Feature List</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/feature/01_uftbfeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/feature/01_uftbfeature/</guid>
+      <description>Feature List Support prediction based on FTB entry Support two-bit saturating counter Support basic prediction result output and meta information output for the s1 channel Support update request response, updating internal FTB and two-bit saturating counter. </description>
+    </item>
+    <item>
+      <title>BPU Global Interface</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/ports/02_global_ports/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/ports/02_global_ports/</guid>
+      <description>BPU Module Overall External Interface (PredirectIO) Interface definition: src/main/scala/xiangshan/frontend/BPU.scala&#xA;PredirectIO is the overall external interface of the branch predictor (BPU). It mainly handles the interaction between the branch predictor (BPU) and the fetch target queue (FTQ), which includes the following parts:&#xA;bpu_to_ftq: Information sent from BPU to FTQ, mainly for sending branch prediction results from BPU to FTQ Interface type： BpuToFtqIO Interface type： resp: Global branch prediction information sent from BPU to FTQ Interface type：DecoupledIO(new BpuToFtqBundle()) BpuToFtqBundle inherits from BranchPredictionResp，without additional signals Interface type：See (BranchPredictionResp) ftq_to_bpu: Information sent from FTQ to BPU, mainly for handling redirect and update requests Interface type： FtqToBpuIO Interface type： redirect: Redirect request sent from FTQ to BPU Interface type： Valid(new BranchPredictionRedirect) Interface list：See （BranchPredictionRedirect） update: Update request sent from FTQ to BPU Interface type：Valid(new BranchPredictionUpdate) Interface list：See （BranchPredictionUpdate） enq_ptr: FTQ pointer sent to BPU, indicating which FTQ entry to write to next Interface type：FtqPtr ctrl: BPU control signals, mainly for enabling various predictors Interface type：BPUCtrl Interface list： ubtb_enable: UBTB predictor enable Interface type：Bool() btb_enable: BTB predictor enable Interface type：Bool() bim_enable: BIM predictor enable Interface type：Bool() tage_enable: TAGE predictor enable Interface type：Bool() sc_enable: SC predictor enable Interface type：Bool() ras_enable: RAS predictor enable Interface type：Bool() loop_enable: LOOP predictor enable Interface type：Bool() reset_vector: Reset vector, which the BPU&amp;rsquo;s PC will be reset to upon reset Interface type：UInt(PAddrBits.</description>
+    </item>
+    <item>
+      <title>FTB Feature List</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/feature/02_ftbfeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/feature/02_ftbfeature/</guid>
+      <description>Feature List Support FTB entry storage Support basic prediction result output and meta information output for the s2, s3 channels Support update request response, updating internal FTB entries </description>
+    </item>
+    <item>
+      <title>Introduction to the Xiangshan Branch Prediction Unit Structure</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/basic/02_xsbpu_structure/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/basic/02_xsbpu_structure/</guid>
+      <description>How Does the BPU Integrate Internal Sub-predictors? We already know that the Xiangshan BPU adopts multiple predictors and multiple pipeline schemes. To adapt to multiple pipelines, the BPU uses a three-channel result output interface. But how does it adapt to multiple predictors? This requires us to further explore the internal structure of the BPU.&#xA;The above figure is the BPU architecture diagram from the Xiangshan documentation. Currently, we only need to focus on one piece of information: all internal sub-predictors are encapsulated in a structure called Composer.</description>
+    </item>
+    <item>
+      <title>TAGE-SC Branch Predictor</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/modules/02_tage_sc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/modules/02_tage_sc/</guid>
+      <description>Introduction TAGE-SC is the primary predictor for conditional branches in the Kunming Lake architecture, classified as an Accurate Predictor (APD). TAGE-SC can be seen as two relatively independent components: the prediction part TAGE and the verification part SC.&#xA;The Tagged Geometric History Length Predictor (TAGE) utilizes multiple prediction tables with different history lengths to exploit extensive branch history information. TAGE predicts whether a branch instruction will be taken or not taken.</description>
+    </item>
+    <item>
+      <title>Base Predictor Class and Sub Predictor Interface</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/ports/03_subpredictor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/ports/03_subpredictor/</guid>
+      <description>In the Xiangshan branch prediction unit, all its sub-predictors and the class implementations of Composer are inherited from the sub-predictor base class (BasePredictor). The sub-predictor interface (BasePredictorIO) is also defined in the sub-predictor base class. Therefore, we can consider that Composer and all sub-predictors have the same interface.&#xA;In the understanding and verification of sub-prediction, our most direct external interaction occurs in the sub-predictor interface and some variables defined in the sub-predictor base class.</description>
+    </item>
+    <item>
+      <title>FTB Branch Predictor</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/modules/03_ftb/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/modules/03_ftb/</guid>
+      <description>Introduction to FTB FTB is the third sub-predictor of the Xiangshan BPU, and it can also get the outputs of uFTB and TAGE-SC together. In the input interface of FTB, the s1 channel contains the basic prediction results of uFTB, and the s2 and s3 channels are filled with only one group of signals, br_taken_mask, by TAGE-SC, without the basic prediction results generated by the FTB entry. The function of FTB is to provide basic prediction results for the s2 and s3 channels.</description>
+    </item>
+    <item>
+      <title>Introduction to the Timing of Xiangshan Branch Prediction Unit</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/basic/03_xsbpu_timing/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/basic/03_xsbpu_timing/</guid>
+      <description>Single-Cycle Prediction without Bubble uFTB is the only predictor in Xiangshan BPU that can generate prediction results in a single cycle. The figure below shows the prediction process of uFTB. The s0_pc is sent from the top level of BPU, and when the s1 stage is active, the s1_pc retains the value of s0_pc from the previous cycle. This means that the value of s0_pc will move down the pipeline.</description>
+    </item>
+    <item>
+      <title>TAGE-SC Feature List</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/feature/03_tagescfeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/feature/03_tagescfeature/</guid>
+      <description>Feature List s2 TAGE outputs prediction results s3 SC outputs prediction results s2 TAGE outputs meta information s3 SC outputs meta information TAGE performs update training Check for new table entry requests Globally reset useful SC performs update training </description>
+    </item>
+    <item>
+      <title>ITTAGE Branch Predictor</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/modules/04_ittage/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/modules/04_ittage/</guid>
+      <description>Function Introduction For general conditional branch instructions, only predicting whether to jump (taken) or not (not taken) is needed. However, for indirect jumps, such as call/jump instructions, it is necessary to predict where to jump to (Target). In order to make TAGE support predicting jump addresses, ITTAGE (Indirect Target TAGE) was introduced.&#xA;The main difference between ITTAGE and TAGE is that in the T0 and Tn tables, Target PC data is added.</description>
+    </item>
+    <item>
+      <title>ITTAGE Feature List</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/feature/04_ittagefeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/feature/04_ittagefeature/</guid>
+      <description>Feature List s2 ITTAGE determines whether to generate a prediction result s3 ITTAGE reads the predicted target for a branch s3 ITTAGE outputs meta information ITTAGE performs update training Check for new table entry requests Globally reset useful Prediction direction </description>
+    </item>
+    <item>
+      <title>RAS Branch Predictor</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/modules/05_ras/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/modules/05_ras/</guid>
+      <description>RAS介绍 RAS stands for &amp;ldquo;Return Address Stack.&amp;rdquo; It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.&#xA;function _add(a, b){ return (a &amp;gt; 0 ? a : 0) + (b &amp;gt; 0? b : 0); } function add(a, b){ return a + b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add.</description>
+    </item>
+    <item>
+      <title>RAS Feature List</title>
+      <link>https://open-verify.cc/xs-bpu/en/docs/feature/05_rasfeature/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/docs/feature/05_rasfeature/</guid>
+      <description>Feature List Supports enabling and disabling of the predictor Supports s3 prediction result overriding s2 prediction result Supports push and pop operations of the RAS stack Supports redirect operation of the RAS stack Supports update operation of the RAS stack Supports base predictor interface Conforms to the standard RAS predictor prediction process </description>
+    </item>
+    <item>
+      <title>Search Results</title>
+      <link>https://open-verify.cc/xs-bpu/en/search/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/xs-bpu/en/search/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>

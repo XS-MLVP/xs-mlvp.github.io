@@ -1,89 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>香山微架构开放验证第一期：昆明湖BPU模块UT验证实战 – 预测结果重定向</title>
+    <title>预测结果重定向 on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
     <link>https://open-verify.cc/xs-bpu/tags/%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%87%8D%E5%AE%9A%E5%90%91/</link>
     <description>Recent content in 预测结果重定向 on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    
-	  <atom:link href="https://open-verify.cc/xs-bpu/tags/%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%87%8D%E5%AE%9A%E5%90%91/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-      
-        
-      
-    
-    
+    <atom:link href="https://open-verify.cc/xs-bpu/tags/%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%87%8D%E5%AE%9A%E5%90%91/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Docs: 香山分支预测单元时序介绍</title>
+      <title>香山分支预测单元时序介绍</title>
       <link>https://open-verify.cc/xs-bpu/docs/basic/03_xsbpu_timing/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
       <guid>https://open-verify.cc/xs-bpu/docs/basic/03_xsbpu_timing/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;一周期无空泡预测&#34;&gt;一周期无空泡预测&lt;/h2&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;1.png&#34; width=&#34;500px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;&lt;code&gt;uFTB&lt;/code&gt; 是香山 BPU 中唯一一个可以在一周期便可以产生预测结果的预测器，上图中展示了 &lt;code&gt;uFTB&lt;/code&gt; 的预测过程。&lt;code&gt;s0_pc&lt;/code&gt; 由 BPU 顶层送入，s1 周期生效时，&lt;code&gt;s1_pc&lt;/code&gt; 保存了上一周期 &lt;code&gt;s0_pc&lt;/code&gt; 的值，依次类推。也就是说传入的 &lt;code&gt;s0_pc&lt;/code&gt; 的值会随流水线向下移动。&lt;/p&gt;
-&lt;p&gt;在 s1 周期生效时，&lt;code&gt;uFTB&lt;/code&gt; 会接收到本周期传来的 &lt;code&gt;s1_fire&lt;/code&gt; 信号，并根据 &lt;code&gt;s1_pc&lt;/code&gt; 指示的地址，在本周期生成预测结果，在预测结果中可以获取新的 PC 值。&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;2.png&#34; width=&#34;500px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;如图所示，BPU 顶层根据 s1 预测结果通道，分析出下一个 PC 值的位置（即图中的 target），并将其送往 &lt;code&gt;npc_Gen&lt;/code&gt; （即新PC生成器）中，用于产生下一个周期的 s0_pc。&lt;/p&gt;
-&lt;p&gt;于是下一周期，&lt;code&gt;uFTB&lt;/code&gt; 获取到了新的 PC 值，并开始了新 PC 值预测块的产生。由此可见，仅凭借 s1 周期，便可以以一周期一个预测块的速度来产生预测结果。&lt;/p&gt;
-&lt;h2 id=&#34;预测结果重定向&#34;&gt;预测结果重定向&lt;/h2&gt;
-&lt;p&gt;但除了 &lt;code&gt;uFTB&lt;/code&gt; 以外，其他预测器都需要 2-3 个周期才可以产生预测结果，如何利用起他们的预测结果？又如何生成预测结果重定向信号呢？&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;3.png&#34; width=&#34;500px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;如图中所示，一个两周期产生预测结果的 &lt;code&gt;Predirector 2&lt;/code&gt; ，可以在 s2 周期，向 s2 预测结果通道内输出它的预测结果。BPU 顶层拿到预测结果后，分析出预测块的跳转目标地址 &lt;code&gt;target&lt;/code&gt; 并连向 &lt;code&gt;npc_Gen&lt;/code&gt;。&lt;/p&gt;
-&lt;p&gt;此时连向 &lt;code&gt;npc_Gen&lt;/code&gt; 的信号中，既有 s2 产生的旧 PC 的预测结果，又有 s1 产生的新 PC 的预测结果，该如何抉择新 PC 用哪一个呢？&lt;/p&gt;
-&lt;p&gt;通过之前的介绍，我们已经知道，BPU 会将 s2 的预测结果与上周期 s1 的预测结果进行比较，如果预测结果不同，那么说明 s1 预测错了，自然 s1 基于上周期错误预测结果产生的本周期预测结果也是错误的，因此在本周期如果预测结果产生错误，&lt;code&gt;npc_Gen&lt;/code&gt; 将使用 s2 所提供的 &lt;code&gt;target&lt;/code&gt; 作为新的 &lt;code&gt;s0_pc&lt;/code&gt;。&lt;/p&gt;
-&lt;p&gt;这个过程画在流水线结构图中是这样的：&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;4.png&#34; width=&#34;500px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;Diff 比较器通过获取 s1 周期的预测结果，与 s1 周期的预测结果进行对比产生 diff 信号，指导 &lt;code&gt;npc_Gen&lt;/code&gt; 进行下一条 pc 的生成。与此同时，diff 信号指示了 s1 阶段的预测结果发生错误，可直接用于 BPU 发往 FTQ 的预测结果中 s2 通道的预测结果重定向通道，指导 FTQ 覆盖之前的预测结果。&lt;/p&gt;
-&lt;p&gt;Diff 信号还会通过 s2_redirect 接口送往每个子预测器，指导子预测器进行状态的更新。&lt;/p&gt;
-&lt;p&gt;除此之外，当 s2 预测结果重定向发生时，说明 s1 通道预测结果已经发生错误，s2 阶段不能继续进行预测，需及时将子预测器流水线控制信号 &lt;code&gt;s2_fire&lt;/code&gt; 置为无效，并等待纠正后的预测结果流入。&lt;/p&gt;
-&lt;p&gt;s3 预测结果的重定向与此类似，其流水线结构图如下所示。具体的处理过程留给大家来分析。&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;5.png&#34; width=&#34;500px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;h2 id=&#34;重定向请求与其他信息生成&#34;&gt;重定向请求与其他信息生成&lt;/h2&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;6.png&#34; width=&#34;500px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;只有当三个阶段的预测信息都错误时，才会产生有外部重定向请求发生，此时 &lt;code&gt;npc_Gen&lt;/code&gt; 会接收到来自重定向请求中的 pc 地址。由于当重定向请求发生时，我们认为三阶段均预测错误，因此需要将三个阶段的 &lt;code&gt;fire&lt;/code&gt; 信号全部置为无效，然后 &lt;code&gt;npc_Gen&lt;/code&gt; 采用重定向请求中需要恢复的 PC，重新开始预测。&lt;/p&gt;
-&lt;p&gt;其他信息，例如全局历史的生成方式与PC的生成方式一致，都是在顶层通过三阶段预测信息来维护，全局历史会根据每一阶段的预测结果来产生新的分支历史。&lt;/p&gt;
-&lt;h2 id=&#34;流水线控制信号&#34;&gt;流水线控制信号&lt;/h2&gt;
-&lt;p&gt;学习了流水线的具体流程，我们应该可以理解子预测器接口中的流水线控制信号了，如下&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;s0_fire, s1_fire, s2_fire, s3_fire&lt;/strong&gt; 指示每个流水级是否工作&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;s2_redirect, s3_redirect&lt;/strong&gt;              指示是否有预测结果重定向发生&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;s1_ready, s2_ready, s3_ready&lt;/strong&gt;    子预测器发给BPU顶层，表示相应流水级是否就绪&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
-&lt;p&gt;至此，你应该懂得了香山分支预测单元的基础设计思想、对外交互逻辑、内部结构、时序等内容，并对 BPU 的工作原理有了大致的理解，香山的 BPU 对你来说已经不再神秘。&lt;/p&gt;
-&lt;p&gt;接下来你可以阅读&lt;code&gt;重要结构及接口文档&lt;/code&gt;，并结合香山 BPU 源代码对 BPU 形成更为细致的理解，当你能清楚的明白 BPU 的工作原理和信号细节时，便可以开始你的验证工作了！&lt;/p&gt;
-
-      </description>
+      <description>一周期无空泡预测 uFTB 是香山 BPU 中唯一一个可以在一周期便可以产生预测结果的预测器，上图中展示了 uFTB 的预测过程。s0_pc 由 BPU 顶层送入，s1 周期生效时，s1_pc 保存了上一周期 s0_pc 的值，依次类推。也就是说传入的 s0_pc 的值会随流水线向下移动。&#xA;在 s1 周期生效时，uFTB 会接收到本周期传来的 s1_fire 信号，并根据 s1_pc 指示的地址，在本周期生成预测结果，在预测结果中可以获取新的 PC 值。&#xA;如图所示，BPU 顶层根据 s1 预测结果通道，分析出下一个 PC 值的位置（即图中的 target），并将其送往 npc_Gen （即新PC生成器）中，用于产生下一个周期的 s0_pc。&#xA;于是下一周期，uFTB 获取到了新的 PC 值，并开始了新 PC 值预测块的产生。由此可见，仅凭借 s1 周期，便可以以一周期一个预测块的速度来产生预测结果。&#xA;预测结果重定向 但除了 uFTB 以外，其他预测器都需要 2-3 个周期才可以产生预测结果，如何利用起他们的预测结果？又如何生成预测结果重定向信号呢？&#xA;如图中所示，一个两周期产生预测结果的 Predirector 2 ，可以在 s2 周期，向 s2 预测结果通道内输出它的预测结果。BPU 顶层拿到预测结果后，分析出预测块的跳转目标地址 target 并连向 npc_Gen。&#xA;此时连向 npc_Gen 的信号中，既有 s2 产生的旧 PC 的预测结果，又有 s1 产生的新 PC 的预测结果，该如何抉择新 PC 用哪一个呢？</description>
     </item>
-    
   </channel>
 </rss>

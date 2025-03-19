@@ -1,95 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>香山微架构开放验证第一期：昆明湖BPU模块UT验证实战 – 香山 BPU 结构</title>
+    <title>香山 BPU 结构 on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
     <link>https://open-verify.cc/xs-bpu/tags/%E9%A6%99%E5%B1%B1-bpu-%E7%BB%93%E6%9E%84/</link>
     <description>Recent content in 香山 BPU 结构 on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    
-	  <atom:link href="https://open-verify.cc/xs-bpu/tags/%E9%A6%99%E5%B1%B1-bpu-%E7%BB%93%E6%9E%84/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-      
-        
-      
-    
-    
+    <atom:link href="https://open-verify.cc/xs-bpu/tags/%E9%A6%99%E5%B1%B1-bpu-%E7%BB%93%E6%9E%84/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Docs: 香山分支预测单元结构介绍</title>
+      <title>香山分支预测单元结构介绍</title>
       <link>https://open-verify.cc/xs-bpu/docs/basic/02_xsbpu_structure/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
       <guid>https://open-verify.cc/xs-bpu/docs/basic/02_xsbpu_structure/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;bpu-是如何整合内部子预测器的&#34;&gt;BPU 是如何整合内部子预测器的？&lt;/h2&gt;
-&lt;p&gt;我们已经知道香山 BPU 采用的是多预测器，多流水线方案。其中为了适配多流水线，BPU 采用了三通道结果输出接口。但是又是如何适配多预测器的呢？这就要求我们进一步深入 BPU，探究其内部结构。&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;1.png&#34; width=&#34;600px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;上图为香山文档中的 BPU 架构图，目前我们只需要关心这样一个信息，内部的所有子预测器都被包在了一个叫做 &lt;code&gt;Composer&lt;/code&gt; 的结构中。BPU只需要和 &lt;code&gt;Composer&lt;/code&gt; 交互。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;Composer&lt;/code&gt; 是什么？我们不妨先看一下香山代码中对于他们的定义。&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;2.png&#34; width=&#34;700px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;可以发现，&lt;code&gt;Composer&lt;/code&gt; 以及五个子预测器有一个共同的特点，他们全部继承于 &lt;code&gt;BasePredictor&lt;/code&gt; 基类。并且接口已经在 &lt;code&gt;BasePredictor&lt;/code&gt; 类中定义好。换句话说就是，&lt;code&gt;Composer&lt;/code&gt;&lt;strong&gt;和五个子预测器都拥有相同的接口&lt;/strong&gt;！BPU 顶层可以直接把 &lt;code&gt;Composer&lt;/code&gt; 也当做一个子预测器，而无需关心内部是怎么连接子预测器的。&lt;/p&gt;
-&lt;h2 id=&#34;子预测器接口&#34;&gt;子预测器接口&lt;/h2&gt;
-&lt;p&gt;接下来我们会查看子预测器接口是怎样的。该接口将涉及到 &lt;code&gt;Composer&lt;/code&gt; 与 BPU 顶层的交互，还会涉及到各子预测器与 &lt;code&gt;Composer&lt;/code&gt; 的交互。&lt;/p&gt;
-&lt;p&gt;我们先以 &lt;code&gt;Composer&lt;/code&gt; 为例，说明子预测器接口的结构&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;3.png&#34; width=&#34;400px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;如上图所示，&lt;code&gt;Composer&lt;/code&gt; 的三通道预测结果被直接输出至 BPU 外部，并且还有一组三通道预测结果从BPU内部连接至 &lt;code&gt;Composer&lt;/code&gt; ，但由于预测结果是由 &lt;code&gt;Composer&lt;/code&gt; 产生，因此 BPU 会将一个空的预测结果传递给 &lt;code&gt;Composer&lt;/code&gt; ，这样做的意义是，使子预测器形成了一个“加工”的作用，子预测器会将输入的预测结果进行加工，然后再输出加工过后的预测结果。&lt;/p&gt;
-&lt;p&gt;接下来，BPU 顶层会为流水线提供预测所需要的信息。首先是 &lt;strong&gt;PC&lt;/strong&gt; 和&lt;strong&gt;分支历史记录&lt;/strong&gt;（包括全局历史和全局折叠历史），接下来 BPU 会和 &lt;code&gt;Composer&lt;/code&gt; 之间连接一些&lt;strong&gt;流水线控制信号&lt;/strong&gt;，最后 BPU 将外部输入的&lt;strong&gt;重定向请求接口&lt;/strong&gt;和&lt;strong&gt;更新接口&lt;/strong&gt;直接连接至 &lt;code&gt;Composer&lt;/code&gt;。&lt;/p&gt;
-&lt;p&gt;最终可以简单给出子预测器接口的定义（详细定义请前往接口文档进行查看）：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;in&lt;/strong&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;(s1, s2, s3)&lt;/strong&gt; 预测信息输入&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;s0_pc&lt;/strong&gt;         需要预测的PC&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;ghist&lt;/strong&gt;            全局分支历史&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;folded_hist&lt;/strong&gt; 全局折叠历史&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;out  (s1, s2, s3)&lt;/strong&gt; 预测信息输出&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;流水线控制信号&lt;/strong&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;s0_fire, s1_fire, s2_fire, s3_fire&lt;/strong&gt; 相应流水级是否工作&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;s2_redirect, s3_redirect&lt;/strong&gt;              后续流水级发现预测错误时重定向信号&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;s1_ready, s2_ready, s3_ready&lt;/strong&gt;    子预测器相应流水级是否就绪&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;update&lt;/strong&gt;        更新请求&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;redirect&lt;/strong&gt;        重定向请求&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;子预测器之间的连接&#34;&gt;子预测器之间的连接&lt;/h2&gt;
-&lt;p&gt;我们已经清楚各个子预测器之间的接口与&lt;code&gt;Composer&lt;/code&gt; 的接口是相同的，并且我们也已经知道了 &lt;code&gt;Composer&lt;/code&gt;是如何连向顶层 BPU 的，本小节将会说明子预测器是如何在 &lt;code&gt;Composer&lt;/code&gt; 内部进行连接的。&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;4.png&#34; width=&#34;400px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;上图便是子预测器在 &lt;code&gt;Composer&lt;/code&gt; 中连接的结构图。可以看出，三通道预测结果送入&lt;code&gt;Composer&lt;/code&gt;后，首先经过 &lt;code&gt;uFTB&lt;/code&gt; 的“加工”后输出，再依次由 &lt;code&gt;TAGE-SC&lt;/code&gt;、&lt;code&gt;FTB&lt;/code&gt;、&lt;code&gt;ITTAGE&lt;/code&gt;、&lt;code&gt;RAS&lt;/code&gt;进行“加工”，最终连接到 &lt;code&gt;Composer&lt;/code&gt; 的预测结果输出，并由&lt;code&gt;Composer&lt;/code&gt; 再直接连往 BPU 外部。&lt;/p&gt;
-&lt;p&gt;而对于其他信号，因为&lt;code&gt;Composer&lt;/code&gt;和各子预测器的接口相同，都被&lt;code&gt;Composer&lt;/code&gt;直接连接到了每个预测器的相应接口，而没有做非常多额外处理。&lt;/p&gt;
-&lt;h3 id=&#34;预测结果接口连接&#34;&gt;预测结果接口连接&lt;/h3&gt;
-&lt;p&gt;对于子预测器来说，他们的预测结果的连接方式是，预测结果输出是下一个预测器的输入。但需要注意的是，这种连接是组合电路的连接，而没有时序的影响。&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;img src=&#34;5.png&#34; width=&#34;400px&#34;/&gt; 
-&lt;/figure&gt;
-
-&lt;p&gt;如上图所示，以 s1 通道为例，从输入到最后一个预测器输出，中间全都是组合电路在做修改，不受时序影响。寄存器只在 s1, s2 和 s3 通道之间存在。&lt;/p&gt;
-&lt;p&gt;因此增加子预测器的数量，并不会导致预测所需的周期数量增多，仅仅会导致每个周期预测所需要的时延增大。&lt;/p&gt;
-
-      </description>
+      <description>BPU 是如何整合内部子预测器的？ 我们已经知道香山 BPU 采用的是多预测器，多流水线方案。其中为了适配多流水线，BPU 采用了三通道结果输出接口。但是又是如何适配多预测器的呢？这就要求我们进一步深入 BPU，探究其内部结构。&#xA;上图为香山文档中的 BPU 架构图，目前我们只需要关心这样一个信息，内部的所有子预测器都被包在了一个叫做 Composer 的结构中。BPU只需要和 Composer 交互。&#xA;Composer 是什么？我们不妨先看一下香山代码中对于他们的定义。&#xA;可以发现，Composer 以及五个子预测器有一个共同的特点，他们全部继承于 BasePredictor 基类。并且接口已经在 BasePredictor 类中定义好。换句话说就是，Composer和五个子预测器都拥有相同的接口！BPU 顶层可以直接把 Composer 也当做一个子预测器，而无需关心内部是怎么连接子预测器的。&#xA;子预测器接口 接下来我们会查看子预测器接口是怎样的。该接口将涉及到 Composer 与 BPU 顶层的交互，还会涉及到各子预测器与 Composer 的交互。&#xA;我们先以 Composer 为例，说明子预测器接口的结构&#xA;如上图所示，Composer 的三通道预测结果被直接输出至 BPU 外部，并且还有一组三通道预测结果从BPU内部连接至 Composer ，但由于预测结果是由 Composer 产生，因此 BPU 会将一个空的预测结果传递给 Composer ，这样做的意义是，使子预测器形成了一个“加工”的作用，子预测器会将输入的预测结果进行加工，然后再输出加工过后的预测结果。&#xA;接下来，BPU 顶层会为流水线提供预测所需要的信息。首先是 PC 和分支历史记录（包括全局历史和全局折叠历史），接下来 BPU 会和 Composer 之间连接一些流水线控制信号，最后 BPU 将外部输入的重定向请求接口和更新接口直接连接至 Composer。&#xA;最终可以简单给出子预测器接口的定义（详细定义请前往接口文档进行查看）：&#xA;in (s1, s2, s3) 预测信息输入 s0_pc 需要预测的PC ghist 全局分支历史 folded_hist 全局折叠历史 out (s1, s2, s3) 预测信息输出 流水线控制信号 s0_fire, s1_fire, s2_fire, s3_fire 相应流水级是否工作 s2_redirect, s3_redirect 后续流水级发现预测错误时重定向信号 s1_ready, s2_ready, s3_ready 子预测器相应流水级是否就绪 update 更新请求 redirect 重定向请求 子预测器之间的连接 我们已经清楚各个子预测器之间的接口与Composer 的接口是相同的，并且我们也已经知道了 Composer是如何连向顶层 BPU 的，本小节将会说明子预测器是如何在 Composer 内部进行连接的。</description>
     </item>
-    
   </channel>
 </rss>
