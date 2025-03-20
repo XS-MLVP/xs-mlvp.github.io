@@ -23,11 +23,17 @@
 <meta name="description" content="本文档参考香山IFU设计文档写成
 本文档撰写的内容截至[c670557]
 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
-IFU说明文档 术语说明 缩写 全称 描述 RVC RISC-V Compressed Instructions RISC-V 手册&#34;C&#34;扩展规定的 16 位长度压缩指令 RVI RISC-V Integer Instructions RISC-V 手册规定的 32 位基本整型指令 IFU Instruction Fetch Unit 取指令单元 FTQ Fetch Target Queue 取指目标队列 ICache L1 Instruction Cache 一级指令缓存 IBuffer Instruction Buffer 指令缓冲 CFI Control Flow Instruction 控制流指令 ITLB Instruction Translation Lookaside Buffer 指令地址转译后备缓冲器 InstrUncache Instruction Ucache Module 指令 MMIO 取指处理单元 整体框图 以下是IFU的架构简图：
+IFU说明文档 文档概述 本文档描述IFU的功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。
+为方便验证参与者，本文档中还额外给出了整体框图和流水级的示意图，以及各个rtl接口的详细说明。此外，本文档还给出了两个时序示例。
+术语说明 名称 描述 RVC（RISC-V Compressed Instructions） RISC-V 手册&#34;C&#34;扩展规定的 16 位长度压缩指令 RVI（RISC-V Integer Instructions） RISC-V 手册规定的 32 位基本整型指令 IFU（Instruction Fetch Unit） 取指令单元 FTQ（Fetch Target Queue） 取指目标队列 ICache（L1 Instruction Cache） 一级指令缓存 IBuffer（Instruction Buffer） 指令缓冲 CFI（Control Flow Instruction） 控制流指令 ITLB（Instruction Translation Lookaside Buffer） 指令地址转译后备缓冲器 InstrUncache（Instruction Ucache Module） 指令 MMIO 取指处理单元 整体框图 以下是IFU的架构简图：
 流水级示意图 香山的IFU一共分为5个stage。
 F0 stage：接收FTQ请求，同时告诉FTQ自己已经ready了，同时，FTQ也会通知ICache准备数据。此外，这一阶段还会接受重定向信息。
 F1 stage：从FTQ请求中先计算出每个指令的pc，half_pc，并计算cut_ptr（这是后续将icache返回的指令码进行切分的依据）
-F2 stage：从icache获取响应数据（缓存行）并校验，提取出异常信息（包括页错误、访问错误、mmio信息）；生成预测到的指令范围（但这并不是一个数字，而是一个用多位表示的bool数组，该位为1表示这一指令在预测块范围内）；从缓存行中，利用上一阶段求出的cut_ptr切分出17×2的初步指令码，最后进行预译码和指令扩展。">
+F2 stage：从icache获取响应数据（缓存行）并校验，提取出异常信息（包括页错误、访问错误、mmio信息）；生成预测到的指令范围（但这并不是一个数字，而是一个用多位表示的bool数组，该位为1表示这一指令在预测块范围内）；从缓存行中，利用上一阶段求出的cut_ptr切分出17×2的初步指令码，最后进行预译码和指令扩展。
+F3 stage：这一阶段主要是对译码阶段的结果进行预检查，对RVC指令进行扩展，以及MMIO状态下的处理逻辑，并向IBuffer写指令码和前端信息
+WB（写回）stage：将预检查的结果写回FTQ。根据预检查结果判断是否进行内部冲刷。
+以下是一张示意图：
+子模块列表 子模块 描述 PreDecoder 预译码模块 F3Predecoder F3阶段预译码模块 RVCExpander RVC指令扩展模块 PredChecker 预检查模块 FrontendTrigger 前端断点模块 IFU模块功能说明 FTQ 将预测块请求分别发送到 ICache 和 IFU 模块，IFU 等到来自 ICache 返回至多两个缓存行的指令码后，进行切分产生取指令请求范围限定的初始指令码，并送到预译码器进行预译码下一拍根据预译码信息修正有效指令范围，同时进行指令码扩展并将指令码及其他信息发送给 IBuffer 模块。当 ICache 查询地址属性发现是 MMIO 地址空间时，IFU 需要将地址发送给 MMIO 处理单元取指令，这个时候处理器进入多周期顺序执行模式，IFU 阻塞流水线直到收到来自 ROB 的提交信号时，IFU 才允许下一个取指令请求的进行，同时 IFU 需要对跨页的 MMIO 地址空间 32 位指令做特殊处理（重发机制）。">
 <meta property="og:title" content="IFU" />
 <meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
 <meta property="og:type" content="website" />
@@ -136,7 +142,7 @@ F2 stage：从icache获取响应数据（缓存行）并校验，提取出异常
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f52e8061f74486f53ca37d0c16a0d38c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a416e15e6305788425a154623775bad6.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -230,59 +236,52 @@ F2 stage：从icache获取响应数据（缓存行）并校验，提取出异常
 <p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
 <h1 id="ifu说明文档"><strong>IFU说明文档</strong></h1>
 <div class="ifu-ctx">
+<h2 id="文档概述">文档概述</h2>
+<p>本文档描述IFU的功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。</p>
+<p>为方便验证参与者，本文档中还额外给出了整体框图和流水级的示意图，以及各个rtl接口的详细说明。此外，本文档还给出了两个时序示例。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
 <thead>
 <tr>
-<th>缩写</th>
-<th>全称</th>
+<th>名称</th>
 <th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>RVC</td>
-<td>RISC-V Compressed Instructions</td>
+<td>RVC（RISC-V Compressed Instructions）</td>
 <td>RISC-V 手册&quot;C&quot;扩展规定的 16 位长度压缩指令</td>
 </tr>
 <tr>
-<td>RVI</td>
-<td>RISC-V Integer Instructions</td>
+<td>RVI（RISC-V Integer Instructions）</td>
 <td>RISC-V 手册规定的 32 位基本整型指令</td>
 </tr>
 <tr>
-<td>IFU</td>
-<td>Instruction Fetch Unit</td>
+<td>IFU（Instruction Fetch Unit）</td>
 <td>取指令单元</td>
 </tr>
 <tr>
-<td>FTQ</td>
-<td>Fetch Target Queue</td>
+<td>FTQ（Fetch Target Queue）</td>
 <td>取指目标队列</td>
 </tr>
 <tr>
-<td>ICache</td>
-<td>L1 Instruction Cache</td>
+<td>ICache（L1 Instruction Cache）</td>
 <td>一级指令缓存</td>
 </tr>
 <tr>
-<td>IBuffer</td>
-<td>Instruction Buffer</td>
+<td>IBuffer（Instruction Buffer）</td>
 <td>指令缓冲</td>
 </tr>
 <tr>
-<td>CFI</td>
-<td>Control Flow Instruction</td>
+<td>CFI（Control Flow Instruction）</td>
 <td>控制流指令</td>
 </tr>
 <tr>
-<td>ITLB</td>
-<td>Instruction Translation Lookaside Buffer</td>
+<td>ITLB（Instruction Translation Lookaside Buffer）</td>
 <td>指令地址转译后备缓冲器</td>
 </tr>
 <tr>
-<td>InstrUncache</td>
-<td>Instruction Ucache Module</td>
+<td>InstrUncache（Instruction Ucache Module）</td>
 <td>指令 MMIO 取指处理单元</td>
 </tr>
 </tbody>
@@ -1078,7 +1077,7 @@ F2 stage：从icache获取响应数据（缓存行）并校验，提取出异常
 </thead>
 <tbody>
 <tr>
-<td>5.8.1</td>
+<td>5.8</td>
 <td>IFU_PREDCHECK_TARGETS</td>
 <td>TARGETS</td>
 <td>随机提供译码信息，检测生成的跳转目标和顺序目标。</td>
@@ -1153,46 +1152,10 @@ F2 stage：从icache获取响应数据（缓存行）并校验，提取出异常
 <p>在F3，根据是否有跨预测块RVI标识来决定选用哪种作为最终的指令有效向量，如果f3_lastHalf_valid为高则选择后一种（即这个预测块第一个2字节不是指令的开始）。IFU所做的处理只是把这条指令算在第一个预测块里，而把第二个预测块的起始地址位置的2字节通过改变指令有效向量来无效掉。</p>
 <h4 id="71-跨预测块32位指令处理">7.1. 跨预测块32位指令处理</h4>
 <p>如果发现当前预测块的最后两个字节是一条RVI指令的开始，则设置一个标识f3_lastHalf_valid，告诉接下来的预测块含有后半条指令。</p>
-<p>我们没有办法直接观察到这个标识，但是可以通过下一预测块来判定：</p>
-<table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>7.1.1</td>
-<td>IFU_CROSS_BLOCK</td>
-<td>NORMAL</td>
-<td>连续传入两个预测块，其中有一条32位指令跨两个预测块，后一个预测块的指令开始向量的首位应该为False</td>
-</tr>
-</tbody>
-</table>
+<p>我们没有办法直接观察到这个标识，但是可以通过下一预测块的开始向量的首位来判断。</p>
 <h4 id="72-跨预测块指令误判">7.2. 跨预测块指令误判</h4>
 <p>但是，如果这一判断出现问题（比如当前预测块存在跳转），则需要进行流水线冲刷。</p>
-<p>这一功能需要PredChecker子模块“配合”（仅仅通过外部IO的修改很难触发这个防御机制），实现起来比较麻烦，但是还是列举一个测试点：</p>
-<table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>7.2.1</td>
-<td>IFU_CROSS_BLOCK</td>
-<td>ERROR</td>
-<td>当IFU根据PredChecker修复的指令有效范围错判了跨预测块指令时，需要将F3以外的流水级全部冲刷</td>
-</tr>
-</tbody>
-</table>
+<p>这一功能需要PredChecker子模块“配合”（仅仅通过外部IO的修改很难触发这个防御机制），实现起来比较麻烦，但是还是列举一个测试点（见后文总表）</p>
 <h3 id="8-将指令码和前端信息送入ibufferf3流水级">8. 将指令码和前端信息送入IBuffer（F3流水级）</h3>
 <p>F3流水级最终得到经过扩展的32位指令码（或者对于非法指令直接传递原始指令码），以及16条指令中每条指令的例外信息、
 预译码信息、FTQ队列中的指针位置、其他后端需要的信息（比如经过折叠的PC）等。IFU除了常规的valid-ready控制信号外，
@@ -2133,7 +2096,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </thead>
 <tbody>
 <tr>
-<td>1.1</td>
+<td>1</td>
 <td><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/#1-接收ftq取指令请求f0流水级">IFU_RCV_REQ</a></td>
 <td>READY</td>
 <td>IFU接收FTQ请求后，设置ready</td>
@@ -2505,7 +2468,7 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <td>构造存在有效跳转指令的预测块和预测跳转但跳转目标计算错误的预测信息作为输入，测试PredChecker能否检出目标地址预测错误</td>
 </tr>
 <tr>
-<td>5.8.1</td>
+<td>5.8</td>
 <td><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/#58-生成跳转和顺序目标">IFU_PREDCHECK_TARGETS</a></td>
 <td>TARGETS</td>
 <td>随机提供译码信息，检测生成的跳转目标和顺序目标。</td>
@@ -2547,13 +2510,13 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 <td>预测请求中存在跳转目标错误，需要冲刷流水线</td>
 </tr>
 <tr>
-<td>7.1.1</td>
+<td>7.1</td>
 <td><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/#71-跨预测块32位指令处理">IFU_CROSS_BLOCK</a></td>
 <td>NORMAL</td>
 <td>连续传入两个预测块，其中有一条32位指令跨两个预测块，后一个预测块的指令开始向量的首位应该为False</td>
 </tr>
 <tr>
-<td>7.2.1</td>
+<td>7.2</td>
 <td>IFU_CROSS_BLOCK</td>
 <td>ERROR</td>
 <td>当IFU根据PredChecker修复的指令有效范围错判了跨预测块指令时，需要将F3以外的流水级全部冲刷</td>
@@ -3427,8 +3390,8 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tbody>
 </table>
 <h3 id="功能点4-更新指令有效范围向量和预测跳转的指令">功能点4 更新指令有效范围向量和预测跳转的指令</h3>
-<p>PredChecker在检查出Jal/Ret指令预测错误时，需要重新生成指令有效范围向量，
-有效范围截取到Jal/Ret指令的位置，之后的bit全部置为0。
+<p>PredChecker在检查出Jal/Ret/Jalr指令预测错误时，需要重新生成指令有效范围向量，
+有效范围截取到Jal/Ret/Jalr指令的位置，之后的bit全部置为0。
 同时，还需要根据每条指令的预译码信息和BPU的预测信息修复预测跳转的结果。</p>
 <p>所以，根据功能要求，我们可以划分出三类情况，分别是预测的有效范围和取用的跳转指令正确的情况，
 由于RET和JAL预测错误引起的有效范围偏大和错判非跳转指令和无效指令引起的有效范围偏小。</p>
@@ -3448,8 +3411,8 @@ io_toIbuffer_bits_valid（表示指令是否是一条指令的开始）、io_toI
 </tr>
 <tr>
 <td>4.2</td>
-<td>RET和JAL预测错误引起的范围偏大</td>
-<td>如果检测到了JAL或RET类的预测错误，PredChecker应该将有效指令的范围修正为预测块开始至第一条跳转指令。同时，应该将预测跳转的指令位置修正为预测块中的第一条跳转指令。</td>
+<td>RET、JAL、JALR预测错误引起的范围偏大</td>
+<td>如果检测到了JAL、RET、JALR类的预测错误，PredChecker应该将有效指令的范围修正为预测块开始至第一条跳转指令。同时，应该将预测跳转的指令位置修正为预测块中的第一条跳转指令。</td>
 </tr>
 <tr>
 <td>4.3</td>

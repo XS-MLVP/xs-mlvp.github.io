@@ -26,12 +26,14 @@
 【必填项】 在该部分对整个文档进行简约描述，例如内容概述，待验证模块的基本功能、特殊需求、特定规格、目标读者、知识前置等。目的是通过对该部分，读者便了解是否具有其感兴趣的内容。例如本文档是对验证文档的编写要求进行描述，便于多文档协作，规范验证的数据输入，特定数据标签等。
 术语说明 术语说明标题请用二号标题格式（两个#）。
 【必填项】 该部分需要列出术语和关键概念解释，方便读者参考。
-优先解释模块专有缩写（如TLB， FIFO等） 对容易混淆的概念请务必明确（如虚拟地址和物理地址等） 示例格式如下： 缩写 全称 定义 TLB Translation Lookaside Buffer 地址转换的缓存单元，用于加速虚拟地址到物理的转换 FIFO First In First Out 先进先出队列 QoS Quality of Service 服务质量，用于总线仲裁中优先级控制机制 如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。
+优先解释模块专有缩写（如TLB， FIFO等），且用缩写（全名）的格式填写在“名称”一栏中。 对容易混淆的概念请务必明确（如虚拟地址和物理地址等） 示例格式如下： 名称 定义 TLB（Translation Lookaside Buffer） 地址转换的缓存单元，用于加速虚拟地址到物理的转换 FIFO（First In First Out） 先进先出队列 写回 发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置 如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。
 前置知识 前置知识标题请用二号标题格式（两个#）。
 【可选项】 在阅读文档或进行验证之前，建议掌握一些关键前置知识，以便更深入理解相关内容。例如，在撰写LoadStoreQueue（LSQ）文档时，讲述RAW（Read After Write）违例有助于理解操作之间的依赖关系。在撰写Icache或L2Cache文档时，介绍缓存层级、替换策略和一致性模型等基本概念也有助于读者理解。如果涉及复杂算法，也应对其进行简要描述。
 基本要求：
 该部分内容应简洁，易于理解。如篇幅较长，可将内容移至附录。 针对较为复杂的内容，可以通过图像、伪代码和案例进行解释，以降低理解难度。 下面是一个举例：
-st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。">
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
 <meta property="og:title" content="验证文档规范" />
 <meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
 <meta property="og:type" content="website" />
@@ -140,7 +142,7 @@ st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f52e8061f74486f53ca37d0c16a0d38c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a416e15e6305788425a154623775bad6.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -164,7 +166,7 @@ st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.f52e8061f74486f53ca37d0c16a0d38c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a416e15e6305788425a154623775bad6.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -262,9 +264,17 @@ st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执�
   <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="td-sidebar-nav-active-item">验证文档规范</span></a></label>
   
   <ul class="ul-3 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-li">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard00_template"><span class="">FIFO文档模板</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"/>
   <label for="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo"><span class="">FIFO文档案例</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/02_nutshell/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell"><span class="">果壳Cache文档案例</span></a></label>
   
 </li>
   </ul>
@@ -443,33 +453,29 @@ st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执�
 <p>术语说明标题请用二号标题格式（两个#）。</p>
 <p><strong>【必填项】</strong> 该部分需要列出术语和关键概念解释，方便读者参考。</p>
 <ol>
-<li>优先解释模块专有缩写（如TLB， FIFO等）</li>
+<li>优先解释模块专有缩写（如TLB， FIFO等），且用<code>缩写（全名）</code>的格式填写在“名称”一栏中。</li>
 <li>对容易混淆的概念请务必明确（如虚拟地址和物理地址等）</li>
 <li>示例格式如下：</li>
 </ol>
 <table>
 <thead>
 <tr>
-<th>缩写</th>
-<th>全称</th>
+<th>名称</th>
 <th>定义</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>TLB</td>
-<td>Translation Lookaside Buffer</td>
+<td>TLB（Translation Lookaside Buffer）</td>
 <td>地址转换的缓存单元，用于加速虚拟地址到物理的转换</td>
 </tr>
 <tr>
-<td>FIFO</td>
-<td>First In First Out</td>
+<td>FIFO（First In First Out）</td>
 <td>先进先出队列</td>
 </tr>
 <tr>
-<td>QoS</td>
-<td>Quality of Service</td>
-<td>服务质量，用于总线仲裁中优先级控制机制</td>
+<td>写回</td>
+<td>发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置</td>
 </tr>
 </tbody>
 </table>
@@ -783,6 +789,7 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>该指令将一个0扩展的非0立即数加到栈指针寄存器x2上，并将结果写入rd'</p>
 <p>其中，nzuimm[5:4|9:6|2|3]的含义是：
 ···</p>
+<p>下方展示了模板和两个验证案例：</p>
 
   <div class="section-index">
     
@@ -790,13 +797,25 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
     <hr class="panel-line">
         <div class="entry">
                 <h5>
+                    <a href="/UnityChipForXiangShan/docs/98_ut/00_standard/00_template/">FIFO文档模板</a>
+                </h5>
+                <p></p>
+            </div>
+        <div class="entry">
+                <h5>
                     <a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/">FIFO文档案例</a>
+                </h5>
+                <p></p>
+            </div>
+        <div class="entry">
+                <h5>
+                    <a href="/UnityChipForXiangShan/docs/98_ut/00_standard/02_nutshell/">果壳Cache文档案例</a>
                 </h5>
                 <p></p>
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 March 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/b8a630146ab23c0f6a90e16935a25ba6d8621d8d">update doc-standard (#101) (b8a6301)</a>
+  最后修改 March 20, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/9d21158a1d1bb5e624c54798e5307a470fa11c11">Nutshell doc examples (#102) (9d21158)</a>
 </div>
 </div>
 
