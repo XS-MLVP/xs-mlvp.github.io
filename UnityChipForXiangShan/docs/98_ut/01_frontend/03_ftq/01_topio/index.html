@@ -1,0 +1,791 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-cn" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/UnityChipForXiangShan/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/UnityChipForXiangShan/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
+
+<title>FTQ顶层 | 万众一芯之香山处理器</title>
+<meta name="description" content="简述 在FTQ概述中，我们已经知道了，FTQ的作用就是多个模块交互的中转站，大致了解了它接受其他模块的哪些信息，它如何接受并存储这些信息在FTQ中，并如何把这些存储信息传递给需要的模块。 下面我们来具体了解一下FTQ与其他模块的交互接口，我们会对这种交互有一个更具体的认识。
+IO一览 模块间IO fromBpu：接受BPU预测结果的接口（BpuToFtqIO） fromIfu：接受IFU预译码写回的接口（IfuToFtqIO） fromBackend：接受后端执行结果和commit信号的接口（CtrlToFtqIO） toBpu：向BPU发送训练信息和重定向信息的接口（FtqToBpuIO） toIfu：向IFU发送取值目标和重定向信息的接口（FtqToIfuIO） toICache：向ICache发送取值目标的接口（FtqToICacheIO) toBackend：向后端发送取值目标的接口（FtqToCtrlIO） toPrefetch：向Prefetch发送取值目标的接口（FtqToPrefetchIO） mmio 其他 上述是主要的IO接口，此外，还有一些用于性能统计的IO接口，比如对BPU预测正确和错误结果次数进行统计，并进行转发的IO, 还有转发BPU各预测器预测信息的IO。
+BpuToFtqIO IfuToFtqIO 我们知道从IFU，我们会得到预译码信息和重定向信息，而后者其实也是从预译码信息中生成。所以从IFU到FTQ的接口主要就是用来传递预译码信息的
+pdWb：IFU向FTQ写回某个FTQ项的预译码信息 接口类型：PredecodeWritebackBundle 信号列表： pc：一个分支预测块覆盖的预测范围内的所有pc 接口类型：Vec(PredictWidth, UInt(VAddrBits.W)) pd：预测范围内所有指令的预译码信息 接口类型：Vec(PredictWidth, new PreDecodeInfo) PreDecodeInfo：每条指令的预译码信息 接口类型：PreDecodeInfo 信号列表： valid：预译码有效信号 接口类型：Bool isRVC：是RVC指令 接口类型：Bool brType：跳转指令类型 接口类型：UInt(2.W) 说明：根据brType的值判断跳转指令类型 b01：对应分支指令 b10：对应jal b11：对应jalr b00：对应非控制流指令 isCall：是Call指令 接口类型：Bool isRet：是Ret指令 接口类型：Bool ftqIdx：FTQ项的索引，标记写回到哪个FTQ项 接口类型：FtqPtr ftqOffset：由BPU预测结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：UInt(log2Ceil(PredictWidth).W) misOffset：预译码发现发生预测错误的指令在指令块中的位置 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) 说明：它的valid信号拉高表示该信号有效，也就说明存在预测错误，会引发重定向 cfiOffset：由预译码结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) target：该指令块的目标地址 接口类型：UInt(VAddrBits.W) 说明：所谓目标地址，即在指令块中有控制流指令时，控制流指令的地址，在没有控制流指令时，指令块顺序执行，该指令块最后一条指令的下一条指令 jalTarget：jal指令的跳转地址 接口类型：UInt(VAddrBits.W) instrRange：有效指令范围 接口类型：Vec(PredictWidth, Bool()) 说明：表示该条指令是不是在这个预测块的有效指令范围内（第一条有效跳转指令之前的指令） CtrlToFtqIO 后端控制块向FTQ发送指令提交信息，后端执行结果的接口。
+rob_commits：一个提交宽度内的RobCommitInfo信息。 接口类型：Vec(CommitWidth, Valid(new RobCommitInfo)) 详情链接：RobCommitInfo redirect：后端提供重定向信息的接口。 接口类型：Valid(new Redirect) 详情链接：Redirect ftqIdxAhead：提前重定向的FTQ指针，将要重定向的FTQ项的指针提前发送 接口类型： Vec(BackendRedirectNum, Valid(new FtqPtr)) 说明：虽然有三个接口，但实际上只用到了第一个接口，后面两个弃用了 ftqIdxSelOH：独热码，本来是依靠该信号从提前重定向ftqIdxAhead中选择一个，但现在只有一个接口了，独热码也只有一位了。 接口类型：Valid(UInt((BackendRedirectNum).">
+<meta property="og:title" content="FTQ顶层" />
+<meta property="og:description" content="简述 在FTQ概述中，我们已经知道了，FTQ的作用就是多个模块交互的中转站，大致了解了它接受其他模块的哪些信息，它如何接受并存储这些信息在FTQ中，并如何把这些存储信息传递给需要的模块。 下面我们来具体了解一下FTQ与其他模块的交互接口，我们会对这种交互有一个更具体的认识。
+IO一览 模块间IO fromBpu：接受BPU预测结果的接口（BpuToFtqIO） fromIfu：接受IFU预译码写回的接口（IfuToFtqIO） fromBackend：接受后端执行结果和commit信号的接口（CtrlToFtqIO） toBpu：向BPU发送训练信息和重定向信息的接口（FtqToBpuIO） toIfu：向IFU发送取值目标和重定向信息的接口（FtqToIfuIO） toICache：向ICache发送取值目标的接口（FtqToICacheIO) toBackend：向后端发送取值目标的接口（FtqToCtrlIO） toPrefetch：向Prefetch发送取值目标的接口（FtqToPrefetchIO） mmio 其他 上述是主要的IO接口，此外，还有一些用于性能统计的IO接口，比如对BPU预测正确和错误结果次数进行统计，并进行转发的IO, 还有转发BPU各预测器预测信息的IO。
+BpuToFtqIO IfuToFtqIO 我们知道从IFU，我们会得到预译码信息和重定向信息，而后者其实也是从预译码信息中生成。所以从IFU到FTQ的接口主要就是用来传递预译码信息的
+pdWb：IFU向FTQ写回某个FTQ项的预译码信息 接口类型：PredecodeWritebackBundle 信号列表： pc：一个分支预测块覆盖的预测范围内的所有pc 接口类型：Vec(PredictWidth, UInt(VAddrBits.W)) pd：预测范围内所有指令的预译码信息 接口类型：Vec(PredictWidth, new PreDecodeInfo) PreDecodeInfo：每条指令的预译码信息 接口类型：PreDecodeInfo 信号列表： valid：预译码有效信号 接口类型：Bool isRVC：是RVC指令 接口类型：Bool brType：跳转指令类型 接口类型：UInt(2.W) 说明：根据brType的值判断跳转指令类型 b01：对应分支指令 b10：对应jal b11：对应jalr b00：对应非控制流指令 isCall：是Call指令 接口类型：Bool isRet：是Ret指令 接口类型：Bool ftqIdx：FTQ项的索引，标记写回到哪个FTQ项 接口类型：FtqPtr ftqOffset：由BPU预测结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：UInt(log2Ceil(PredictWidth).W) misOffset：预译码发现发生预测错误的指令在指令块中的位置 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) 说明：它的valid信号拉高表示该信号有效，也就说明存在预测错误，会引发重定向 cfiOffset：由预译码结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) target：该指令块的目标地址 接口类型：UInt(VAddrBits.W) 说明：所谓目标地址，即在指令块中有控制流指令时，控制流指令的地址，在没有控制流指令时，指令块顺序执行，该指令块最后一条指令的下一条指令 jalTarget：jal指令的跳转地址 接口类型：UInt(VAddrBits.W) instrRange：有效指令范围 接口类型：Vec(PredictWidth, Bool()) 说明：表示该条指令是不是在这个预测块的有效指令范围内（第一条有效跳转指令之前的指令） CtrlToFtqIO 后端控制块向FTQ发送指令提交信息，后端执行结果的接口。
+rob_commits：一个提交宽度内的RobCommitInfo信息。 接口类型：Vec(CommitWidth, Valid(new RobCommitInfo)) 详情链接：RobCommitInfo redirect：后端提供重定向信息的接口。 接口类型：Valid(new Redirect) 详情链接：Redirect ftqIdxAhead：提前重定向的FTQ指针，将要重定向的FTQ项的指针提前发送 接口类型： Vec(BackendRedirectNum, Valid(new FtqPtr)) 说明：虽然有三个接口，但实际上只用到了第一个接口，后面两个弃用了 ftqIdxSelOH：独热码，本来是依靠该信号从提前重定向ftqIdxAhead中选择一个，但现在只有一个接口了，独热码也只有一位了。 接口类型：Valid(UInt((BackendRedirectNum)." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/01_topio/" /><meta property="article:section" content="docs" />
+
+<meta property="article:modified_time" content="2025-03-25T12:58:08+08:00" />
+<meta itemprop="name" content="FTQ顶层">
+<meta itemprop="description" content="简述 在FTQ概述中，我们已经知道了，FTQ的作用就是多个模块交互的中转站，大致了解了它接受其他模块的哪些信息，它如何接受并存储这些信息在FTQ中，并如何把这些存储信息传递给需要的模块。 下面我们来具体了解一下FTQ与其他模块的交互接口，我们会对这种交互有一个更具体的认识。
+IO一览 模块间IO fromBpu：接受BPU预测结果的接口（BpuToFtqIO） fromIfu：接受IFU预译码写回的接口（IfuToFtqIO） fromBackend：接受后端执行结果和commit信号的接口（CtrlToFtqIO） toBpu：向BPU发送训练信息和重定向信息的接口（FtqToBpuIO） toIfu：向IFU发送取值目标和重定向信息的接口（FtqToIfuIO） toICache：向ICache发送取值目标的接口（FtqToICacheIO) toBackend：向后端发送取值目标的接口（FtqToCtrlIO） toPrefetch：向Prefetch发送取值目标的接口（FtqToPrefetchIO） mmio 其他 上述是主要的IO接口，此外，还有一些用于性能统计的IO接口，比如对BPU预测正确和错误结果次数进行统计，并进行转发的IO, 还有转发BPU各预测器预测信息的IO。
+BpuToFtqIO IfuToFtqIO 我们知道从IFU，我们会得到预译码信息和重定向信息，而后者其实也是从预译码信息中生成。所以从IFU到FTQ的接口主要就是用来传递预译码信息的
+pdWb：IFU向FTQ写回某个FTQ项的预译码信息 接口类型：PredecodeWritebackBundle 信号列表： pc：一个分支预测块覆盖的预测范围内的所有pc 接口类型：Vec(PredictWidth, UInt(VAddrBits.W)) pd：预测范围内所有指令的预译码信息 接口类型：Vec(PredictWidth, new PreDecodeInfo) PreDecodeInfo：每条指令的预译码信息 接口类型：PreDecodeInfo 信号列表： valid：预译码有效信号 接口类型：Bool isRVC：是RVC指令 接口类型：Bool brType：跳转指令类型 接口类型：UInt(2.W) 说明：根据brType的值判断跳转指令类型 b01：对应分支指令 b10：对应jal b11：对应jalr b00：对应非控制流指令 isCall：是Call指令 接口类型：Bool isRet：是Ret指令 接口类型：Bool ftqIdx：FTQ项的索引，标记写回到哪个FTQ项 接口类型：FtqPtr ftqOffset：由BPU预测结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：UInt(log2Ceil(PredictWidth).W) misOffset：预译码发现发生预测错误的指令在指令块中的位置 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) 说明：它的valid信号拉高表示该信号有效，也就说明存在预测错误，会引发重定向 cfiOffset：由预译码结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) target：该指令块的目标地址 接口类型：UInt(VAddrBits.W) 说明：所谓目标地址，即在指令块中有控制流指令时，控制流指令的地址，在没有控制流指令时，指令块顺序执行，该指令块最后一条指令的下一条指令 jalTarget：jal指令的跳转地址 接口类型：UInt(VAddrBits.W) instrRange：有效指令范围 接口类型：Vec(PredictWidth, Bool()) 说明：表示该条指令是不是在这个预测块的有效指令范围内（第一条有效跳转指令之前的指令） CtrlToFtqIO 后端控制块向FTQ发送指令提交信息，后端执行结果的接口。
+rob_commits：一个提交宽度内的RobCommitInfo信息。 接口类型：Vec(CommitWidth, Valid(new RobCommitInfo)) 详情链接：RobCommitInfo redirect：后端提供重定向信息的接口。 接口类型：Valid(new Redirect) 详情链接：Redirect ftqIdxAhead：提前重定向的FTQ指针，将要重定向的FTQ项的指针提前发送 接口类型： Vec(BackendRedirectNum, Valid(new FtqPtr)) 说明：虽然有三个接口，但实际上只用到了第一个接口，后面两个弃用了 ftqIdxSelOH：独热码，本来是依靠该信号从提前重定向ftqIdxAhead中选择一个，但现在只有一个接口了，独热码也只有一位了。 接口类型：Valid(UInt((BackendRedirectNum).">
+<meta itemprop="dateModified" content="2025-03-25T12:58:08+08:00" />
+<meta itemprop="wordCount" content="186">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ顶层"/>
+<meta name="twitter:description" content="简述 在FTQ概述中，我们已经知道了，FTQ的作用就是多个模块交互的中转站，大致了解了它接受其他模块的哪些信息，它如何接受并存储这些信息在FTQ中，并如何把这些存储信息传递给需要的模块。 下面我们来具体了解一下FTQ与其他模块的交互接口，我们会对这种交互有一个更具体的认识。
+IO一览 模块间IO fromBpu：接受BPU预测结果的接口（BpuToFtqIO） fromIfu：接受IFU预译码写回的接口（IfuToFtqIO） fromBackend：接受后端执行结果和commit信号的接口（CtrlToFtqIO） toBpu：向BPU发送训练信息和重定向信息的接口（FtqToBpuIO） toIfu：向IFU发送取值目标和重定向信息的接口（FtqToIfuIO） toICache：向ICache发送取值目标的接口（FtqToICacheIO) toBackend：向后端发送取值目标的接口（FtqToCtrlIO） toPrefetch：向Prefetch发送取值目标的接口（FtqToPrefetchIO） mmio 其他 上述是主要的IO接口，此外，还有一些用于性能统计的IO接口，比如对BPU预测正确和错误结果次数进行统计，并进行转发的IO, 还有转发BPU各预测器预测信息的IO。
+BpuToFtqIO IfuToFtqIO 我们知道从IFU，我们会得到预译码信息和重定向信息，而后者其实也是从预译码信息中生成。所以从IFU到FTQ的接口主要就是用来传递预译码信息的
+pdWb：IFU向FTQ写回某个FTQ项的预译码信息 接口类型：PredecodeWritebackBundle 信号列表： pc：一个分支预测块覆盖的预测范围内的所有pc 接口类型：Vec(PredictWidth, UInt(VAddrBits.W)) pd：预测范围内所有指令的预译码信息 接口类型：Vec(PredictWidth, new PreDecodeInfo) PreDecodeInfo：每条指令的预译码信息 接口类型：PreDecodeInfo 信号列表： valid：预译码有效信号 接口类型：Bool isRVC：是RVC指令 接口类型：Bool brType：跳转指令类型 接口类型：UInt(2.W) 说明：根据brType的值判断跳转指令类型 b01：对应分支指令 b10：对应jal b11：对应jalr b00：对应非控制流指令 isCall：是Call指令 接口类型：Bool isRet：是Ret指令 接口类型：Bool ftqIdx：FTQ项的索引，标记写回到哪个FTQ项 接口类型：FtqPtr ftqOffset：由BPU预测结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：UInt(log2Ceil(PredictWidth).W) misOffset：预译码发现发生预测错误的指令在指令块中的位置 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) 说明：它的valid信号拉高表示该信号有效，也就说明存在预测错误，会引发重定向 cfiOffset：由预译码结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) target：该指令块的目标地址 接口类型：UInt(VAddrBits.W) 说明：所谓目标地址，即在指令块中有控制流指令时，控制流指令的地址，在没有控制流指令时，指令块顺序执行，该指令块最后一条指令的下一条指令 jalTarget：jal指令的跳转地址 接口类型：UInt(VAddrBits.W) instrRange：有效指令范围 接口类型：Vec(PredictWidth, Bool()) 说明：表示该条指令是不是在这个预测块的有效指令范围内（第一条有效跳转指令之前的指令） CtrlToFtqIO 后端控制块向FTQ发送指令提交信息，后端执行结果的接口。
+rob_commits：一个提交宽度内的RobCommitInfo信息。 接口类型：Vec(CommitWidth, Valid(new RobCommitInfo)) 详情链接：RobCommitInfo redirect：后端提供重定向信息的接口。 接口类型：Valid(new Redirect) 详情链接：Redirect ftqIdxAhead：提前重定向的FTQ指针，将要重定向的FTQ项的指针提前发送 接口类型： Vec(BackendRedirectNum, Valid(new FtqPtr)) 说明：虽然有三个接口，但实际上只用到了第一个接口，后面两个弃用了 ftqIdxSelOH：独热码，本来是依靠该信号从提前重定向ftqIdxAhead中选择一个，但现在只有一个接口了，独热码也只有一位了。 接口类型：Valid(UInt((BackendRedirectNum)."/>
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/UnityChipForXiangShan/css/prism.css"/>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/UnityChipForXiangShan/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">万众一芯之香山处理器</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.bc5b426aea33aa80fded88bf6b9f2010.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.bc5b426aea33aa80fded88bf6b9f2010.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
+    <div class="td-sidebar-nav__section nav-item dropdown d-block d-lg-none">
+      <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    </ul>
+</div>
+    </div>
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs-li">
+  <a href="/UnityChipForXiangShan/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-unitychipforxiangshandocs"><span class="">进度概述</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-check"/>
+  <label for="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-check"><a href="/UnityChipForXiangShan/docs/00_unitychip_for_xiangshan/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan"><span class="">目标验证单元</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs01_verfiy_env-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs01_verfiy_env-check"/>
+  <label for="m-unitychipforxiangshandocs01_verfiy_env-check"><a href="/UnityChipForXiangShan/docs/01_verfiy_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs01_verfiy_env"><span class="">准备验证环境</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs02_run_test-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs02_run_test-check"/>
+  <label for="m-unitychipforxiangshandocs02_run_test-check"><a href="/UnityChipForXiangShan/docs/02_run_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs02_run_test"><span class="">运行测试</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs03_add_test-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test-check"><a href="/UnityChipForXiangShan/docs/03_add_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs03_add_test"><span class="">添加测试</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test01_build_script-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test01_build_script-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test01_build_script-check"><a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test01_build_script"><span class="">添加编译脚本</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test02_build_env-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test02_build_env-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test02_build_env-check"><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test02_build_env"><span class="">构建测试环境</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test03_add_test-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test03_add_test-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test03_add_test-check"><a href="/UnityChipForXiangShan/docs/03_add_test/03_add_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test03_add_test"><span class="">添加测试用例</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test04_cover_line-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test04_cover_line-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test04_cover_line-check"><a href="/UnityChipForXiangShan/docs/03_add_test/04_cover_line/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test04_cover_line"><span class="">代码覆盖率</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test05_cover_func-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test05_cover_func-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test05_cover_func-check"><a href="/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test05_cover_func"><span class="">功能覆盖率</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs06_join_us-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs06_join_us-check"/>
+  <label for="m-unitychipforxiangshandocs06_join_us-check"><a href="/UnityChipForXiangShan/docs/06_join_us/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs06_join_us"><span class="">如何参与本项目</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs08_template_pr-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs08_template_pr-check"/>
+  <label for="m-unitychipforxiangshandocs08_template_pr-check"><a href="/UnityChipForXiangShan/docs/08_template_pr/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs08_template_pr"><span class="">模板-PR</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs09_template_issue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs09_template_issue-check"/>
+  <label for="m-unitychipforxiangshandocs09_template_issue-check"><a href="/UnityChipForXiangShan/docs/09_template_issue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs09_template_issue"><span class="">模板-ISSUE</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs10_template_ut_readme-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs10_template_ut_readme-check"/>
+  <label for="m-unitychipforxiangshandocs10_template_ut_readme-check"><a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-README</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs95_api-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs95_api-check"/>
+  <label for="m-unitychipforxiangshandocs95_api-check"><a href="/UnityChipForXiangShan/docs/95_api/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs95_api"><span class="">常用API</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs96_others-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs96_others-check"/>
+  <label for="m-unitychipforxiangshandocs96_others-check"><a href="/UnityChipForXiangShan/docs/96_others/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs96_others"><span class="">其他</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs97_constraint-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs97_constraint-check"/>
+  <label for="m-unitychipforxiangshandocs97_constraint-check"><a href="/UnityChipForXiangShan/docs/97_constraint/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs97_constraint"><span class="">必要规范</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut-check"><a href="/UnityChipForXiangShan/docs/98_ut/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut"><span class="">验证文档</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut00_standard-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="">验证文档规范</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard00_template"><span class="">文档模板</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo"><span class="">FIFO文档案例</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/02_nutshell/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell"><span class="">果壳Cache文档案例</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq"><span class="">FTQ概述</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/01_topio/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio"><span class="td-sidebar-nav-active-item">FTQ顶层</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/03_enqfrombpu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu"><span class="">FTQ接收BPU分支预测结果</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/07_redirectfromifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu"><span class="">FTQ接收IFU重定向</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/06_-redirectfrombackend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend"><span class="">FTQ接收后端重定向</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu"><span class="">FTQ向BPU发送更新与重定向信息</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/04_toifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu"><span class="">FTQ向IFU发送取指目标</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/08_tobackend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend"><span class="">FTQ向后端发送取指目标</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/02_subqueue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue"><span class="">FTQ子队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/05_wbfromifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu"><span class="">IFU向FTQ写回预译码信息</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/10_flushptrandstatequeue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue"><span class="">冲刷指针和状态队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/09_wbfromexu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu"><span class="">执行单元修改FTQ状态队列</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu"><span class="">IFU</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder"><span class="">F3PreDecoder</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/05_frontend_trigger/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger"><span class="">FrontendTrigger</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker"><span class="">PredChecker</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode"><span class="">PreDecode</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp"><span class="">RVCExpander</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb"><span class="">ITLB</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/04_io/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io"><span class="">IO接口说明</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/02_func/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func"><span class="">功能详述</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/03_keysignal/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal"><span class="">关键信号说明</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env"><span class="">环境配置</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut02_backend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut02_backend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut02_backend-check"><a href="/UnityChipForXiangShan/docs/98_ut/02_backend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut02_backend"><span class="">Backend</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock"><span class="">Mem Block</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut04_misc-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut04_misc-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut04_misc-check"><a href="/UnityChipForXiangShan/docs/98_ut/04_misc/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut04_misc"><span class="">Misc</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs99_maintain-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs99_maintain-check"/>
+  <label for="m-unitychipforxiangshandocs99_maintain-check"><a href="/UnityChipForXiangShan/docs/99_maintain/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_maintain"><span class="">维护者</span></a></label>
+  
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_ut/01_frontend/03_ftq/01_TopIO.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_ut/01_frontend/03_ftq/01_TopIO.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs/98_ut/01_frontend/03_ftq?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=FTQ%e9%a1%b6%e5%b1%82" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan//issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
+  <a id="print" href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#模块间io">模块间IO</a></li>
+    <li><a href="#其他">其他</a></li>
+  </ul>
+</nav>
+      </div>
+    
+            
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/">进度概述</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/">验证文档</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/">Frontend</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/">FTQ概述</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    FTQ顶层</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>FTQ顶层</h1>
+	
+	<header class="article-meta">
+		
+  </header>
+	<h1 id="简述">简述</h1>
+<p>在FTQ概述中，我们已经知道了，FTQ的作用就是多个模块交互的中转站，大致了解了它接受其他模块的哪些信息，它如何接受并存储这些信息在FTQ中，并如何把这些存储信息传递给需要的模块。
+下面我们来具体了解一下FTQ与其他模块的交互接口，我们会对这种交互有一个更具体的认识。</p>
+<h1 id="io一览">IO一览</h1>
+<h2 id="模块间io">模块间IO</h2>
+<ul>
+<li><strong>fromBpu：接受BPU预测结果的接口（BpuToFtqIO）</strong></li>
+<li><strong>fromIfu：接受IFU预译码写回的接口（IfuToFtqIO）</strong></li>
+<li><strong>fromBackend：接受后端执行结果和commit信号的接口（CtrlToFtqIO）</strong></li>
+<li><strong>toBpu：向BPU发送训练信息和重定向信息的接口（FtqToBpuIO）</strong></li>
+<li><strong>toIfu：向IFU发送取值目标和重定向信息的接口（FtqToIfuIO）</strong></li>
+<li>toICache：向ICache发送取值目标的接口（FtqToICacheIO)</li>
+<li><strong>toBackend：向后端发送取值目标的接口（FtqToCtrlIO）</strong></li>
+<li>toPrefetch：向Prefetch发送取值目标的接口（FtqToPrefetchIO）</li>
+<li>mmio</li>
+</ul>
+<h2 id="其他">其他</h2>
+<p>上述是主要的IO接口，此外，还有一些用于性能统计的IO接口，比如对BPU预测正确和错误结果次数进行统计，并进行转发的IO, 还有转发BPU各预测器预测信息的IO。</p>
+<h1 id="bputoftqiohttpsopen-verifyccxs-bpudocsports02_global_ports"><a href="https://open-verify.cc/xs-bpu/docs/ports/02_global_ports/">BpuToFtqIO</a></h1>
+<h1 id="ifutoftqio">IfuToFtqIO</h1>
+<p>我们知道从IFU，我们会得到预译码信息和重定向信息，而后者其实也是从预译码信息中生成。所以从IFU到FTQ的接口主要就是用来传递预译码信息的</p>
+<ul>
+<li>pdWb：IFU向FTQ写回某个FTQ项的预译码信息
+<ul>
+<li>接口类型：<strong>PredecodeWritebackBundle</strong></li>
+<li>信号列表：
+<ul>
+<li>pc：一个分支预测块覆盖的预测范围内的所有pc
+<ul>
+<li>接口类型：Vec(PredictWidth, UInt(VAddrBits.W))</li>
+</ul>
+</li>
+<li>pd：预测范围内所有指令的预译码信息
+<ul>
+<li>接口类型：Vec(PredictWidth, new PreDecodeInfo)</li>
+<li>PreDecodeInfo：每条指令的预译码信息
+<ul>
+<li>接口类型：PreDecodeInfo</li>
+<li>信号列表：
+<ul>
+<li>valid：预译码有效信号
+<ul>
+<li>接口类型：Bool</li>
+</ul>
+</li>
+<li>isRVC：是RVC指令
+<ul>
+<li>接口类型：Bool</li>
+</ul>
+</li>
+<li>brType：跳转指令类型
+<ul>
+<li>接口类型：UInt(2.W)</li>
+<li>说明：根据brType的值判断跳转指令类型
+<ul>
+<li>b01：对应分支指令</li>
+<li>b10：对应jal</li>
+<li>b11：对应jalr</li>
+<li>b00：对应非控制流指令</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>isCall：是Call指令
+<ul>
+<li>接口类型：Bool</li>
+</ul>
+</li>
+<li>isRet：是Ret指令
+<ul>
+<li>接口类型：Bool</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ftqIdx：FTQ项的索引，标记写回到哪个FTQ项
+<ul>
+<li>接口类型：FtqPtr</li>
+</ul>
+</li>
+<li>ftqOffset：由BPU预测结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令）
+<ul>
+<li>接口类型：UInt(log2Ceil(PredictWidth).W)</li>
+</ul>
+</li>
+<li>misOffset：预译码发现发生预测错误的指令在指令块中的位置
+<ul>
+<li>接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W))</li>
+<li>说明：它的valid信号拉高表示该信号有效，也就说明存在预测错误，会引发重定向</li>
+</ul>
+</li>
+<li>cfiOffset：由预译码结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令）
+<ul>
+<li>接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W))</li>
+</ul>
+</li>
+<li>target：该指令块的目标地址
+<ul>
+<li>接口类型：UInt(VAddrBits.W)</li>
+<li>说明：所谓目标地址，即在指令块中有控制流指令时，控制流指令的地址，在没有控制流指令时，指令块顺序执行，该指令块最后一条指令的下一条指令</li>
+</ul>
+</li>
+<li>jalTarget：jal指令的跳转地址
+<ul>
+<li>接口类型：UInt(VAddrBits.W)</li>
+</ul>
+</li>
+<li>instrRange：有效指令范围
+<ul>
+<li>接口类型：Vec(PredictWidth, Bool())</li>
+<li>说明：表示该条指令是不是在这个预测块的有效指令范围内（第一条有效跳转指令之前的指令）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="ctrltoftqio">CtrlToFtqIO</h1>
+<p>后端控制块向FTQ发送指令提交信息，后端执行结果的接口。</p>
+<ul>
+<li>rob_commits：一个提交宽度内的RobCommitInfo信息。
+<ul>
+<li>接口类型：Vec(CommitWidth, Valid(new RobCommitInfo))</li>
+<li>详情链接：RobCommitInfo</li>
+</ul>
+</li>
+<li>redirect：后端提供重定向信息的接口。
+<ul>
+<li>接口类型：Valid(new Redirect)</li>
+<li>详情链接：Redirect</li>
+</ul>
+</li>
+<li>ftqIdxAhead：提前重定向的FTQ指针，将要重定向的FTQ项的指针提前发送
+<ul>
+<li>接口类型： Vec(BackendRedirectNum, Valid(new FtqPtr))</li>
+<li>说明：虽然有三个接口，但实际上只用到了第一个接口，后面两个弃用了</li>
+</ul>
+</li>
+<li>ftqIdxSelOH：独热码，本来是依靠该信号从提前重定向ftqIdxAhead中选择一个，但现在只有一个接口了，独热码也只有一位了。
+<ul>
+<li>接口类型：Valid(UInt((BackendRedirectNum).W))</li>
+<li>说明：为了实现提前一拍读出在ftq中存储的重定向数据，减少redirect损失，后端会向ftq提前一拍（相对正式的后端redirect信号）传送ftqIdxAhead信号和ftqIdxSelOH信号。</li>
+</ul>
+</li>
+</ul>
+<h1 id="ftqtobpuiohttpsopen-verifyccxs-bpudocsports02_global_ports"><a href="https://open-verify.cc/xs-bpu/docs/ports/02_global_ports/">FtqToBpuIO</a></h1>
+<h1 id="ftqtoicacheio">FtqToICacheIO</h1>
+<p>FTQ向IFU发送取值目标，ICache是指令缓存，如果取值目标在ICache中命中，由ICache将指令发给IFU</p>
+<ul>
+<li>req：FTQ向ICache发送取值目标的请求
+<ul>
+<li>接口类型：Decoupled(new FtqToICacheRequestBundle)</li>
+<li>信号列表：
+<ul>
+<li>pcMemRead：FTQ针对ICache发送的取值目标，ICache通过5个端口同时读取取指目标
+<ul>
+<li>接口类型：Vec(5, new FtqICacheInfo)</li>
+<li>FtqICacheInfo: FTQ针对ICache发送的取值目标
+<ul>
+<li>信号列表：
+<ul>
+<li>ftqIdx：指令块在FTQ中的位置索引
+<ul>
+<li>接口类型：FtqPtr</li>
+</ul>
+</li>
+<li>startAddr：预测块起始地址
+<ul>
+<li>接口类型：UInt(VAddrBits.W)</li>
+</ul>
+</li>
+<li>nextlineStart：起始地址所在cacheline的下一个cacheline的开始地址
+<ul>
+<li>接口类型：UInt(VAddrBits.W)</li>
+</ul>
+</li>
+<li>说明：通过startAddr(blockOffBits - 1)这一位（也就是块内偏移地址的最高位）可以判断该预读取pc地址是位于cacheline的前半块还是后半块，若是前半块，由于取值块大小为cacheline大小的一半，不会发生跨cacheline行</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>readValid: 对应5个pcMemRead是否有效</li>
+<li>backendException：是否有后端异常</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="ftqtoctrlio">FtqToCtrlIO</h1>
+<p>FTQ向后端控制模块转发PC，后端将这些pc存储在本地，之后直接在本地读取这些pc
+<strong>写入后端pc mem</strong></p>
+<ul>
+<li>pc_mem_wen：FTQ向后端pc存储单元pc_mem写使能信号
+<ul>
+<li>接口类型：Output(Bool())</li>
+</ul>
+</li>
+<li>pc_mem_waddr：写入地址
+<ul>
+<li>接口类型：Output(UInt(log2Ceil(FtqSize).W))</li>
+</ul>
+</li>
+<li>pc_mem_wdata：写入数据，是一个指令块的取值目标
+<ul>
+<li>接口类型：Output(new Ftq_RF_Components)，详见FTQ子队列相关介绍
+<strong>写入最新目标</strong></li>
+</ul>
+</li>
+<li>newest_entry_en：是否启用
+<ul>
+<li>接口类型：Output(Bool())</li>
+</ul>
+</li>
+<li>newest_entry_target：最新指令块的跳转目标
+<ul>
+<li>接口类型：Output(UInt(VAddrBits.W))</li>
+</ul>
+</li>
+<li>newest_entry_ptr：最新指令块的索引值
+<ul>
+<li>接口类型： Output(new FtqPtr)</li>
+</ul>
+</li>
+</ul>
+<h1 id="ftqtoprefetchio">FtqToPrefetchIO</h1>
+<ul>
+<li>req：FTQ向Prefetch发送取值目标的请求
+<ul>
+<li>接口类型：FtqICacheInfo</li>
+</ul>
+</li>
+<li>flushFromBPU: 来自BPU的冲刷信息
+<ul>
+<li>接口类型：BpuFlushInfo</li>
+<li>信号列表：
+<ul>
+<li>s2 ：BPU预测结果重定向（注意这种重定向是BPU自己产生的，与其他类型要做区分）发生在s2阶段时，此阶段的分支预测块的索引
+<ul>
+<li>接口类型：Valid(new FtqPtr)</li>
+<li>说明：valid信号有效时，说明此时s2流水级分支预测结果与其s1阶段预测结果不一致，产生s2阶段重定向</li>
+</ul>
+</li>
+<li>s3：BPU预测结果重定向（注意这种重定向是BPU自己产生的，与其他类型要做区分）发生在s3阶段时，此阶段的分支预测块的索引
+<ul>
+<li>接口类型：Valid(new FtqPtr)</li>
+<li>说明：与s2类似</li>
+</ul>
+</li>
+<li>说明：发生预测结果重定向的时候，预取单元和IFU都可能会被冲刷，比如，如果发生s2阶段重定向，FTQ会比较发给IFU req接口中的ftqIdx和s2阶段预测结果的ftqIdx，如果s2阶段的ftqIdx不在req的ftqIdx之后，这意味着，s2阶段产生的预测结果重定向之前的错误预测结果s1阶段预测结果被发给IFU进行取指了，为了消除这种错误，需要向IFU发送s2阶段flush信号。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>backendException：后端执行发生的异常
+<ul>
+<li>接口类型：UInt(ExceptionType.width.W)</li>
+<li>说明：表示后端执行时发生异常的类型，有这样几种类型的异常：</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">none</span><span style="color:#204a87;font-weight:bold">:</span>  <span style="color:#204a87;font-weight:bold">UInt</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;b00&#34;</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">U</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">width</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">W</span><span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">pf</span><span style="color:#204a87;font-weight:bold">:</span>    <span style="color:#204a87;font-weight:bold">UInt</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;b01&#34;</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">U</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">width</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">W</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// instruction page fault
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">gpf</span><span style="color:#204a87;font-weight:bold">:</span>   <span style="color:#204a87;font-weight:bold">UInt</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;b10&#34;</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">U</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">width</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">W</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// instruction guest page fault
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">af</span><span style="color:#204a87;font-weight:bold">:</span>    <span style="color:#204a87;font-weight:bold">UInt</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;b11&#34;</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">U</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">width</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">W</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// instruction access fault
+</span></span></span></code></pre></div>
+	<div class="td-page-meta__lastmod">
+  最后修改 March 25, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0de46c2e520310c3fb2c205d20cc54422f4b6bd4">init FTQ documents (#93) (0de46c2)</a>
+</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2025
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">保留所有权利</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+<script src='/UnityChipForXiangShan/js/prism.js'></script>
+<script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
