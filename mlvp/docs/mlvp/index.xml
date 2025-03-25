@@ -7,26 +7,5 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <atom:link href="https://open-verify.cc/mlvp/docs/mlvp/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>快速开始</title>
-      <link>https://open-verify.cc/mlvp/docs/mlvp/quick-start/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://open-verify.cc/mlvp/docs/mlvp/quick-start/</guid>
-      <description>安装 toffee Toffee 是一款基于 Python 的硬件验证框架，旨在帮助用户更加便捷、规范地使用 Python 构建硬件验证环境。它依托于多语言转换工具 picker，该工具能够将硬件设计的 Verilog 代码转换为 Python Package，使得用户可以使用 Python 来驱动并验证硬件设计。&#xA;Toffee 需要的依赖有：&#xA;Python 3.6.8+ Picker 0.9.0+ 当安装好上述依赖后,可通过pip安装toffee：&#xA;pip install pytoffee 或通过以下命令安装最新版本的toffee：&#xA;pip install pytoffee@git+https://github.com/XS-MLVP/toffee@master 或通过以下方式进行本地安装：&#xA;git clone https://github.com/XS-MLVP/toffee.git cd toffee pip install . toffee-test Toffee-test 是一个用于为 Toffee 框架提供测试支持的 Pytest 插件，他为 toffee 框架提供了将测试用例函数标识为 toffee 的测试用例对象，使其可以被 toffee 框架识别并执行;测试用例资源的管理功能;测试报告生成功能，以便于用户编写测试用例。&#xA;通过 pip 安装 toffee-test&#xA;pip install toffee-test 或安装开发版本&#xA;pip install toffee-test@git+https://github.com/XS-MLVP/toffee-test@master 或通过源码安装&#xA;git clone https://github.com/XS-MLVP/toffee-test.git cd toffee-test pip install .</description>
-    </item>
-    <item>
-      <title>编写规范的验证环境</title>
-      <link>https://open-verify.cc/mlvp/docs/mlvp/canonical_env/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://open-verify.cc/mlvp/docs/mlvp/canonical_env/</guid>
-      <description>概述 一个验证任务编写代码的主体工作可以大致分为两部分，验证环境的搭建 和 测试用例的编写。&#xA;验证环境的搭建 旨在完成对待测设计（DUT）的封装，使得验证人员在驱动 DUT 时，不必面临繁杂的接口信号，而是可以直接使用验证环境中提供的高级接口。如果需要编写参考模型，则参考模型也应是验证环境的一部分。&#xA;测试用例的编写 则是测试人员使用验证环境提供的接口，编写一个个测试用例，对 DUT 进行功能验证。&#xA;搭建验证环境是一件相当有挑战的事情，当 DUT 极度复杂，特别是在接口信号繁多的情况下，搭建验证环境的难度会更大。此时，若没有一个统一的规范，验证环境的搭建将会变得混乱不堪，一个人编写的验证环境很难被其他人维护。并且当出现新的验证任务与原有验证任务有交集时，因为原有的验证环境缺乏规范，很难将原有的验证环境复用。&#xA;本节将会介绍一个规范的验证环境所应该具备的特性，这将有助于理解 mlvp 验证环境的搭建流程。&#xA;无法复用的验证代码 以一个简单的加法器为例，该加法器拥有两个输入端口 io_a 和 io_b，一个输出端口 io_sum。 在没有意识到验证代码可能会被用于其他验证任务的情况下，我们可能会编写出这样的驱动代码：&#xA;def exec_add(dut, a, b): dut.io_a.value = a dut.io_b.value = b dut.Step(1) return dut.io_sum.value 上述代码中，我们编写了一个 exec_add 方法，该方法本质上是对加法器加法操作的一次高层封装。拥有 exec_add 方法以后，我们无需再关心如何对加法器的接口信号进行赋值，也无需关心怎样驱动加法器并获取其输出，只需要调用 exec_add 方法即可驱动加法器完成一次加法操作。&#xA;然而，这个驱动函数却有一个很大的弊端，它直接使用了 DUT 的接口信号来与 DUT 进行交互，这也就意味着，这个驱动函数只能用于这个加法器。&#xA;与软件测试不同，在硬件验证中我们每时每刻都能碰到接口结构相同的情况。假设我们拥有另一个具有相同功能的加法器，但其接口信号名称分别是 io_a_0、io_b_0 和 io_sum_0，那么这个驱动函数对这个加法器则直接失效，无法复用。要想驱动，只能重新编写一个新的驱动函数。&#xA;一个加法器尚且如此，倘若我们拿到了一个拥有繁杂接口的 DUT，费尽心思为其编写了驱动代码。当后续发现驱动代码需要迁移至另一个相似结构的接口上时，我们将会面临巨大的工作量。例如出现接口名称改变、部分接口缺少但驱动代码中却有引用，部分接口新增等等一系列的问题。&#xA;出现这种问题的根本原因在于，我们在验证代码中直接对 DUT 的接口信号进行操作，如下图所示，这种做法是不可取的。&#xA;+-----------+ +-----------+ | |--&amp;gt;| | | Test Code | | DUT | | |&amp;lt;--| | +-----------+ +-----------+ 将验证代码与 DUT 进行解耦 为了解决上述问题，我们需要将验证代码与 DUT 进行解耦，使得验证代码不再直接操作 DUT 的接口信号，而是通过一个中间层来与 DUT 进行交互。这个中间层是人为定义的一个接口结构，在 toffee 中，我们将这个中间层定义为 Bundle，下文也将会使用 Bundle 来代指这个中间层。</description>
-    </item>
-    <item>
-      <title>开始新的验证任务</title>
-      <link>https://open-verify.cc/mlvp/docs/mlvp/verification/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://open-verify.cc/mlvp/docs/mlvp/verification/</guid>
-      <description>使用 toffee，你已经可以搭建出一个完整的验证环境，并且方便地去编写测试用例了。然而在实际的业务中，往往无法理解如何开始上手，并最终完成验证任务。实际编写代码后，会遇到无法正确划分 Bundle，无法正确理解 Agent 的高级语义封装，搭建完环境之后不知道做什么等问题。&#xA;在这一节中，将会介绍如何从头开始完成一个新的验证任务，以及如何更好地使用 toffee 来完成验证任务。&#xA;1. 了解待验证设计 拿到一个新的设计后，往往面对的是几十或数百个输入输出信号，如果直接看这些信号，很可能一头雾水，感觉无从下手。在这时，你必须坚信，输入输出信号都是设计人员来定义的，只要能够理解设计的功能，就能够理解这些信号的含义。&#xA;如果设计人员提供了设计文档，那么你可以阅读设计文档，了解设计的功能，并一步步地将功能与输入输出信号对应起来，并且要清楚地理解输入输出信号的时序，以及如何使用这些信号来驱动设计。一般来说，你还需要阅读设计的源代码，来找寻更细节的接口时序问题。&#xA;当大致了解了 DUT 的功能，并明白如何驱动起 DUT 接口之后，你就可以开始搭建验证环境了。&#xA;2. 划分 Bundle 搭建环境的第一件事，就是根据接口的逻辑功能，将其划分为若干个接口集合，我们可以每一个接口集合视作一个 Bundle。划分为的每个 Bundle 都应是独立的，由一个独立的 Agent 来驱动。&#xA;但是，往往实际中的接口是这样的：&#xA;|---------------------- DUT Bundle -------------------------------| |------- Bundle 1 ------| |------ Bundle 2 ------| |-- Bundle 3 --| |-- B1.1 --| |-- B1.2 --| |-- B2.1 --| 那么问题就出现了，例如究竟是应该为 B1.1， B1.2 各自创建一个 Agent，还是应该直接为 Bundle 1 建立一个 Agent 呢？&#xA;这还是取决于接口的逻辑功能，如果需要定义一个独立的请求，这个请求需要对 B1.1 和 B1.2 同时进行操作，那么就应该为 Bundle 1 创建一个 Agent，而不是为 B1.</description>
-    </item>
   </channel>
 </rss>
