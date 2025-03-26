@@ -18,47 +18,51 @@
 <link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
 
 <title>FTQ接收BPU分支预测结果 | 万众一芯之香山处理器</title>
-<meta name="description" content="FTQ接收BPU分支预测结果 文档概述 BPU会将分支预测结果和meta数据发给FTQ。
-从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 。 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
+<meta name="description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
 1.2 允许BPU入队allowBpuIn 重定向发生时，会回滚到之前的状态，新发送的BPU预测信息自然就不需要了。允许BPU入队时不能发生重定向 1.2.1 后端重定向发生 后端重定向发生： 标志：接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向realAhdValid(参见FTQ接收后端重定向一文)，则下一个周期也不允许入队。 1.2.2 IFU重定向发生 IFU重定向发生： 标志：IFU重定向信息生成的两个周期，均不许入队（参见FTQ接收IFU重定向一文了解IFU重定向信息的生成） 只要避免上述两种重定向出现的情况，就可以允许BPU入队,即可以把发送到FTQ的数据，写入FTQ项
 1.3 以BPU预测结果重定向的方式入队 上述的BPU入队方式是一个全新的预测块进队，即BPU分支预测的s1阶段结果入队，此时未发生预测结果重定向。
 当BPU发生预测结果重定向时，只要允许BPU入队allowBpuIn，也可以看作预测结果入队，不过这种入队是覆写队列中已有的FTQ项，没有写入新的指令块。
 BPU预测结果发生重定向的具体标志：fromBpu的resp接口的s2（s2阶段的预测信息）有效，且s2的hasRedirect拉高，表示在s2阶段发生了重定向，s3阶段重定向是一样的。 综合两种形式的BPU入队，这里称之为广义BPU入队方便区分，记为bpu_in_fire，该信号拉高，表明发生广义BPU入队。
 2. 写入FTQ项 之前已经说明过了，FTQ项只是一个抽象的概念，FTQ有很多个子队列组成，它们的项共同构成一个FTQ项，所以，向FTQ中写入FTQ项，实际上就是就是把BPU的预测信息写到对应的FTQ子队列中。
-FTQ主要获取以下信息作为bpu_in_resp">
+FTQ主要获取以下信息作为bpu_in_resp
+bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2.">
 <meta property="og:title" content="FTQ接收BPU分支预测结果" />
-<meta property="og:description" content="FTQ接收BPU分支预测结果 文档概述 BPU会将分支预测结果和meta数据发给FTQ。
-从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 。 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
+<meta property="og:description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
 1.2 允许BPU入队allowBpuIn 重定向发生时，会回滚到之前的状态，新发送的BPU预测信息自然就不需要了。允许BPU入队时不能发生重定向 1.2.1 后端重定向发生 后端重定向发生： 标志：接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向realAhdValid(参见FTQ接收后端重定向一文)，则下一个周期也不允许入队。 1.2.2 IFU重定向发生 IFU重定向发生： 标志：IFU重定向信息生成的两个周期，均不许入队（参见FTQ接收IFU重定向一文了解IFU重定向信息的生成） 只要避免上述两种重定向出现的情况，就可以允许BPU入队,即可以把发送到FTQ的数据，写入FTQ项
 1.3 以BPU预测结果重定向的方式入队 上述的BPU入队方式是一个全新的预测块进队，即BPU分支预测的s1阶段结果入队，此时未发生预测结果重定向。
 当BPU发生预测结果重定向时，只要允许BPU入队allowBpuIn，也可以看作预测结果入队，不过这种入队是覆写队列中已有的FTQ项，没有写入新的指令块。
 BPU预测结果发生重定向的具体标志：fromBpu的resp接口的s2（s2阶段的预测信息）有效，且s2的hasRedirect拉高，表示在s2阶段发生了重定向，s3阶段重定向是一样的。 综合两种形式的BPU入队，这里称之为广义BPU入队方便区分，记为bpu_in_fire，该信号拉高，表明发生广义BPU入队。
 2. 写入FTQ项 之前已经说明过了，FTQ项只是一个抽象的概念，FTQ有很多个子队列组成，它们的项共同构成一个FTQ项，所以，向FTQ中写入FTQ项，实际上就是就是把BPU的预测信息写到对应的FTQ子队列中。
-FTQ主要获取以下信息作为bpu_in_resp" />
+FTQ主要获取以下信息作为bpu_in_resp
+bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/03_enqfrombpu/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-25T12:58:08+08:00" />
+<meta property="article:modified_time" content="2025-03-25T20:39:04+08:00" />
 <meta itemprop="name" content="FTQ接收BPU分支预测结果">
-<meta itemprop="description" content="FTQ接收BPU分支预测结果 文档概述 BPU会将分支预测结果和meta数据发给FTQ。
-从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 。 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
+<meta itemprop="description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
 1.2 允许BPU入队allowBpuIn 重定向发生时，会回滚到之前的状态，新发送的BPU预测信息自然就不需要了。允许BPU入队时不能发生重定向 1.2.1 后端重定向发生 后端重定向发生： 标志：接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向realAhdValid(参见FTQ接收后端重定向一文)，则下一个周期也不允许入队。 1.2.2 IFU重定向发生 IFU重定向发生： 标志：IFU重定向信息生成的两个周期，均不许入队（参见FTQ接收IFU重定向一文了解IFU重定向信息的生成） 只要避免上述两种重定向出现的情况，就可以允许BPU入队,即可以把发送到FTQ的数据，写入FTQ项
 1.3 以BPU预测结果重定向的方式入队 上述的BPU入队方式是一个全新的预测块进队，即BPU分支预测的s1阶段结果入队，此时未发生预测结果重定向。
 当BPU发生预测结果重定向时，只要允许BPU入队allowBpuIn，也可以看作预测结果入队，不过这种入队是覆写队列中已有的FTQ项，没有写入新的指令块。
 BPU预测结果发生重定向的具体标志：fromBpu的resp接口的s2（s2阶段的预测信息）有效，且s2的hasRedirect拉高，表示在s2阶段发生了重定向，s3阶段重定向是一样的。 综合两种形式的BPU入队，这里称之为广义BPU入队方便区分，记为bpu_in_fire，该信号拉高，表明发生广义BPU入队。
 2. 写入FTQ项 之前已经说明过了，FTQ项只是一个抽象的概念，FTQ有很多个子队列组成，它们的项共同构成一个FTQ项，所以，向FTQ中写入FTQ项，实际上就是就是把BPU的预测信息写到对应的FTQ子队列中。
-FTQ主要获取以下信息作为bpu_in_resp">
-<meta itemprop="dateModified" content="2025-03-25T12:58:08+08:00" />
-<meta itemprop="wordCount" content="296">
+FTQ主要获取以下信息作为bpu_in_resp
+bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2.">
+<meta itemprop="dateModified" content="2025-03-25T20:39:04+08:00" />
+<meta itemprop="wordCount" content="294">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ接收BPU分支预测结果"/>
-<meta name="twitter:description" content="FTQ接收BPU分支预测结果 文档概述 BPU会将分支预测结果和meta数据发给FTQ。
-从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 。 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
+<meta name="twitter:description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
 1.2 允许BPU入队allowBpuIn 重定向发生时，会回滚到之前的状态，新发送的BPU预测信息自然就不需要了。允许BPU入队时不能发生重定向 1.2.1 后端重定向发生 后端重定向发生： 标志：接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向realAhdValid(参见FTQ接收后端重定向一文)，则下一个周期也不允许入队。 1.2.2 IFU重定向发生 IFU重定向发生： 标志：IFU重定向信息生成的两个周期，均不许入队（参见FTQ接收IFU重定向一文了解IFU重定向信息的生成） 只要避免上述两种重定向出现的情况，就可以允许BPU入队,即可以把发送到FTQ的数据，写入FTQ项
 1.3 以BPU预测结果重定向的方式入队 上述的BPU入队方式是一个全新的预测块进队，即BPU分支预测的s1阶段结果入队，此时未发生预测结果重定向。
 当BPU发生预测结果重定向时，只要允许BPU入队allowBpuIn，也可以看作预测结果入队，不过这种入队是覆写队列中已有的FTQ项，没有写入新的指令块。
 BPU预测结果发生重定向的具体标志：fromBpu的resp接口的s2（s2阶段的预测信息）有效，且s2的hasRedirect拉高，表示在s2阶段发生了重定向，s3阶段重定向是一样的。 综合两种形式的BPU入队，这里称之为广义BPU入队方便区分，记为bpu_in_fire，该信号拉高，表明发生广义BPU入队。
 2. 写入FTQ项 之前已经说明过了，FTQ项只是一个抽象的概念，FTQ有很多个子队列组成，它们的项共同构成一个FTQ项，所以，向FTQ中写入FTQ项，实际上就是就是把BPU的预测信息写到对应的FTQ子队列中。
-FTQ主要获取以下信息作为bpu_in_resp"/>
+FTQ主要获取以下信息作为bpu_in_resp
+bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2."/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -160,7 +164,7 @@ FTQ主要获取以下信息作为bpu_in_resp"/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c9183e3019415586c24aacfff3252fbc.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a33bc41eecec0446aed624ddb13a8006.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -184,7 +188,7 @@ FTQ主要获取以下信息作为bpu_in_resp"/>
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c9183e3019415586c24aacfff3252fbc.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a33bc41eecec0446aed624ddb13a8006.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -303,52 +307,52 @@ FTQ主要获取以下信息作为bpu_in_resp"/>
   <ul class="ul-3 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-check" checked/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq"><span class="">FTQ概述</span></a></label>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/" title="FTQ概述" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq"><span class="">FTQ</span></a></label>
   
   <ul class="ul-4 foldable">
     <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/01_topio/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio"><span class="">FTQ顶层</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check" checked/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/03_enqfrombpu/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu"><span class="td-sidebar-nav-active-item">FTQ接收BPU分支预测结果</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/07_redirectfromifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu"><span class="">FTQ接收IFU重定向</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/06_-redirectfrombackend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend"><span class="">FTQ接收后端重定向</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu"><span class="">FTQ向BPU发送更新与重定向信息</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/04_toifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu"><span class="">FTQ向IFU发送取指目标</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/08_tobackend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend"><span class="">FTQ向后端发送取指目标</span></a></label>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/01_topio/" title="FTQ顶层" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio"><span class="">01_FTQ顶层</span></a></label>
   
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/02_subqueue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue"><span class="">FTQ子队列</span></a></label>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/02_subqueue/" title="FTQ子队列" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue"><span class="">02_FTQ子队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/03_enqfrombpu/" title="FTQ接收BPU分支预测结果" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu"><span class="td-sidebar-nav-active-item">03_FTQ接收BPU分支预测结果</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/04_toifu/" title="FTQ向IFU发送取指目标" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu"><span class="">04_FTQ向IFU发送取指目标</span></a></label>
   
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/05_wbfromifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu"><span class="">IFU向FTQ写回预译码信息</span></a></label>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/05_wbfromifu/" title="IFU向FTQ写回预译码信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu"><span class="">05_IFU向FTQ写回预译码信息</span></a></label>
   
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/10_flushptrandstatequeue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue"><span class="">冲刷指针和状态队列</span></a></label>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/06_-redirectfrombackend/" title="FTQ接收后端重定向" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend"><span class="">06_FTQ接收后端重定向</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/07_redirectfromifu/" title="FTQ接收IFU重定向" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu"><span class="">07_FTQ接收IFU重定向</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/08_tobackend/" title="FTQ向后端发送取指目标" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend"><span class="">08_FTQ向后端发送取指目标</span></a></label>
   
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/09_wbfromexu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu"><span class="">执行单元修改FTQ状态队列</span></a></label>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/09_wbfromexu/" title="执行单元修改FTQ状态队列" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu"><span class="">09_执行单元修改FTQ状态队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/10_flushptrandstatequeue/" title="冲刷指针和状态队列" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue"><span class="">10_冲刷指针和状态队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" title="FTQ向BPU发送更新与重定向信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu"><span class="">11_FTQ向BPU发送更新与重定向信息</span></a></label>
   
 </li>
   </ul>
@@ -446,7 +450,7 @@ FTQ主要获取以下信息作为bpu_in_resp"/>
   <ul>
     <li><a href="#文档概述">文档概述</a></li>
     <li><a href="#术语说明">术语说明</a></li>
-    <li><a href="#模块功能说明-">模块功能说明 。</a>
+    <li><a href="#模块功能说明">模块功能说明</a>
       <ul>
         <li><a href="#1-新的预测块进队条件">1. 新的预测块进队条件</a></li>
         <li><a href="#2-写入ftq项">2. 写入FTQ项</a></li>
@@ -476,9 +480,9 @@ FTQ主要获取以下信息作为bpu_in_resp"/>
   <li class="breadcrumb-item">
     <a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/">Frontend</a></li>
   <li class="breadcrumb-item">
-    <a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/">FTQ概述</a></li>
+    <a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/">FTQ</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    FTQ接收BPU分支预测结果</li>
+    03_FTQ接收BPU分支预测结果</li>
   </ol>
 </nav>
             
@@ -488,8 +492,7 @@ FTQ主要获取以下信息作为bpu_in_resp"/>
 	<header class="article-meta">
 		
   </header>
-	<h1 id="ftq接收bpu分支预测结果">FTQ接收BPU分支预测结果</h1>
-<h2 id="文档概述">文档概述</h2>
+	<h2 id="文档概述">文档概述</h2>
 <p>BPU会将分支预测结果和meta数据发给FTQ。</p>
 <ul>
 <li>从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。</li>
@@ -527,7 +530,7 @@ FTQ主要获取以下信息作为bpu_in_resp"/>
 </tr>
 </tbody>
 </table>
-<h2 id="模块功能说明-">模块功能说明 。</h2>
+<h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-新的预测块进队条件">1. 新的预测块进队条件</h3>
 <h4 id="11-成功接收数据"><strong>1.1 成功接收数据</strong></h4>
 <h5 id="111-ftq准备好接收信号">1.1.1 FTQ准备好接收信号</h5>
@@ -882,7 +885,7 @@ s3阶段向IFU以及Prefetch的重定向传递与s2阶段的重定向信号传�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 25, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0de46c2e520310c3fb2c205d20cc54422f4b6bd4">init FTQ documents (#93) (0de46c2)</a>
+  最后修改 March 25, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/b0bf1aab187500064c439ec7dfc1cf8a9db745a5">modify ftq doc (#105) (b0bf1aa)</a>
 </div>
 
 </div>
