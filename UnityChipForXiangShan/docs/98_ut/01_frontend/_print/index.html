@@ -129,7 +129,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a33bc41eecec0446aed624ddb13a8006.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.58dbf9d634e9819a876c4135dddad1cd.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -7497,6 +7497,28 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 <h2 id="非法指令判断">非法指令判断</h2>
 <p>RVI指令永远判断为合法。</p>
 <p>对于RVC指令的判定，详细内容参阅20240411的RISCV手册的26.8节表格列出的指令条件。</p>
+<h2 id="常量说明">常量说明</h2>
+<table>
+<thead>
+<tr>
+<th>常量名</th>
+<th>常量值</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XLEN</td>
+<td>64</td>
+<td>通用寄存器位宽，决定指令扩展时使用rv32还是rv64还是rv128</td>
+</tr>
+<tr>
+<td>fLen</td>
+<td>64</td>
+<td>香山支持d扩展，故为64</td>
+</tr>
+</tbody>
+</table>
 <h2 id="rvcexpander接口说明">RVCExpander接口说明</h2>
 <h3 id="输入接口">输入接口</h3>
 <p>fsIsOff：表示CSR是否使能<code>fs.status</code></p>
@@ -7973,12 +7995,12 @@ imm[12|10:5]rs2rs1001imm[4:1|11]1100011BNE</p>
 <tbody>
 <tr>
 <td>1.1</td>
-<td>接收来自 IFU 请求（requestor0、1）</td>
+<td>接收来自 ICache 请求（requestor0、1）</td>
 <td>ITLB 根据请求查找自身缓存 TLBuffer，返回 hit/miss 结果</td>
 </tr>
 <tr>
 <td>1.2</td>
-<td>接收来自 ICache 请求（requestor2）</td>
+<td>接收来自 IFU 请求（requestor2）</td>
 <td>注意此处为阻塞式访问，每次访问后若 miss 应当 reset 后再次访问</td>
 </tr>
 <tr>
@@ -9995,24 +10017,72 @@ imm[12|10:5]rs2rs1001imm[4:1|11]1100011BNE</p>
     
 	<h1 id="pg-281abdcb1782ae5b04b47c9045b8633a">3.4 - 环境配置</h1>
     
-	<h2 id="推荐使用wsl2ubuntu2204gtkwave">推荐使用WSL2+Ubuntu22.04+GTKWave</h2>
-<p>我们推荐Windows10/11用户通过WSL2进行开发，在此给出通过此方法进行环境配置的教程集锦，仅供参考。如环境安装过程中出现任何问题，欢迎在QQ群（群号：<b>976081653</b>）中提出，我们将尽力帮助解决。此页面将收集大家提出的所有环境配置相关问题并提供解决方案，欢迎随时向我们提问！</p>
-<h2 id="1在windows下安装wsl2ubuntu2204">1、在Windows下安装WSL2（Ubuntu22.04）</h2>
+	<h2 id="wsl2ubuntu2204gtkwavewindows用户推荐使用">WSL2+Ubuntu22.04+GTKWave（Windows用户推荐使用）</h2>
+<p>我们推荐 Windows10/11 用户通过 WSL2 进行开发，在此给出通过此方法进行环境配置的教程集锦，仅供参考。如环境安装过程中出现任何问题，欢迎在QQ群（群号：<b>976081653</b>）中提出，我们将尽力帮助解决。此页面将收集大家提出的所有环境配置相关问题并提供解决方案，欢迎随时向我们提问！</p>
+<h3 id="1在-windows-下安装-wsl2ubuntu2204">1、在 Windows 下安装 WSL2（Ubuntu22.04）</h3>
 <p>参考资源：</p>
 <p>&mdash; 微软官方教程：<a href="https://learn.microsoft.com/zh-cn/windows/wsl/install">如何使用 WSL 在 Windows 上安装 Linux</a></p>
 <p>&mdash; 其它资源：<a href="https://blog.csdn.net/HHHBan/article/details/126843786">安装WSL2和Ubuntu22.04版本</a></p>
-<h2 id="2打开wsl换源">2、打开WSL，换源</h2>
+<h3 id="2打开-wsl换源">2、打开 WSL，换源</h3>
 <p>推荐使用清华源：<a href="https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/">清华大学开源软件镜像站-Ubuntu软件仓库</a></p>
-<h2 id="3配置验证环境">3、配置验证环境</h2>
-<p>请参照<a href="https://open-verify.cc/mlvp/docs/quick-start/installer/">开放验证平台学习资源-快速开始-搭建验证环境</a>配置picker环境。</p>
-<h2 id="4使用-gtkwave">4、使用 GTKWave</h2>
-<p>使用<a href="https://co.ccslab.cn/tips/win-gtkwave/">重庆大学硬件综合设计实验文档-Windows原生GTKWave</a>给出的方法，可以通过在WSL中输入 <code>gtkwave.exe wave.fst</code> 打开在Windows下安装的GTKWave。请注意，gtkwave在使用中需要进入fst文件所在文件夹，否则会出现无法
-initialize的情况。</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">cd</span> out
-</span></span><span style="display:flex;"><span>gtkwave.exe <span style="color:#ce5c00;font-weight:bold">{</span>test_name<span style="color:#ce5c00;font-weight:bold">}</span>.fst
-</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> ..
-</span></span></code></pre></div><h2 id="5使用vscode插件live-server查看验证报告">5、使用VSCode插件Live Server查看验证报告</h2>
+<h3 id="3配置验证环境">3、配置验证环境</h3>
+<p>请参照<a href="https://open-verify.cc/mlvp/docs/quick-start/installer/">开放验证平台学习资源-快速开始-搭建验证环境</a>配置环境。</p>
+<p>以下是示例方法：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 基本工具包</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> ~ <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> sudo apt-get update
+</span></span><span style="display:flex;"><span>sudo apt-get install -y build-essential cmake git wget curl lcov autoconf flex bison libgoogle-perftools-dev gcc python3.11 python3.11-dev python3.11-distutils python3-pip python-is-python3
+</span></span><span style="display:flex;"><span>rm -rf /var/lib/apt/lists/*
+</span></span><span style="display:flex;"><span>sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span>curl -sS https://bootstrap.pypa.io/get-pip.py <span style="color:#000;font-weight:bold">|</span> python3.11
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># verilator</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/verilator/verilator.git
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> verilator
+</span></span><span style="display:flex;"><span>git checkout v4.218 <span style="color:#8f5902;font-style:italic"># 4.218为最低需求版本，可自行查看并选择新版本</span>
+</span></span><span style="display:flex;"><span>autoconf <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> ./configure <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> make -j<span style="color:#204a87;font-weight:bold">$(</span>nproc<span style="color:#204a87;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> make install
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> .. <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> rm -rf verilator
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># verible</span>
+</span></span><span style="display:flex;"><span>curl -sS https://github.com/chipsalliance/verible/releases/download/v0.0-3946-g851d3ff4/verible-v0.0-3946-g851d3ff4-linux-static-x86_64.tar.gz -o /tmp/
+</span></span><span style="display:flex;"><span>tar -zxvf /tmp/verible-v0.0-3946-g851d3ff4-linux-static-x86_64.tar.gz -C /tmp/
+</span></span><span style="display:flex;"><span>copy /tmp/verible-v0.0-3946-g851d3ff4/bin/verible-* /usr/local/bin/
+</span></span><span style="display:flex;"><span>sudo chmod +x /usr/local/bin/verible-*
+</span></span><span style="display:flex;"><span>rm /tmp/verible-*
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># pcre2</span>
+</span></span><span style="display:flex;"><span>curl -sS https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.45/pcre2-10.45.tar.gz -o /tmp/
+</span></span><span style="display:flex;"><span>tar -zxvf /tmp/pcre2-10.45.tar.gz -C /tmp/
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> /tmp/pcre2-10.45
+</span></span><span style="display:flex;"><span>./configure --prefix<span style="color:#ce5c00;font-weight:bold">=</span>/usr/local <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> make -j<span style="color:#204a87;font-weight:bold">$(</span>nproc<span style="color:#204a87;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> make install
+</span></span><span style="display:flex;"><span>rm -rf /tmp/pcre2* <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> <span style="color:#204a87">cd</span> ~
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># swig </span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 注意不要使用 apt install swig，将会下载不符合最低要求的版本 4.0.2</span>
+</span></span><span style="display:flex;"><span>curl -sS http://prdownloads.sourceforge.net/swig/swig-4.3.0.tar.gz -o /tmp/
+</span></span><span style="display:flex;"><span>tar -zxvf /tmp/swig-4.3.0.tar.gz -C /tmp/
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> /tmp/swig-4.3.0
+</span></span><span style="display:flex;"><span>./configure --prefix<span style="color:#ce5c00;font-weight:bold">=</span>/usr/local <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> make -j<span style="color:#204a87;font-weight:bold">$(</span>nproc<span style="color:#204a87;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> make install
+</span></span><span style="display:flex;"><span>rm -rf /tmp/swig* <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> <span style="color:#204a87">cd</span> ~
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 更新本地包</span>
+</span></span><span style="display:flex;"><span>apt-get update <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> apt-get -y upgrade
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># picker</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/picker.git --depth<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker
+</span></span><span style="display:flex;"><span>make init <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> make <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> make install
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> .. <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> rm -rf picker
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># UnityChipForXiangShan</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> UnityChipForXiangShan
+</span></span><span style="display:flex;"><span>pip3 install --no-cache-dir -r requirements.txt
+</span></span></code></pre></div><h3 id="4使用-gtkwave-查看波形文件">4、使用 GTKWave 查看波形文件</h3>
+<p>使用<a href="https://co.ccslab.cn/tips/win-gtkwave/">重庆大学硬件综合设计实验文档-Windows原生GTKWave</a>给出的方法，可以通过在WSL中输入 <code>gtkwave.exe wave.fst</code> 打开在 Windows 下安装的 GTKWave。请注意，gtkwave在使用中需要进入 fst 文件所在文件夹，否则会出现无法
+initialize 的情况。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gtkwave.exe /out/<span style="color:#ce5c00;font-weight:bold">{</span>test_name<span style="color:#ce5c00;font-weight:bold">}</span>.fst
+</span></span></code></pre></div><h3 id="5使用-vscode-插件-live-server-查看验证报告">5、使用 VSCode 插件 Live Server 查看验证报告</h3>
 <p>成功安装插件Live Server后，打开文件列表，定位到 <code>/out/report/2025*-itlb-doc-*/index.html</code> 右键并选择 <code>Open With Live Server</code>，之后在浏览器中打开提示的端口（默认为<code>//localhost:5500</code>）即可。</p>
+<h2 id="docker一键部署方案mac用户可用">docker一键部署方案（MAC用户可用）</h2>
+<p>我们提供了 MAC 可用的 docker 环境，已在 Docker Hub 发布，名称为 <code>unitychip-env</code>。安装 Docker Desktop 后在命令行使用以下命令即可获取并打开开发环境。需下载约 500MB 的镜像，展开后约占用 1GB 空间。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker search unitychip-env
+</span></span><span style="display:flex;"><span>docker pull dingjunbi/unitychip-env <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> docker run unitychip-env
+</span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> UnityChipForXiangShan <span style="color:#ce5c00;font-weight:bold">&amp;&amp;</span> git pull
+</span></span></code></pre></div><p><a href="https://docs.docker.com/docker-hub/">Docker Hub使用文档</a></p>
+<p><a href="https://blog.csdn.net/sj349781478/article/details/105267887/">Docker：docker 拉取镜像及查看pull下来的image在哪里</a></p>
 
 </div>
 

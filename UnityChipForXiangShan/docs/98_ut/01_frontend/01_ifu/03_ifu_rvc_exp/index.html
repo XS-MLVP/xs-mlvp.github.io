@@ -25,7 +25,7 @@
 否则对RVC指令，按照手册的约定进行扩展。
 非法指令判断 RVI指令永远判断为合法。
 对于RVC指令的判定，详细内容参阅20240411的RISCV手册的26.8节表格列出的指令条件。
-RVCExpander接口说明 输入接口 fsIsOff：表示CSR是否使能fs.status
+常量说明 常量名 常量值 解释 XLEN 64 通用寄存器位宽，决定指令扩展时使用rv32还是rv64还是rv128 fLen 64 香山支持d扩展，故为64 RVCExpander接口说明 输入接口 fsIsOff：表示CSR是否使能fs.status
 in：传入一个32位数据，其可以是一个完整的RVI指令，也可以是低16位RVC指令&#43;高16位为RVI指令的一半（当然低16位也有可能是RVI指令的后半部分，但是RVCExpander不会区分，可以认为RVCExpander假定传入的32位数据的低16位一定为一条指令的开始）
 输出接口 ill：表示这条指令是否为非法指令
 out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位指令。
@@ -34,7 +34,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.">
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.">
 <meta property="og:title" content="RVCExpander" />
 <meta property="og:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
@@ -43,7 +43,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 否则对RVC指令，按照手册的约定进行扩展。
 非法指令判断 RVI指令永远判断为合法。
 对于RVC指令的判定，详细内容参阅20240411的RISCV手册的26.8节表格列出的指令条件。
-RVCExpander接口说明 输入接口 fsIsOff：表示CSR是否使能fs.status
+常量说明 常量名 常量值 解释 XLEN 64 通用寄存器位宽，决定指令扩展时使用rv32还是rv64还是rv128 fLen 64 香山支持d扩展，故为64 RVCExpander接口说明 输入接口 fsIsOff：表示CSR是否使能fs.status
 in：传入一个32位数据，其可以是一个完整的RVI指令，也可以是低16位RVC指令&#43;高16位为RVI指令的一半（当然低16位也有可能是RVI指令的后半部分，但是RVCExpander不会区分，可以认为RVCExpander假定传入的32位数据的低16位一定为一条指令的开始）
 输出接口 ill：表示这条指令是否为非法指令
 out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位指令。
@@ -52,11 +52,11 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2." />
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-26T15:48:16+08:00" />
+<meta property="article:modified_time" content="2025-03-27T16:46:16+08:00" />
 <meta itemprop="name" content="RVCExpander">
 <meta itemprop="description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
@@ -65,7 +65,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 否则对RVC指令，按照手册的约定进行扩展。
 非法指令判断 RVI指令永远判断为合法。
 对于RVC指令的判定，详细内容参阅20240411的RISCV手册的26.8节表格列出的指令条件。
-RVCExpander接口说明 输入接口 fsIsOff：表示CSR是否使能fs.status
+常量说明 常量名 常量值 解释 XLEN 64 通用寄存器位宽，决定指令扩展时使用rv32还是rv64还是rv128 fLen 64 香山支持d扩展，故为64 RVCExpander接口说明 输入接口 fsIsOff：表示CSR是否使能fs.status
 in：传入一个32位数据，其可以是一个完整的RVI指令，也可以是低16位RVC指令&#43;高16位为RVI指令的一半（当然低16位也有可能是RVI指令的后半部分，但是RVCExpander不会区分，可以认为RVCExpander假定传入的32位数据的低16位一定为一条指令的开始）
 输出接口 ill：表示这条指令是否为非法指令
 out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位指令。
@@ -74,9 +74,9 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.">
-<meta itemprop="dateModified" content="2025-03-26T15:48:16+08:00" />
-<meta itemprop="wordCount" content="915">
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.">
+<meta itemprop="dateModified" content="2025-03-27T16:46:16+08:00" />
+<meta itemprop="wordCount" content="925">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RVCExpander"/>
 <meta name="twitter:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
@@ -85,7 +85,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 否则对RVC指令，按照手册的约定进行扩展。
 非法指令判断 RVI指令永远判断为合法。
 对于RVC指令的判定，详细内容参阅20240411的RISCV手册的26.8节表格列出的指令条件。
-RVCExpander接口说明 输入接口 fsIsOff：表示CSR是否使能fs.status
+常量说明 常量名 常量值 解释 XLEN 64 通用寄存器位宽，决定指令扩展时使用rv32还是rv64还是rv128 fLen 64 香山支持d扩展，故为64 RVCExpander接口说明 输入接口 fsIsOff：表示CSR是否使能fs.status
 in：传入一个32位数据，其可以是一个完整的RVI指令，也可以是低16位RVC指令&#43;高16位为RVI指令的一半（当然低16位也有可能是RVI指令的后半部分，但是RVCExpander不会区分，可以认为RVCExpander假定传入的32位数据的低16位一定为一条指令的开始）
 输出接口 ill：表示这条指令是否为非法指令
 out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位指令。
@@ -94,7 +94,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2."/>
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2."/>
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -196,7 +196,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a33bc41eecec0446aed624ddb13a8006.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.58dbf9d634e9819a876c4135dddad1cd.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -220,7 +220,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a33bc41eecec0446aed624ddb13a8006.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.58dbf9d634e9819a876c4135dddad1cd.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -482,6 +482,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
   <ul>
     <li><a href="#指令扩展">指令扩展</a></li>
     <li><a href="#非法指令判断">非法指令判断</a></li>
+    <li><a href="#常量说明">常量说明</a></li>
     <li><a href="#rvcexpander接口说明">RVCExpander接口说明</a>
       <ul>
         <li><a href="#输入接口">输入接口</a></li>
@@ -545,6 +546,28 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 <h2 id="非法指令判断">非法指令判断</h2>
 <p>RVI指令永远判断为合法。</p>
 <p>对于RVC指令的判定，详细内容参阅20240411的RISCV手册的26.8节表格列出的指令条件。</p>
+<h2 id="常量说明">常量说明</h2>
+<table>
+<thead>
+<tr>
+<th>常量名</th>
+<th>常量值</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XLEN</td>
+<td>64</td>
+<td>通用寄存器位宽，决定指令扩展时使用rv32还是rv64还是rv128</td>
+</tr>
+<tr>
+<td>fLen</td>
+<td>64</td>
+<td>香山支持d扩展，故为64</td>
+</tr>
+</tbody>
+</table>
 <h2 id="rvcexpander接口说明">RVCExpander接口说明</h2>
 <h3 id="输入接口">输入接口</h3>
 <p>fsIsOff：表示CSR是否使能<code>fs.status</code></p>
@@ -962,7 +985,7 @@ imm[12|10:5]rs2rs1001imm[4:1|11]1100011BNE</p>
 <p>RVI的SD格式形如：| imm[11:5]| rs2 | rs1 | 011 | imm[4:0] | 0100111 |</p>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 March 26, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/162ce67810b0b2fa87df5894e65a35f007c6d4f0">modify top doc (#106) (162ce67)</a>
+  最后修改 March 27, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/039e7f65fc85f621bf5fa57a3a9364dc46d2e079">update itlb doc (#109) (039e7f6)</a>
 </div>
 
 </div>

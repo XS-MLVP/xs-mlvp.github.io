@@ -32,14 +32,14 @@ rob_commits：一个提交宽度内的RobCommitInfo信息。 接口类型：Vec(
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/01_topio/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-26T15:48:16+08:00" />
+<meta property="article:modified_time" content="2025-03-27T16:46:16+08:00" />
 <meta itemprop="name" content="FTQ顶层">
 <meta itemprop="description" content="简述 在FTQ概述中，我们已经知道了，FTQ的作用就是多个模块交互的中转站，大致了解了它接受其他模块的哪些信息，它如何接受并存储这些信息在FTQ中，并如何把这些存储信息传递给需要的模块。 下面我们来具体了解一下FTQ与其他模块的交互接口，我们会对这种交互有一个更具体的认识。
 IO一览 模块间IO fromBpu：接受BPU预测结果的接口（BpuToFtqIO） fromIfu：接受IFU预译码写回的接口（IfuToFtqIO） fromBackend：接受后端执行结果和commit信号的接口（CtrlToFtqIO） toBpu：向BPU发送训练信息和重定向信息的接口（FtqToBpuIO） toIfu：向IFU发送取值目标和重定向信息的接口（FtqToIfuIO） toICache：向ICache发送取值目标的接口（FtqToICacheIO） toBackend：向后端发送取值目标的接口（FtqToCtrlIO） toPrefetch：向Prefetch发送取值目标的接口（FtqToPrefetchIO） mmio 其他 上述是主要的IO接口，此外，还有一些用于性能统计的IO接口，比如对BPU预测正确和错误结果次数进行统计，并进行转发的IO, 还有转发BPU各预测器预测信息的IO。
 BpuToFtqIO IfuToFtqIO 我们知道从IFU，我们会得到预译码信息和重定向信息，而后者其实也是从预译码信息中生成。所以从IFU到FTQ的接口主要就是用来传递预译码信息的
 pdWb：IFU向FTQ写回某个FTQ项的预译码信息 接口类型：PredecodeWritebackBundle 信号列表： pc：一个分支预测块覆盖的预测范围内的所有pc 接口类型：Vec(PredictWidth, UInt(VAddrBits.W)) pd：预测范围内所有指令的预译码信息 接口类型：Vec(PredictWidth, new PreDecodeInfo) PreDecodeInfo：每条指令的预译码信息 接口类型：PreDecodeInfo 信号列表： valid：预译码有效信号 接口类型：Bool isRVC：是RVC指令 接口类型：Bool brType：跳转指令类型 接口类型：UInt(2.W) 说明：根据brType的值判断跳转指令类型 b01：对应分支指令 b10：对应jal b11：对应jalr b00：对应非控制流指令 isCall：是Call指令 接口类型：Bool isRet：是Ret指令 接口类型：Bool ftqIdx：FTQ项的索引，标记写回到哪个FTQ项 接口类型：FtqPtr ftqOffset：由BPU预测结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：UInt(log2Ceil(PredictWidth).W) misOffset：预译码发现发生预测错误的指令在指令块中的位置 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) 说明：它的valid信号拉高表示该信号有效，也就说明存在预测错误，会引发重定向 cfiOffset：由预译码结果得到的，在该指令块中指令控制流指令的位置（指令控制流指令就是实际发生跳转的指令） 接口类型：ValidUndirectioned(UInt(log2Ceil(PredictWidth).W)) target：该指令块的目标地址 接口类型：UInt(VAddrBits.W) 说明：所谓目标地址，即在指令块中有控制流指令时，控制流指令的地址，在没有控制流指令时，指令块顺序执行，该指令块最后一条指令的下一条指令 jalTarget：jal指令的跳转地址 接口类型：UInt(VAddrBits.W) instrRange：有效指令范围 接口类型：Vec(PredictWidth, Bool()) 说明：表示该条指令是不是在这个预测块的有效指令范围内（第一条有效跳转指令之前的指令） CtrlToFtqIO 后端控制块向FTQ发送指令提交信息，后端执行结果的接口。
 rob_commits：一个提交宽度内的RobCommitInfo信息。 接口类型：Vec(CommitWidth, Valid(new RobCommitInfo)) 详情链接：RobCommitInfo redirect：后端提供重定向信息的接口。 接口类型：Valid(new Redirect) 详情链接：Redirect ftqIdxAhead：提前重定向的FTQ指针，将要重定向的FTQ项的指针提前发送 接口类型： Vec(BackendRedirectNum, Valid(new FtqPtr)) 说明：虽然有三个接口，但实际上只用到了第一个接口，后面两个弃用了 ftqIdxSelOH：独热码，本来是依靠该信号从提前重定向ftqIdxAhead中选择一个，但现在只有一个接口了，独热码也只有一位了。 接口类型：Valid(UInt((BackendRedirectNum).">
-<meta itemprop="dateModified" content="2025-03-26T15:48:16+08:00" />
+<meta itemprop="dateModified" content="2025-03-27T16:46:16+08:00" />
 <meta itemprop="wordCount" content="186">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ顶层"/>
 <meta name="twitter:description" content="简述 在FTQ概述中，我们已经知道了，FTQ的作用就是多个模块交互的中转站，大致了解了它接受其他模块的哪些信息，它如何接受并存储这些信息在FTQ中，并如何把这些存储信息传递给需要的模块。 下面我们来具体了解一下FTQ与其他模块的交互接口，我们会对这种交互有一个更具体的认识。
@@ -148,7 +148,7 @@ rob_commits：一个提交宽度内的RobCommitInfo信息。 接口类型：Vec(
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a33bc41eecec0446aed624ddb13a8006.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.58dbf9d634e9819a876c4135dddad1cd.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -172,7 +172,7 @@ rob_commits：一个提交宽度内的RobCommitInfo信息。 接口类型：Vec(
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a33bc41eecec0446aed624ddb13a8006.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.58dbf9d634e9819a876c4135dddad1cd.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -739,7 +739,7 @@ rob_commits：一个提交宽度内的RobCommitInfo信息。 接口类型：Vec(
 </span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">af</span><span style="color:#204a87;font-weight:bold">:</span>    <span style="color:#204a87;font-weight:bold">UInt</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;b11&#34;</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">U</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">width</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">W</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// instruction access fault
 </span></span></span></code></pre></div>
 	<div class="td-page-meta__lastmod">
-  最后修改 March 26, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/162ce67810b0b2fa87df5894e65a35f007c6d4f0">modify top doc (#106) (162ce67)</a>
+  最后修改 March 27, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/039e7f65fc85f621bf5fa57a3a9364dc46d2e079">update itlb doc (#109) (039e7f6)</a>
 </div>
 
 </div>

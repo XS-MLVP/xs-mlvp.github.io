@@ -50,7 +50,7 @@ case1. 如果第一周期的提前重定向无效，而现在正式重定向有�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/06_-redirectfrombackend/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-26T15:48:16+08:00" />
+<meta property="article:modified_time" content="2025-03-27T16:46:16+08:00" />
 <meta itemprop="name" content="FTQ接收后端重定向">
 <meta itemprop="description" content="文档概述 FTQ重定向信息有两个来源，分别是IFU 和 后端。两者的 重定向接口大致相似，但重定向的过程有一定区别。
 对于重定向，后端有提前重定向机制，为了实现提前一拍读出在ftq中存储的重定向数据，减少redirect损失，后端会向ftq提前一拍（相对正式的后端redirect信号）传送ftqIdxAhead信号和ftqIdxSelOH信号。ftqIdxSelOH信号出现的原因，是早期版本要读多个ftqIdxAhead信号，以独热码的形式选其中一路作为最终确认的提前索引值，但现在只需要从一个端口获取ftqIdx信号了，ftqIdxAhead只能确认这一个端口了。
@@ -66,7 +66,7 @@ ftq_redirect_mem：FTQ会根据后端重定向提供的ftqIdx读出ftq_Redirect_
 case1. 如果第一周期的提前重定向无效，而现在正式重定向有效，则在此时才拉高读有效信号，使用正式重定向接口的ftqIdx作为读取地址，发起读取请求。 case2. 真实提前重定向有效了，此时因为前一个周期已经发起读取请求，此时可以直接从子队列的读端口读出了 第三个周期
 真实提前重定向无效，但至少前一个周期正式重定向发起的读取请求能保证在当前周期从子队列中读出。 3.2 将子队列信息整合到后端重定向信号 处理读取信息 FTQ会将从子队列中读出的信息整合到fromBackendRedirect中。 具体来说：
 重定向redirect接口的CfiUpdateInfo接口直接接收ftq_Redirect_SRAMEntry中的同名信号。 利用fromBackendRedirect中指示的ftqOffset读取指令块预译码信息中实际跳转指令的预译码信息，该ftqOffset为后端执行过后确定的控制流指令在指令块内的偏移。 得到的预译码信息被直接连接到CfiUpdateInfo接口的pd接口中 对于读出的指令块对应的FTB项，我们可以从中得知实际执行时得到的跳转指令，是否在FTB项被预测为跳转指令，或者是被预测为jmp指令，如果是，则cfiUpdateInfo的br_hit接口或者jr_hit接口被拉高，表示对应的分支预测结果正确了。 具体来说：通过发送ftqOffset，ftb项以brIsSaved的方式判断是否br_hit，判断是否jr_hit的方式也是类似的（r_ftb_entry.isJalr &amp;&amp; r_ftb_entry.">
-<meta itemprop="dateModified" content="2025-03-26T15:48:16+08:00" />
+<meta itemprop="dateModified" content="2025-03-27T16:46:16+08:00" />
 <meta itemprop="wordCount" content="112">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ接收后端重定向"/>
 <meta name="twitter:description" content="文档概述 FTQ重定向信息有两个来源，分别是IFU 和 后端。两者的 重定向接口大致相似，但重定向的过程有一定区别。
@@ -184,7 +184,7 @@ case1. 如果第一周期的提前重定向无效，而现在正式重定向有�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a33bc41eecec0446aed624ddb13a8006.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.58dbf9d634e9819a876c4135dddad1cd.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -208,7 +208,7 @@ case1. 如果第一周期的提前重定向无效，而现在正式重定向有�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.a33bc41eecec0446aed624ddb13a8006.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.58dbf9d634e9819a876c4135dddad1cd.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -670,7 +670,7 @@ case1. 如果第一周期的提前重定向无效，而现在正式重定向有�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 26, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/162ce67810b0b2fa87df5894e65a35f007c6d4f0">modify top doc (#106) (162ce67)</a>
+  最后修改 March 27, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/039e7f65fc85f621bf5fa57a3a9364dc46d2e079">update itlb doc (#109) (039e7f6)</a>
 </div>
 
 </div>
