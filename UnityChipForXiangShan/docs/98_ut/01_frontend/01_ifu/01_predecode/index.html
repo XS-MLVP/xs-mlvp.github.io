@@ -70,7 +70,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-27T16:46:16+08:00" />
+<meta property="article:modified_time" content="2025-03-31T10:14:48+08:00" />
 <meta itemprop="name" content="PreDecode">
 <meta itemprop="description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
 所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
@@ -96,7 +96,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
 所以，预译码器接收的输入是： 17 x 2B的初始指令码，这个2字节的初始指令码要么是一条RVC指令，要么是一条RVI指令的前半或后半部分。
 预译码器的输出是：16x4B的拼接指令码；对每个4B指令码，该条指令是否为RVI或RVC指令（RVC指令只考虑该4B的低2B）；对每个4B指令码，该条指令的跳转偏移；两个16位的有效指令开始向量，其中第一种向量假定当前预测块的起始2字节为一条有效指令的开始，而第二种向量假定当前预测块的起始2字节为一条有效RVI指令的结束（但是由于第二种向量的前两位必然为0和1,所以编译优化后，第二种向量实际只有14个信号，表示2-15位；同理，第1种向量的第0位因为恒为1,所以也被优化） 功能介绍 指令码生成">
-<meta itemprop="dateModified" content="2025-03-27T16:46:16+08:00" />
+<meta itemprop="dateModified" content="2025-03-31T10:14:48+08:00" />
 <meta itemprop="wordCount" content="283">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PreDecode"/>
 <meta name="twitter:description" content="子模块：PreDecoder简介 预译码器PreDeocoder接受初始指令码并进行指令码拼接，拼接之后对每个指令码查询预译码表产生预译码信息，预译码信息包括该位置是否是有效指令开始、CFI指令类型、是否是RVC指令、是否是Call指令以及是否是Ret指令。预译码器会产生两种有效指令开始的向量，一种是默认第1个二字节必为有效指令开始，另一种是默认第2个二字节必为有效指令的开始，最终的选择在IFU端做。
@@ -224,7 +224,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.58dbf9d634e9819a876c4135dddad1cd.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -248,7 +248,7 @@ PreDecoder测试点和功能点 功能点1 生成指令码 子模块：PreDecode
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.58dbf9d634e9819a876c4135dddad1cd.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -945,7 +945,7 @@ CFI指令类型（branch/jal/jalr/call/ret）、CFI指令的目标地址计算�
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 March 27, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/039e7f65fc85f621bf5fa57a3a9364dc46d2e079">update itlb doc (#109) (039e7f6)</a>
+  最后修改 March 31, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/73c0bf672f342e1763c0b084a232835dec31c9f8">Fix rvc appendix (#110) (73c0bf6)</a>
 </div>
 
 </div>
