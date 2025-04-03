@@ -52,7 +52,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/05_wbfromifu/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-31T10:14:48+08:00" />
+<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
 <meta itemprop="name" content="IFU向FTQ写回预译码信息">
 <meta itemprop="description" content="文档概述 IFU获取来自BPU的预测信息之后，会执行预译码，并将FTQ项写回FTQ中去。我们会比对FTQ中原BPU预测项和预译码的结果，判断是否有预测错误
 基本流程 预译码写回ftq_pd_mem：
@@ -69,7 +69,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
 5. 综合错误 综合比对预测结果与预译码结果得到的错误信息，与预译码错误直接获得的预测错误，任意一种发生时has_false_hit拉高表示有预测错误，此时，命中状态队列entry_hit_status中写回项的状态置为h_false_hit
 6. 更新写回指针 ifu_wb_valid拉高，表示写回有效，将ifuWbPtr更新为原值加1。
 接口说明 顶层IO 子接口 fromIfu pdWb 测试点总表 序号 功能名称 测试点名称 描述 1 WB_PD WB_PD 向ftq_pd_mem中写回预译码信息 2 UPDATE_COMMITSTATE UPDATE_COMMITSTATE 当预译码信息pdWb有效时，根据预译码信息中每条指令的有效情况和该指令是否在有效范围内，判断指令的提交状态是否可以修改，若可以修改，则将提交状态队列，写回项中的指令状态修改 3.">
-<meta itemprop="dateModified" content="2025-03-31T10:14:48+08:00" />
+<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
 <meta itemprop="wordCount" content="103">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="IFU向FTQ写回预译码信息"/>
 <meta name="twitter:description" content="文档概述 IFU获取来自BPU的预测信息之后，会执行预译码，并将FTQ项写回FTQ中去。我们会比对FTQ中原BPU预测项和预译码的结果，判断是否有预测错误
@@ -188,7 +188,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5a879e7e38b6a2c73489359744029573.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -212,7 +212,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5a879e7e38b6a2c73489359744029573.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -377,6 +377,37 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"/>
   <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" title="FTQ向BPU发送更新与重定向信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu"><span class="">11_FTQ向BPU发送更新与重定向信息</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache"><span class="">ICache</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/05_ctrlunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit"><span class="">CtrlUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/06_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache"><span class="">ICache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/01_iprefetchpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe"><span class="">IPrefetchPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/02_mainpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe"><span class="">MainPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/04_missunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit"><span class="">MissUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/03_waylookup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup"><span class="">WayLookup</span></a></label>
   
 </li>
   </ul>
@@ -687,7 +718,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 31, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/73c0bf672f342e1763c0b084a232835dec31c9f8">Fix rvc appendix (#110) (73c0bf6)</a>
+  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
 </div>
 
 </div>

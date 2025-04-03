@@ -50,7 +50,7 @@ case1. 如果第一周期的提前重定向无效，而现在正式重定向有�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/06_-redirectfrombackend/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-31T10:14:48+08:00" />
+<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
 <meta itemprop="name" content="FTQ接收后端重定向">
 <meta itemprop="description" content="文档概述 FTQ重定向信息有两个来源，分别是IFU 和 后端。两者的 重定向接口大致相似，但重定向的过程有一定区别。
 对于重定向，后端有提前重定向机制，为了实现提前一拍读出在ftq中存储的重定向数据，减少redirect损失，后端会向ftq提前一拍（相对正式的后端redirect信号）传送ftqIdxAhead信号和ftqIdxSelOH信号。ftqIdxSelOH信号出现的原因，是早期版本要读多个ftqIdxAhead信号，以独热码的形式选其中一路作为最终确认的提前索引值，但现在只需要从一个端口获取ftqIdx信号了，ftqIdxAhead只能确认这一个端口了。
@@ -66,7 +66,7 @@ ftq_redirect_mem：FTQ会根据后端重定向提供的ftqIdx读出ftq_Redirect_
 case1. 如果第一周期的提前重定向无效，而现在正式重定向有效，则在此时才拉高读有效信号，使用正式重定向接口的ftqIdx作为读取地址，发起读取请求。 case2. 真实提前重定向有效了，此时因为前一个周期已经发起读取请求，此时可以直接从子队列的读端口读出了 第三个周期
 真实提前重定向无效，但至少前一个周期正式重定向发起的读取请求能保证在当前周期从子队列中读出。 3.2 将子队列信息整合到后端重定向信号 处理读取信息 FTQ会将从子队列中读出的信息整合到fromBackendRedirect中。 具体来说：
 重定向redirect接口的CfiUpdateInfo接口直接接收ftq_Redirect_SRAMEntry中的同名信号。 利用fromBackendRedirect中指示的ftqOffset读取指令块预译码信息中实际跳转指令的预译码信息，该ftqOffset为后端执行过后确定的控制流指令在指令块内的偏移。 得到的预译码信息被直接连接到CfiUpdateInfo接口的pd接口中 对于读出的指令块对应的FTB项，我们可以从中得知实际执行时得到的跳转指令，是否在FTB项被预测为跳转指令，或者是被预测为jmp指令，如果是，则cfiUpdateInfo的br_hit接口或者jr_hit接口被拉高，表示对应的分支预测结果正确了。 具体来说：通过发送ftqOffset，ftb项以brIsSaved的方式判断是否br_hit，判断是否jr_hit的方式也是类似的（r_ftb_entry.isJalr &amp;&amp; r_ftb_entry.">
-<meta itemprop="dateModified" content="2025-03-31T10:14:48+08:00" />
+<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
 <meta itemprop="wordCount" content="112">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ接收后端重定向"/>
 <meta name="twitter:description" content="文档概述 FTQ重定向信息有两个来源，分别是IFU 和 后端。两者的 重定向接口大致相似，但重定向的过程有一定区别。
@@ -184,7 +184,7 @@ case1. 如果第一周期的提前重定向无效，而现在正式重定向有�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5a879e7e38b6a2c73489359744029573.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -208,7 +208,7 @@ case1. 如果第一周期的提前重定向无效，而现在正式重定向有�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5a879e7e38b6a2c73489359744029573.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -373,6 +373,37 @@ case1. 如果第一周期的提前重定向无效，而现在正式重定向有�
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"/>
   <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" title="FTQ向BPU发送更新与重定向信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu"><span class="">11_FTQ向BPU发送更新与重定向信息</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache"><span class="">ICache</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/05_ctrlunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit"><span class="">CtrlUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/06_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache"><span class="">ICache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/01_iprefetchpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe"><span class="">IPrefetchPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/02_mainpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe"><span class="">MainPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/04_missunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit"><span class="">MissUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/03_waylookup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup"><span class="">WayLookup</span></a></label>
   
 </li>
   </ul>
@@ -670,7 +701,7 @@ case1. 如果第一周期的提前重定向无效，而现在正式重定向有�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 31, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/73c0bf672f342e1763c0b084a232835dec31c9f8">Fix rvc appendix (#110) (73c0bf6)</a>
+  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
 </div>
 
 </div>

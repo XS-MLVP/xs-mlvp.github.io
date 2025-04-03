@@ -28,12 +28,12 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/08_tobackend/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-31T10:14:48+08:00" />
+<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
 <meta itemprop="name" content="FTQ向后端发送取指目标">
 <meta itemprop="description" content="文档概述 pc取值目标会发给后端pc mem让他自己进行存储，之后从自己的pc mem取指，此外，最新的FTQ项和对应的跳转目标也会发给后端。
 怎样算是一个最新的FTQ项，BPU最新发送的预测块可以是最新的FTQ项，其次，重定向发生时，需要回滚到发生错误预测之前的状态，从指定的FTQ项开始重新开始预测，预译码等等，这也可以是被更新的最新的FTQ项。
 术语说明 名称 定义 暂无 暂无 模块功能说明 流程 1.发送取值目标到pc mem 发送时机：bpu_in_fire，即BPU向前端发送有效预测信息，或者重定向信息的时候。以此为基础之后的第二个周期，进行发送，通过将toBackend接口的pc_mem_wen设置为true的方式指明开始发送 接口信号列表： pc_mem_wen：设置为true pc_mem_waddr：接收bpu_in_fire那个周期BPU发送的ftqIdx pc_mem_wdata：接收bpu_in_fire那个周期，FTQ读取的ftq_pc_mem中的取指目标 2.更新最新的FTQ项 发送时机： 最新的FTQ项可能是由BPU写入最新预测信息造成的，发送取值目标到pc mem也是因为BPU写入最新预测信息才写入的，如果是这种情况造成的，更新FTQ项和写入pc mem的时机是一致的。 此外发生重定向时，也会进行状态回滚更新FTQ项，标志是后端接口fromBackend的重定向redirect信号有效，或者写入BPU的接口toBPU的redirctFromIFU拉高说明当前有来自IFU的重定向 （注释（可忽略）IFU重定向信号生成有两个周期，可以认为第一个周期预译码信息中missoffset有效说明IFU重定向发生，也可以认为第二个周期redirctFromIFU拉高说明重定向发生，此处取后者）。 同样是向toBackend中写入 接口信号列表： newest_entry_en：前面说的发送时机到来时，再延迟一个周期达到真正的写入时机，这时才拉高信号 newest_entry_ptr：发送时机到来时的newest_entry_ptr，在真正的写入时机写入 newest_entry_target：发送时机到来时的newest_entry_target newest_entry_ptr，newest_entry_target这几个都是同名的内部信号，如之前所说，BPU新的写入，重定向等等都会对最新FTQ项进行新的安排，在相应的文档中，对其生成方式做具体的描述。 接口说明 顶层IO 作用 toBackend 发送取指令目标，让后端进行储存 测试点总表 序号 功能名称 测试点名称 描述 1 SEND_PC_TO_BACKEND SEND_PC 发送取值目标到pc mem 2 SEND_PC_TO_BACKEND UPDATE_NEWEST 更新最新的FTQ项 ">
-<meta itemprop="dateModified" content="2025-03-31T10:14:48+08:00" />
+<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
 <meta itemprop="wordCount" content="51">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ向后端发送取指目标"/>
 <meta name="twitter:description" content="文档概述 pc取值目标会发给后端pc mem让他自己进行存储，之后从自己的pc mem取指，此外，最新的FTQ项和对应的跳转目标也会发给后端。
@@ -140,7 +140,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5a879e7e38b6a2c73489359744029573.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -164,7 +164,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5a879e7e38b6a2c73489359744029573.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -329,6 +329,37 @@
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"/>
   <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" title="FTQ向BPU发送更新与重定向信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu"><span class="">11_FTQ向BPU发送更新与重定向信息</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache"><span class="">ICache</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/05_ctrlunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit"><span class="">CtrlUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/06_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache"><span class="">ICache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/01_iprefetchpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe"><span class="">IPrefetchPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/02_mainpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe"><span class="">MainPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/04_missunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit"><span class="">MissUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/03_waylookup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup"><span class="">WayLookup</span></a></label>
   
 </li>
   </ul>
@@ -561,7 +592,7 @@ newest_entry_ptr，newest_entry_target这几个都是同名的内部信号，如
 </mrs-testpoints>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 31, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/73c0bf672f342e1763c0b084a232835dec31c9f8">Fix rvc appendix (#110) (73c0bf6)</a>
+  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
 </div>
 
 </div>

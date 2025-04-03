@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ICache on 万众一芯之香山处理器</title>
+    <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/</link>
+    <description>Recent content in ICache on 万众一芯之香山处理器</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <atom:link href="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CtrlUnit</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/05_ctrlunit/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/05_ctrlunit/</guid>
+      <description>CtrlUnit 目前 CtrlUnit 主要负责 ECC 校验使能/错误注入等功能。 RegField 案例类和伴生对象的作用，RegReadFn 和 RegWriteFn 案例类和伴生对象的作用。&#xA;通过两个控制寄存器 CSR：eccctrl 和 ecciaddr，来实现错误注入。 在 eccctrlBundle 中，定义 eccctrl 的 ierror、istatus、itarget、inject、enable 域的初始值。 在 ecciaddrBundle 中，定义 ecciaddr 的 paddr 域的初始值。&#xA;mmio-mapped CSR CtrlUnit 内实现了一组 mmio-mapped CSR，连接在 tilelink 总线上，地址可由参数 cacheCtrlAddressOpt 配置，默认地址为0x38022080。总大小为 128B。&#xA;当参数 cacheCtrlAddressOpt 为 None 时，CtrlUnit 不会实例化。此时 ECC 校验使能默认开启，软件不可控制关闭；软件不可控制错误注入。&#xA;目前实现的 CSR 如下：&#xA;64 10 7 4 2 1 0 0x00 eccctrl | WARL | ierror | istatus | itarget | inject | enable | 64 PAddrBits-1 0 0x08 ecciaddr | WARL | paddr | CSR field desp eccctrl enable ECC 错误校验使能，原 sfetchctl(0) 。 注：即使不使能，在 icache 重填时仍会计算 parity，可能会有额外功耗；但如果不计算，则在未使能转换成使能时需要冲刷 icache（否则读出的 parity 有 50%概率是错的）。 eccctrl inject ECC 错误注入使能，写 1 即使能，读恒 0 eccctrl itarget ECC 错误注入目标 0: metaArray</description>
+    </item>
+    <item>
+      <title>ICache</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/06_icache/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/06_icache/</guid>
+      <description>ICache 各种组合数据的宽度以 system verilog/verilog 中的为准。&#xA;IPrefetchPipe 接收来自 FTQ 的预取请求，然后向 MetaArray 和 ITLB 发送请求，再从 ITLB 的响应得到 paddr，之后与 MetaArray 返回的 tag 进行比较得到命中信息，把命中信息、MetaArray ECC 校验信息和 ITLB 信息一并写入 WayLookup，同时进行 PMP 检查。未命中就将信息发送给 MissUnit 处理，MissUnit 通过 TileLink 总线向 L2Cache 发起请求，获取数据后返回给 MetaArray 和 IPrefetchPipe。之后会判断是否 Miss，如果 Miss 则把预取请求发送到 MissUnit，它会通过 TileLink 向 L2 做预取指。 MainPipe 接收来自 FTQ 的取指请求，然后从 WayLookup 获取路命中信息和 ITLB 查询结果，再访问 DataArray。命中后向 replacer 发送 touch 请求，replacer 采用 PLRU 替换策略,接收到 MainPipe 的命中更新，向 MissUnit 提供写入的 waymask。同时进行 PMP 检查，接收 DataArry 返回的数据。对 DataArray 做 ECC 校验，根据 DataArry 和 MetaArry 的校验结果（MetaArray 的校验结果来自 Waylookup）判断是否将错误报告给总线（beu）。之后，如果 DataArry 没有命中，将信息发往 MissUnit 处理。MissUnit 通过 TileLink 总线向 L2Cache 发起请求，获取数据后返回给 DataArray 和 MainPipe。之后就可以将数据返回给 IFU。 MetaArray 存储缓存行的标签（Tag）和 ECC 校验码 使用双 Bank SRAM 结构，支持双线访问（Double-Line），每个 Bank 存储部分元数据。 标签包含物理地址的高位，用于地址匹配。 支持标签 ECC 校验，检测和纠正存储错误。 valid_array 记录每个 Way 的有效状态，Flush 操作会清零 DataArray 存储实际的指令数据块。 数据按 Bank 划分为八个，每个 Bank 宽度为 64 位，支持多 Bank 并行访问。 数据 ECC 校验，分段生成校验码，增强错误检测能力。 支持双线访问，根据地址偏移选择 Bank，单周期可读取 32 字节数据。 冲刷信号有三种：ftqPrefetch.</description>
+    </item>
+    <item>
+      <title>IPrefetchPipe</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/01_iprefetchpipe/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/01_iprefetchpipe/</guid>
+      <description>IPrefetchPipe IPrefetchPipe 为预取的流水线，三级流水设计，负责预取请求的过滤。&#xA;IPrefetchPipe结构示意图&#x9;接收预取请求（s0 阶段）： 从 FTQ 或后端接收预取请求。 发送读请求到 ITLB 和 MetaArray 缓存元数据模块。 地址转换和缓存检查（s1 阶段）： 接收 ITLB 的地址转换结果，处理可能的缺失和重发。 从缓存元数据中读取标签和有效位，检查是否命中。 进行 PMP 权限检查，合并异常信息。 根据情况决定是否发送请求到 WayLookup 模块。 未命中请求处理（s2 阶段）： 检查与 missUnit 的交互，更新命中状态。 对于无异常的未命中请求，向 missUnit 发送请求以获取数据。 控制流水线的推进和刷新，处理可能的阻塞和异常。 S0 流水级 在 S0 流水级，接收来自 FTQ 的预取请求，向 MetaArray 和 ITLB 发送请求。&#xA;接收预取请求：从 FTQ 或后端接收预取请求，提取预取请求的虚拟地址、FTQ 索引、是否为软件预取、是否跨缓存行信、虚拟组索引（s0_req_vSetIdx）和后端的异常信息。 发送请求到 ITLB：将虚拟地址发送到 ITLB 进行地址转换。 发送请求到缓存元数据（Meta SRAM）：将请求发送到缓存的元数据存储器，以便在后续阶段读取缓存标签和有效位。 S1 流水级 软件预取 enqway 持续一拍&amp;hellip;&#xA;接收 ITLB 的响应：从 ITLB 接收地址转换的结果，包括物理地址 paddr、异常类型(af/pf)和特殊情况(pbmt.nc/pbmt.io)。 接收缓存元数据的响应并检查缓存命中：从缓存元数据存储器 MetaArray 读取缓存标签 tag 和有效位，检查预取地址是否在缓存中已存在，命中结果存入 waymask 中。 权限检查：使用 PMP 对物理地址进行权限检查，确保预取操作的合法性。 异常处理和合并：合并来自后端、ITLB、PMP 的异常信息，准备在后续阶段处理。 发送请求到 WayLookup 模块：当条件满足时，将元数据（命中信息 waymask、ITLB 信息 paddr/af/pf）发送到 WayLookup 模块，以便进行后续的缓存访问。 状态机转换：根据当前状态和条件，更新下一个状态。 状态机初始状态为 idle，当 S1 流水级进入新的请求时，首先判断 ITLB 是否缺失，如果缺失，就进入 itlbResend；如果 ITLB 命中但命中信息未入队 WayLookup，就进入 enqWay；如果 ITLB 命中且 WayLookup 入队但 S2 请求未处理完，就进入 enterS2。 在 itlbResend 状态，重发 ITLB 请求，此时占用 ITLB 端口，直至请求回填完成，在回填完成的当拍向 MetaArray 再次发送读请求，回填期间可能发生新的写入，如果 MetaArray 繁忙（正在被写入），就进入metaResend，否则进入 enqWay。 在 metaResend 状态，重发 MetaArray 读请求，发送成功后进入 enqWay。 在 enqWay 状态，尝试将元数据入队 WayLookup，如果 WayLookup 队列已满，就阻塞至 WayLookup 入队成功，另外在 MSHR 发生新的写入时禁止入队，主要是为了防止写入的信息与命中信息所冲突，需要对命中信息进行更新。当成功入队 WayLookup 或者是软件预取时，如果 S2 空闲，就直接进入 idle，否则进入 enterS2。 在 enterS2 状态，尝试将请求流入下一流水级，流入后进入 idle。 IPrefetchPipe S1状态机&#x9;S2 流水级 监控 missUnit 的请求：更新 MSHR 的匹配状态。综合该请求的命中结果、ITLB 异常、PMP 异常、meta 损坏，判断是否需要预取，只有不存在异常时才进行预取。 发送请求到 missUnit：因为同一个预测块可能对应两个 cacheline，所以通过 Arbiter 依次将请求发送至 MissUnit。 命中信息的更新 在 S1 流水级中得到命中信息后，距离命中信息真正在 MainPipe 中被使用要经过两个阶段，分别是在 IPrefetchPipe 中等待入队 WayLookup 阶段和在 WayLookup 中等待出队阶段，在等待期间可能会发生 MSHR 对 Meta/DataArray 的更新，因此需要对 MSHR 的响应进行监听，分为两种情况：</description>
+    </item>
+    <item>
+      <title>MainPipe</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/02_mainpipe/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/02_mainpipe/</guid>
+      <description>MainPipe MainPipe 为 ICache 的主流水，为三级流水设计，负责从 DataArray 中读取数据，pmp 检查，缺失处理，并且将结果返回给 IFU。&#xA;MainPipe结构示意图&#x9;从 WayLookup 获取信息，访问 DataArray 单路（S0 阶段） 在 S0 流水级，从 WayLookup 获取元数据，包括路命中信息和 ITLB 查询结果，访问 DataArray 的单路，如果 DataArray 正在被写或 WayLookup 中没有有效表项，流水线就会阻塞。每次重定向后，FTQ 中同一个请求被同时发送到 MainPipe 和 IPrefetchPipe 中，MainPipe 始终需要等待 IPrefetchPipe 将请求的查询信息写入 WayLookup 后才能向下走，导致了 1 拍重定向延迟，当预取超过取指时，该延迟就会被覆盖。 接收并解析来自 FTQ 的取指请求，提取必要的请求信息，如虚拟地址、缓存组索引、块内偏移、是否为双行读、后端的异常信息。 从 WayLookup 模块获取缓存命中信息和 TLB 信息，包括 waymask、物理标签、虚拟机物理地址、是否为叶节点、 ITLB 异常、ITLB 的 PBMT 信息、缓存元数据的校验码。 访问 DataArray 的单路，如果 DataArray 正在被写或 WayLookup 中没有有效表项，流水线就会阻塞。 每次重定向后，FTQ 中同一个请求被同时发送到 MainPipe 和 IPrefetchPipe 中，MainPipe 始终需要等待 IPrefetchPipe 将请求的查询信息写入 WayLookup 后才能向下走，导致了 1 拍重定向延迟，当预取超过取指时，该延迟就会被覆盖。 接收上一个阶段的信息并进行数据暂存、PMP 检查、从 DataArray 获取读响应异常合并、替换策略更新以及监控 MissUnit（S1 阶段） 寄存并延迟 S0 阶段信息 从 S0 获取的地址、tag、命中方式（waymask）、TLB 异常标志、下一拍要用的数据等，都会在 S1 寄存一拍，保证在流水线停顿时也能维持正确值。 Meta ECC 检查 对 S0 读出的 meta 和其校验码（ECC/Parity）进行比对，判断是否发生错误。如果关闭 parity 功能，则跳过该检查。 更新 replacer 对确定命中的访问请求，进行“touch”更新，标记最近使用过的 way，以便后续替换算法正确运行。 PMP 检查 根据 S0 得到的物理地址（paddr），在 S1 对其进行 PMP 检查，判断是否拥有执行权限、是否为 MMIO 等。在当拍收到响应，将结果寄存到下一流水级进行处理。 需要指出，IPrefetchPipe s1 流水级也会进行 PMP 检查，和此处的检查实际上是完全一样的，分别检查只是为了优化时序（避免 ITLB(reg) -&amp;gt; ITLB.</description>
+    </item>
+    <item>
+      <title>MissUnit</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/04_missunit/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/04_missunit/</guid>
+      <description>子模块：FIFO 一个先入先出的循环队列，目前仅在 MissUnit 中有使用，作为优先队列 priorityFIFO。 按照在 MissUnit 中的实例化，pipe 是默认值 false，hasflush 是 true。 队列的指针都是环形的，分为入队指针（写指针，ent_ptr）和出队指针（读指针，deq_ptr），记录读和写的位置。 两个指针都有对应的 flag 位，当指针超过队列大小时，flag 位会翻转，用以判断是否已经循环。 在入队、出队对应的 fire（valid &amp;amp;&amp;amp; ready） 信号有效时，移动对应的指针。 FIFO 的功能点和测试点 入队操作 队未满，正常入队 当队列未满，且空位不小于一时，可以正常入队，如果从零号位开始入队到最大容量，入队指针的 flag 不会翻转。 io.enq.fire 为高有效，regFiles(enq_ptr.value) = io.enq.bits，enq_ptr.value+1 入队指针移动，入队指针标记位不翻转。 重复以上操作至队满。 队未满，入队后标记位翻转 当队未满，但是空位却是靠近队尾时，入队一位后就到达了队头，入队指针的 flag 会翻转。 队列的容量为 10，入队指针指向 9，队未满。此时如果 io.enq.fire 为高，则 regFiles(9) = io.enq.bits，enq_ptr.value+1（循环队列，加完后 enq_ptr.value=0）入队指针移动，入队指针标记位翻转。 队满，入队就绪信号为低，无法入队 当队满时，(enq_ptr.value === deq_ptr.value) &amp;amp;&amp;amp; (enq_ptr.flag ^ deq_ptr.flag) 为高，io.enq.ready 为低，io.enq.fire 为低无效。 此时入队，入队指针的 value 和 flag 不变。 出队操作 队非空，正常出队 当队列非空时，可以正常出队，如果出队指针不经过最大容量位置，出队指针的 flag 不会翻转。 io.</description>
+    </item>
+    <item>
+      <title>WayLookup</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/03_waylookup/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/03_waylookup/</guid>
+      <description>WayLookup WayLookup 读写结构&#x9;WayLookup 更新结构&#x9;内部是 FIFO 环形队列结构。暂存 IPrefetchPipe 查询 MetaArray 和 ITLB 得到的元数据，以备 MainPipe 使用。同时监听 MSHR 写入 SRAM 的 cacheline，对命中信息进行更新。 通过 readPtr 和 writePtr 来管理读写位置。当有 flush 信号时，读写指针都会被重置。当写入数据时，写指针递增；读取时，读指针递增。需要处理队列的空和满的情况，empty 是读指针等于写指针，而 full 则是两者的值相同且标志位不同。 处理 GPF 的部分，有一个 gpf_entry 寄存器，存储 GPF 的相关信息。当写入的数据包含 GPF 异常时，需要将信息存入 gpf_entry，并记录当前的写指针位置到 gpfPtr。当读取的时候，如果当前读指针的位置与 gpfPtr 匹配，并且 gpf_entry 有效，那么就将 GPF 信息一并输出。 IPrefetchPipe 向其写入 WayLookupInfo 信息（包括 vSetIdx，waymask，ptag，itlb_exception，itlb_pbmt，meta_codes，gpaddr，isForVSnonLeafPTE）。 写入前，需要考虑队列是否已满，以及是否有 GPF 阻塞。如果有 GPF 信息待读取且未被处理，则写入需要等待，防止覆盖 GPF 信息。写入时，如果数据中包含 GPF 异常，就将信息存入 gpf_entry，并更新 gpfPtr。 MainPipe 从其读出 WayLookupInfo 信息。 在读取上，有两种情况：当队列为空但有写请求时，可以直接将写的数据旁路（bypass）给读端口；否则就从 entries 数组中读取对应读指针的数据。同时，如果当前读的位置存在 GPF 信息，就将 GPF 信息一起输出，并在读取后清除有效位。 允许 bypass（当队列为空但有写请求时，可以直接将写的数据旁路给读端口），为了不将更新逻辑的延迟引入到 DataArray 的访问路径上，在 MSHR 有新的写入时禁止出队，MainPipe 的 S0 流水级也需要访问 DataArray，当 MSHR 有新的写入时无法向下走，所以该措施并不会带来额外影响。 MissUnit 向其写入命中信息。 若是命中则将 waymask 更新 ICacheMissResp 信息（包括 blkPaddr，vSetIdx，waymask，data，corrupt）且 meta_codes 也更新，否则 waymask 清零。更新逻辑与 IPrefetchPipe 中相同，见 IPrefetchPipe 子模块文档中的“命中信息的更新”一节。 GPaddr 省面积机制 由于 gpaddr 仅在 guest page fault 发生时有用，并且每次发生 gpf 后前端实际上工作在错误路径上，后端保证会送一个 redirect（WayLookup flush）到前端（无论是发生 gpf 前就已经预测错误/发生异常中断导致的；还是 gpf 本身导致的），因此在 WayLookup 中只需存储 reset/flush 后第一个 gpf 有效时的 gpaddr。对双行请求，只需存储第一个有 gpf 的行的 gpaddr。</description>
+    </item>
+  </channel>
+</rss>

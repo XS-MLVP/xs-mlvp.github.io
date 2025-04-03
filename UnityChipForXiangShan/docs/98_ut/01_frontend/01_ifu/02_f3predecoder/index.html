@@ -42,7 +42,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2025-03-31T10:14:48+08:00" />
+<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
 <meta itemprop="name" content="F3PreDecoder">
 <meta itemprop="description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
 F3PreDecoder功能介绍 CFI指令类型判定 要想确定CFI指令类型，只需要分别尝试匹配JAL、JALR、BR和他们的RVC版本即可，注意，RVC的EBREAK 不应该被视为CFI指令。在匹配的过程中，自然CFI指令的类型就被甄别出来了。在这一步中，我们将所有指令分到如下四类brType中：
@@ -54,7 +54,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 对于类型2，只有不为RVC指令且目的寄存器rd为link寄存器（x1或x5）时，才为Call。
 对于类型3，在RVI指令下，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。 在RVC指令下，对C.JALR指令，为call，对C.JR指令，当rs1为link时，为Ret
 序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.">
-<meta itemprop="dateModified" content="2025-03-31T10:14:48+08:00" />
+<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
 <meta itemprop="wordCount" content="146">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="F3PreDecoder"/>
 <meta name="twitter:description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
@@ -168,7 +168,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5a879e7e38b6a2c73489359744029573.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -192,7 +192,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eeead15d5c085e26deb2014a0c0626ce.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.5a879e7e38b6a2c73489359744029573.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -357,6 +357,37 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"/>
   <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" title="FTQ向BPU发送更新与重定向信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu"><span class="">11_FTQ向BPU发送更新与重定向信息</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache"><span class="">ICache</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/05_ctrlunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit"><span class="">CtrlUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/06_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache"><span class="">ICache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/01_iprefetchpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe"><span class="">IPrefetchPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/02_mainpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe"><span class="">MainPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/04_missunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit"><span class="">MissUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/03_waylookup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup"><span class="">WayLookup</span></a></label>
   
 </li>
   </ul>
@@ -738,7 +769,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 March 31, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/73c0bf672f342e1763c0b084a232835dec31c9f8">Fix rvc appendix (#110) (73c0bf6)</a>
+  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
 </div>
 
 </div>
