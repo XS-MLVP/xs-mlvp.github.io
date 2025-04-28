@@ -19,18 +19,24 @@
 
 <title>工具介绍 | 开放验证平台学习资源</title>
 <meta name="description" content="验证工具的基本使用。">
-<meta property="og:title" content="工具介绍" />
-<meta property="og:description" content="验证工具的基本使用。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/docs/env_usage/picker_usage/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/mlvp/docs/env_usage/picker_usage/">
+  <meta property="og:site_name" content="开放验证平台学习资源">
+  <meta property="og:title" content="工具介绍">
+  <meta property="og:description" content="验证工具的基本使用。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:44:02+08:00">
+    <meta property="article:tag" content="Docs">
 
-<meta property="article:modified_time" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="name" content="工具介绍">
-<meta itemprop="description" content="验证工具的基本使用。">
-<meta itemprop="dateModified" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="wordCount" content="643">
-<meta itemprop="keywords" content="docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="工具介绍"/>
-<meta name="twitter:description" content="验证工具的基本使用。"/>
+  <meta itemprop="name" content="工具介绍">
+  <meta itemprop="description" content="验证工具的基本使用。">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="643">
+  <meta itemprop="keywords" content="Docs">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="工具介绍">
+  <meta name="twitter:description" content="验证工具的基本使用。">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -130,7 +136,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +160,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -380,7 +386,7 @@
 </ol>
 <p><strong>Picker的工作原理</strong><br>
 <code>Picker</code>的主要功能就是将<code>Verilog</code>代码转换为C++或者Python代码，以Chisel开发的处理器为例:先通过Chisel自带的工具将其转换为Verilog代码，再通Picker提供高级编程语言接口。</p>
-<p><img alt="Picker的工作原理" src="Picker_working_principle.svg"></p>
+<p><img src="Picker_working_principle.svg" alt="Picker的工作原理"></p>
 <h2 id="python-模块生成">Python 模块生成</h2>
 <h3 id="生成模块的过程">生成模块的过程</h3>
 <p>Picker 导出 Python Module 的方式是基于 C++ 的。</p>
@@ -393,8 +399,7 @@
 <blockquote>
 <p>Swig 是一个用于将 C/C++ 导出为其他高级语言的工具。该工具会解析 C++ 头文件，并生成对应的中间代码。
 如果希望详细了解生成过程，请参阅 <a href="http://www.swig.org/Doc4.2/SWIGDocumentation.html">Swig 官方文档</a>。
-如果希望知道 Picker 如何生成 C++ Class，请参阅 <a href="docs/quick-start/multi-lang/cpp">C++</a>。</p>
-</blockquote>
+如果希望知道 Picker 如何生成 C++ Class，请参阅 <a href="docs/quick-start/multi-lang/cpp">C++</a>。</p></blockquote>
 <ul>
 <li>该这个模块和标准的 Python 模块一样，可以被其他 Python 程序导入并调用，文件结构也与普通 Python 模块无异。</li>
 </ul>
@@ -578,7 +583,7 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">async</span> <span style="color:#000">RunStep</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">cycle</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">int</span><span style="color:#000;font-weight:bold">)</span>    <span style="color:#8f5902;font-style:italic">#持续推进时钟cycle个时钟，用于最外层</span>
 </span></span></code></pre></div>
 	<div class="td-page-meta__lastmod">
-  最后修改 March 25, 2025: <a href="https://github.com/XS-MLVP/course/commit/1a44bfa239ee57ae2f3162e4a24390caa05f9553">update Toffee document address (1a44bfa)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/d04c617785d261fcdfbe044e537c68a450369c09">Upgrade hugo version to 0.146.7 (d04c617)</a>
 </div>
 
 </div>
@@ -622,7 +627,7 @@
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

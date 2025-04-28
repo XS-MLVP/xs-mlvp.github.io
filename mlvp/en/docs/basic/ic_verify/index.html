@@ -19,21 +19,22 @@
 
 <title>Chip Verification | UnityChip Verification</title>
 <meta name="description" content="Basic concepts of chip verification">
-<meta property="og:title" content="Chip Verification" />
-<meta property="og:description" content="Basic concepts of chip verification
-" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/basic/ic_verify/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/basic/ic_verify/">
+  <meta property="og:site_name" content="UnityChip Verification">
+  <meta property="og:title" content="Chip Verification">
+  <meta property="og:description" content="Basic concepts of chip verification">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:44:02+08:00">
 
-<meta property="article:modified_time" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="name" content="Chip Verification">
-<meta itemprop="description" content="Basic concepts of chip verification
-">
-<meta itemprop="dateModified" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="wordCount" content="3129">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Chip Verification"/>
-<meta name="twitter:description" content="Basic concepts of chip verification
-"/>
+  <meta itemprop="name" content="Chip Verification">
+  <meta itemprop="description" content="Basic concepts of chip verification">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="3129">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Chip Verification">
+  <meta name="twitter:description" content="Basic concepts of chip verification">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -133,7 +134,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -157,7 +158,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -348,7 +349,7 @@ For chip products, design errors that make it to production can be extremely cos
 </p></blockquote>
 <h2 id="chip-verification-process">Chip Verification Process</h2>
 <hr>
-<p><img alt="Position of Verification in Chip Design" src="ic-verify.drawio.svg"></p>
+<p><img src="ic-verify.drawio.svg" alt="Position of Verification in Chip Design"></p>
 <p>The coupling relationship between chip design and verification is shown in the diagram above. Both design and verification have the same input: the specification document. Based on this document, both design and verification teams independently code according to their understanding and requirements. The design team needs to ensure that the RTL code is &ldquo;synthesizable,&rdquo; considering circuit characteristics, while the verification team mainly focuses on whether the functionality meets the requirements, with fewer coding constraints. After both teams complete module development, a sanity test is conducted to check if the functionality matches. If there are discrepancies, collaborative debugging is done to identify and fix issues before retesting. Due to the high coupling between chip design and verification, some companies directly couple their design and verification teams, assigning verification teams to each design submodule. The coupling process in the diagram is coarse-grained, with specific chips (e.g., SoC, DDR) and companies having their cooperation models.</p>
 <p>In the above comparison test, the module produced by the design team is usually called DUT (Design Under Test), while the model developed by the verification team is called RM (Reference Model). The verification process includes: writing a verification plan, creating a verification platform, organizing functional points, constructing test cases, running and debugging, collecting bugs/coverage, regression testing, and writing test reports.</p>
 <blockquote><p>
@@ -408,10 +409,10 @@ Summary: Complex Chip Verification Costs
 <h2 id="crowdsourcing-chip-verification">Crowdsourcing Chip Verification</h2>
 <hr>
 <p>In contrast to hardware, the software field has already made testing outsourcing (subcontracting) a norm to reduce testing costs. This business is highly mature, with a market size in the billions of yuan, advancing towards the trillion-yuan scale. From the content perspective, software testing and hardware verification share significant similarities (different targets with the same system objective). Is it feasible to subcontract hardware verification in the same way as software?</p>
-<p><img alt="Software Outsourcing Market" src="maket_of_soft_test.png"></p>
+<p><img src="maket_of_soft_test.png" alt="Software Outsourcing Market"></p>
 <blockquote><p>
 Crowdsourcing chip verification faces many challenges, such as:
-<p><strong>Small Number of Practitioners：</strong> Compared to the software field, the number of hardware developers is several orders of magnitude smaller. For instance, according to GitHub statistics (<a href="https://madnight.github.io/githut/#/pull_requests/2023/2)">https://madnight.github.io/githut/#/pull_requests/2023/2)</a>, traditional software programming languages (Python, Java, C++, Go) account for nearly 50%, whereas hardware description languages like Verilog account for only 0.076%, reflecting the disparity in developer numbers.</p>
+<p><strong>Small Number of Practitioners：</strong> Compared to the software field, the number of hardware developers is several orders of magnitude smaller. For instance, according to GitHub statistics (<a href="https://madnight.github.io/githut/#/pull_requests/2023/2%29">https://madnight.github.io/githut/#/pull_requests/2023/2)</a>, traditional software programming languages (Python, Java, C++, Go) account for nearly 50%, whereas hardware description languages like Verilog account for only 0.076%, reflecting the disparity in developer numbers.</p>
 <p><strong>Commercial Verification Tools：</strong> The verification tools used in enterprises (simulators, formal verification, data analysis) are almost all commercial tools, which are nearly invisible to ordinary people and difficult to self-learn.</p>
 <p><strong>Lack of Open Learning Materials：</strong> Chip verification involves accessing the chip design source code, which is typically regarded as the company&rsquo;s trade secrets and proprietary technology. Chip design companies may be unwilling to disclose detailed verification processes and techniques, limiting the availability of learning materials.</p>
 </blockquote></p>
@@ -438,7 +439,7 @@ Crowdsourcing chip verification faces many challenges, such as:
 
 
 	<div class="td-page-meta__lastmod">
-  Last modified March 25, 2025: <a href="https://github.com/XS-MLVP/course/commit/1a44bfa239ee57ae2f3162e4a24390caa05f9553">update Toffee document address (1a44bfa)</a>
+  Last modified April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/d04c617785d261fcdfbe044e537c68a450369c09">Upgrade hugo version to 0.146.7 (d04c617)</a>
 </div>
 
 </div>
@@ -482,7 +483,7 @@ Crowdsourcing chip verification faces many challenges, such as:
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

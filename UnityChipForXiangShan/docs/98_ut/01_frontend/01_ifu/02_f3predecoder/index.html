@@ -27,9 +27,11 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 序号 名称 描述 1.1 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 BR判定 对传入的BR指令，应该判定为类型1 1.3 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 JALR判定 对传入的JALR指令，应该判定为类型3 功能点2 ret、call判定 然后，需要判断是否为call或者ret，这可以通过rd和rs的取值来考察。当然，首先必须得满足无条件跳转指令。
 对于类型2，只有不为RVC指令且目的寄存器rd为link寄存器（x1或x5）时，才为Call。
 对于类型3，在RVI指令下，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。 在RVC指令下，对C.JALR指令，为call，对C.JR指令，当rs1为link时，为Ret
-序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.">
-<meta property="og:title" content="F3PreDecoder" />
-<meta property="og:description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
+序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret 测试点汇总 序号 功能 名称 描述 1.1 CFI指令类型判定 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 CFI指令类型判定 BR判定 对传入的BR指令，应该判定为类型1 1.3 CFI指令类型判定 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 CFI指令类型判定 JALR判定 对传入的JALR指令，应该判定为类型3 2.1 ret、call判定 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 ret、call判定 RVI.JAL判定call 对传入的RVC.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 ret、call判定 RVI.JAL例外 对传入的RVC.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 ret、call判定 RVC.JAL不判定 对传入的RVI.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 ret、call判定 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 ret、call判定 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 ret、call判定 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 ret、call判定 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 ret、call判定 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 ret、call判定 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="F3PreDecoder">
+  <meta property="og:description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
 F3PreDecoder功能介绍 CFI指令类型判定 要想确定CFI指令类型，只需要分别尝试匹配JAL、JALR、BR和他们的RVC版本即可，注意，RVC的EBREAK 不应该被视为CFI指令。在匹配的过程中，自然CFI指令的类型就被甄别出来了。在这一步中，我们将所有指令分到如下四类brType中：
 CFI指令类型 brType类型编码 非CFI 00 branch指令 01 jal指令 10 jalr指令 11 ret、call判定 然后，我们需要判断是否为call或者ret，这可以通过rd和rs的取值来考察，具体来说，RISCV的RVI指令中，提供了对rd和rs取值的约定， 当二者取到link寄存器的序号（x1为标准的返回地址寄存器，x5为备用的link寄存器），分别对应着压栈和弹栈。详细的对应情况如下：
 F3Predecoder接口说明 in_instr: 传递 16 x 4B的拼接指令码
@@ -38,13 +40,14 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 序号 名称 描述 1.1 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 BR判定 对传入的BR指令，应该判定为类型1 1.3 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 JALR判定 对传入的JALR指令，应该判定为类型3 功能点2 ret、call判定 然后，需要判断是否为call或者ret，这可以通过rd和rs的取值来考察。当然，首先必须得满足无条件跳转指令。
 对于类型2，只有不为RVC指令且目的寄存器rd为link寄存器（x1或x5）时，才为Call。
 对于类型3，在RVI指令下，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。 在RVC指令下，对C.JALR指令，为call，对C.JR指令，当rs1为link时，为Ret
-序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/" /><meta property="article:section" content="docs" />
+序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret 测试点汇总 序号 功能 名称 描述 1.1 CFI指令类型判定 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 CFI指令类型判定 BR判定 对传入的BR指令，应该判定为类型1 1.3 CFI指令类型判定 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 CFI指令类型判定 JALR判定 对传入的JALR指令，应该判定为类型3 2.1 ret、call判定 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 ret、call判定 RVI.JAL判定call 对传入的RVC.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 ret、call判定 RVI.JAL例外 对传入的RVC.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 ret、call判定 RVC.JAL不判定 对传入的RVI.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 ret、call判定 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 ret、call判定 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 ret、call判定 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 ret、call判定 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 ret、call判定 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 ret、call判定 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
 
-<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="name" content="F3PreDecoder">
-<meta itemprop="description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
+  <meta itemprop="name" content="F3PreDecoder">
+  <meta itemprop="description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
 F3PreDecoder功能介绍 CFI指令类型判定 要想确定CFI指令类型，只需要分别尝试匹配JAL、JALR、BR和他们的RVC版本即可，注意，RVC的EBREAK 不应该被视为CFI指令。在匹配的过程中，自然CFI指令的类型就被甄别出来了。在这一步中，我们将所有指令分到如下四类brType中：
 CFI指令类型 brType类型编码 非CFI 00 branch指令 01 jal指令 10 jalr指令 11 ret、call判定 然后，我们需要判断是否为call或者ret，这可以通过rd和rs的取值来考察，具体来说，RISCV的RVI指令中，提供了对rd和rs取值的约定， 当二者取到link寄存器的序号（x1为标准的返回地址寄存器，x5为备用的link寄存器），分别对应着压栈和弹栈。详细的对应情况如下：
 F3Predecoder接口说明 in_instr: 传递 16 x 4B的拼接指令码
@@ -53,11 +56,12 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 序号 名称 描述 1.1 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 BR判定 对传入的BR指令，应该判定为类型1 1.3 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 JALR判定 对传入的JALR指令，应该判定为类型3 功能点2 ret、call判定 然后，需要判断是否为call或者ret，这可以通过rd和rs的取值来考察。当然，首先必须得满足无条件跳转指令。
 对于类型2，只有不为RVC指令且目的寄存器rd为link寄存器（x1或x5）时，才为Call。
 对于类型3，在RVI指令下，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。 在RVC指令下，对C.JALR指令，为call，对C.JR指令，当rs1为link时，为Ret
-序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.">
-<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="wordCount" content="146">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="F3PreDecoder"/>
-<meta name="twitter:description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
+序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret 测试点汇总 序号 功能 名称 描述 1.1 CFI指令类型判定 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 CFI指令类型判定 BR判定 对传入的BR指令，应该判定为类型1 1.3 CFI指令类型判定 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 CFI指令类型判定 JALR判定 对传入的JALR指令，应该判定为类型3 2.1 ret、call判定 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 ret、call判定 RVI.JAL判定call 对传入的RVC.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 ret、call判定 RVI.JAL例外 对传入的RVC.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 ret、call判定 RVC.JAL不判定 对传入的RVI.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 ret、call判定 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 ret、call判定 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 ret、call判定 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 ret、call判定 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 ret、call判定 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 ret、call判定 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="146">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="F3PreDecoder">
+  <meta name="twitter:description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
 F3PreDecoder功能介绍 CFI指令类型判定 要想确定CFI指令类型，只需要分别尝试匹配JAL、JALR、BR和他们的RVC版本即可，注意，RVC的EBREAK 不应该被视为CFI指令。在匹配的过程中，自然CFI指令的类型就被甄别出来了。在这一步中，我们将所有指令分到如下四类brType中：
 CFI指令类型 brType类型编码 非CFI 00 branch指令 01 jal指令 10 jalr指令 11 ret、call判定 然后，我们需要判断是否为call或者ret，这可以通过rd和rs的取值来考察，具体来说，RISCV的RVI指令中，提供了对rd和rs取值的约定， 当二者取到link寄存器的序号（x1为标准的返回地址寄存器，x5为备用的link寄存器），分别对应着压栈和弹栈。详细的对应情况如下：
 F3Predecoder接口说明 in_instr: 传递 16 x 4B的拼接指令码
@@ -66,7 +70,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 序号 名称 描述 1.1 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 BR判定 对传入的BR指令，应该判定为类型1 1.3 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 JALR判定 对传入的JALR指令，应该判定为类型3 功能点2 ret、call判定 然后，需要判断是否为call或者ret，这可以通过rd和rs的取值来考察。当然，首先必须得满足无条件跳转指令。
 对于类型2，只有不为RVC指令且目的寄存器rd为link寄存器（x1或x5）时，才为Call。
 对于类型3，在RVI指令下，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。 在RVC指令下，对C.JALR指令，为call，对C.JR指令，当rs1为link时，为Ret
-序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI."/>
+序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret 测试点汇总 序号 功能 名称 描述 1.1 CFI指令类型判定 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 CFI指令类型判定 BR判定 对传入的BR指令，应该判定为类型1 1.3 CFI指令类型判定 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 CFI指令类型判定 JALR判定 对传入的JALR指令，应该判定为类型3 2.1 ret、call判定 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 ret、call判定 RVI.JAL判定call 对传入的RVC.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 ret、call判定 RVI.JAL例外 对传入的RVC.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 ret、call判定 RVC.JAL不判定 对传入的RVI.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 ret、call判定 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 ret、call判定 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 ret、call判定 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 ret、call判定 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 ret、call判定 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 ret、call判定 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -168,7 +172,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -192,7 +196,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -537,35 +541,35 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 <p>要想确定CFI指令类型，只需要分别尝试匹配JAL、JALR、BR和他们的RVC版本即可，注意，RVC的EBREAK
 不应该被视为CFI指令。在匹配的过程中，自然CFI指令的类型就被甄别出来了。在这一步中，我们将所有指令分到如下四类brType中：</p>
 <table>
-<thead>
-<tr>
-<th>CFI指令类型</th>
-<th>brType类型编码</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>非CFI</td>
-<td>00</td>
-</tr>
-<tr>
-<td>branch指令</td>
-<td>01</td>
-</tr>
-<tr>
-<td>jal指令</td>
-<td>10</td>
-</tr>
-<tr>
-<td>jalr指令</td>
-<td>11</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>CFI指令类型</th>
+          <th>brType类型编码</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>非CFI</td>
+          <td>00</td>
+      </tr>
+      <tr>
+          <td>branch指令</td>
+          <td>01</td>
+      </tr>
+      <tr>
+          <td>jal指令</td>
+          <td>10</td>
+      </tr>
+      <tr>
+          <td>jalr指令</td>
+          <td>11</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="retcall判定">ret、call判定</h3>
 <p>然后，我们需要判断是否为call或者ret，这可以通过rd和rs的取值来考察，具体来说，RISCV的RVI指令中，提供了对rd和rs取值的约定，
 当二者取到link寄存器的序号（x1为标准的返回地址寄存器，x5为备用的link寄存器），分别对应着压栈和弹栈。详细的对应情况如下：</p>
-<p><img alt="links" src="linkjal.png"></p>
+<p><img src="linkjal.png" alt="links"></p>
 <h2 id="f3predecoder接口说明">F3Predecoder接口说明</h2>
 <p>in_instr: 传递 16 x 4B的拼接指令码</p>
 <p>out_pd：每条指令的预译码信息，在F3Predecoder分析得到的是brType、isCall和isRet</p>
@@ -574,35 +578,35 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 <p>要想确定CFI指令类型，只需要分别尝试匹配JAL、JALR、BR和他们的RVC版本即可，注意，RVC的EBREAK
 不应该被视为CFI指令。</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>非CFI判定</td>
-<td>对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>BR判定</td>
-<td>对传入的BR指令，应该判定为类型1</td>
-</tr>
-<tr>
-<td>1.3</td>
-<td>JAL判定</td>
-<td>对传入的JAL指令，应该判定为类型2</td>
-</tr>
-<tr>
-<td>1.4</td>
-<td>JALR判定</td>
-<td>对传入的JALR指令，应该判定为类型3</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>非CFI判定</td>
+          <td>对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>BR判定</td>
+          <td>对传入的BR指令，应该判定为类型1</td>
+      </tr>
+      <tr>
+          <td>1.3</td>
+          <td>JAL判定</td>
+          <td>对传入的JAL指令，应该判定为类型2</td>
+      </tr>
+      <tr>
+          <td>1.4</td>
+          <td>JALR判定</td>
+          <td>对传入的JALR指令，应该判定为类型3</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点2-retcall判定">功能点2 ret、call判定</h3>
 <p>然后，需要判断是否为call或者ret，这可以通过rd和rs的取值来考察。当然，首先必须得满足无条件跳转指令。</p>
@@ -610,166 +614,166 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 <p>对于类型3，在RVI指令下，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。
 在RVC指令下，对C.JALR指令，为call，对C.JR指令，当rs1为link时，为Ret</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2.1</td>
-<td>非CFI和BR不判定</td>
-<td>对传入的非CFI和BR指令，都不应判定为call或者ret</td>
-</tr>
-<tr>
-<td>2.2.1.1</td>
-<td>RVI.JAL判定call</td>
-<td>对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call</td>
-</tr>
-<tr>
-<td>2.2.1.2</td>
-<td>RVI.JAL例外</td>
-<td>对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret</td>
-</tr>
-<tr>
-<td>2.2.2</td>
-<td>RVC.JAL不判定</td>
-<td>对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret</td>
-</tr>
-<tr>
-<td>2.3.1.1</td>
-<td>RVI.JALR和rd为link</td>
-<td>传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call</td>
-</tr>
-<tr>
-<td>2.3.1.2</td>
-<td>RVI.JALR且仅rs为link</td>
-<td>传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret</td>
-</tr>
-<tr>
-<td>2.3.1.3</td>
-<td>RVI.JALR无link</td>
-<td>对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal</td>
-</tr>
-<tr>
-<td>2.3.2.1</td>
-<td>RVC.JALR为Ret</td>
-<td>传入RVC.JALR指令，必定为call</td>
-</tr>
-<tr>
-<td>2.3.2.2.1</td>
-<td>RVC.JR且rs为link</td>
-<td>传入RVC.JR指令，rs为1或5，应判定为ret</td>
-</tr>
-<tr>
-<td>2.3.2.2.2</td>
-<td>RVC.JR且rs不为link</td>
-<td>传入RVC.JR指令，rs不为1或5，不应判定为ret</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2.1</td>
+          <td>非CFI和BR不判定</td>
+          <td>对传入的非CFI和BR指令，都不应判定为call或者ret</td>
+      </tr>
+      <tr>
+          <td>2.2.1.1</td>
+          <td>RVI.JAL判定call</td>
+          <td>对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call</td>
+      </tr>
+      <tr>
+          <td>2.2.1.2</td>
+          <td>RVI.JAL例外</td>
+          <td>对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret</td>
+      </tr>
+      <tr>
+          <td>2.2.2</td>
+          <td>RVC.JAL不判定</td>
+          <td>对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret</td>
+      </tr>
+      <tr>
+          <td>2.3.1.1</td>
+          <td>RVI.JALR和rd为link</td>
+          <td>传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call</td>
+      </tr>
+      <tr>
+          <td>2.3.1.2</td>
+          <td>RVI.JALR且仅rs为link</td>
+          <td>传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret</td>
+      </tr>
+      <tr>
+          <td>2.3.1.3</td>
+          <td>RVI.JALR无link</td>
+          <td>对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal</td>
+      </tr>
+      <tr>
+          <td>2.3.2.1</td>
+          <td>RVC.JALR为Ret</td>
+          <td>传入RVC.JALR指令，必定为call</td>
+      </tr>
+      <tr>
+          <td>2.3.2.2.1</td>
+          <td>RVC.JR且rs为link</td>
+          <td>传入RVC.JR指令，rs为1或5，应判定为ret</td>
+      </tr>
+      <tr>
+          <td>2.3.2.2.2</td>
+          <td>RVC.JR且rs不为link</td>
+          <td>传入RVC.JR指令，rs不为1或5，不应判定为ret</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点汇总">测试点汇总</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能</th>
-<th>名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>CFI指令类型判定</td>
-<td>非CFI判定</td>
-<td>对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>CFI指令类型判定</td>
-<td>BR判定</td>
-<td>对传入的BR指令，应该判定为类型1</td>
-</tr>
-<tr>
-<td>1.3</td>
-<td>CFI指令类型判定</td>
-<td>JAL判定</td>
-<td>对传入的JAL指令，应该判定为类型2</td>
-</tr>
-<tr>
-<td>1.4</td>
-<td>CFI指令类型判定</td>
-<td>JALR判定</td>
-<td>对传入的JALR指令，应该判定为类型3</td>
-</tr>
-<tr>
-<td>2.1</td>
-<td>ret、call判定</td>
-<td>非CFI和BR不判定</td>
-<td>对传入的非CFI和BR指令，都不应判定为call或者ret</td>
-</tr>
-<tr>
-<td>2.2.1.1</td>
-<td>ret、call判定</td>
-<td>RVC.JAL判定call</td>
-<td>对传入的RVC.JAL指令，当rd设置为1或5，应当判定该指令为call</td>
-</tr>
-<tr>
-<td>2.2.1.2</td>
-<td>ret、call判定</td>
-<td>RVC.JAL例外</td>
-<td>对传入的RVC.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret</td>
-</tr>
-<tr>
-<td>2.2.2</td>
-<td>ret、call判定</td>
-<td>RVI.JAL不判定</td>
-<td>对传入的RVI.JAL指令，无论什么情况都不能判定为call或ret</td>
-</tr>
-<tr>
-<td>2.3.1.1</td>
-<td>ret、call判定</td>
-<td>RVI.JALR和rd为link</td>
-<td>传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call</td>
-</tr>
-<tr>
-<td>2.3.1.2</td>
-<td>ret、call判定</td>
-<td>RVI.JALR且仅rs为link</td>
-<td>传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret</td>
-</tr>
-<tr>
-<td>2.3.1.3</td>
-<td>ret、call判定</td>
-<td>RVI.JALR无link</td>
-<td>对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal</td>
-</tr>
-<tr>
-<td>2.3.2.1</td>
-<td>ret、call判定</td>
-<td>RVC.JALR为Ret</td>
-<td>传入RVC.JALR指令，必定为call</td>
-</tr>
-<tr>
-<td>2.3.2.2.1</td>
-<td>ret、call判定</td>
-<td>RVC.JR且rs为link</td>
-<td>传入RVC.JR指令，rs为1或5，应判定为ret</td>
-</tr>
-<tr>
-<td>2.3.2.2.2</td>
-<td>ret、call判定</td>
-<td>RVC.JR且rs不为link</td>
-<td>传入RVC.JR指令，rs不为1或5，不应判定为ret</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能</th>
+          <th>名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>CFI指令类型判定</td>
+          <td>非CFI判定</td>
+          <td>对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>CFI指令类型判定</td>
+          <td>BR判定</td>
+          <td>对传入的BR指令，应该判定为类型1</td>
+      </tr>
+      <tr>
+          <td>1.3</td>
+          <td>CFI指令类型判定</td>
+          <td>JAL判定</td>
+          <td>对传入的JAL指令，应该判定为类型2</td>
+      </tr>
+      <tr>
+          <td>1.4</td>
+          <td>CFI指令类型判定</td>
+          <td>JALR判定</td>
+          <td>对传入的JALR指令，应该判定为类型3</td>
+      </tr>
+      <tr>
+          <td>2.1</td>
+          <td>ret、call判定</td>
+          <td>非CFI和BR不判定</td>
+          <td>对传入的非CFI和BR指令，都不应判定为call或者ret</td>
+      </tr>
+      <tr>
+          <td>2.2.1.1</td>
+          <td>ret、call判定</td>
+          <td>RVI.JAL判定call</td>
+          <td>对传入的RVC.JAL指令，当rd设置为1或5，应当判定该指令为call</td>
+      </tr>
+      <tr>
+          <td>2.2.1.2</td>
+          <td>ret、call判定</td>
+          <td>RVI.JAL例外</td>
+          <td>对传入的RVC.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret</td>
+      </tr>
+      <tr>
+          <td>2.2.2</td>
+          <td>ret、call判定</td>
+          <td>RVC.JAL不判定</td>
+          <td>对传入的RVI.JAL指令，无论什么情况都不能判定为call或ret</td>
+      </tr>
+      <tr>
+          <td>2.3.1.1</td>
+          <td>ret、call判定</td>
+          <td>RVI.JALR和rd为link</td>
+          <td>传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call</td>
+      </tr>
+      <tr>
+          <td>2.3.1.2</td>
+          <td>ret、call判定</td>
+          <td>RVI.JALR且仅rs为link</td>
+          <td>传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret</td>
+      </tr>
+      <tr>
+          <td>2.3.1.3</td>
+          <td>ret、call判定</td>
+          <td>RVI.JALR无link</td>
+          <td>对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal</td>
+      </tr>
+      <tr>
+          <td>2.3.2.1</td>
+          <td>ret、call判定</td>
+          <td>RVC.JALR为Ret</td>
+          <td>传入RVC.JALR指令，必定为call</td>
+      </tr>
+      <tr>
+          <td>2.3.2.2.1</td>
+          <td>ret、call判定</td>
+          <td>RVC.JR且rs为link</td>
+          <td>传入RVC.JR指令，rs为1或5，应判定为ret</td>
+      </tr>
+      <tr>
+          <td>2.3.2.2.2</td>
+          <td>ret、call判定</td>
+          <td>RVC.JR且rs不为link</td>
+          <td>传入RVC.JR指令，rs不为1或5，不应判定为ret</td>
+      </tr>
+  </tbody>
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 
 </div>
@@ -813,7 +817,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

@@ -4,7 +4,7 @@
     <title>TAGE-SC on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
     <link>https://open-verify.cc/xs-bpu/tags/tage-sc/</link>
     <description>Recent content in TAGE-SC on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>zh-cn</language>
     <atom:link href="https://open-verify.cc/xs-bpu/tags/tage-sc/index.xml" rel="self" type="application/rss+xml" />
     <item>
@@ -12,14 +12,14 @@
       <link>https://open-verify.cc/xs-bpu/docs/modules/02_tage_sc/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://open-verify.cc/xs-bpu/docs/modules/02_tage_sc/</guid>
-      <description>功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。&#xA;标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。&#xA;昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1+N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。&#xA;基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。&#xA;对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。&#xA;对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。&#xA;如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。</description>
+      <description>&lt;h2 id=&#34;功能介绍&#34;&gt;功能介绍&lt;/h2&gt;&#xA;&lt;p&gt;TAGE-SC 是南湖架构条件分支的&lt;strong&gt;主预测器&lt;/strong&gt;，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用&lt;strong&gt;历史长度不同的多个预测表&lt;/strong&gt;，可以挖掘&lt;strong&gt;极长的分支历史信息&lt;/strong&gt;。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。&lt;/li&gt;&#xA;&lt;li&gt;SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和&lt;strong&gt;统计偏向的结果&lt;/strong&gt;。并根据这两个结果，&lt;strong&gt;矫正&lt;/strong&gt;最终的预测结果。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多&lt;strong&gt;同时预测 2 条&lt;/strong&gt;条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并&lt;strong&gt;基于相同的全局历史&lt;/strong&gt;进行预测。&lt;/p&gt;&#xA;&lt;h2 id=&#34;昆明湖tage分支预测器&#34;&gt;昆明湖Tage分支预测器&lt;/h2&gt;&#xA;&lt;h3 id=&#34;基本功能&#34;&gt;基本功能&lt;/h3&gt;&#xA;&lt;p&gt;&lt;img src=&#34;tage.PNG&#34; alt=&#34;img&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 &lt;strong&gt;1+N&lt;/strong&gt; 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。&lt;/p&gt;&#xA;&lt;p&gt;基于 T0 表的预测器为&lt;strong&gt;基础预测器&lt;/strong&gt;。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。&lt;/p&gt;&#xA;&lt;p&gt;对于 T0 以外的表，我们用 &lt;strong&gt;Tn&lt;/strong&gt; &lt;strong&gt;进行表示&lt;/strong&gt;。在查表时除了 PC 外，还需要用到&lt;strong&gt;全局跳转历史信息H&lt;/strong&gt;进行查找。&lt;strong&gt;查找命中后&lt;/strong&gt;，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。&lt;/p&gt;&#xA;&lt;p&gt;对于每一次预测，TAGE 从所有 Tn 命中表项中选择&lt;strong&gt;全局跳转历史最长&lt;/strong&gt;的表项。&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。&lt;/li&gt;&#xA;&lt;li&gt;如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行&lt;strong&gt;压缩&lt;/strong&gt;，该过程也称为&lt;strong&gt;历史折叠&lt;/strong&gt;。&lt;/p&gt;</description>
     </item>
     <item>
       <title>TAGE-SC 功能列表</title>
       <link>https://open-verify.cc/xs-bpu/docs/feature/03_tagescfeature/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://open-verify.cc/xs-bpu/docs/feature/03_tagescfeature/</guid>
-      <description>功能列表（Feature List） s2 TAGE 输出预测结果 s3 SC 输出预测结果 s2 TAGE 输出meta信息 s3 SC 输出meta信息 TAGE 进行更新训练 检查申请新表项 全局重置useful SC 进行更新训练 </description>
+      <description>&lt;h2 id=&#34;功能列表feature-list&#34;&gt;功能列表（Feature List）&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;s2 TAGE 输出预测结果&lt;/li&gt;&#xA;&lt;li&gt;s3 SC 输出预测结果&lt;/li&gt;&#xA;&lt;li&gt;s2 TAGE 输出meta信息&lt;/li&gt;&#xA;&lt;li&gt;s3 SC 输出meta信息&lt;/li&gt;&#xA;&lt;li&gt;TAGE 进行更新训练&lt;/li&gt;&#xA;&lt;li&gt;检查申请新表项&lt;/li&gt;&#xA;&lt;li&gt;全局重置useful&lt;/li&gt;&#xA;&lt;li&gt;SC 进行更新训练&lt;/li&gt;&#xA;&lt;/ol&gt;</description>
     </item>
   </channel>
 </rss>

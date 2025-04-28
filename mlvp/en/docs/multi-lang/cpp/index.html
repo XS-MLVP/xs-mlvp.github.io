@@ -19,18 +19,24 @@
 
 <title>Using C&#43;&#43; | UnityChip Verification</title>
 <meta name="description" content="Encapsulate the DUT hardware runtime environment with C&#43;&#43; and compile it into a dynamic library.">
-<meta property="og:title" content="Using C&#43;&#43;" />
-<meta property="og:description" content="Encapsulate the DUT hardware runtime environment with C&#43;&#43; and compile it into a dynamic library." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/multi-lang/cpp/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/multi-lang/cpp/">
+  <meta property="og:site_name" content="UnityChip Verification">
+  <meta property="og:title" content="Using C&#43;&#43;">
+  <meta property="og:description" content="Encapsulate the DUT hardware runtime environment with C&#43;&#43; and compile it into a dynamic library.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:44:02+08:00">
+    <meta property="article:tag" content="Docs">
 
-<meta property="article:modified_time" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="name" content="Using C&#43;&#43;">
-<meta itemprop="description" content="Encapsulate the DUT hardware runtime environment with C&#43;&#43; and compile it into a dynamic library.">
-<meta itemprop="dateModified" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="wordCount" content="934">
-<meta itemprop="keywords" content="docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Using C&#43;&#43;"/>
-<meta name="twitter:description" content="Encapsulate the DUT hardware runtime environment with C&#43;&#43; and compile it into a dynamic library."/>
+  <meta itemprop="name" content="Using C&#43;&#43;">
+  <meta itemprop="description" content="Encapsulate the DUT hardware runtime environment with C&#43;&#43; and compile it into a dynamic library.">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="934">
+  <meta itemprop="keywords" content="Docs">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Using C&#43;&#43;">
+  <meta name="twitter:description" content="Encapsulate the DUT hardware runtime environment with C&#43;&#43; and compile it into a dynamic library.">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -130,7 +136,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +160,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -344,15 +350,13 @@
 <li>
 <p>First, the Picker tool parses the RTL code, creates a new module based on the specified Top Module, encapsulates the module&rsquo;s <strong>input and output ports</strong>, and exports <code>DPI/API</code> to operate the input ports and read the output ports.</p>
 <blockquote>
-<p><em>The tool determines the module to be encapsulated by specifying the file and Module Name of the Top Module. At this point, you can understand Top as the main function in software programming.</em></p>
-</blockquote>
+<p><em>The tool determines the module to be encapsulated by specifying the file and Module Name of the Top Module. At this point, you can understand Top as the main function in software programming.</em></p></blockquote>
 </li>
 <li>
 <p>Next, the Picker tool uses the specified <strong>simulator</strong> to compile the RTL code and generate a <strong>DPI library file</strong>. This library file contains the logic required to simulate running the RTL code (i.e., the <strong>hardware simulator</strong>).</p>
 <blockquote>
 <p><em>For VCS, this library file is a .so (dynamic library) file, and for Verilator, it is a .a (static library) file.</em>
-<em>DPI stands for <a href="https://www.chipverify.com/systemverilog/systemverilog-dpi">Direct Programming Interface</a>，which can be understood as an API specification.</em></p>
-</blockquote>
+<em>DPI stands for <a href="https://www.chipverify.com/systemverilog/systemverilog-dpi">Direct Programming Interface</a>，which can be understood as an API specification.</em></p></blockquote>
 </li>
 <li>
 <p>Then, the Picker tool renders the base class defined in the source code according to the configuration parameters, generates a base class (wrapper) for interfacing with the simulator and <strong>hides simulator details</strong>, and links the base class with the DPI library file to generate a <strong>UT dynamic library file</strong>.</p>
@@ -360,8 +364,7 @@
 <ul>
 <li><em>At this point, the <strong>UT library file</strong> uses the unified API provided by the Picker tool template. Compared with the simulator-specific API in the <strong>DPI library file</strong>, the UT library file provides a <strong>unified API interface</strong> for the hardware simulator generated by the simulator.</em></li>
 <li><em>The generated <strong>UT library file</strong> is <strong>common</strong> across different languages! Unless otherwise specified, other high-level languages will operate the hardware simulator by <strong>calling the UT dynamic library</strong>.</em></li>
-</ul>
-</blockquote>
+</ul></blockquote>
 </li>
 <li>
 <p>Finally, based on the configuration parameters and parsed RTL code, the Picker tool generates a <strong>C++ class</strong> source code. This source code is the <strong>definition (.hpp)</strong> and <strong>implementation (.cpp)</strong> of the RTL hardware module in the software. Instantiating this class is equivalent to creating a hardware module.</p>
@@ -371,8 +374,7 @@
 <ol>
 <li><em>Since the <strong>UT library file</strong> needs to be <strong>common</strong> across different languages, and different languages have different ways to implement classes, for universality, the <code>class implementation</code> is not encapsulated into the dynamic library.</em></li>
 <li><em>To <strong>facilitate debugging</strong>, enhance code readability, and make it easier for users to repackage and modify.</em></li>
-</ol>
-</blockquote>
+</ol></blockquote>
 </li>
 </ol>
 <h3 id="generating-executable-files">Generating Executable Files</h3>
@@ -389,8 +391,7 @@ Details can be found in [Random Number Generator Verification - Configure Test C
 <p>Finally, according to the configured linking parameters, the compiler will link the basic library and generate an executable file.</p>
 <blockquote>
 <p>Taking <a href="docs/quick-start/examples/adder/#%E5%B0%86rtl%E6%9E%84%E5%BB%BA%E4%B8%BAc-class">Adder Verification</a> as an example, <code>picker_out_adder/cpp/cmake/*.cmake</code> is a copy of the template described in item 2 above.
-<code>vcs.cmake</code> defines the linking parameters of the basic library generated using the VCS simulator, and <code>verilator.cmake</code> defines the linking parameters of the basic library generated using the Verilator simulator.</p>
-</blockquote>
+<code>vcs.cmake</code> defines the linking parameters of the basic library generated using the VCS simulator, and <code>verilator.cmake</code> defines the linking parameters of the basic library generated using the Verilator simulator.</p></blockquote>
 </li>
 </ol>
 <h2 id="usage">Usage</h2>
@@ -505,7 +506,7 @@ Details can be found in [Random Number Generator Verification - Configure Test C
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span></code></pre></div>
 	<div class="td-page-meta__lastmod">
-  Last modified March 25, 2025: <a href="https://github.com/XS-MLVP/course/commit/1a44bfa239ee57ae2f3162e4a24390caa05f9553">update Toffee document address (1a44bfa)</a>
+  Last modified April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/d04c617785d261fcdfbe044e537c68a450369c09">Upgrade hugo version to 0.146.7 (d04c617)</a>
 </div>
 
 </div>
@@ -549,7 +550,7 @@ Details can be found in [Random Number Generator Verification - Configure Test C
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

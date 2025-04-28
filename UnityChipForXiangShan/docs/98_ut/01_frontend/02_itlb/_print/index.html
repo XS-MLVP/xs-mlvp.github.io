@@ -25,13 +25,32 @@
 MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映射，在进程的视角看来它独享一段确定的（通常是连续的）地址，避免了其它进程的干扰；同时提供了虚实地址转换功能，这使得进程不必关心实际的物理地址在哪里，只需要对自己的地址空间进行操作。同时，对于一个进程来说，每次访问内存时并不是访问整个虚拟内存空间，因此进程实际需要占用的物理内存大小可以小于其虚拟地址空间的大小，由操作系统来决定要把哪一部分留在内存中，将剩余部分保存在磁盘中，在需要时再加载进入内存，极大的扩展了可用内存空间。
 程序局部性原理，是计算机科学术语，指程序在执行时呈现出局部性规律，即在一段时间内，整个程序的执行仅限于程序中的某一部分。相应地，执行所访问的存储空间也局限于某个内存区域。局部性原理又表现为：时间局部性和空间局部性。
 时间局部性是指如果程序中的某条指令一旦执行，则不久之后该指令可能再次被执行；如果某数据被访问，则不久之后该数据可能再次被访问。 空间局部性是指一旦程序访问了某个存储单元，则不久之后，其附近的存储单元也将被访问。 这样的由 MMU 创建的并负责维护的由虚拟地址指向物理地址的映射也将成为一项存储在一个物理页帧中，MMU 为了访问这样的物理页帧也需要一个根页表，根页表中存储着指向这些物理页帧的页表项（PTE），称为叶子 PTE。一个 PTE 的长度一般为 64 Bit（8 Bytes），而每一个一般物理页帧的大小为 4KB，这也就意味着一个物理页帧最多可以存储 4KB/8B = 2^9 个 PTE，因此根页表可以索引的范围即为 2^9 × 4KB = 2MB。2MB 的页表并不能满足内存日益增大的需要，在香山中实现的 SV48 即采用了四级页表的形式，通过四级的查询最终得到物理地址，每一级页表都能够索引 2^9 个下一级页表，最终找到需要的映射。四级页表下能够索引的地址范围达到了 2^9 × 2^9 × 2^9 × 2MB = 256TB。而页表本身也会比较大，如果存满的话大小会达到 4KB &#43; 2^9 × 4KB &#43; 2^9 × 2^9 × 4KB &#43; 2^9 × 2^9 × 2^9 × 4KB = 537921540KB ≈ 513GB。当然，不是说每一级页表都要填满，页表的四级结构可以理解为一个多叉树形结构，只有需要用到的才会实际使用，很多的分支都不需要使用，因此页表的大小是可变的。">
-<meta property="og:title" content="ITLB" />
-<meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/" />
-<meta itemprop="name" content="ITLB">
-<meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="ITLB"/>
-<meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."/>
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="ITLB">
+  <meta property="og:description" content="TLB 功能概述 现代操作系统通常采用虚拟内存管理机制（Virtual Memory Management），在处理器中对应需要内存管理单元（MMU，Memory Management Unit）来进行虚实地址的映射。MMU 负责处理 CPU 的内存访问请求，其功能包括虚实地址的映射、内存保护、CPU 高速缓存控制等。
+虚实地址的映射是以页（Page）为单位的。在物理内存管理中，内核会将整个物理内存空间划分为一个一个的页帧（Page Frame），一般情况下页帧大小为 4KB，称为一个物理页帧，内核会将每一个物理页帧进行编号（PFN，Page Frame Number），每个页帧有唯一确定的 PFN。对于一个进程来说，如果它直接使用物理地址构建自己的地址空间，那么作为进程就需要关心每一个变量存放在哪一个物理地址，也就是说程序员需要清楚数据在内存中的具体布局，还需要每次都要考虑内存的分配问题；同时，对于多个进程同时进行的情况，哪些数据是共享的，如何避免地址冲突等等都会成为问题。
+MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映射，在进程的视角看来它独享一段确定的（通常是连续的）地址，避免了其它进程的干扰；同时提供了虚实地址转换功能，这使得进程不必关心实际的物理地址在哪里，只需要对自己的地址空间进行操作。同时，对于一个进程来说，每次访问内存时并不是访问整个虚拟内存空间，因此进程实际需要占用的物理内存大小可以小于其虚拟地址空间的大小，由操作系统来决定要把哪一部分留在内存中，将剩余部分保存在磁盘中，在需要时再加载进入内存，极大的扩展了可用内存空间。
+程序局部性原理，是计算机科学术语，指程序在执行时呈现出局部性规律，即在一段时间内，整个程序的执行仅限于程序中的某一部分。相应地，执行所访问的存储空间也局限于某个内存区域。局部性原理又表现为：时间局部性和空间局部性。
+时间局部性是指如果程序中的某条指令一旦执行，则不久之后该指令可能再次被执行；如果某数据被访问，则不久之后该数据可能再次被访问。 空间局部性是指一旦程序访问了某个存储单元，则不久之后，其附近的存储单元也将被访问。 这样的由 MMU 创建的并负责维护的由虚拟地址指向物理地址的映射也将成为一项存储在一个物理页帧中，MMU 为了访问这样的物理页帧也需要一个根页表，根页表中存储着指向这些物理页帧的页表项（PTE），称为叶子 PTE。一个 PTE 的长度一般为 64 Bit（8 Bytes），而每一个一般物理页帧的大小为 4KB，这也就意味着一个物理页帧最多可以存储 4KB/8B = 2^9 个 PTE，因此根页表可以索引的范围即为 2^9 × 4KB = 2MB。2MB 的页表并不能满足内存日益增大的需要，在香山中实现的 SV48 即采用了四级页表的形式，通过四级的查询最终得到物理地址，每一级页表都能够索引 2^9 个下一级页表，最终找到需要的映射。四级页表下能够索引的地址范围达到了 2^9 × 2^9 × 2^9 × 2MB = 256TB。而页表本身也会比较大，如果存满的话大小会达到 4KB &#43; 2^9 × 4KB &#43; 2^9 × 2^9 × 4KB &#43; 2^9 × 2^9 × 2^9 × 4KB = 537921540KB ≈ 513GB。当然，不是说每一级页表都要填满，页表的四级结构可以理解为一个多叉树形结构，只有需要用到的才会实际使用，很多的分支都不需要使用，因此页表的大小是可变的。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="ITLB">
+  <meta itemprop="description" content="TLB 功能概述 现代操作系统通常采用虚拟内存管理机制（Virtual Memory Management），在处理器中对应需要内存管理单元（MMU，Memory Management Unit）来进行虚实地址的映射。MMU 负责处理 CPU 的内存访问请求，其功能包括虚实地址的映射、内存保护、CPU 高速缓存控制等。
+虚实地址的映射是以页（Page）为单位的。在物理内存管理中，内核会将整个物理内存空间划分为一个一个的页帧（Page Frame），一般情况下页帧大小为 4KB，称为一个物理页帧，内核会将每一个物理页帧进行编号（PFN，Page Frame Number），每个页帧有唯一确定的 PFN。对于一个进程来说，如果它直接使用物理地址构建自己的地址空间，那么作为进程就需要关心每一个变量存放在哪一个物理地址，也就是说程序员需要清楚数据在内存中的具体布局，还需要每次都要考虑内存的分配问题；同时，对于多个进程同时进行的情况，哪些数据是共享的，如何避免地址冲突等等都会成为问题。
+MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映射，在进程的视角看来它独享一段确定的（通常是连续的）地址，避免了其它进程的干扰；同时提供了虚实地址转换功能，这使得进程不必关心实际的物理地址在哪里，只需要对自己的地址空间进行操作。同时，对于一个进程来说，每次访问内存时并不是访问整个虚拟内存空间，因此进程实际需要占用的物理内存大小可以小于其虚拟地址空间的大小，由操作系统来决定要把哪一部分留在内存中，将剩余部分保存在磁盘中，在需要时再加载进入内存，极大的扩展了可用内存空间。
+程序局部性原理，是计算机科学术语，指程序在执行时呈现出局部性规律，即在一段时间内，整个程序的执行仅限于程序中的某一部分。相应地，执行所访问的存储空间也局限于某个内存区域。局部性原理又表现为：时间局部性和空间局部性。
+时间局部性是指如果程序中的某条指令一旦执行，则不久之后该指令可能再次被执行；如果某数据被访问，则不久之后该数据可能再次被访问。 空间局部性是指一旦程序访问了某个存储单元，则不久之后，其附近的存储单元也将被访问。 这样的由 MMU 创建的并负责维护的由虚拟地址指向物理地址的映射也将成为一项存储在一个物理页帧中，MMU 为了访问这样的物理页帧也需要一个根页表，根页表中存储着指向这些物理页帧的页表项（PTE），称为叶子 PTE。一个 PTE 的长度一般为 64 Bit（8 Bytes），而每一个一般物理页帧的大小为 4KB，这也就意味着一个物理页帧最多可以存储 4KB/8B = 2^9 个 PTE，因此根页表可以索引的范围即为 2^9 × 4KB = 2MB。2MB 的页表并不能满足内存日益增大的需要，在香山中实现的 SV48 即采用了四级页表的形式，通过四级的查询最终得到物理地址，每一级页表都能够索引 2^9 个下一级页表，最终找到需要的映射。四级页表下能够索引的地址范围达到了 2^9 × 2^9 × 2^9 × 2MB = 256TB。而页表本身也会比较大，如果存满的话大小会达到 4KB &#43; 2^9 × 4KB &#43; 2^9 × 2^9 × 4KB &#43; 2^9 × 2^9 × 2^9 × 4KB = 537921540KB ≈ 513GB。当然，不是说每一级页表都要填满，页表的四级结构可以理解为一个多叉树形结构，只有需要用到的才会实际使用，很多的分支都不需要使用，因此页表的大小是可变的。">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="727">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="ITLB">
+  <meta name="twitter:description" content="TLB 功能概述 现代操作系统通常采用虚拟内存管理机制（Virtual Memory Management），在处理器中对应需要内存管理单元（MMU，Memory Management Unit）来进行虚实地址的映射。MMU 负责处理 CPU 的内存访问请求，其功能包括虚实地址的映射、内存保护、CPU 高速缓存控制等。
+虚实地址的映射是以页（Page）为单位的。在物理内存管理中，内核会将整个物理内存空间划分为一个一个的页帧（Page Frame），一般情况下页帧大小为 4KB，称为一个物理页帧，内核会将每一个物理页帧进行编号（PFN，Page Frame Number），每个页帧有唯一确定的 PFN。对于一个进程来说，如果它直接使用物理地址构建自己的地址空间，那么作为进程就需要关心每一个变量存放在哪一个物理地址，也就是说程序员需要清楚数据在内存中的具体布局，还需要每次都要考虑内存的分配问题；同时，对于多个进程同时进行的情况，哪些数据是共享的，如何避免地址冲突等等都会成为问题。
+MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映射，在进程的视角看来它独享一段确定的（通常是连续的）地址，避免了其它进程的干扰；同时提供了虚实地址转换功能，这使得进程不必关心实际的物理地址在哪里，只需要对自己的地址空间进行操作。同时，对于一个进程来说，每次访问内存时并不是访问整个虚拟内存空间，因此进程实际需要占用的物理内存大小可以小于其虚拟地址空间的大小，由操作系统来决定要把哪一部分留在内存中，将剩余部分保存在磁盘中，在需要时再加载进入内存，极大的扩展了可用内存空间。
+程序局部性原理，是计算机科学术语，指程序在执行时呈现出局部性规律，即在一段时间内，整个程序的执行仅限于程序中的某一部分。相应地，执行所访问的存储空间也局限于某个内存区域。局部性原理又表现为：时间局部性和空间局部性。
+时间局部性是指如果程序中的某条指令一旦执行，则不久之后该指令可能再次被执行；如果某数据被访问，则不久之后该数据可能再次被访问。 空间局部性是指一旦程序访问了某个存储单元，则不久之后，其附近的存储单元也将被访问。 这样的由 MMU 创建的并负责维护的由虚拟地址指向物理地址的映射也将成为一项存储在一个物理页帧中，MMU 为了访问这样的物理页帧也需要一个根页表，根页表中存储着指向这些物理页帧的页表项（PTE），称为叶子 PTE。一个 PTE 的长度一般为 64 Bit（8 Bytes），而每一个一般物理页帧的大小为 4KB，这也就意味着一个物理页帧最多可以存储 4KB/8B = 2^9 个 PTE，因此根页表可以索引的范围即为 2^9 × 4KB = 2MB。2MB 的页表并不能满足内存日益增大的需要，在香山中实现的 SV48 即采用了四级页表的形式，通过四级的查询最终得到物理地址，每一级页表都能够索引 2^9 个下一级页表，最终找到需要的映射。四级页表下能够索引的地址范围达到了 2^9 × 2^9 × 2^9 × 2MB = 256TB。而页表本身也会比较大，如果存满的话大小会达到 4KB &#43; 2^9 × 4KB &#43; 2^9 × 2^9 × 4KB &#43; 2^9 × 2^9 × 2^9 × 4KB = 537921540KB ≈ 513GB。当然，不是说每一级页表都要填满，页表的四级结构可以理解为一个多叉树形结构，只有需要用到的才会实际使用，很多的分支都不需要使用，因此页表的大小是可变的。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -133,7 +152,7 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -217,7 +236,7 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
       <h2 id="tlb-功能概述">TLB 功能概述</h2>
 <p>现代操作系统通常采用虚拟内存管理机制（Virtual Memory Management），在处理器中对应需要内存管理单元（MMU，Memory Management Unit）来进行虚实地址的映射。MMU 负责处理 CPU 的内存访问请求，其功能包括虚实地址的映射、内存保护、CPU 高速缓存控制等。</p>
 <p>虚实地址的映射是以页（Page）为单位的。在物理内存管理中，内核会将整个物理内存空间划分为一个一个的页帧（Page Frame），一般情况下页帧大小为 4KB，称为一个物理页帧，内核会将每一个物理页帧进行编号（PFN，Page Frame Number），每个页帧有唯一确定的 PFN。对于一个进程来说，如果它直接使用物理地址构建自己的地址空间，那么作为进程就需要关心每一个变量存放在哪一个物理地址，也就是说程序员需要清楚数据在内存中的具体布局，还需要每次都要考虑内存的分配问题；同时，对于多个进程同时进行的情况，哪些数据是共享的，如何避免地址冲突等等都会成为问题。</p>
-<p><img alt="进程地址空间" src="address_space.png"></p>
+<p><img src="address_space.png" alt="进程地址空间"></p>
 <p>MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映射，在进程的视角看来它独享一段确定的（通常是连续的）地址，避免了其它进程的干扰；同时提供了虚实地址转换功能，这使得进程不必关心实际的物理地址在哪里，只需要对自己的地址空间进行操作。同时，对于一个进程来说，每次访问内存时并不是访问整个虚拟内存空间，因此进程实际需要占用的物理内存大小可以小于其虚拟地址空间的大小，由操作系统来决定要把哪一部分留在内存中，将剩余部分保存在磁盘中，在需要时再加载进入内存，极大的扩展了可用内存空间。</p>
 <i>
 <p><strong>程序局部性原理</strong>，是计算机科学术语，指程序在执行时呈现出局部性规律，即在一段时间内，整个程序的执行仅限于程序中的某一部分。相应地，执行所访问的存储空间也局限于某个内存区域。局部性原理又表现为：<strong>时间局部性</strong>和<strong>空间局部性</strong>。</p>
@@ -226,14 +245,14 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <li><strong>空间局部性</strong>是指一旦程序访问了某个存储单元，则不久之后，其附近的存储单元也将被访问。</li>
 </ul>
 </i>
-<p><img alt="虚实页表映射" src="virtual2real_pagetable_mapping.png"></p>
+<p><img src="virtual2real_pagetable_mapping.png" alt="虚实页表映射"></p>
 <p>这样的由 MMU 创建的并负责维护的由虚拟地址指向物理地址的映射也将成为一项存储在一个物理页帧中，MMU 为了访问这样的物理页帧也需要一个根页表，根页表中存储着指向这些物理页帧的页表项（PTE），称为叶子 PTE。一个 PTE 的长度一般为 64 Bit（8 Bytes），而每一个一般物理页帧的大小为 4KB，这也就意味着一个物理页帧最多可以存储 4KB/8B = 2^9 个 PTE，因此根页表可以索引的范围即为 2^9 × 4KB = 2MB。2MB 的页表并不能满足内存日益增大的需要，在香山中实现的 SV48 即采用了四级页表的形式，通过四级的查询最终得到物理地址，每一级页表都能够索引 2^9 个下一级页表，最终找到需要的映射。四级页表下能够索引的地址范围达到了 2^9 × 2^9 × 2^9 × 2MB = 256TB。而页表本身也会比较大，如果存满的话大小会达到 4KB + 2^9 × 4KB + 2^9 × 2^9 × 4KB + 2^9 × 2^9 × 2^9 × 4KB = 537921540KB ≈ 513GB。当然，不是说每一级页表都要填满，页表的四级结构可以理解为一个多叉树形结构，只有需要用到的才会实际使用，很多的分支都不需要使用，因此页表的大小是可变的。</p>
 <p>页表一般很大，需要存放在内存中，而处理器每一次访问内存的请求都需要先访问页表查找对应的物理页号然后再去读取所需数据，因此在不发生缺页的情况下，每次访存操作都需要两次访问内存才能得到物理地址，然后再次访问才能得到需要的数据。为了减少多次访存造成的开销，引入了地址转换后援缓存器（TLB，Translation Lookaside Buffer）。MMU 通常借助 TLB 来进行虚实地址的转换。TLB 一般是相连高速缓存（associative cache），相当于页表的 Cache，负责将最可能会用到的页表项对应的映射（虚拟地址与对应的物理地址）存储下来；在查找页表时首先查找 TLB 内存储的映射，如果没有命中再去查找内存中存储的完整页表。</p>
 <p>同 Cache 一样，TLB 中页表项的组织方式一般有直接映射、全相联映射、组相连映射三种方式。直接映射一般通过模运算匹配，例如对昆明湖 48 行的 TLB 来说，其第 1 块只能对应内存的第 1/49/97/&hellip;/(n×48+1) 块，硬件结构简单、成本低、转换速度快，但是 TLB 表项利用率低，TLB miss 频繁，只适用于 TLB 大小与页表大小较接近的情况。全相联映射则不同，内存中的所有表项可以存放在 TLB 中的任意一项中，可以充分利用 TLB 的空间，冲突概率更低，但因此查找开销较高，适用于小容量 TLB。组相联映射是一种折中，可以二路组相联、四路组相联等。在香山的 TLB 模块中提供了丰富的参数配置，其中即包括采取哪一种相连方式，可以通过传入参数自行配置。本次验证的 ITLB 即采用 48 项全相联的结构。</p>
-<p><img alt="二路组相联示意图" src="2waygroup.png">
-<img alt="四路组相联示意图" src="4waygroup.png"></p>
+<p><img src="2waygroup.png" alt="二路组相联示意图">
+<img src="4waygroup.png" alt="四路组相联示意图"></p>
 <p>香山的 MMU 模块由 TLB、Repeator、L2TLB、PMP&amp;PMA 组成，其中 L2TLB 又包含了 Page Cache、Page Table Walker、Last Level Page Table Walker、Miss Queue 和 Prefetcher。在核内每次进行内存的操作（读写）时都需要通过 MMU 模块进行虚实地址的翻译，而 TLB 将被实例化为 ITLB（前端取指）和 DTLB（后端访存）。以 ITLB 为例，每当 ICache 或 IFU 需要进行取指操作，会先向 ITLB 发送一个地址转换请求，把需要转换的虚拟地址发给 ITLB；ITLB 接收到请求后就要查找自己存储的表项里有没有这个虚拟地址对应的映射，如果有的话就输出对应物理地址（paddr），之后由 PMP&amp;PMA 模块检查对该物理地址的访问是否有效（包括地址是否有效、访问者是否有访问权限、页表属性等，其中对 ITLB 来说由于取出来的物理地址是待执行的指令，需要检查是否可以执行），检查通过后就可以把物理地址返回给前端。如果 ITLB 发现自己没有存储这样的表项，那么立即回应 miss，并同时发起 PTW 请求。前端接收到 miss 信号后会通过一些调度策略重新发起访问，在香山中体现为 miss 后不断重新给 TLB 发请求直到 hit。PTW 请求将交由 Page Table Walker 来执行，通过一些策略访问 L2TLB、Page Cache、内存中的完整页表，之后把访问到的 PTE（页表项）发回给 TLB（如果 PTW 都找不到那么会发生 Page Fault，同样返回给 TLB，TLB 收到 Page Fault 后会上报并由操作系统等从磁盘中加载页面）。TLB 接收到 PTE 的同时将 PTE 填充进自己的缓存中并向前端返回物理地址，前端才能通过该物理地址找到对应的指令。</p>
-<p><img alt="TLB功能示意图" src="TLBfunc.png"></p>
+<p><img src="TLBfunc.png" alt="TLB功能示意图"></p>
 <p>香山实现了二级 TLB，包括 TLB 与 L2TLB。同样类似于 Cache 与 L2Cache，TLB（一级 TLB）通常是小容量、高速缓存，直接与处理器核心连接，用于加速最近访问过的虚拟地址到物理地址的转换；L2TLB（二级 TLB）容量较大，速度稍慢，但比直接访问内存要快。L2TLB 用来缓存更多的页表项，减少一级 TLB 未命中（TLB Miss）时对内存的频繁访问，香山目前有 1 个 ITLB 和 3 个 DTLB，都与同一个 L2TLB 连接。在这种二级结构下，TLB 未命中时将会首先查找 L2TLB，之后如果再次未命中才去访问内存，可以有效提高地址转换的命中率和性能。由于在 TLB 与 L2TLB 之间有着一定的物理距离，因此在 TLB 向 L2TLB 发出读取请求的时候需要进行加拍，这项工作交给了 MMU 中的 repeater 进行，是 TLB 与 L2TLB 之间的一个请求缓冲。同时，repeator 还需要负责对 TLB 向 L2TLB 发送的请求进行过滤（即 Filter 的功能），把重复的请求过滤掉，以减少 L2TLB 性能损失。</p>
 <p>昆明湖架构支持 RISC-V 手册中定义的 Hypervisor 扩展，即 H 扩展。H 扩展为处理器提供了虚拟化的支持，即允许虚拟机运行在主机上，此时虚拟机将与主机共享 TLB，那么在 MMU 中也需要进行相应的调整与支持。TLB 需要能够同时容纳多个虚拟机的条目并做到隔离，同时需要引入 Hypervisor Page Table Walker（HPTW）用于遍历虚拟机的页表。</p>
 <p>在 MMU 模块中还需要实现 PMP（Physical Memory Protection）与 PMA（Physical Memory Access）检查，不过这与 TLB 无关，在实现中无论请求是否有效或有足够权限，都会通过 TLB 先进行地址转换，之后再把转换的结果（物理地址）送到 PMP&amp;PMA 模块进行权限检查。</p>
@@ -244,520 +263,520 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <p>TLB 应当正常接收来自 IFU 与 ICache 的取指令请求，查找自身页表并作出适当的反应：miss 情况下返回 miss 并同时向 PTW 发送遍历请求，hit 情况返回正确结果。验证时此处应关注 TLB 做出的反应，无需关注请求本身的多种情况。</p>
 <h4 id="测试点示例">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>接收来自 ICache 请求（requestor0、1）</td>
-<td>ITLB 根据请求查找自身缓存 TLBuffer，返回 hit/miss 结果</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>接收来自 IFU 请求（requestor2）</td>
-<td>注意此处为阻塞式访问，每次访问后若 miss 应当 reset 后再次访问</td>
-</tr>
-<tr>
-<td>1.3</td>
-<td>接收条件判断（requestor0、1）</td>
-<td>valid 信号</td>
-</tr>
-<tr>
-<td>1.4</td>
-<td>接受条件判断（requestor2）</td>
-<td>valid-ready 信号</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>接收来自 ICache 请求（requestor0、1）</td>
+          <td>ITLB 根据请求查找自身缓存 TLBuffer，返回 hit/miss 结果</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>接收来自 IFU 请求（requestor2）</td>
+          <td>注意此处为阻塞式访问，每次访问后若 miss 应当 reset 后再次访问</td>
+      </tr>
+      <tr>
+          <td>1.3</td>
+          <td>接收条件判断（requestor0、1）</td>
+          <td>valid 信号</td>
+      </tr>
+      <tr>
+          <td>1.4</td>
+          <td>接受条件判断（requestor2）</td>
+          <td>valid-ready 信号</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点2tlb-miss-处理">功能点2：TLB miss 处理</h3>
 <h4 id="功能说明-1">功能说明</h4>
 <p>miss 情况下发送页表遍历请求，额外需要注意边界情况下的请求处理，保证 TLB 发送的 PTW 请求正确。</p>
 <h4 id="测试点示例-1">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2.1</td>
-<td>返回 miss 结果</td>
-<td>比对后发现 miss 并返回</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>发起 PTW req（同时检验 PTW req valid 0/1）</td>
-<td>从端口 0/1 发起页表遍历请求</td>
-</tr>
-<tr>
-<td>2.3</td>
-<td>发起 PTW req（同时检验 PTW req valid-ready 2）</td>
-<td>从端口 2 发起页表遍历请求</td>
-</tr>
-<tr>
-<td>2.4</td>
-<td>不同情况下发起 PTW req</td>
-<td>改变 CSR（vsatp、hgatp），依然能够正常发送请求</td>
-</tr>
-<tr>
-<td>2.5</td>
-<td>PTW resp valid 信号有效</td>
-<td>检验该信号是否正常</td>
-</tr>
-<tr>
-<td>2.6</td>
-<td>重填 nonStage 条目，之后能正确访问</td>
-<td>无</td>
-</tr>
-<tr>
-<td>2.7</td>
-<td>重填 OnlyStage1 条目，之后能正确访问</td>
-<td>无</td>
-</tr>
-<tr>
-<td>2.8</td>
-<td>重填 OnleStage2 条目，之后能正确访问</td>
-<td>无</td>
-</tr>
-<tr>
-<td>2.9</td>
-<td>重填 allStage 条目，之后能正确访问</td>
-<td>无</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2.1</td>
+          <td>返回 miss 结果</td>
+          <td>比对后发现 miss 并返回</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>发起 PTW req（同时检验 PTW req valid 0/1）</td>
+          <td>从端口 0/1 发起页表遍历请求</td>
+      </tr>
+      <tr>
+          <td>2.3</td>
+          <td>发起 PTW req（同时检验 PTW req valid-ready 2）</td>
+          <td>从端口 2 发起页表遍历请求</td>
+      </tr>
+      <tr>
+          <td>2.4</td>
+          <td>不同情况下发起 PTW req</td>
+          <td>改变 CSR（vsatp、hgatp），依然能够正常发送请求</td>
+      </tr>
+      <tr>
+          <td>2.5</td>
+          <td>PTW resp valid 信号有效</td>
+          <td>检验该信号是否正常</td>
+      </tr>
+      <tr>
+          <td>2.6</td>
+          <td>重填 nonStage 条目，之后能正确访问</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>2.7</td>
+          <td>重填 OnlyStage1 条目，之后能正确访问</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>2.8</td>
+          <td>重填 OnleStage2 条目，之后能正确访问</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>2.9</td>
+          <td>重填 allStage 条目，之后能正确访问</td>
+          <td>无</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点3tlb-hit-处理">功能点3：TLB hit 处理</h3>
 <h4 id="功能说明-2">功能说明</h4>
 <p>hit 情况下返回查询到的物理地址。requestor2 应当结束阻塞。</p>
 <h4 id="测试点示例-2">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3.1</td>
-<td>主机查询得到物理地址</td>
-<td>paddr</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>虚拟机查询得到物理地址</td>
-<td>gpaddr</td>
-</tr>
-<tr>
-<td>3.3</td>
-<td>虚拟机查询得到中间物理地址</td>
-<td>IPA</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>3.1</td>
+          <td>主机查询得到物理地址</td>
+          <td>paddr</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>虚拟机查询得到物理地址</td>
+          <td>gpaddr</td>
+      </tr>
+      <tr>
+          <td>3.3</td>
+          <td>虚拟机查询得到中间物理地址</td>
+          <td>IPA</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点4替换策略">功能点4：替换策略</h3>
 <h4 id="功能说明-3">功能说明</h4>
 <p>根据文档说明，香山的 ITLB 使用 PLRU 替换策略，具体实现时使用的是外部提供的库。验证时可自学 PLRU 算法，并设计合理策略。</p>
 <h4 id="测试点示例-3">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>4.1</td>
-<td>填满后持续重填随机次数</td>
-<td>建议建立参考模型进行对比</td>
-</tr>
-<tr>
-<td>4.2</td>
-<td>随机 hit/miss 一段时间</td>
-<td>建议建立参考模型进行对比</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>4.1</td>
+          <td>填满后持续重填随机次数</td>
+          <td>建议建立参考模型进行对比</td>
+      </tr>
+      <tr>
+          <td>4.2</td>
+          <td>随机 hit/miss 一段时间</td>
+          <td>建议建立参考模型进行对比</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点5tlb-缓存大小">功能点5：TLB 缓存大小</h3>
 <h4 id="功能说明-4">功能说明</h4>
 <p>检验 TLB 是否能够支持理论最大（48*8）项页表条目的存储。注意 PLRU 替换策略将导致一定情况下不能填满，验证中无需考虑因为该策略导致的未填充满。</p>
 <h4 id="测试点示例-4">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>5.1</td>
-<td>顺序填充至满</td>
-<td>检验最终能够存储的最大条目数，这将直接影响 TLB 加速取指的效率</td>
-</tr>
-<tr>
-<td>5.2</td>
-<td>乱序随机</td>
-<td>模拟应用场景，记录并检验条目数</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>5.1</td>
+          <td>顺序填充至满</td>
+          <td>检验最终能够存储的最大条目数，这将直接影响 TLB 加速取指的效率</td>
+      </tr>
+      <tr>
+          <td>5.2</td>
+          <td>乱序随机</td>
+          <td>模拟应用场景，记录并检验条目数</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点6tlb-压缩">功能点6：TLB 压缩</h3>
 <h4 id="功能说明-5">功能说明</h4>
 <p>支持 TLB 压缩，具体可见文档。注意保证随机性。</p>
 <h4 id="测试点示例-5">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>6.1</td>
-<td>压缩 8 项条目</td>
-<td>一个压缩条目内的 8 项页表项都可以正常 hit</td>
-</tr>
-<tr>
-<td>6.2</td>
-<td>全满压力测试</td>
-<td>全部填满时可连续命中</td>
-</tr>
-<tr>
-<td>6.3</td>
-<td>idx 随机测试</td>
-<td>检测对应 idx 信号是否有效</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>6.1</td>
+          <td>压缩 8 项条目</td>
+          <td>一个压缩条目内的 8 项页表项都可以正常 hit</td>
+      </tr>
+      <tr>
+          <td>6.2</td>
+          <td>全满压力测试</td>
+          <td>全部填满时可连续命中</td>
+      </tr>
+      <tr>
+          <td>6.3</td>
+          <td>idx 随机测试</td>
+          <td>检测对应 idx 信号是否有效</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点7刷新">功能点7：刷新</h3>
 <h4 id="功能说明-6">功能说明</h4>
 <p>TLB 模块需要在进程切换等场景下频繁刷新，也需要接收定向刷新指令刷新指定条目。验证中要建立填入-刷新-检验miss情况的流程，建议自定义函数完成。注意页表属性 Global 的影响，自行制定合适的策略。</p>
 <h4 id="测试点示例-6">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>7.1</td>
-<td>SFENCE  rs1=0 rs2=0</td>
-<td>刷新全部条目</td>
-</tr>
-<tr>
-<td>7.2</td>
-<td>SFENCE  rs1=0 rs2=1</td>
-<td>刷新指定条目</td>
-</tr>
-<tr>
-<td>7.3</td>
-<td>SFENCE  rs1=1 rs2=0</td>
-<td>刷新指定地址空间</td>
-</tr>
-<tr>
-<td>7.4</td>
-<td>SFENCE  rs1=1 rs2=1</td>
-<td>刷新指定地址空间的指定条目</td>
-</tr>
-<tr>
-<td>7.5</td>
-<td>带 flushpipe 的 Sfence</td>
-<td>清空流水线</td>
-</tr>
-<tr>
-<td>7.6</td>
-<td>SFENCE hv=1/hg=1</td>
-<td>刷新虚拟机的条目</td>
-</tr>
-<tr>
-<td>7.7</td>
-<td>flushPipe0</td>
-<td>清空流水线0</td>
-</tr>
-<tr>
-<td>7.8</td>
-<td>flushPipe1</td>
-<td>清空流水线1</td>
-</tr>
-<tr>
-<td>7.9</td>
-<td>flushPipe2</td>
-<td>清空流水线2</td>
-</tr>
-<tr>
-<td>7.10</td>
-<td>satp.changed</td>
-<td>按一定策略刷新</td>
-</tr>
-<tr>
-<td>7.11</td>
-<td>vsatp.changed</td>
-<td>按一定策略刷新</td>
-</tr>
-<tr>
-<td>7.12</td>
-<td>hgatp.changed</td>
-<td>按一定策略刷新</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>7.1</td>
+          <td>SFENCE  rs1=0 rs2=0</td>
+          <td>刷新全部条目</td>
+      </tr>
+      <tr>
+          <td>7.2</td>
+          <td>SFENCE  rs1=0 rs2=1</td>
+          <td>刷新指定条目</td>
+      </tr>
+      <tr>
+          <td>7.3</td>
+          <td>SFENCE  rs1=1 rs2=0</td>
+          <td>刷新指定地址空间</td>
+      </tr>
+      <tr>
+          <td>7.4</td>
+          <td>SFENCE  rs1=1 rs2=1</td>
+          <td>刷新指定地址空间的指定条目</td>
+      </tr>
+      <tr>
+          <td>7.5</td>
+          <td>带 flushpipe 的 Sfence</td>
+          <td>清空流水线</td>
+      </tr>
+      <tr>
+          <td>7.6</td>
+          <td>SFENCE hv=1/hg=1</td>
+          <td>刷新虚拟机的条目</td>
+      </tr>
+      <tr>
+          <td>7.7</td>
+          <td>flushPipe0</td>
+          <td>清空流水线0</td>
+      </tr>
+      <tr>
+          <td>7.8</td>
+          <td>flushPipe1</td>
+          <td>清空流水线1</td>
+      </tr>
+      <tr>
+          <td>7.9</td>
+          <td>flushPipe2</td>
+          <td>清空流水线2</td>
+      </tr>
+      <tr>
+          <td>7.10</td>
+          <td>satp.changed</td>
+          <td>按一定策略刷新</td>
+      </tr>
+      <tr>
+          <td>7.11</td>
+          <td>vsatp.changed</td>
+          <td>按一定策略刷新</td>
+      </tr>
+      <tr>
+          <td>7.12</td>
+          <td>hgatp.changed</td>
+          <td>按一定策略刷新</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点8reset">功能点8：Reset</h3>
 <h4 id="功能说明-7">功能说明</h4>
 <p>保证正常复位。TLB 工作流程涉及多个周期，需保证在各个阶段中执行 reset 均能正常复位。</p>
 <h4 id="测试点示例-7">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>8.1</td>
-<td>Reset 复位</td>
-<td>检查所有信号按预期复位</td>
-</tr>
-<tr>
-<td>8.2</td>
-<td>请求同时复位</td>
-<td>检查所有信号按预期复位</td>
-</tr>
-<tr>
-<td>8.3</td>
-<td>resp 同时复位</td>
-<td>检查所有信号按预期复位</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>8.1</td>
+          <td>Reset 复位</td>
+          <td>检查所有信号按预期复位</td>
+      </tr>
+      <tr>
+          <td>8.2</td>
+          <td>请求同时复位</td>
+          <td>检查所有信号按预期复位</td>
+      </tr>
+      <tr>
+          <td>8.3</td>
+          <td>resp 同时复位</td>
+          <td>检查所有信号按预期复位</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点9权限检查">功能点9：权限检查</h3>
 <h4 id="功能说明-8">功能说明</h4>
 <p>TLB 并不涉及复杂的页属性检查，仅涉及用户态/内核态的权限。由于 ITLB 存储的全部为指令页，页属性必须全部可执行。</p>
 <h4 id="测试点示例-8">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>9.1</td>
-<td>主机状态下（U/S）访问权限检查</td>
-<td>U 只能访问 U=1，S 只能访问 U=0</td>
-</tr>
-<tr>
-<td>9.2</td>
-<td>虚拟机状态下（VU/VS）访问权限检查</td>
-<td>VU 只能访问 U=1，VS 只能访问 U=0</td>
-</tr>
-<tr>
-<td>9.3</td>
-<td>权限切换时的行为</td>
-<td>IT级别验证时报告权限切换时会出现一个信号异常，可重点关注</td>
-</tr>
-<tr>
-<td>9.4</td>
-<td>X=0</td>
-<td>页面不可执行时的行为</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>9.1</td>
+          <td>主机状态下（U/S）访问权限检查</td>
+          <td>U 只能访问 U=1，S 只能访问 U=0</td>
+      </tr>
+      <tr>
+          <td>9.2</td>
+          <td>虚拟机状态下（VU/VS）访问权限检查</td>
+          <td>VU 只能访问 U=1，VS 只能访问 U=0</td>
+      </tr>
+      <tr>
+          <td>9.3</td>
+          <td>权限切换时的行为</td>
+          <td>IT级别验证时报告权限切换时会出现一个信号异常，可重点关注</td>
+      </tr>
+      <tr>
+          <td>9.4</td>
+          <td>X=0</td>
+          <td>页面不可执行时的行为</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点10异常处理">功能点10：异常处理</h3>
 <h4 id="功能说明-9">功能说明</h4>
 <p>ITLB 在异常方面承担的主要职责就是上报。当下层模块报告 GPF 时，由于 ITLB 不存储中间物理地址，此时重填需要首先发送一个带 GetGPA 标志的重填，标志当前重填请求是请求的虚拟机物理地址，PTW 会把这个请求标志发送回来，带该标志的 PTW resp 不会被存入 TLBuffer。</p>
 <h4 id="测试点示例-9">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>10.1</td>
-<td>s1-pf</td>
-<td>主机缺页异常</td>
-</tr>
-<tr>
-<td>10.2</td>
-<td>s1-af</td>
-<td>主机访问权限异常</td>
-</tr>
-<tr>
-<td>10.3</td>
-<td>s2-gpf</td>
-<td>虚拟机缺页异常</td>
-</tr>
-<tr>
-<td>10.4</td>
-<td>s2-gaf</td>
-<td>虚拟机访问权限异常</td>
-</tr>
-<tr>
-<td>10.5</td>
-<td>getGPA 信号相关</td>
-<td>验证中自行拆分</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>10.1</td>
+          <td>s1-pf</td>
+          <td>主机缺页异常</td>
+      </tr>
+      <tr>
+          <td>10.2</td>
+          <td>s1-af</td>
+          <td>主机访问权限异常</td>
+      </tr>
+      <tr>
+          <td>10.3</td>
+          <td>s2-gpf</td>
+          <td>虚拟机缺页异常</td>
+      </tr>
+      <tr>
+          <td>10.4</td>
+          <td>s2-gaf</td>
+          <td>虚拟机访问权限异常</td>
+      </tr>
+      <tr>
+          <td>10.5</td>
+          <td>getGPA 信号相关</td>
+          <td>验证中自行拆分</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点11隔离">功能点11：隔离</h3>
 <h4 id="功能说明-10">功能说明</h4>
 <p>地址空间隔离，通过 asid、vmid 实现进程、虚拟机之间的隔离。</p>
 <h4 id="测试点示例-10">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>11.1</td>
-<td>进程间隔离</td>
-<td>无</td>
-</tr>
-<tr>
-<td>11.2</td>
-<td>虚拟机间隔离</td>
-<td>无</td>
-</tr>
-<tr>
-<td>11.3</td>
-<td>虚拟机的进程间隔离</td>
-<td>无</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>11.1</td>
+          <td>进程间隔离</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>11.2</td>
+          <td>虚拟机间隔离</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>11.3</td>
+          <td>虚拟机的进程间隔离</td>
+          <td>无</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点12并行访问">功能点12：并行访问</h3>
 <h4 id="功能说明-11">功能说明</h4>
 <p>模块包含 3 个端口，其访问是可以同时接收的，但是TLB的查询必须按序。TLB会将接收的请求暂存，以队列形式处理，当然 requestor2 作为阻塞式访问不参与这个过程。在实际场景下，对与 TLB miss 的情况，ICache 会自行组织重新持续发送请求。</p>
 <h4 id="测试点示例-11">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>12.1</td>
-<td>同时 hit</td>
-<td>三个预期会 hit 的请求同一拍进入 TLB</td>
-</tr>
-<tr>
-<td>12.2</td>
-<td>同时 miss</td>
-<td>三个预期会 miss 的请求同一拍进入 TLB</td>
-</tr>
-<tr>
-<td>12.3</td>
-<td>随机顺序回填</td>
-<td>模拟实际场景持续发送请求，并以随机顺序回填</td>
-</tr>
-<tr>
-<td>12.4</td>
-<td>发送请求同时回填请求的地址</td>
-<td>在同一拍对同一个地址发送请求&amp;回填</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>12.1</td>
+          <td>同时 hit</td>
+          <td>三个预期会 hit 的请求同一拍进入 TLB</td>
+      </tr>
+      <tr>
+          <td>12.2</td>
+          <td>同时 miss</td>
+          <td>三个预期会 miss 的请求同一拍进入 TLB</td>
+      </tr>
+      <tr>
+          <td>12.3</td>
+          <td>随机顺序回填</td>
+          <td>模拟实际场景持续发送请求，并以随机顺序回填</td>
+      </tr>
+      <tr>
+          <td>12.4</td>
+          <td>发送请求同时回填请求的地址</td>
+          <td>在同一拍对同一个地址发送请求&amp;回填</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点13大小页支持">功能点13：大小页支持</h3>
 <h4 id="功能说明-12">功能说明</h4>
 <p>TLB 支持保存全部大小页，不同 level 的页面都应该可以存入 TLB 中。</p>
 <h4 id="测试点示例-12">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>13.1</td>
-<td>level=0</td>
-<td>无</td>
-</tr>
-<tr>
-<td>13.2</td>
-<td>level=1</td>
-<td>无</td>
-</tr>
-<tr>
-<td>13.3</td>
-<td>level=2</td>
-<td>无</td>
-</tr>
-<tr>
-<td>13.4</td>
-<td>level=3</td>
-<td>无</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>13.1</td>
+          <td>level=0</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>13.2</td>
+          <td>level=1</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>13.3</td>
+          <td>level=2</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>13.4</td>
+          <td>level=3</td>
+          <td>无</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点14时序">功能点14：时序</h3>
 <h4 id="功能点说明">功能点说明</h4>
 <p>检验 TLB 时序，保证每拍的信号级别行为正确。</p>
 <h4 id="测试点示例-13">测试点示例</h4>
 <table>
-<thead>
-<tr>
-<th>No.</th>
-<th>名称</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>14.1</td>
-<td>请求命中时序（requestor0、1）</td>
-<td>无</td>
-</tr>
-<tr>
-<td>14.2</td>
-<td>请求命中时序（requestor2）</td>
-<td>无</td>
-</tr>
-<tr>
-<td>14.3</td>
-<td>请求miss时序（requestor0、1）</td>
-<td>无</td>
-</tr>
-<tr>
-<td>14.4</td>
-<td>请求miss时序（requestor2）</td>
-<td>无</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>No.</th>
+          <th>名称</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>14.1</td>
+          <td>请求命中时序（requestor0、1）</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>14.2</td>
+          <td>请求命中时序（requestor2）</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>14.3</td>
+          <td>请求miss时序（requestor0、1）</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>14.4</td>
+          <td>请求miss时序（requestor2）</td>
+          <td>无</td>
+      </tr>
+  </tbody>
 </table>
 
 </div>
@@ -922,9 +941,9 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
     
 	<h2 id="支持-sv48-分页机制">支持 SV48 分页机制</h2>
 <p><code>SV48</code> （<code>Supervisor-mode Virtual Memory</code>）是一种基于 <code>RISC-V</code> 的页表虚拟内存寻址模式，指定了 <code>48</code> 位虚拟地址空间的结构，支持 <code>256TB</code> 的虚拟内存地址空间。使用四级页表结构：</p>
-<p><img alt="Sv48_vaddr" src="Sv48_vaddr.png"></p>
-<p><img alt="Sv48_paddr" src="Sv48_paddr.png"></p>
-<p><img alt="Sv48_pagetable" src="Sv48_pagetable.png"></p>
+<p><img src="Sv48_vaddr.png" alt="Sv48_vaddr"></p>
+<p><img src="Sv48_paddr.png" alt="Sv48_paddr"></p>
+<p><img src="Sv48_pagetable.png" alt="Sv48_pagetable"></p>
 <p>在 <code>SV48</code> 的一个 <code>PTE</code> 中包含了如下字段：</p>
 <ul>
 <li>
@@ -1015,14 +1034,14 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 </li>
 </ul>
 <p>值得一提的是，如果该 <code>PTE</code> 并不是叶子 <code>PTE</code>，即它所存储的 <code>PPN</code> 用来指向下一级页表，那么它的 <code>X</code>、<code>W</code>、<code>R</code> 位应全为零。在手册中的要求如下：</p>
-<p><img alt="XWR 示意图" src="XWR.png"></p>
+<p><img src="XWR.png" alt="XWR 示意图"></p>
 <p><code>RISC-V H</code> 扩展即 <code>Hypervisor</code> 扩展，增加了对虚拟化和 <code>hypervisor</code> 模式的支持，将会允许虚拟机监控程序和虚拟机的管理程序，允许操作系统运行在虚拟机上，并可以通过 <code>hypervisor</code> 调度虚拟机的运行。在 <code>hypervisor</code> 下使用 <code>SV48x4</code> 寻址模式，支持四倍页表扩展。</p>
-<p><img alt="Sv48x4 虚拟地址" src="Sv48x4.png"></p>
+<p><img src="Sv48x4.png" alt="Sv48x4 虚拟地址"></p>
 <p><code>VPN[3]</code> 进行了两位的扩展，也即大小从原来的 <code>4KB</code> 变为 <code>16KB</code>，支持 $2^{11}$ 个 <code>PTE</code>。值得注意的是，<code>SV48x4</code> 作用于虚拟机物理地址 <code>VPA</code>，在虚拟机上创建进程地址空间时仍然采用的是 <code>SV48</code>。也正是因此，虚拟机进行虚实地址转换的时候，首先将 <code>48</code> 位的虚拟机虚拟地址（<code>GVA</code>）转换为 <code>50</code> 位的虚拟机物理地址（<code>GPA</code>），之后再将 <code>GPA</code>（相当于主机的 <code>HVA</code>）转换为主机物理地址（<code>HPA</code>）。在页表项中存储的是 <code>44</code> 位的 <code>PPN</code>，这是由 <code>56</code> 位的物理地址去掉 <code>12</code> 位的页内偏移得到的，因此完全可以存的下扩展了两位（<code>38</code> 位）的 <code>VPN</code>。</p>
 <p>出于对面积等的优化考虑，在香山中采用 <code>48</code> 位的主机物理地址，而不是 <code>Sv48</code> 要求的 <code>56</code> 位物理地址，这是因为 <code>48</code> 位的物理地址已经可以索引 <code>256TB</code> 的物理地址空间，目前来说已经足够使用。但是由于 <code>TLB</code> 对虚拟机的支持，在虚拟机两阶段地址转换过程中（两阶段地址转换可见支持两阶段虚实地址翻译过程部分），虚拟机通过 <code>VS</code> 阶段转换的结果仍然是 <code>56</code> 位的虚拟机物理地址，只不过在进入 <code>G</code> 阶段地址转换时，<code>G</code> 阶段要求传入的 <code>GPA</code> 的高 <code>6</code> 位必须为 <code>0</code>，这是因为在 <code>Sv48x4</code> 中客户机物理地址要求为 <code>50</code> 位，而 <code>VS</code> 阶段得到的物理地址是 <code>56</code> 位。为了保持 <code>gpaddr</code> 的完整性，<code>PTW</code> 传入 <code>TLB</code> 的 <code>ppn</code> 信号的位宽依然为 <code>44</code> 位，然而由于 <code>TLB</code> 不存储中间转换结果（中间物理地址 <code>IPA</code>），也就不需要存储 <code>44</code> 位的 <code>ppn</code>，在 <code>TLB</code> 表项中存储的只有主机的 <code>ppn</code>，也即 <code>36</code> 位的 <code>ppn</code>。</p>
 <h2 id="支持缓存映射条目">支持缓存映射条目</h2>
 <p><code>TLB</code> 中存储的条目并不是页表项 <code>PTE</code>，而是一个映射，一个从虚拟地址（来自于请求）到物理地址（来自于查找结果）的映射，当然还有一些访问所必须的信息。在目前的香山中 <code>TLB</code> 所存储的条目包含 <code>tag[35]</code>、<code>asid[16]</code>、<code>vmid[14]</code>、<code>level[2]</code>、<code>ppn[33]</code>、<code>8 × ppn_low[3]</code>、<code>8 × valididx</code>、<code>8 × pteidx</code>、<code>s2xlate</code>、<code>perm[6]</code>、<code>g_perm[4]</code>。为供以后使用 <code>svpbmt</code> 扩展，还存储了 <code>pbmt</code> 与 <code>g_pbmt</code> 字段。</p>
-<p><img alt="TLB 缓存条目" src="TLBstore.png"></p>
+<p><img src="TLBstore.png" alt="TLB 缓存条目"></p>
 <ul>
 <li>
 <p><strong>tag[34:0]</strong></p>
@@ -1094,154 +1113,154 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <p>香山的 <code>ITLB</code> 采用 <code>48</code> 项全相联的结构，保存全部大小页，共能存储 <code>48</code> 条映射。</p>
 <p>在支持 <code>H</code> 扩展的前提下，对于不同的 <code>s2xlate</code> 的状态 <code>TLB</code> 中存储的条目的值代表的意义也会有所区别：</p>
 <table>
-<thead>
-<tr>
-<th>类型</th>
-<th>s2xlate</th>
-<th>tag</th>
-<th>ppn</th>
-<th>perm</th>
-<th>g_perm</th>
-<th>level</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>noS2xlate</td>
-<td>b00</td>
-<td>非虚拟化下的虚拟页号</td>
-<td>非虚拟化下的物理页号</td>
-<td>非虚拟化下的页表项 perm</td>
-<td>不使用</td>
-<td>非虚拟化下的页表项 level</td>
-</tr>
-<tr>
-<td>allStage</td>
-<td>b11</td>
-<td>第一阶段页表的虚拟页号</td>
-<td>第二阶段页表的物理页号</td>
-<td>第一阶段页表的 perm</td>
-<td>第二阶段页表的 perm</td>
-<td>两阶段翻译中最大的 level</td>
-</tr>
-<tr>
-<td>onlyStage1</td>
-<td>b01</td>
-<td>第一阶段页表的虚拟页号</td>
-<td>第一阶段页表的物理页号</td>
-<td>第一阶段页表的 perm</td>
-<td>不使用</td>
-<td>第一阶段页表的 level</td>
-</tr>
-<tr>
-<td>onlyStage2</td>
-<td>b10</td>
-<td>第二阶段页表的虚拟页号</td>
-<td>第二阶段页表的物理页号</td>
-<td>不使用</td>
-<td>第二阶段页表的 perm</td>
-<td>第二阶段页表的 level</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>类型</th>
+          <th>s2xlate</th>
+          <th>tag</th>
+          <th>ppn</th>
+          <th>perm</th>
+          <th>g_perm</th>
+          <th>level</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>noS2xlate</td>
+          <td>b00</td>
+          <td>非虚拟化下的虚拟页号</td>
+          <td>非虚拟化下的物理页号</td>
+          <td>非虚拟化下的页表项 perm</td>
+          <td>不使用</td>
+          <td>非虚拟化下的页表项 level</td>
+      </tr>
+      <tr>
+          <td>allStage</td>
+          <td>b11</td>
+          <td>第一阶段页表的虚拟页号</td>
+          <td>第二阶段页表的物理页号</td>
+          <td>第一阶段页表的 perm</td>
+          <td>第二阶段页表的 perm</td>
+          <td>两阶段翻译中最大的 level</td>
+      </tr>
+      <tr>
+          <td>onlyStage1</td>
+          <td>b01</td>
+          <td>第一阶段页表的虚拟页号</td>
+          <td>第一阶段页表的物理页号</td>
+          <td>第一阶段页表的 perm</td>
+          <td>不使用</td>
+          <td>第一阶段页表的 level</td>
+      </tr>
+      <tr>
+          <td>onlyStage2</td>
+          <td>b10</td>
+          <td>第二阶段页表的虚拟页号</td>
+          <td>第二阶段页表的物理页号</td>
+          <td>不使用</td>
+          <td>第二阶段页表的 perm</td>
+          <td>第二阶段页表的 level</td>
+      </tr>
+  </tbody>
 </table>
 <p>支持 <code>H</code> 扩展后 <code>TLB</code> 中缓存的条目会有所变化（表中未提及的条目即没有变化）：</p>
 <table>
-<thead>
-<tr>
-<th>支持 H 扩展</th>
-<th>vmid</th>
-<th>s2xlate</th>
-<th>g_perm</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>否</td>
-<td>不保存</td>
-<td>不保存</td>
-<td>不保存</td>
-</tr>
-<tr>
-<td>是</td>
-<td>14位</td>
-<td>2位</td>
-<td>4位</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>支持 H 扩展</th>
+          <th>vmid</th>
+          <th>s2xlate</th>
+          <th>g_perm</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>否</td>
+          <td>不保存</td>
+          <td>不保存</td>
+          <td>不保存</td>
+      </tr>
+      <tr>
+          <td>是</td>
+          <td>14位</td>
+          <td>2位</td>
+          <td>4位</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="支持保存全部大小页">支持保存全部大小页</h2>
 <p>在 <code>RISC-V</code> 架构中，大小页机制旨在优化虚拟内存的使用效率和性能。<code>Sv48</code> 支持多种页面大小，包括 <code>4KB</code>、<code>2MB</code>、<code>1GB</code> 页，在标准的设计中没有定义 <code>512GB</code> 的页，理论上可行，但目前并没有这样的需要，<code>512GB</code> 的页也无法加载进内存，因此标准不做要求。但是出于对完整性的考虑，香山中依然实现了对 <code>512GB</code> 大页的支持。</p>
-<p><img alt="Sv48 大小页示意图" src="Sv48%E5%A4%A7%E5%B0%8F%E9%A1%B5%E7%A4%BA%E6%84%8F%E5%9B%BE.png"></p>
+<p><img src="Sv48%E5%A4%A7%E5%B0%8F%E9%A1%B5%E7%A4%BA%E6%84%8F%E5%9B%BE.png" alt="Sv48 大小页示意图"></p>
 <p>在一般的应用程序需求中，<code>4KB</code> 的页面足够满足日常的使用，可以存储较小的数据结构以及程序等，常用于大多数应用程序中。然而，有的程序可能会需要频繁访问大的数据结构或数据集，这时引入大页可以提升内存访问效率。每个大页覆盖的虚拟地址空间更大，可以显著减少页表条目的数量；在映射相同数量的内存时，所需的页表条目会大幅降低，这可以减少内存开销、减少页表查找频率，从而优化内存访问速度，尤其对频繁访问大块内存的应用，能够显著提升性能。大页通常包含连续的数据，可以提高命中率，更有效地利用缓存资源。</p>
 <p>当然，由于大页覆盖的地址空间较大，可能导致内存碎片，而未被使用的大页空间无法被其他请求有效利用，也会浪费一定的内存资源。同时，管理不同大小的页面为内存管理带来了额外的复杂性。在混合使用小页和大页时，操作系统需要复杂的算法来优化内存分配和使用。现代操作系统通常采用混合使用大小页的模式以满足不同应用的不同需求。</p>
 <p>在香山的 <code>TLB</code> 中，支持保存任意大小的页面，这是通过保存页面的 <code>level</code> 来实现的。根据不同的 <code>level</code>，可以决定最终生成物理地址的方法（<code>index</code> 为页内偏移，来源于 <code>vaddr</code> 的低 <code>12</code> 位；<code>ppn</code>、<code>ppn_low</code>、<code>tag</code> 来源于 <code>TLB</code> 中存储的映射条目）：</p>
 <table>
-<thead>
-<tr>
-<th>level</th>
-<th>页面大小</th>
-<th>paddr[47:0]</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0</td>
-<td>4KB</td>
-<td>ppn[32:0] + ppn_low[2:0] + index[11:0]</td>
-</tr>
-<tr>
-<td>1</td>
-<td>2MB</td>
-<td>ppn[32:6] + tag[8:0] + index[11:0]</td>
-</tr>
-<tr>
-<td>2</td>
-<td>1GB</td>
-<td>ppn[32:15] + tag[17:0] + index[11:0]</td>
-</tr>
-<tr>
-<td>3</td>
-<td>512GB</td>
-<td>ppn[32:24] + tag[26:0] + index[11:0]</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>level</th>
+          <th>页面大小</th>
+          <th>paddr[47:0]</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>0</td>
+          <td>4KB</td>
+          <td>ppn[32:0] + ppn_low[2:0] + index[11:0]</td>
+      </tr>
+      <tr>
+          <td>1</td>
+          <td>2MB</td>
+          <td>ppn[32:6] + tag[8:0] + index[11:0]</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>1GB</td>
+          <td>ppn[32:15] + tag[17:0] + index[11:0]</td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td>512GB</td>
+          <td>ppn[32:24] + tag[26:0] + index[11:0]</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="支持-tlb-压缩">支持 TLB 压缩</h2>
 <p>随着虚拟地址空间的不断扩展，传统 <code>TLB</code> 的大小和效率面临挑战，可能不足以覆盖应用程序的需求，导致频繁的缺失（<code>TLB miss</code>），从而影响系统性能，导致性能瓶颈。为了应对这一问题，<code>TLB</code> 压缩技术应运而生，旨在提高 <code>TLB</code> 的有效性和性能。</p>
 <p>在操作系统分配内存的时候，由于使用伙伴地址分配策略等原因，会倾向于将连续的物理页分配给连续的虚拟页。虽然随着程序的不断运行，页分配逐渐的从有序趋向于无序，但是这种页的相连性普遍存在，因此可以通过将多个连续的页表项在 <code>TLB</code> 硬件中合成为一个 <code>TLB</code> 项，以增大 <code>TLB</code> 容量。<code>TLB</code> 压缩通过优化页表结构，支持连续的映射，通过引入范围映射（<code>range mapping</code>）机制，一个 <code>TLB</code> 条目可以映射一段连续的虚拟地址到一段连续的物理地址。</p>
 <p>在实际中，以香山昆明湖架构为例，在 <code>TLB</code> 中存储 <code>35</code> 位的 <code>vpn_high</code>（即 <code>tag</code>），剩下的三位用于索引对应的 <code>ppn_low</code>（一共有 <code>8</code> 个所以需要 <code>3</code> 位来索引）。每次匹配中，<code>TLB</code> 用传入的 <code>vaddr[49:15]</code>（高 <code>35</code> 位）与 <code>tag</code> 进行匹配，找到对应的条目，这个条目中可以存储 <code>8</code> 个 <code>PTE</code>，再根据 <code>vaddr[14:12]</code> 找到对应的 <code>ppn_low</code>，之后检查对应的 <code>valididx</code> 是否有效，如果有效说明 <code>hit</code>，将 <code>ppn_low</code> 与 <code>ppn_high</code> 拼接得到 <code>PPN</code>，再与 <code>vaddr[11:0]</code> 拼接得到 <code>paddr</code>。</p>
-<p><img alt="香山 TLB 压缩示意图" src="TLB%E5%8E%8B%E7%BC%A9.png"></p>
+<p><img src="TLB%E5%8E%8B%E7%BC%A9.png" alt="香山 TLB 压缩示意图"></p>
 <p>在支持了 <code>H</code> 扩展后（见支持两阶段虚实地址翻译），<code>TLB</code> 压缩仅在 <code>OnlyStage1</code> 和 <code>noS2xlate</code> 下启用，在其他情况下不启用。</p>
 <p>支持 <code>TLB</code> 压缩后 <code>TLB</code> 中缓存的条目会有所变化（表中未提及的条目即没有变化）：</p>
 <table>
-<thead>
-<tr>
-<th>是否压缩</th>
-<th>tag</th>
-<th>ppn</th>
-<th>valididx</th>
-<th>pteidx</th>
-<th>ppn_low</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>否</td>
-<td>38位</td>
-<td>36位</td>
-<td>不保存</td>
-<td>不保存</td>
-<td>不保存</td>
-</tr>
-<tr>
-<td>是</td>
-<td>35位</td>
-<td>33位</td>
-<td>8位</td>
-<td>8位</td>
-<td>8×3位</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>是否压缩</th>
+          <th>tag</th>
+          <th>ppn</th>
+          <th>valididx</th>
+          <th>pteidx</th>
+          <th>ppn_low</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>否</td>
+          <td>38位</td>
+          <td>36位</td>
+          <td>不保存</td>
+          <td>不保存</td>
+          <td>不保存</td>
+      </tr>
+      <tr>
+          <td>是</td>
+          <td>35位</td>
+          <td>33位</td>
+          <td>8位</td>
+          <td>8位</td>
+          <td>8×3位</td>
+      </tr>
+  </tbody>
 </table>
 <p>在支持了大小页的情况下，<code>TLB</code> 压缩在大页情况下（<code>2MB/1GB/512GB</code>）不启用，仅在查询结果为小页（<code>4KB</code>）情况下启用。大页在返回时会将 <code>valididx</code> 的 <code>8</code> 位全部设置为 <code>1</code>，而由于大页的查询过程中只需要 <code>PPN</code> 的高位，大页下不使用 <code>ppn_low</code>，<code>ppn_low</code> 的值在此时是未定义的。</p>
 <h2 id="支持-hypervisor-扩展与两阶段虚实地址翻译">支持 Hypervisor 扩展与两阶段虚实地址翻译</h2>
@@ -1289,45 +1308,45 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 </ol>
 <p>在一般的虚实地址翻译过程中，将按照如上所述的过程进行转换，由 satp 寄存器控制进行地址翻译。其中，前端取指通过 <code>ITLB</code> 进行地址翻译，后端访存通过 <code>DTLB</code> 进行地址翻译。<code>ITLB</code> 和 <code>DTLB</code> 如果 <code>miss</code>，会通过 <code>Repeater</code> 向 <code>L2TLB</code> 发送请求。在目前设计中，前端取指和后端访存对 <code>TLB</code> 均采用非阻塞式访问，即一个请求 <code>miss</code> 后，会将请求 <code>miss</code> 的信息返回，请求来源调度重新发送 <code>TLB</code> 查询请求，直至命中。也就是说，<code>TLB</code> 本体是非阻塞的，可以向它连续发送请求，无论结果都可以在下一拍发送任意的请求，但是总体上由于前端的调度，体现为阻塞访问。</p>
 <p>在支持了 <code>H</code> 扩展的前提下，香山的虚拟化地址翻译过程会经历两个阶段的地址转换，可以将它划分为 <code>VS</code> 阶段和 <code>G</code> 阶段。<code>VS</code> 阶段的地址转换由 <code>vsatp</code> 寄存器控制，其实与主机的 <code>satp</code> 寄存器非常相似。</p>
-<p><img alt="VS 阶段：GVA 至 GPA" src="GVA-GPA.png"></p>
+<p><img src="GVA-GPA.png" alt="VS 阶段：GVA 至 GPA"></p>
 <p>页表项（<code>PTE</code>）的长度为 <code>64 bit</code>，也即每个 <code>4KB</code> 的页面可以存储 $2^9$ 个 <code>PTE</code>。在 <code>vsatp</code> 寄存器中存储了第一级页表（即根页表）的物理地址 <code>PPN</code>，通过这个 <code>PPN</code> 可以找到根页表，并根据 <code>GVA</code> 中的 <code>VPN[3]</code> 找到对应页表项 <code>PTE</code>，在 <code>PTE</code> 中存储了指向下一级页表的 <code>PPN</code> 以及权限位等。以此方式通过逐级的查找最终达到叶子 <code>PTE</code> 并得到 <code>PPN</code>，与 <code>offset</code> 合成后得到 <code>GPA</code>。注意这里的 <code>GPA</code> 应当是 <code>50</code> 位的，最后一级的 <code>PPN</code> 应当是 <code>38</code> 位的，这是因为支持 <code>SV48x4</code> 的原因，虚拟机的物理地址被拓宽了两位。这样的拓宽并不难实现，只需要在主机分配虚拟机内存空间的时候分配一个 <code>16KB</code> 的大页作为根页表即可；通过多使用 <code>12KB</code>（本来分配的根页表大小是 <code>4KB</code>）的物理内存就可以实现虚拟机地址空间增大四倍。至于页表项能否放下多了两位的 <code>PPN</code>，观察 <code>PTE</code> 中 <code>PPN</code> 的位数为 <code>44</code> 位，不需要担心这个问题。<code>44</code> 位的 <code>PPN</code> 放 <code>38</code> 位，前六位并没有清零要求，但是是被忽略的。</p>
-<p><img alt="G 阶段：GPA 至 HPA" src="GPA-HPA.png"></p>
+<p><img src="GPA-HPA.png" alt="G 阶段：GPA 至 HPA"></p>
 <p><code>G</code> 阶段的地址翻译则不同，由于支持了 <code>SV48x4</code>，其根页表被扩展为 <code>11</code> 位 <code>16KB</code>，因此需要特别注意 <code>hgatp</code> 寄存器中存储的 <code>PPN</code> 应当对齐 <code>16KB</code> 页，在标准情况下 <code>PPN</code> 的最后两 <code>bit</code> 应当被固定为零，意味着 <code>hgatp</code> 寄存器应当指向一个 <code>16KB</code> 页的起始地址，以避免根页表在不同的小页面内。</p>
 <p>在实际的实现中，地址的翻译并不是这样理想化的先查虚拟机的页表得到 <code>GPA</code> 再使用这个 <code>GPA</code> 查主机的页表得到 <code>HPA</code>。事实上的实现中，我们通过虚拟机的页表查到的下一级页表的物理地址是 <code>GPA</code>，并不能通过它访问到下一级页表，每次访问虚拟机的下一级页表都需要进行一次 <code>GPA</code> 到 <code>HPA</code> 的转换。比如此时给定一个 <code>GVA</code>，之后在虚拟机的一级页表（根页表）中根据 <code>GVA[2]</code>（<code>11 bit</code>）查找得到一个 <code>PTE</code>，这个 <code>PTE</code> 存储的是二级页表的 <code>GPA</code>，得到这个 <code>GPA</code> 并不能找到二级页表，因此需要将它转换为 <code>HPA</code>，也就是 <code>G</code> 阶段的地址翻译。依次查找直到找到最终需要的那个 <code>HPA</code>，共需要经历五次 <code>G</code> 阶段地址翻译，才能得到最终的 <code>HPA</code>。</p>
-<p><img alt="香山昆明湖架构 TLB 两阶段地址翻译过程" src="%E9%A6%99%E5%B1%B1%E5%9C%B0%E5%9D%80%E7%BF%BB%E8%AF%91%E8%BF%87%E7%A8%8B.png"></p>
+<p><img src="%E9%A6%99%E5%B1%B1%E5%9C%B0%E5%9D%80%E7%BF%BB%E8%AF%91%E8%BF%87%E7%A8%8B.png" alt="香山昆明湖架构 TLB 两阶段地址翻译过程"></p>
 <h2 id="支持阻塞式与非阻塞式访问">支持阻塞式与非阻塞式访问</h2>
 <p>阻塞式访问代表着 <code>TLB</code> 的端口同时仅支持一个请求，阻塞端口带 <code>valid-ready</code> 握手信号。在 <code>TLB</code> 准备好接收请求时，会将 <code>ready</code> 置 <code>1</code>，由外部检测到 <code>ready</code> 后会发送请求。请求到达 <code>TLB</code> 时 <code>valid</code> 为 <code>1</code> 则 <code>TLB</code> 接收请求并将 <code>ready</code> 置 <code>0</code>，不再接受新的请求。之后 <code>TLB</code> 会对请求进行匹配，查找结果，如果 <code>miss</code> 则发送 <code>ptw</code> 请求（同样为阻塞），等待直到 <code>ptw</code> 返回结果（物理地址或 <code>pf</code> 异常），然后 <code>TLB</code> 将结果保存并上报给请求方，再将 <code>ready</code> 置 <code>1</code>。</p>
 <p>对于非阻塞式请求，仅带 <code>valid</code> 信号，每当 <code>valid</code> 置 <code>1</code>，<code>TLB</code> 即接受请求并在下一拍返回结果（<code>hit/miss/异常</code>），无论是否命中都能在请求下一拍得到结果。如果 <code>miss</code> 的话，<code>TLB</code> 在返回 <code>miss</code> 结果同时会发起 <code>PTW</code> 请求（非阻塞），<code>PTW</code> 接收到请求则进行处理，在处理完成后回填进 <code>TLB</code> 中，然后如果请求方再次发起请求就可以命中。在香山 <code>ITLB</code> 的具体实现中，<code>TLB</code> 本体虽然是非阻塞的，不存储请求的信息，但当前端发起的取指请求 <code>miss</code> 后，将会由前端进行调度不断发起相同取指请求直到 <code>hit</code>，才能将指令送到处理器进行处理，因此会体现出阻塞的效果。</p>
 <table>
-<thead>
-<tr>
-<th>请求来源</th>
-<th>iCache</th>
-<th>IFU</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>请求数量</td>
-<td>2</td>
-<td>1</td>
-</tr>
-<tr>
-<td>请求类型</td>
-<td>非阻塞请求</td>
-<td>阻塞请求</td>
-</tr>
-<tr>
-<td>握手信号</td>
-<td>仅带 valid 信号</td>
-<td>带 valid 和 ready 信号</td>
-</tr>
-<tr>
-<td>处理方式</td>
-<td>可以继续处理其他指令</td>
-<td>等待 iTLB 响应后继续处理指令</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>请求来源</th>
+          <th>iCache</th>
+          <th>IFU</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>请求数量</td>
+          <td>2</td>
+          <td>1</td>
+      </tr>
+      <tr>
+          <td>请求类型</td>
+          <td>非阻塞请求</td>
+          <td>阻塞请求</td>
+      </tr>
+      <tr>
+          <td>握手信号</td>
+          <td>仅带 valid 信号</td>
+          <td>带 valid 和 ready 信号</td>
+      </tr>
+      <tr>
+          <td>处理方式</td>
+          <td>可以继续处理其他指令</td>
+          <td>等待 iTLB 响应后继续处理指令</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="支持读取-ptw-返回条目">支持读取 PTW 返回条目</h2>
 <p>每次 <code>TLB</code> 发生 <code>miss</code> 之后，会向 <code>L2TLB</code> 发送 <code>Page Table Walk</code> 请求。由于 <code>TLB</code> 与 <code>L2TLB</code> 之间有比较长的物理距离，需要在中间加拍，这项工作由 <code>repeator</code> 完成。同时，<code>repeator</code> 还需要对 <code>PTW</code> 请求进行过滤，以避免 <code>TLB</code> 中出现重复项，因此也被称为 <code>filter</code>。目前香山中 <code>TLB</code> 发出的 <code>PTW</code> 请求的内容包含 <code>VPN</code>、<code>s2xlate</code>、<code>getGPA</code> 三个信号以及必要的控制信号：</p>
@@ -1344,35 +1363,35 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <li>两阶段地址转换标志，指示当前的两阶段地址转换模式。<code>TLB</code> 中该标志将通过 <code>vsatp</code> 与 <code>hgatp</code> 寄存器的 <code>mode</code> 域进行判断：</li>
 </ul>
 <table>
-<thead>
-<tr>
-<th>s2xlate</th>
-<th>vsatp.mode</th>
-<th>hgatp.mode</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0b00</td>
-<td>0</td>
-<td>0</td>
-</tr>
-<tr>
-<td>0b01</td>
-<td>1</td>
-<td>0</td>
-</tr>
-<tr>
-<td>0b10</td>
-<td>0</td>
-<td>1</td>
-</tr>
-<tr>
-<td>0b11</td>
-<td>1</td>
-<td>1</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>s2xlate</th>
+          <th>vsatp.mode</th>
+          <th>hgatp.mode</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>0b00</td>
+          <td>0</td>
+          <td>0</td>
+      </tr>
+      <tr>
+          <td>0b01</td>
+          <td>1</td>
+          <td>0</td>
+      </tr>
+      <tr>
+          <td>0b10</td>
+          <td>0</td>
+          <td>1</td>
+      </tr>
+      <tr>
+          <td>0b11</td>
+          <td>1</td>
+          <td>1</td>
+      </tr>
+  </tbody>
 </table>
 </li>
 <li>
@@ -1385,474 +1404,474 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <p>在支持了 <code>TLB</code> 压缩后，<code>PTW</code> 返回的结果主要包括 <code>resp_valid</code>、<code>tag[33:0]</code>、<code>asid[15:0]</code>、<code>perm[6:0]</code>、<code>level[1:0]</code>、<code>ppn[35:0]</code>、<code>addr_low[2:0]</code>、<code>ppn_low[2:0]</code> × <code>8</code>、<code>valididx</code> × <code>8</code>、<code>pteidx</code> × <code>8</code>、<code>pf</code>、<code>af</code>（各个信号的含义可见支持缓存映射条目部分）。<code>TLB</code> 接收到有效的 <code>PTW resp</code> 后即将这些条目存进自己的缓存中。</p>
 <p>在支持了 <code>H</code> 扩展后，<code>TLB</code> 压缩仅在 <code>noS2xlate</code> 和 <code>onlyStage1</code> 时启用，需要添加 <code>s2xlate</code> 信号指示两阶段地址转换的类型，并分开返回 <code>s1</code> 和 <code>s2</code>。其中，<code>s1</code> 阶段可以与之前的主机地址转换合并，在主机地址转换中，<code>s1</code> 添加的部分信号以及位宽不适用，添加或扩充的信号如下所示：</p>
 <table>
-<thead>
-<tr>
-<th>支持 H 扩展</th>
-<th>s2xlate[1:0]</th>
-<th>tag</th>
-<th>vmid[13:0]</th>
-<th>ppn</th>
-<th>s2</th>
-<th>getGPA</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>否</td>
-<td>无</td>
-<td>[32:0]</td>
-<td>无</td>
-<td>[32:0]</td>
-<td>无</td>
-<td>无</td>
-</tr>
-<tr>
-<td>是</td>
-<td>有</td>
-<td>[34:0]</td>
-<td>有</td>
-<td>[40:0]</td>
-<td>有</td>
-<td>有</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>支持 H 扩展</th>
+          <th>s2xlate[1:0]</th>
+          <th>tag</th>
+          <th>vmid[13:0]</th>
+          <th>ppn</th>
+          <th>s2</th>
+          <th>getGPA</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>否</td>
+          <td>无</td>
+          <td>[32:0]</td>
+          <td>无</td>
+          <td>[32:0]</td>
+          <td>无</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>是</td>
+          <td>有</td>
+          <td>[34:0]</td>
+          <td>有</td>
+          <td>[40:0]</td>
+          <td>有</td>
+          <td>有</td>
+      </tr>
+  </tbody>
 </table>
 <p>其中，<code>tag</code> 扩充的两位是由于虚拟机采用 <code>Sv48x4</code>，将 <code>hypervisor</code> 下的虚拟地址从 <code>48</code> 位扩充为 <code>50</code> 位，因此 <code>tag</code> 相应需要多两位。<code>vmid</code> 指示虚拟机号。<code>ppn</code> 多的 <code>8</code> 位是因为主机采用 <code>48</code> 位物理地址，而第一阶段转换出来的虚拟机物理地址为 <code>56</code> 位（在进入下一阶段时要求前 <code>6</code> 位是 <code>0</code>，变为 <code>50</code> 位），<code>getGPA</code> 可见后面支持发生 <code>GPF</code> 时重新发起请求部分。</p>
 <p><code>s2</code> 部分用于第二阶段地址转换，即从虚拟机物理地址到主机物理地址的转换，此时 <code>asid</code> 无效，<code>resp</code> 的信号包括 <code>tag[37:0]</code>、<code>vmid[13:0]</code>、<code>ppn[37:0]</code>、<code>perm[6:0]</code>、<code>level</code>、<code>gpf</code>、<code>gaf</code>。由于不考虑 <code>TLB</code> 压缩，<code>tag</code> 即为 <code>38</code> 位，来自 <code>50</code> 位虚拟地址的高 <code>38</code> 位。值得注意，在目前的香山昆明湖架构中，这里的 <code>ppn</code> 有效的位数仅有后 <code>36</code> 位，之所以 <code>ppn</code> 位宽为 <code>38</code> 位是出于优化的需要，香山 <code>TLB</code> 中通过 <code>readResult</code> 方法从 <code>PTW</code> 中读取信息，<code>s1</code>、<code>s2</code> 阶段复用了 <code>readResult</code> 方法，由于在 <code>s1</code> 阶段的需要用到 <code>50</code> 位的物理地址，<code>readResult.ppn</code> 被定义为 <code>38</code> 位，以至于在 <code>verilog</code> 文件中传入 <code>s2.ppn</code> 时也需要额外多传 <code>2</code> 位，事实上这两位仅仅传进 <code>TLB</code> 中而不起作用，可以忽略。</p>
 <table>
-<thead>
-<tr>
-<th>支持 H 扩展</th>
-<th>s2_tag[37:0]</th>
-<th>s2_vmid[14:0]</th>
-<th>s2_ppn[37:0]</th>
-<th>s2_perm[6:0]</th>
-<th>s2_level[1:0]</th>
-<th>gpf</th>
-<th>gaf</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>否</td>
-<td>无</td>
-<td>无</td>
-<td>无</td>
-<td>无</td>
-<td>无</td>
-<td>无</td>
-<td>无</td>
-</tr>
-<tr>
-<td>是</td>
-<td>有</td>
-<td>有</td>
-<td>有</td>
-<td>有</td>
-<td>有</td>
-<td>有</td>
-<td>有</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>支持 H 扩展</th>
+          <th>s2_tag[37:0]</th>
+          <th>s2_vmid[14:0]</th>
+          <th>s2_ppn[37:0]</th>
+          <th>s2_perm[6:0]</th>
+          <th>s2_level[1:0]</th>
+          <th>gpf</th>
+          <th>gaf</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>否</td>
+          <td>无</td>
+          <td>无</td>
+          <td>无</td>
+          <td>无</td>
+          <td>无</td>
+          <td>无</td>
+          <td>无</td>
+      </tr>
+      <tr>
+          <td>是</td>
+          <td>有</td>
+          <td>有</td>
+          <td>有</td>
+          <td>有</td>
+          <td>有</td>
+          <td>有</td>
+          <td>有</td>
+      </tr>
+  </tbody>
 </table>
 <p>添加了 <code>H</code> 拓展后的 <code>MMU</code>，<code>PTW</code> 返回的结构分为三部分，第一部分 <code>s1</code> 是原先设计中的 <code>PtwSec-torResp</code>，存储第一阶段翻译的页表，第二部分 <code>s2</code> 是 <code>HptwResp</code>，存储第二阶段翻译的页表，第三部分是 <code>s2xlate</code>，代表这次 <code>resp</code> 的类型，仍然分为 <code>noS2xlate</code>、<code>allStage</code>、<code>onlyStage1</code> 和 <code>onlyStage2</code>。如下图。其中 <code>PtwSectorEntry</code> 是采用了 <code>TLB</code> 压缩技术的 <code>PtwEntry</code>。</p>
-<p><img alt="PTW resp 结构示意图" src="PTW_resp%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F.png"></p>
+<p><img src="PTW_resp%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F.png" alt="PTW resp 结构示意图"></p>
 <h2 id="支持回填条目与两阶段条目融合">支持回填条目与两阶段条目融合</h2>
 <p>参照支持缓存映射条目与支持读取 <code>PTW</code> 返回条目，对于主机地址转换（<code>nos2xlate</code>）的情况对应填入 <code>entry</code> 中的对应表项即可，此时访客有关信号无效。注意大页时，即 <code>level</code> 不为 <code>0</code> 时，<code>ppn_low</code> 无效。</p>
 <table>
-<thead>
-<tr>
-<th>TLB entry</th>
-<th>填入的来自 PTW 的信号</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>s2xlate[1:0]</td>
-<td>0b00 (nos2xlate)</td>
-</tr>
-<tr>
-<td>tag[34:0]</td>
-<td>s1.tag[34:0]</td>
-</tr>
-<tr>
-<td>asid[15:0]</td>
-<td>s1.asid[15:0]</td>
-</tr>
-<tr>
-<td>vmid[13:0]</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>level[1:0]</td>
-<td>s1.level[1:0]</td>
-</tr>
-<tr>
-<td>ppn[32:0]</td>
-<td>s1.ppn[32:0]</td>
-</tr>
-<tr>
-<td>ppn_low[2:0]×8</td>
-<td>s1.ppn_low_*</td>
-</tr>
-<tr>
-<td>valididx×8</td>
-<td>s1.valididx_*</td>
-</tr>
-<tr>
-<td>pteidx×8</td>
-<td>s1.pteidx_*</td>
-</tr>
-<tr>
-<td>perm_pf</td>
-<td>s1.pf</td>
-</tr>
-<tr>
-<td>perm_af</td>
-<td>s1.af</td>
-</tr>
-<tr>
-<td>perm_a</td>
-<td>s1.perm.a</td>
-</tr>
-<tr>
-<td>perm_g</td>
-<td>s1.perm.g</td>
-</tr>
-<tr>
-<td>perm_u</td>
-<td>s1.perm.u</td>
-</tr>
-<tr>
-<td>perm_x</td>
-<td>s1.perm.x</td>
-</tr>
-<tr>
-<td>gperm_gpf</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>gperm_gaf</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>gperm_a</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>gperm_x</td>
-<td>无效</td>
-</tr>
-<tr>
-<td><em>s2xlate=0b00 时填入 TLB entry 示意表</em></td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>TLB entry</th>
+          <th>填入的来自 PTW 的信号</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>s2xlate[1:0]</td>
+          <td>0b00 (nos2xlate)</td>
+      </tr>
+      <tr>
+          <td>tag[34:0]</td>
+          <td>s1.tag[34:0]</td>
+      </tr>
+      <tr>
+          <td>asid[15:0]</td>
+          <td>s1.asid[15:0]</td>
+      </tr>
+      <tr>
+          <td>vmid[13:0]</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>level[1:0]</td>
+          <td>s1.level[1:0]</td>
+      </tr>
+      <tr>
+          <td>ppn[32:0]</td>
+          <td>s1.ppn[32:0]</td>
+      </tr>
+      <tr>
+          <td>ppn_low[2:0]×8</td>
+          <td>s1.ppn_low_*</td>
+      </tr>
+      <tr>
+          <td>valididx×8</td>
+          <td>s1.valididx_*</td>
+      </tr>
+      <tr>
+          <td>pteidx×8</td>
+          <td>s1.pteidx_*</td>
+      </tr>
+      <tr>
+          <td>perm_pf</td>
+          <td>s1.pf</td>
+      </tr>
+      <tr>
+          <td>perm_af</td>
+          <td>s1.af</td>
+      </tr>
+      <tr>
+          <td>perm_a</td>
+          <td>s1.perm.a</td>
+      </tr>
+      <tr>
+          <td>perm_g</td>
+          <td>s1.perm.g</td>
+      </tr>
+      <tr>
+          <td>perm_u</td>
+          <td>s1.perm.u</td>
+      </tr>
+      <tr>
+          <td>perm_x</td>
+          <td>s1.perm.x</td>
+      </tr>
+      <tr>
+          <td>gperm_gpf</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>gperm_gaf</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>gperm_a</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>gperm_x</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td><em>s2xlate=0b00 时填入 TLB entry 示意表</em></td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <p>在 <code>OnlyStage1</code> 的情况下，主机的异常信号以及部分不可复用的权限位无效，其余均与主机地址转换一致。</p>
 <table>
-<thead>
-<tr>
-<th>TLB entry</th>
-<th>填入的来自 PTW 的信号</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>s2xlate[1:0]</td>
-<td>0b01 (OnlyStage1)</td>
-</tr>
-<tr>
-<td>tag[34:0]</td>
-<td>s1.tag[34:0]</td>
-</tr>
-<tr>
-<td>asid[15:0]</td>
-<td>s1.asid[15:0]</td>
-</tr>
-<tr>
-<td>vmid[13:0]</td>
-<td>s1.vmid[13:0]</td>
-</tr>
-<tr>
-<td>level[1:0]</td>
-<td>s1.level[1:0]</td>
-</tr>
-<tr>
-<td>ppn[32:0]</td>
-<td>s1.ppn[32:0]</td>
-</tr>
-<tr>
-<td>ppn_low[2:0]×8</td>
-<td>s1.ppn_low_*</td>
-</tr>
-<tr>
-<td>valididx×8</td>
-<td>s1.valididx_*</td>
-</tr>
-<tr>
-<td>pteidx×8</td>
-<td>s1.pteidx_*</td>
-</tr>
-<tr>
-<td>perm_pf</td>
-<td>s1.pf</td>
-</tr>
-<tr>
-<td>perm_af</td>
-<td>s1.af</td>
-</tr>
-<tr>
-<td>perm_a</td>
-<td>s1.perm.a</td>
-</tr>
-<tr>
-<td>perm_g</td>
-<td>s1.perm.g</td>
-</tr>
-<tr>
-<td>perm_u</td>
-<td>s1.perm.u</td>
-</tr>
-<tr>
-<td>perm_x</td>
-<td>s1.perm.x</td>
-</tr>
-<tr>
-<td>gperm_gpf</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>gperm_gaf</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>gperm_a</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>gperm_x</td>
-<td>无效</td>
-</tr>
-<tr>
-<td><em>s2xlate=0b01 时填入 TLB entry 示意表</em></td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>TLB entry</th>
+          <th>填入的来自 PTW 的信号</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>s2xlate[1:0]</td>
+          <td>0b01 (OnlyStage1)</td>
+      </tr>
+      <tr>
+          <td>tag[34:0]</td>
+          <td>s1.tag[34:0]</td>
+      </tr>
+      <tr>
+          <td>asid[15:0]</td>
+          <td>s1.asid[15:0]</td>
+      </tr>
+      <tr>
+          <td>vmid[13:0]</td>
+          <td>s1.vmid[13:0]</td>
+      </tr>
+      <tr>
+          <td>level[1:0]</td>
+          <td>s1.level[1:0]</td>
+      </tr>
+      <tr>
+          <td>ppn[32:0]</td>
+          <td>s1.ppn[32:0]</td>
+      </tr>
+      <tr>
+          <td>ppn_low[2:0]×8</td>
+          <td>s1.ppn_low_*</td>
+      </tr>
+      <tr>
+          <td>valididx×8</td>
+          <td>s1.valididx_*</td>
+      </tr>
+      <tr>
+          <td>pteidx×8</td>
+          <td>s1.pteidx_*</td>
+      </tr>
+      <tr>
+          <td>perm_pf</td>
+          <td>s1.pf</td>
+      </tr>
+      <tr>
+          <td>perm_af</td>
+          <td>s1.af</td>
+      </tr>
+      <tr>
+          <td>perm_a</td>
+          <td>s1.perm.a</td>
+      </tr>
+      <tr>
+          <td>perm_g</td>
+          <td>s1.perm.g</td>
+      </tr>
+      <tr>
+          <td>perm_u</td>
+          <td>s1.perm.u</td>
+      </tr>
+      <tr>
+          <td>perm_x</td>
+          <td>s1.perm.x</td>
+      </tr>
+      <tr>
+          <td>gperm_gpf</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>gperm_gaf</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>gperm_a</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>gperm_x</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td><em>s2xlate=0b01 时填入 TLB entry 示意表</em></td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <p>对于 <code>OnlyStage2</code> 的情况，<code>asid</code> 无效，<code>vmid</code> 使用 <code>s1.vmid</code>（由于 <code>PTW</code> 模块无论什么情况都会填写这个字段，所以可以直接使用这个字段写入），<code>pteidx</code> 根据 <code>s2</code> 的 <code>tag</code> 的低 <code>3</code> 位来确定。如果 <code>s2</code> 是大页，那么 <code>TLB</code> 项的 <code>valididx</code> 均为有效，否则 <code>TLB</code> 项的 <code>pteidx</code> 对应 <code>valididx</code> 有效。<code>ppn</code> 的填写复用了 <code>allStage</code> 的逻辑，将在 <code>allStage</code> 的情况下介绍。</p>
 <table>
-<thead>
-<tr>
-<th>TLB entry</th>
-<th>填入的来自 PTW 的信号</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>s2xlate[1:0]</td>
-<td>0b10 (OnlyStage2)</td>
-</tr>
-<tr>
-<td>tag[34:0]</td>
-<td>s2.tag[37:3]</td>
-</tr>
-<tr>
-<td>asid[15:0]</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>vmid[13:0]</td>
-<td>s1.vmid[13:0]</td>
-</tr>
-<tr>
-<td>level[1:0]</td>
-<td>s2.level[1:0]</td>
-</tr>
-<tr>
-<td>ppn[32:0]</td>
-<td>s2.ppn[35:3]</td>
-</tr>
-<tr>
-<td>ppn_low[2:0]×8</td>
-<td>{ s2.ppn[2:0], 无效×7 }</td>
-</tr>
-<tr>
-<td>valididx×8</td>
-<td>{ 1， 0×7 }</td>
-</tr>
-<tr>
-<td>pteidx×8</td>
-<td>s2.tag[2:0]</td>
-</tr>
-<tr>
-<td>perm_pf</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>perm_af</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>perm_a</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>perm_g</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>perm_u</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>perm_x</td>
-<td>无效</td>
-</tr>
-<tr>
-<td>gperm_gpf</td>
-<td>s2.gpf</td>
-</tr>
-<tr>
-<td>gperm_gaf</td>
-<td>s2.gaf</td>
-</tr>
-<tr>
-<td>gperm_a</td>
-<td>s2.perm.a</td>
-</tr>
-<tr>
-<td>gperm_x</td>
-<td>s2.perm.x</td>
-</tr>
-<tr>
-<td><em>s2xlate=0b10 时填入 TLB entry 示意表</em></td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>TLB entry</th>
+          <th>填入的来自 PTW 的信号</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>s2xlate[1:0]</td>
+          <td>0b10 (OnlyStage2)</td>
+      </tr>
+      <tr>
+          <td>tag[34:0]</td>
+          <td>s2.tag[37:3]</td>
+      </tr>
+      <tr>
+          <td>asid[15:0]</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>vmid[13:0]</td>
+          <td>s1.vmid[13:0]</td>
+      </tr>
+      <tr>
+          <td>level[1:0]</td>
+          <td>s2.level[1:0]</td>
+      </tr>
+      <tr>
+          <td>ppn[32:0]</td>
+          <td>s2.ppn[35:3]</td>
+      </tr>
+      <tr>
+          <td>ppn_low[2:0]×8</td>
+          <td>{ s2.ppn[2:0], 无效×7 }</td>
+      </tr>
+      <tr>
+          <td>valididx×8</td>
+          <td>{ 1， 0×7 }</td>
+      </tr>
+      <tr>
+          <td>pteidx×8</td>
+          <td>s2.tag[2:0]</td>
+      </tr>
+      <tr>
+          <td>perm_pf</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>perm_af</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>perm_a</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>perm_g</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>perm_u</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>perm_x</td>
+          <td>无效</td>
+      </tr>
+      <tr>
+          <td>gperm_gpf</td>
+          <td>s2.gpf</td>
+      </tr>
+      <tr>
+          <td>gperm_gaf</td>
+          <td>s2.gaf</td>
+      </tr>
+      <tr>
+          <td>gperm_a</td>
+          <td>s2.perm.a</td>
+      </tr>
+      <tr>
+          <td>gperm_x</td>
+          <td>s2.perm.x</td>
+      </tr>
+      <tr>
+          <td><em>s2xlate=0b10 时填入 TLB entry 示意表</em></td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <p>如果两阶段地址转换均启用，<code>TLB</code> 将两阶段的结果合并存储，并丢弃中间物理地址（<code>s1</code> 阶段的 <code>ppn</code>），仅存储最终物理地址。<code>level</code> 需要取 <code>s1.level</code> 与 <code>s2.level</code> 中的较大值，此时需要注意，当 <code>s1</code> 阶段为大页，而 <code>s2</code> 阶段为小页的情况下，例如中间物理地址指向一个 <code>2MB</code> 页，而 <code>s2</code> 阶段转换的结果却是一个 <code>4KB</code> 页，在这种情况下，需要特殊处理，将 <code>s1.tag</code> 的高位（在此例子中为高 <code>11+9+9=29</code> 位）和 <code>s2.tag</code> 的低位（在此例子中为低 <code>9</code> 位）共 <code>38</code> 位合并存储到 <code>tag</code> 与 <code>pteidx</code> 中，如果不足 <code>38</code> 位则在后面补 <code>0</code>（例如中间物理地址指向 <code>1GB</code> 页而 <code>s2</code> 阶段指向 <code>2MB</code> 页，此时 <code>tag[34:0] = {s1.tag[34:15], s2.tag[17:9], 6'b0}</code>）。在这种情况（<code>s1</code> 大页 <code>s2</code> 小页）下 <code>ppn</code> 也需要处理后存储，根据 <code>s2.level</code> 将 <code>s2.ppn</code> 与 <code>s2.tag</code> 进行拼接后存储。</p>
 <table>
-<thead>
-<tr>
-<th>TLB entry</th>
-<th>填入的来自 PTW 的信号</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>s2xlate[1:0]</td>
-<td>0b11 (allStage)</td>
-</tr>
-<tr>
-<td>tag[34:0]</td>
-<td>根据策略选择 s1.tag/s2.tag 的部分位</td>
-</tr>
-<tr>
-<td>asid[15:0]</td>
-<td>s1.asid</td>
-</tr>
-<tr>
-<td>vmid[13:0]</td>
-<td>s1.vmid</td>
-</tr>
-<tr>
-<td>level[1:0]</td>
-<td>s1.level 与 s2.level 的较大者</td>
-</tr>
-<tr>
-<td>ppn[32:0]</td>
-<td>s2.ppn 与 s2.tag 根据 s2.level 的拼接的高位</td>
-</tr>
-<tr>
-<td>ppn_low[2:0]×8</td>
-<td>s2.ppn 与 s2.tag 根据 s2.level 的拼接的低位</td>
-</tr>
-<tr>
-<td>valididx×8</td>
-<td>根据 level 确定</td>
-</tr>
-<tr>
-<td>pteidx×8</td>
-<td>tag 的低位</td>
-</tr>
-<tr>
-<td>perm_pf</td>
-<td>s1.pf</td>
-</tr>
-<tr>
-<td>perm_af</td>
-<td>s1.af</td>
-</tr>
-<tr>
-<td>perm_a</td>
-<td>s1.perm.a</td>
-</tr>
-<tr>
-<td>perm_g</td>
-<td>s1.perm.g</td>
-</tr>
-<tr>
-<td>perm_u</td>
-<td>s1.perm.u</td>
-</tr>
-<tr>
-<td>perm_x</td>
-<td>s1.perm.x</td>
-</tr>
-<tr>
-<td>gperm_gpf</td>
-<td>s2.gpf</td>
-</tr>
-<tr>
-<td>gperm_gaf</td>
-<td>s2.gaf</td>
-</tr>
-<tr>
-<td>gperm_a</td>
-<td>s2.perm.a</td>
-</tr>
-<tr>
-<td>gperm_x</td>
-<td>s2.perm.x</td>
-</tr>
-<tr>
-<td><em>s2xlate=0b11 时填入 TLB entry 示意表</em></td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>TLB entry</th>
+          <th>填入的来自 PTW 的信号</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>s2xlate[1:0]</td>
+          <td>0b11 (allStage)</td>
+      </tr>
+      <tr>
+          <td>tag[34:0]</td>
+          <td>根据策略选择 s1.tag/s2.tag 的部分位</td>
+      </tr>
+      <tr>
+          <td>asid[15:0]</td>
+          <td>s1.asid</td>
+      </tr>
+      <tr>
+          <td>vmid[13:0]</td>
+          <td>s1.vmid</td>
+      </tr>
+      <tr>
+          <td>level[1:0]</td>
+          <td>s1.level 与 s2.level 的较大者</td>
+      </tr>
+      <tr>
+          <td>ppn[32:0]</td>
+          <td>s2.ppn 与 s2.tag 根据 s2.level 的拼接的高位</td>
+      </tr>
+      <tr>
+          <td>ppn_low[2:0]×8</td>
+          <td>s2.ppn 与 s2.tag 根据 s2.level 的拼接的低位</td>
+      </tr>
+      <tr>
+          <td>valididx×8</td>
+          <td>根据 level 确定</td>
+      </tr>
+      <tr>
+          <td>pteidx×8</td>
+          <td>tag 的低位</td>
+      </tr>
+      <tr>
+          <td>perm_pf</td>
+          <td>s1.pf</td>
+      </tr>
+      <tr>
+          <td>perm_af</td>
+          <td>s1.af</td>
+      </tr>
+      <tr>
+          <td>perm_a</td>
+          <td>s1.perm.a</td>
+      </tr>
+      <tr>
+          <td>perm_g</td>
+          <td>s1.perm.g</td>
+      </tr>
+      <tr>
+          <td>perm_u</td>
+          <td>s1.perm.u</td>
+      </tr>
+      <tr>
+          <td>perm_x</td>
+          <td>s1.perm.x</td>
+      </tr>
+      <tr>
+          <td>gperm_gpf</td>
+          <td>s2.gpf</td>
+      </tr>
+      <tr>
+          <td>gperm_gaf</td>
+          <td>s2.gaf</td>
+      </tr>
+      <tr>
+          <td>gperm_a</td>
+          <td>s2.perm.a</td>
+      </tr>
+      <tr>
+          <td>gperm_x</td>
+          <td>s2.perm.x</td>
+      </tr>
+      <tr>
+          <td><em>s2xlate=0b11 时填入 TLB entry 示意表</em></td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="支持发生-gpf-时重新发起-ptw-请求">支持发生 GPF 时重新发起 PTW 请求</h2>
 <p>在香山的 <code>TLB</code> 中并不会保存中间物理地址。在两阶段地址转换过程中，如果第一阶段发生缺页异常，即 <code>PTW</code> 返回 <code>gpf</code>，此时 <code>TLB</code> 将 <code>PTW</code> 返回的结果存入 <code>TLB</code> 项内，请求方再次请求的时候发现 <code>gpf</code>，此时 <code>TLB</code> 会返回 <code>miss</code>，即使已经存储了这个映射。同时，<code>TLB</code> 将发起带 <code>getGPA</code> 标志的 <code>PTW</code> 请求，请求这个虚拟地址，并维护一组寄存器暂存相关信号：</p>
 <table>
-<thead>
-<tr>
-<th>信号</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>need_gpa</td>
-<td>表示此时有一个请求正在获取 gpaddr</td>
-</tr>
-<tr>
-<td>need_gpa_robidx</td>
-<td>存储请求的 ROB（Reorder Buffer）索引，用于跟踪请求来源，目前未使用</td>
-</tr>
-<tr>
-<td>need_gpa_vpn[37:0]</td>
-<td>存储请求的 vpn，即 50 位虚拟地址的高 38 位</td>
-</tr>
-<tr>
-<td>need_gpa_gvpn[43:0]</td>
-<td>存储获取的 gpaddr 的 gvpn，虚拟机通过转换得到的 56 位虚拟机物理地址的高 44 位，前六位在第二阶段地址转换中被要求为全 0</td>
-</tr>
-<tr>
-<td>need_gpa_refill</td>
-<td>表示该请求的 gpaddr 已经被填入 need_gpa_gvpn</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>信号</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>need_gpa</td>
+          <td>表示此时有一个请求正在获取 gpaddr</td>
+      </tr>
+      <tr>
+          <td>need_gpa_robidx</td>
+          <td>存储请求的 ROB（Reorder Buffer）索引，用于跟踪请求来源，目前未使用</td>
+      </tr>
+      <tr>
+          <td>need_gpa_vpn[37:0]</td>
+          <td>存储请求的 vpn，即 50 位虚拟地址的高 38 位</td>
+      </tr>
+      <tr>
+          <td>need_gpa_gvpn[43:0]</td>
+          <td>存储获取的 gpaddr 的 gvpn，虚拟机通过转换得到的 56 位虚拟机物理地址的高 44 位，前六位在第二阶段地址转换中被要求为全 0</td>
+      </tr>
+      <tr>
+          <td>need_gpa_refill</td>
+          <td>表示该请求的 gpaddr 已经被填入 need_gpa_gvpn</td>
+      </tr>
+  </tbody>
 </table>
 <p>每当 <code>TLB</code> 发起带 <code>getGPA</code> 标志的请求时，就会将 <code>need_gpa</code> 置 <code>1</code>，并将请求的 <code>vpn</code> 填入到 <code>need_gpa_vpn</code> 中，同时将 <code>need_gpa_refill</code> 置 <code>0</code>。当 <code>PTW</code> 返回结果的时候，<code>TLB</code> 将 <code>PTW resp</code> 中的 <code>vpn</code> 提取出来与 <code>need_gpa_vpn</code> 进行比较，判断是否是对之前 <code>getGPA</code> 请求的回应。如果是，那么将 <code>PTW resp</code> 中的 <code>s2 tag</code> 填入到 <code>need_gpa_gvpn</code> 中并将 <code>need_gpa_refill</code> 置 <code>1</code>，表示已经获取到需要的 <code>gvpn</code>。下一次 <code>TLB</code> 接收到相同请求时就可以通过 <code>need_gpa_gvpn</code> 得到 <code>gpaddr</code>，之后 <code>TLB</code> 会将 <code>need_gpa</code> 置 <code>0</code>，但保留其它寄存器，因此下次其它的请求发生 <code>gpf</code> 时也可以再次使用相同的 <code>need_gpa_vpn</code> 找到 <code>paddr</code> 而无需再次发起 <code>PTW</code> 请求。</p>
 <p>注意这里的 <code>gvpn</code> 是 <code>44</code> 位的，这是由于客户机采用 <code>56</code> 位物理地址，为了维护 <code>gpaddr</code> 的完整性，所以在这里需要存储 <code>44</code> 位的 <code>gvpn</code>，但是事实上 <code>gvpn</code> 的前 <code>6</code> 位一定会是 <code>0</code>，否则说明第一阶段产生了错误的物理地址，会触发 <code>gpf</code>，在此时需要将错误信息保存在 <code>mtval2/htval</code> 寄存器中，因此需要完整的 <code>gpaddr</code>，正常情况下并不需要。（当发生页面错误时，<code>mtval2</code> 将被填充为生成错误的物理地址，帮助异常处理程序；<code>htval</code> 将被填充为导致异常的虚拟地址，帮助 <code>hypervisor</code> 识别问题）</p>
@@ -1860,62 +1879,62 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <p><code>getGPA</code> 标志并不用于判断指令是否是请求 <code>gpaddr</code>，<code>PTW</code> 不需要关心请求是干什么的，只需要负责查找并返回结果；<code>TLB</code> 内会通过一系列寄存器的比较来判断。这个信号的作用在于防止 <code>TLB</code> 重填，每次 <code>TLB</code> 发送带 <code>getGPA</code> 标志的请求时，<code>PTW</code> 在返回时会将 <code>getGPA</code> 信号传递回 <code>TLB</code>，从而使 <code>TLB</code> 不进行重填，不存储此项 <code>gpaddr</code>。</p>
 <h2 id="支持-plru-替换算法">支持 PLRU 替换算法</h2>
 <p><code>LRU</code>（<code>Least Recently Used</code>）算法核心思想就是替换掉最近最少使用的页，也就是最长时间没有访问的页。<code>LRU</code> 算法将内存中的每个页组织成了一个链表的形式，如图所示：</p>
-<p><img alt="LRU 算法示意图" src="LRU%E7%AE%97%E6%B3%95.png"></p>
+<p><img src="LRU%E7%AE%97%E6%B3%95.png" alt="LRU 算法示意图"></p>
 <p>链表有两端，一端是最近最少使用的页，可以称为 <code>LRU</code> 端，另一端是最近刚刚使用的页，即最近使用最频繁的页，称之为 <code>MRU</code>（<code>Most Recently Used</code>）端。每次访问的时候如果命中，那么就将命中的页移动到 <code>MRU</code> 端，如果 <code>miss</code> 则触发缺页，此时需要加载页面。如果这时候内存已满，那么就需要进行页面替换，选择 <code>LRU</code> 端的页进行替换，并把新访问的页放在 <code>MRU</code> 端。这就是 <code>LRU</code> 替换算法，是 <code>cache</code> 替换的经典算法。</p>
 <p>但是由于 <code>LRU</code> 需要为 <code>cache</code> 行维护一个链表数据结构，在多路组相联的 <code>cache</code> 行中需要为每一路配置链表并跟踪每一行的使用时间，<code>LRU</code> 算法有着巨大的开销。因此虽然 <code>LRU</code> 在页面替换中表现出色，也依然不常使用。</p>
 <p>在香山的昆明湖架构中，<code>TLB</code> 采用 <code>PLRU</code>（<code>pseudo-LRU</code>）替换算法，详细来说是 <code>tree-based PLRU</code> 算法。假设当前 <code>Cache</code> 是 <code>n</code> 路组相联（<code>n</code> 一般是 <code>2</code> 的整数幂）的结构，那么需要定义 <code>n-1</code> 位用来进行二叉树索引，假设为 <code>0</code> 表示左，为 <code>1</code> 表示右，如图所示：</p>
-<p><img alt="PLRU 二叉索引示意图" src="PLRU%E7%B4%A2%E5%BC%95.png"></p>
+<p><img src="PLRU%E7%B4%A2%E5%BC%95.png" alt="PLRU 二叉索引示意图"></p>
 <p>对目前的香山昆明湖架构来说，采用每路 <code>48 cache</code> 行的二路组相联结构下，<code>PLRU</code> 需要维护一个 <code>48</code> 项的链表和一个一级的二叉树（<code>1</code> 位），而采用 <code>LRU</code> 将需要维护一个 <code>48</code> 项的链表和 <code>48</code> 个 <code>2</code> 项的链表，有一定的开销优势，随着路数的增加，优势会更加明显；同时，对二叉树的维护成本也比链表更低。</p>
 <p>当然，<code>PLRU</code> 多级二叉树的选择策略下并不能做到与 <code>LRU</code> 一样精确控制，每次二分地排除掉一半不一定能找到绝对 <code>LRU</code> 的条目。</p>
 <h2 id="支持-sfencevma-指令">支持 SFENCE.VMA 指令</h2>
 <p><code>SFENCE.VMA</code> 指令（<code>Supervisor Memory-Management Fence Instruction</code>）是定义在 <code>RISC-V</code> 指令架构的指令：</p>
-<p><img alt="SFECE.VMA 指令" src="SFENCE_VMA.png"></p>
+<p><img src="SFENCE_VMA.png" alt="SFECE.VMA 指令"></p>
 <p>在内存管理中，页表负责将虚拟地址映射到物理地址。当修改了页表后，这些修改不会自动在处理器的缓存中生效。为了确保后续的指令能使用更新后的页表，必须通过 <code>SFENCE.VMA</code> 指令来刷新这些缓存。此外，处理器在执行指令时，可能隐式地对内存管理数据结构进行读取和写入操作，但这些隐式操作和显式的内存操作通常是无序的。<code>SFENCE.VMA</code> 指令可以强制处理器将某些隐式操作在显式操作之前完成，从而确保操作的顺序性。</p>
 <p><code>SFENCE.VMA</code> 是 <code>RISC-V</code> 架构中的一条特权指令，用于刷新与地址翻译相关的本地硬件缓存，处理内存管理数据结构的同步，特别是当需要确保对这些数据结构的修改在不同的硬件组件之间保持一致时需要频繁使用该指令。<code>SFENCE.VMA</code> 只影响本地核心（<code>hart</code>），如果需要在多个核心之间同步，则需要核间中断等额外机制。虽然 <code>SFENCE.VMA</code> 指令对于维护一致性至关重要，但频繁调用可能会影响系统性能，因此，应根据实际需要合理使用，以平衡一致性和性能之间的关系。</p>
 <p><code>SFENCE.VMA</code> 的行为依赖于 <code>rs1</code> 和 <code>rs2</code>，在 <code>RISC-V</code> 特权指令集中如下所述：</p>
 <table>
-<thead>
-<tr>
-<th>条件</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>- 如果 <code>rs1=x0</code> 且 <code>rs2=x0</code>，栅栏会对所有地址空间的页面表的所有读写进行排序，并将所有地址翻译缓存条目标记为 invalid。</td>
-</tr>
-<tr>
-<td>- 如果 <code>rs1=x0</code> 且 <code>rs2</code> 不是 <code>x0</code>，栅栏会对指定的地址空间的页面表的所有读写进行排序，但不对全局映射进行排序。它还会失效与指定地址空间匹配的地址翻译缓存条目，但不包括全局映射的条目。</td>
-</tr>
-<tr>
-<td>- 如果 <code>rs1</code> 不是 <code>x0</code> 且 <code>rs2=x0</code>，栅栏会对所有地址空间的与 <code>rs1</code> 对应的虚拟地址的叶子页面表条目的读写进行排序，并失效包含该虚拟地址的所有叶子页面表条目的地址翻译缓存条目。</td>
-</tr>
-<tr>
-<td>- 如果 <code>rs1</code> 不是 <code>x0</code> 且 <code>rs2</code> 不是 <code>x0</code>，栅栏会对与 <code>rs1</code> 对应的虚拟地址在指定地址空间的叶子页面表条目的读写进行排序，并失效与 <code>rs1</code> 对应的虚拟地址并匹配指定地址空间的所有叶子页面表条目的地址翻译缓存条目，但不包括全局映射的条目。</td>
-</tr>
-<tr>
-<td>- 如果 <code>rs1</code> 中的值不是有效的虚拟地址，则 <code>SFENCE.VMA</code> 指令没有效果，且不会引发异常。</td>
-</tr>
-<tr>
-<td>- 当 <code>rs2=x0</code> 时，<code>rs2</code> 中的值的 <code>SXLEN-1:ASIDMAX</code> 位保留供将来标准使用。在标准扩展定义其用法之前，这些位应由软件置为零并被当前实现忽略。此外，如果 <code>ASIDLEN &lt; ASIDMAX</code>，则实现应忽略 <code>rs2</code> 中值的 <code>ASIDMAX-1:ASIDLEN</code> 位。</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>条件</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>- 如果 <code>rs1=x0</code> 且 <code>rs2=x0</code>，栅栏会对所有地址空间的页面表的所有读写进行排序，并将所有地址翻译缓存条目标记为 invalid。</td>
+      </tr>
+      <tr>
+          <td>- 如果 <code>rs1=x0</code> 且 <code>rs2</code> 不是 <code>x0</code>，栅栏会对指定的地址空间的页面表的所有读写进行排序，但不对全局映射进行排序。它还会失效与指定地址空间匹配的地址翻译缓存条目，但不包括全局映射的条目。</td>
+      </tr>
+      <tr>
+          <td>- 如果 <code>rs1</code> 不是 <code>x0</code> 且 <code>rs2=x0</code>，栅栏会对所有地址空间的与 <code>rs1</code> 对应的虚拟地址的叶子页面表条目的读写进行排序，并失效包含该虚拟地址的所有叶子页面表条目的地址翻译缓存条目。</td>
+      </tr>
+      <tr>
+          <td>- 如果 <code>rs1</code> 不是 <code>x0</code> 且 <code>rs2</code> 不是 <code>x0</code>，栅栏会对与 <code>rs1</code> 对应的虚拟地址在指定地址空间的叶子页面表条目的读写进行排序，并失效与 <code>rs1</code> 对应的虚拟地址并匹配指定地址空间的所有叶子页面表条目的地址翻译缓存条目，但不包括全局映射的条目。</td>
+      </tr>
+      <tr>
+          <td>- 如果 <code>rs1</code> 中的值不是有效的虚拟地址，则 <code>SFENCE.VMA</code> 指令没有效果，且不会引发异常。</td>
+      </tr>
+      <tr>
+          <td>- 当 <code>rs2=x0</code> 时，<code>rs2</code> 中的值的 <code>SXLEN-1:ASIDMAX</code> 位保留供将来标准使用。在标准扩展定义其用法之前，这些位应由软件置为零并被当前实现忽略。此外，如果 <code>ASIDLEN &lt; ASIDMAX</code>，则实现应忽略 <code>rs2</code> 中值的 <code>ASIDMAX-1:ASIDLEN</code> 位。</td>
+      </tr>
+  </tbody>
 </table>
 <p><code>SFENCE.VMA</code> 指令的作用是确保在执行该指令之前的所有写入操作已经被提交到内存。这意味着 <code>Store Buffer</code> 中的所有未完成写入都会被写入到 <code>DCache</code> 或最终的内存地址中；<code>SFENCE.VMA</code> 发出刷新信号，通知 <code>MMU</code>（内存管理单元）更新 <code>TLB</code>（转换后备缓冲区）等内部状态。这一刷新信号是瞬时的，并且没有返回确认信号。在验证时需要通过再次访问观察是否 <code>miss</code> 的形式来进行，也可以通过分析波形文件观察 <code>TLB</code> 内部寄存器行为。</p>
 <table>
-<thead>
-<tr>
-<th>Store Buffer（存储缓冲区）</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Store Buffer 用于提高内存写入效率，允许 CPU 在发出写入操作后，立即继续执行后续指令，而不需要等待内存系统确认写入完成。这有助于减少 CPU 的闲置时间，提高指令执行的整体效率。写回时，写入数据首先被放入 Store Buffer，随后，数据会按某种策略写入主内存（如 DCache 或其他存储层级）。Store Buffer 维护写入操作的顺序，但不保证这些写入操作立即反映在内存中。在多核处理器中，Store Buffer 可以帮助降低缓存一致性协议的复杂性。</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Store Buffer（存储缓冲区）</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Store Buffer 用于提高内存写入效率，允许 CPU 在发出写入操作后，立即继续执行后续指令，而不需要等待内存系统确认写入完成。这有助于减少 CPU 的闲置时间，提高指令执行的整体效率。写回时，写入数据首先被放入 Store Buffer，随后，数据会按某种策略写入主内存（如 DCache 或其他存储层级）。Store Buffer 维护写入操作的顺序，但不保证这些写入操作立即反映在内存中。在多核处理器中，Store Buffer 可以帮助降低缓存一致性协议的复杂性。</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="支持-hfencevvma-与-hfencegvma-指令">支持 HFENCE.VVMA 与 HFENCE.GVMA 指令</h2>
 <p>事实上，对 <code>hv</code>（<code>SFENCE Bundle</code> 中的信号，用于刷新第一阶段地址转换的条目）和 <code>hg</code>（<code>SFENCE Bundle</code> 中的信号，用于刷新第二阶段地址转换的条目）信号不为 <code>0</code> 的情况执行的指令并不是 <code>SFENCE.VMA</code>，而是 <code>HFENCE.VVMA</code> 和 <code>HFENCE.GVMA</code>：</p>
-<p><img alt="HFENCE.VVMA 与 HFENCE.GVMA" src="HFENCE.png"></p>
+<p><img src="HFENCE.png" alt="HFENCE.VVMA 与 HFENCE.GVMA"></p>
 <p>这两个指令与 <code>SFENCE.VMA</code> 功能很相似，区别在于 <code>HFENCE.VVMA</code> 适用于由 <code>vsatp</code> 控制的 <code>VS</code> 级别内存管理数据结构；<code>HFENCE.GVMA</code> 适用于由 <code>hgatp</code> 控制的虚拟机监管程序 <code>G</code> 阶段内存管理数据结构。</p>
 <p><code>HFENCE.VVMA</code> 仅在 <code>M</code> 模式或 <code>HS</code> 模式生效，类似于暂时进入 <code>VS</code> 模式并执行 <code>SFENCE.VMA</code> 指令，可以保证当前 <code>hart</code> 之前的所有存储操作在后续的隐式读取 <code>VS</code> 级别内存管理数据结构之前都已经排序；注意这里所说的隐式读取指的仅有在 <code>HFENCE.VVMA</code> 之后执行的，并且 <code>hgatp.VMID</code> 与执行 <code>HFENCE.VVMA</code> 相同的时候，简单来说就是仅对当前这一个虚拟机生效。<code>rs1</code> 与 <code>rs2</code> 的功能与 <code>SFENCE.VMA</code> 相同。</p>
 <p>对 <code>HFENCE.GVMA</code> 来说，<code>rs1</code> 指定的是客机的物理地址。由于主机采用 <code>SV48</code> 而虚拟机采用 <code>SV48x4</code>，客机物理地址比主机物理地址多两位，因此此时需要将 <code>rs1</code> 对应的客机物理地址右移两位。如果某一个虚拟机的地址翻译模式更改了，也即 <code>hgatp.MODE</code> 对某个 <code>VMID</code> 更改了，则必须使用 <code>HFENCE.GVMA</code> 指令，将 <code>rs1</code> 设为 <code>0</code>，<code>rs2</code> 设为 <code>0</code> 或 <code>VMID</code> 进行刷新。</p>
@@ -1923,8 +1942,8 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <h2 id="支持-sinval-扩展">支持 SINVAL 扩展</h2>
 <p>在 <code>RISC-V</code> 特权指令集中定义了 <code>Svinval</code> 扩展（<code>Supervisor Virtual Address Invalidation</code>），在香山昆明湖架构实现了该扩展。<code>Svinval</code> 扩展的意义在于将 <code>SFENCE.VMA</code> 指令更加细化为 <code>SFENCE.W.INVAL</code>、<code>SINVAL.VMA</code>、<code>SFENCE.INVAL.IR</code> 三条指令（<code>HFENCE.VVMA</code> 和 <code>HFENCE.GVMA</code> 同理）。</p>
 <p><code>SINVAL.VMA</code> 指令事实上与 <code>SFENCE.VMA</code> 指令的功能基本一致，只是添加了对 <code>SFENCE.W.INVAL</code> 与 <code>SFENCE.INVAL.IR</code> 两个指令的相互排序，可以理解为需要在两个指令中间进行。<code>SFENCE.W.INVAL</code> 指令用于确保当前 <code>RISC-V hart</code> 可见的任何先前存储在后续由同一个 <code>hart</code> 执行的 <code>SINVAL.VMA</code> 指令之前被重新排序。<code>SFENCE.INVAL.IR</code> 指令确保当前 <code>hart</code> 执行的任何先前 <code>SINVAL.VMA</code> 指令在后续隐式引用内存管理数据结构之前被排序。当由单个 <code>hart</code> 按顺序（不一定连续）执行 <code>SFENCE.W.INVAL</code>、<code>SINVAL.VMA</code> 和 <code>SFENCE.INVAL.IR</code> 时，可以相当于执行了 <code>SFENCE.VMA</code> 指令。</p>
-<p><img alt="SINVAL.VMA" src="SINVAL_VMA.png"></p>
-<p><img alt="SFENCE.W.INVAL 和 SFENCE.INVAL.IR" src="SFENCE_W_INVAL&INVAL_IR.png"></p>
+<p><img src="SINVAL_VMA.png" alt="SINVAL.VMA"></p>
+<p><img src="SFENCE_W_INVAL&amp;INVAL_IR.png" alt="SFENCE.W.INVAL 和 SFENCE.INVAL.IR"></p>
 <h2 id="支持软件更新-ad-位">支持软件更新 A/D 位</h2>
 <p><code>A</code> 位（<code>Access</code>）用于指示某一页面是否被访问过。如果处理器对该页面进行任何形式的访问（读/写/取指），则 <code>A</code> 位会被设置为 <code>1</code>。每当 <code>CPU</code> 访问某个页面时，操作系统或硬件会自动将 <code>A</code> 位设置为 <code>1</code>，这种更新通常是硬件支持的，由处理器在地址转换时自动进行。</p>
 <p><code>D</code> 位（<code>Dirty</code>）指示页面是否被修改。如果页面在内存中被写入，则 <code>D</code> 位会被设置为 <code>1</code>，表示该页面的内容已被更改。当处理器对页面进行写操作时，通常会自动将 <code>D</code> 位设置为 <code>1</code>，这种更新通常也是由硬件支持的。在页面替换过程中，操作系统会检查 <code>D</code> 位，如果 <code>D</code> 位为 <code>1</code>，操作系统会将页面写回到磁盘，并在写回后清除 <code>D</code> 位，以表示页面已经被保存且不再是“脏”的。</p>
@@ -2022,7 +2041,7 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <li><code>asid</code>：地址空间标识符，用于区分不同进程，香山昆明湖架构使用的 <code>SV48</code> 中最大长度为 <code>16</code>。</li>
 <li><code>ppn</code>：<code>Page Table Pointer</code>，根页表的物理页框号，其位宽为 <code>44</code> 位，由物理地址右移 <code>12</code> 位得到。</li>
 </ul>
-<p><img alt="SATP" src="satp.png"></p>
+<p><img src="satp.png" alt="SATP"></p>
 <h4 id="vsatp"><code>VSATP</code></h4>
 <ul>
 <li><code>vsatp (Virtual Supervisor Address Translation and Protection)</code> 是虚拟机中客体操作系统的地址转换寄存器，提供虚拟机的虚拟地址到中间物理地址（<code>IPA</code>）的转换。</li>
@@ -2030,7 +2049,7 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <li><code>asid</code>：虚拟机内地址空间标识符。</li>
 <li><code>ppn</code>：虚拟机页表的物理基地址。</li>
 </ul>
-<p><img alt="VSATP" src="vsatp.png"></p>
+<p><img src="vsatp.png" alt="VSATP"></p>
 <h4 id="hgatp"><code>HGATP</code></h4>
 <ul>
 <li><code>hgatp (Hypervisor Guest Address Translation and Protection)</code> 是虚拟机监控程序（<code>Hypervisor</code>）的二级地址转换寄存器，用于将虚拟机的中间物理地址（<code>IPA</code>）转换为主机物理地址（<code>HPA</code>）。</li>
@@ -2044,7 +2063,7 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 <li><code>vmid</code>：虚拟机标识符，区分不同虚拟机。</li>
 <li><code>ppn</code>：二级页表的物理基地址。</li>
 </ul>
-<p><img alt="HGATP" src="hgatp.png"></p>
+<p><img src="hgatp.png" alt="HGATP"></p>
 <p><code>satp</code> 管理主机地址空间的虚拟地址到物理地址的转换，<code>vsatp</code> 用于虚拟机中的虚拟地址到中间物理地址（<code>IPA</code>）的转换，而 <code>hgatp</code> 则负责虚拟机二级地址转换，将 <code>IPA</code> 转换为主机物理地址。</p>
 <h4 id="priv"><code>PRIV</code></h4>
 <ul>
@@ -2166,34 +2185,34 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 </span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">with</span> <span style="color:#000">HasCSRConst</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">with</span> <span style="color:#000">HasPerfEvents</span>
 </span></span></code></pre></div><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Width: Int</code></td>
-<td>指示 <code>requestor</code> 的数量</td>
-</tr>
-<tr>
-<td><code>nRespDups: Int = 1</code></td>
-<td>需要复制 <code>response</code> 的数目，默认为 <code>1</code>（不复制）</td>
-</tr>
-<tr>
-<td><code>Block: Seq[Boolean]</code></td>
-<td>指示每个 <code>requestor</code> 是否被阻塞</td>
-</tr>
-<tr>
-<td><code>q: TLBParameters</code></td>
-<td>TLB 使用的参数</td>
-</tr>
-<tr>
-<td><code>p: Parameter</code></td>
-<td>全局参数（香山架构参数）</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>参数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>Width: Int</code></td>
+          <td>指示 <code>requestor</code> 的数量</td>
+      </tr>
+      <tr>
+          <td><code>nRespDups: Int = 1</code></td>
+          <td>需要复制 <code>response</code> 的数目，默认为 <code>1</code>（不复制）</td>
+      </tr>
+      <tr>
+          <td><code>Block: Seq[Boolean]</code></td>
+          <td>指示每个 <code>requestor</code> 是否被阻塞</td>
+      </tr>
+      <tr>
+          <td><code>q: TLBParameters</code></td>
+          <td>TLB 使用的参数</td>
+      </tr>
+      <tr>
+          <td><code>p: Parameter</code></td>
+          <td>全局参数（香山架构参数）</td>
+      </tr>
+  </tbody>
 </table>
 <p>实例化 <code>TLB</code> 时以香山架构的 <code>itlb</code> 为例：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">itlb</span> <span style="color:#204a87;font-weight:bold">=</span> <span style="color:#000">Module</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">TLB</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">coreParams</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">itlbPortNum</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">nRespDups</span> <span style="color:#204a87;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Seq</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">fill</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">PortNumber</span><span style="color:#ce5c00;font-weight:bold">)(</span><span style="color:#204a87;font-weight:bold">false</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">++</span> <span style="color:#000">Seq</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#ce5c00;font-weight:bold">),</span> <span style="color:#000">itlbParams</span><span style="color:#ce5c00;font-weight:bold">))</span>
@@ -2389,7 +2408,7 @@ initialize 的情况。</p>
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

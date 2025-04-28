@@ -34,9 +34,11 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.">
-<meta property="og:title" content="RVCExpander" />
-<meta property="og:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="RVCExpander">
+  <meta property="og:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
 输出量也是两个：输入指令对应的RVI指令；RVC指令是否非法。
 指令扩展 如果是RVI指令，则无需扩展。
@@ -52,13 +54,14 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" /><meta property="article:section" content="docs" />
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
 
-<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="name" content="RVCExpander">
-<meta itemprop="description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
+  <meta itemprop="name" content="RVCExpander">
+  <meta itemprop="description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
 输出量也是两个：输入指令对应的RVI指令；RVC指令是否非法。
 指令扩展 如果是RVI指令，则无需扩展。
@@ -74,11 +77,12 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.">
-<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="wordCount" content="926">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RVCExpander"/>
-<meta name="twitter:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="926">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="RVCExpander">
+  <meta name="twitter:description" content="子模块：RVCExpander简介 RVCExpander是IFU的子模块，负责对传入的指令进行指令扩展，并解码计算非法信息。
 该模块接收的输入量是两个：一条RVC指令或者RVI指令；CSR对fs.status的使能情况。
 输出量也是两个：输入指令对应的RVI指令；RVC指令是否非法。
 指令扩展 如果是RVI指令，则无需扩展。
@@ -94,7 +98,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 序号 名称 描述 1.1 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 功能点2 非法指令判断 RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法
 对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：
 此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。
-序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2."/>
+序号 名称 描述 2.1 常规非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 测试点汇总 序号 功能 名称 描述 1.1 指令扩展 RVI指令保留 构造RVI指令传入，检查保留情况 1.2 指令扩展 RVC指令扩展 构造RVC指令传入，按手册检查扩展结果 2.1 非法指令判断 非法指令测试 随机构造非法RVC指令传入，检查判断结果 2.2 非法指令判断 合法指令测试 随机构造合法RVC指令传入，检查判断结果 2.3 C.fp指令测试 CSR未使能fs.status的情况下，C.fp指令应该为非法 RVC扩展辅助阅读材料 为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -196,7 +200,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -220,7 +224,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -526,7 +530,7 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
         <li><a href="#功能点2-非法指令判断">功能点2 非法指令判断</a></li>
       </ul>
     </li>
-    <li><a href="#测试点汇总-a-idrvc_expander_functions-a">测试点汇总 <a id="rvc_expander_functions"> </a></a></li>
+    <li><a href="#测试点汇总">测试点汇总 <a id="rvc_expander_functions"> </a></a></li>
     <li><a href="#rvc扩展辅助阅读材料">RVC扩展辅助阅读材料</a>
       <ul>
         <li><a href="#op--b00">op = b'00'</a></li>
@@ -579,25 +583,25 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 <p>对于RVC指令的判定，详细内容参阅20240411的RISCV手册的26.8节表格列出的指令条件。</p>
 <h2 id="常量说明">常量说明</h2>
 <table>
-<thead>
-<tr>
-<th>常量名</th>
-<th>常量值</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>XLEN</td>
-<td>64</td>
-<td>通用寄存器位宽，决定指令扩展时使用rv32还是rv64还是rv128</td>
-</tr>
-<tr>
-<td>fLen</td>
-<td>64</td>
-<td>香山支持d扩展，故为64</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>常量名</th>
+          <th>常量值</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>XLEN</td>
+          <td>64</td>
+          <td>通用寄存器位宽，决定指令扩展时使用rv32还是rv64还是rv128</td>
+      </tr>
+      <tr>
+          <td>fLen</td>
+          <td>64</td>
+          <td>香山支持d扩展，故为64</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="rvcexpander接口说明">RVCExpander接口说明</h2>
 <h3 id="输入接口">输入接口</h3>
@@ -611,151 +615,151 @@ out_bits：对RVI指令，直接返回，对RVC指令，返回扩展后的32位�
 <p>RVCExpander负责接收预译码器拼接的指令码，并进行指令扩展，如果是16位RVC指令，需要按照RISCV手册的约定完成扩展</p>
 <p>对此，我们需要随机生成RVI指令和RVC指令，送入预译码器：</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>RVI指令保留</td>
-<td>构造RVI指令传入，检查保留情况</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>RVC指令扩展</td>
-<td>构造RVC指令传入，按手册检查扩展结果</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>RVI指令保留</td>
+          <td>构造RVI指令传入，检查保留情况</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>RVC指令扩展</td>
+          <td>构造RVC指令传入，按手册检查扩展结果</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="功能点2-非法指令判断">功能点2 非法指令判断</h3>
 <p>RVCExpander在解析指令时，如发现指令违反了手册的约定，则需要判定该指令非法</p>
 <p>对此，我们需要随机生成非法指令送入RVI中，并检测RVCExpander对合法位的校验；同时，我们还需要校验合法指令是否会被误判为非法指令：</p>
 <p>此外，需要判定C.fp指令在CSR未使能fs.status的情况下，能否将这类指令判定为非法。</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2.1</td>
-<td>常规非法指令测试</td>
-<td>随机构造非法RVC指令传入，检查判断结果</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>合法指令测试</td>
-<td>随机构造合法RVC指令传入，检查判断结果</td>
-</tr>
-<tr>
-<td>2.3</td>
-<td>C.fp指令测试</td>
-<td>CSR未使能fs.status的情况下，C.fp指令应该为非法</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2.1</td>
+          <td>常规非法指令测试</td>
+          <td>随机构造非法RVC指令传入，检查判断结果</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>合法指令测试</td>
+          <td>随机构造合法RVC指令传入，检查判断结果</td>
+      </tr>
+      <tr>
+          <td>2.3</td>
+          <td>C.fp指令测试</td>
+          <td>CSR未使能fs.status的情况下，C.fp指令应该为非法</td>
+      </tr>
+  </tbody>
 </table>
-<h2 id="测试点汇总-a-idrvc_expander_functions-a">测试点汇总 <a id="rvc_expander_functions"> </a></h2>
+<h2 id="测试点汇总">测试点汇总 <a id="rvc_expander_functions"> </a></h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能</th>
-<th>名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>指令扩展</td>
-<td>RVI指令保留</td>
-<td>构造RVI指令传入，检查保留情况</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>指令扩展</td>
-<td>RVC指令扩展</td>
-<td>构造RVC指令传入，按手册检查扩展结果</td>
-</tr>
-<tr>
-<td>2.1</td>
-<td>非法指令判断</td>
-<td>非法指令测试</td>
-<td>随机构造非法RVC指令传入，检查判断结果</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>非法指令判断</td>
-<td>合法指令测试</td>
-<td>随机构造合法RVC指令传入，检查判断结果</td>
-</tr>
-<tr>
-<td>2.3</td>
-<td>C.fp指令测试</td>
-<td>CSR未使能fs.status的情况下，C.fp指令应该为非法</td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能</th>
+          <th>名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>指令扩展</td>
+          <td>RVI指令保留</td>
+          <td>构造RVI指令传入，检查保留情况</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>指令扩展</td>
+          <td>RVC指令扩展</td>
+          <td>构造RVC指令传入，按手册检查扩展结果</td>
+      </tr>
+      <tr>
+          <td>2.1</td>
+          <td>非法指令判断</td>
+          <td>非法指令测试</td>
+          <td>随机构造非法RVC指令传入，检查判断结果</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>非法指令判断</td>
+          <td>合法指令测试</td>
+          <td>随机构造合法RVC指令传入，检查判断结果</td>
+      </tr>
+      <tr>
+          <td>2.3</td>
+          <td>C.fp指令测试</td>
+          <td>CSR未使能fs.status的情况下，C.fp指令应该为非法</td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="rvc扩展辅助阅读材料">RVC扩展辅助阅读材料</h2>
 <p>为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。</p>
 <p>对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)</p>
 <table>
-<thead>
-<tr>
-<th>op\funct</th>
-<th>000</th>
-<th>001</th>
-<th>010</th>
-<th>011</th>
-<th>100</th>
-<th>101</th>
-<th>110</th>
-<th>111</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>00</td>
-<td>addi4spn</td>
-<td>fld</td>
-<td>lw</td>
-<td>ld</td>
-<td>lbu<br>lhu;lh<br>sb;sh</td>
-<td>fsd</td>
-<td>sw</td>
-<td>sd</td>
-</tr>
-<tr>
-<td>01</td>
-<td>addi</td>
-<td>addiw</td>
-<td>li</td>
-<td>lui<br>addi16sp<br>zcmop</td>
-<td>ARITHs<br>zcb</td>
-<td>j</td>
-<td>beqz</td>
-<td>bnez</td>
-</tr>
-<tr>
-<td>10</td>
-<td>slli</td>
-<td>fldsp</td>
-<td>lwsp</td>
-<td>ldsp</td>
-<td>jr;mv<br>ebreak<br>jalr;add</td>
-<td>fsdsp</td>
-<td>fwsp</td>
-<td>sdsp</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>op\funct</th>
+          <th>000</th>
+          <th>001</th>
+          <th>010</th>
+          <th>011</th>
+          <th>100</th>
+          <th>101</th>
+          <th>110</th>
+          <th>111</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>00</td>
+          <td>addi4spn</td>
+          <td>fld</td>
+          <td>lw</td>
+          <td>ld</td>
+          <td>lbu<br>lhu;lh<br>sb;sh</td>
+          <td>fsd</td>
+          <td>sw</td>
+          <td>sd</td>
+      </tr>
+      <tr>
+          <td>01</td>
+          <td>addi</td>
+          <td>addiw</td>
+          <td>li</td>
+          <td>lui<br>addi16sp<br>zcmop</td>
+          <td>ARITHs<br>zcb</td>
+          <td>j</td>
+          <td>beqz</td>
+          <td>bnez</td>
+      </tr>
+      <tr>
+          <td>10</td>
+          <td>slli</td>
+          <td>fldsp</td>
+          <td>lwsp</td>
+          <td>ldsp</td>
+          <td>jr;mv<br>ebreak<br>jalr;add</td>
+          <td>fsdsp</td>
+          <td>fwsp</td>
+          <td>sdsp</td>
+      </tr>
+  </tbody>
 </table>
 <p>在开始阅读各指令的扩展规则时，需要了解一些RVC扩展的前置知识，比如：</p>
 <p>rd&rsquo;, rs1&rsquo;和rs2&rsquo;寄存器：受限于16位指令的位宽限制，这几个寄存器只有3位来表示，他们对应到x8~x15寄存器。</p>
@@ -1017,7 +1021,7 @@ imm[12|10:5]rs2rs1001imm[4:1|11]1100011BNE</p>
 <p>RVI的SD格式形如：| imm[11:5]| rs2 | rs1 | 011 | imm[4:0] | 0100111 |</p>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 
 </div>
@@ -1061,7 +1065,7 @@ imm[12|10:5]rs2rs1001imm[4:1|11]1100011BNE</p>
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

@@ -19,18 +19,25 @@
 
 <title>Multi-File Input | UnityChip Verification</title>
 <meta name="description" content="Handling multiple Verilog source files">
-<meta property="og:title" content="Multi-File Input" />
-<meta property="og:description" content="Handling multiple Verilog source files" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/env_usage/multifile/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/env_usage/multifile/">
+  <meta property="og:site_name" content="UnityChip Verification">
+  <meta property="og:title" content="Multi-File Input">
+  <meta property="og:description" content="Handling multiple Verilog source files">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:44:02+08:00">
+    <meta property="article:tag" content="Examples">
+    <meta property="article:tag" content="Docs">
 
-<meta property="article:modified_time" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="name" content="Multi-File Input">
-<meta itemprop="description" content="Handling multiple Verilog source files">
-<meta itemprop="dateModified" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="wordCount" content="226">
-<meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Multi-File Input"/>
-<meta name="twitter:description" content="Handling multiple Verilog source files"/>
+  <meta itemprop="name" content="Multi-File Input">
+  <meta itemprop="description" content="Handling multiple Verilog source files">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="225">
+  <meta itemprop="keywords" content="Examples,Docs">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Multi-File Input">
+  <meta name="twitter:description" content="Handling multiple Verilog source files">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -130,7 +137,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +161,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -381,16 +388,16 @@
 <p>You can also use a .txt file to specify multiple input files:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> Cache.sv --fs src.txt --sname Cache
 </span></span></code></pre></div><p>Where the contents of <code>src.txt</code> are:</p>
-<pre tabindex="0"><code>CacheStage.sv
-CacheMeta.sv
-</code></pre><h3 id="notes">Notes</h3>
+
+<div class="chem">$$CacheStage.sv
+CacheMeta.sv$$</div><h3 id="notes">Notes</h3>
 <ol>
 <li>It is important to note that even when using multiple file inputs, you still need to specify the file containing the top-level module under test, as shown in the example above with <code>Cache.sv</code>.</li>
 <li>When using multiple file inputs, Picker will pass all files to the simulator, which will compile them simultaneously. Therefore, it is necessary to ensure that the module names in all files are unique.</li>
 </ol>
 
 	<div class="td-page-meta__lastmod">
-  Last modified March 25, 2025: <a href="https://github.com/XS-MLVP/course/commit/1a44bfa239ee57ae2f3162e4a24390caa05f9553">update Toffee document address (1a44bfa)</a>
+  Last modified April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/d04c617785d261fcdfbe044e537c68a450369c09">Upgrade hugo version to 0.146.7 (d04c617)</a>
 </div>
 
 </div>
@@ -434,7 +441,21 @@ CacheMeta.sv
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css"
+      integrity="sha512-r2+FkHzf1u0+SQbZOoIz2RxWOIWfdEzRuYybGjzKq18jG9zaSfEy9s3+jMqG/zPtRor/q4qaUCYQpmSjTw8M+g==" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"
+        integrity="sha512-INps9zQ2GUEMCQD7xiZQbGUVnqnzEvlynVy6eqcTcHN4+aQiLo9/uaQqckDpdJ8Zm3M0QBs+Pktg4pz0kEklUg=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/mhchem.min.js"
+        integrity="sha512-mxjNw/u1lIsFC09k/unscDRY3ofIYPVFbWkP8slrePcS36ht4d/OZ8rRu5yddB2uiqajhTcLD8+jupOWuYPebg=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"
+       integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous"
+       onload='renderMathInElement(document.body, null);'>
+</script>
+<script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

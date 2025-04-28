@@ -4,7 +4,7 @@
     <title>UFTB on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
     <link>https://open-verify.cc/xs-bpu/tags/uftb/</link>
     <description>Recent content in UFTB on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>zh-cn</language>
     <atom:link href="https://open-verify.cc/xs-bpu/tags/uftb/index.xml" rel="self" type="application/rss+xml" />
     <item>
@@ -12,14 +12,14 @@
       <link>https://open-verify.cc/xs-bpu/docs/modules/01_uftb/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://open-verify.cc/xs-bpu/docs/modules/01_uftb/</guid>
-      <description>uFTB 简介 uFTB 是香山所有预测器中第一个预测器，也是其他预测器产生预测结果的基石。uFTB 工作在 s1 阶段，它获取到 s1_pc 后能在本周期内产生预测结果，并在 s1 通道输出，其他通道不予更改。分支指令的位置、指令的跳转目标都是由它来提供，后续预测器也将会根据这一预测结果进行进一步的预测。&#xA;而其本质则是一个 FTB 项缓存，其中存储了 FTB 项，基础的预测结果将直接由读出的 FTB 项生成。&#xA;因此，在你开始文档的阅读之前，请确保你理解了 FTB 项和含义以及预测结果接口的具体细节。&#xA;uFTB 功能简介 缓存FTB项，生成一周期预测结果 uFTB 中维护了一个小型的 FTB 项缓存，拿到 PC 之后，会在一周期之内读出 PC 所对应的 FTB 项，并从 FTB 项生成 s1 阶段预测结果。 维护两比特饱和计数器，提供基础条件分支结果 uFTB 中为 FTB项缓存的每一行都维护了对应的两比特饱和计数器，其方向预测结果会反映在 uFTB 的预测结果输出中。 根据更新请求更新 FTB 缓存和两比特饱和计数器 uFTB 缓存结构 如上所述，uFTB 本质上是一个存储了 FTB 项的小型缓存，其大致结构如下图所示。&#xA;在当前版本的香山中，uFTB 共有 32 个缓存行，每个缓存行被称作 FauFTBWay，一个缓存行中可以存储一个 FTB 项。&#xA;当 s1 流水有效时，uFTB 会使用 s1_pc 来决定读出 uFTB 缓存的哪一项。缓存是根据 PC 中的 tag 字段来索引，tag 字段被定义为 pc[16: 1]，即在 PC 中截取了 16 比特作为标识来匹配缓存中的某一行。</description>
+      <description>&lt;h2 id=&#34;uftb-简介&#34;&gt;uFTB 简介&lt;/h2&gt;&#xA;&lt;p&gt;uFTB 是香山所有预测器中第一个预测器，也是其他预测器产生预测结果的基石。uFTB 工作在 s1 阶段，它获取到 s1_pc 后能在本周期内产生预测结果，并在 s1 通道输出，其他通道不予更改。分支指令的位置、指令的跳转目标都是由它来提供，后续预测器也将会根据这一预测结果进行进一步的预测。&lt;/p&gt;&#xA;&lt;p&gt;而其本质则是一个 FTB 项缓存，其中存储了 FTB 项，基础的预测结果将直接由读出的 FTB 项生成。&lt;/p&gt;&#xA;&lt;p&gt;因此，在你开始文档的阅读之前，请确保你理解了 FTB 项和含义以及预测结果接口的具体细节。&lt;/p&gt;&#xA;&lt;h2 id=&#34;uftb-功能简介&#34;&gt;uFTB 功能简介&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;缓存FTB项，生成一周期预测结果&lt;/strong&gt;    uFTB 中维护了一个小型的 FTB 项缓存，拿到 PC 之后，会在一周期之内读出 PC 所对应的 FTB 项，并从 FTB 项生成 s1 阶段预测结果。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;维护两比特饱和计数器，提供基础条件分支结果&lt;/strong&gt;   uFTB 中为 FTB项缓存的每一行都维护了对应的两比特饱和计数器，其方向预测结果会反映在 uFTB 的预测结果输出中。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;根据更新请求更新 FTB 缓存和两比特饱和计数器&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;uftb-缓存结构&#34;&gt;uFTB 缓存结构&lt;/h2&gt;&#xA;&lt;p&gt;如上所述，uFTB 本质上是一个存储了 FTB 项的小型缓存，其大致结构如下图所示。&lt;/p&gt;&#xA;&#xA;&lt;figure&gt;&#xA;    &lt;img src=&#34;1.png&#34; width=&#34;400px&#34;/&gt; &#xA;&lt;/figure&gt;&#xA;&#xA;&lt;p&gt;在当前版本的香山中，uFTB 共有 32 个缓存行，每个缓存行被称作 &lt;code&gt;FauFTBWay&lt;/code&gt;，一个缓存行中可以存储一个 FTB 项。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;当 s1 流水有效时&lt;/strong&gt;，uFTB 会使用 &lt;strong&gt;s1_pc&lt;/strong&gt; 来决定读出 uFTB 缓存的哪一项。缓存是根据 PC 中的 tag 字段来索引，tag 字段被定义为 pc[16: 1]，即在 PC 中截取了 16 比特作为标识来匹配缓存中的某一行。&lt;/p&gt;</description>
     </item>
     <item>
       <title>uFTB 功能列表</title>
       <link>https://open-verify.cc/xs-bpu/docs/feature/01_uftbfeature/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://open-verify.cc/xs-bpu/docs/feature/01_uftbfeature/</guid>
-      <description>功能列表（Feature List） 支持基于 FTB 项的预测 支持两比特饱和计数器 支持 s1 通道基础预测结果输出及 meta 信息输出 支持更新请求响应，更新内部 FTB 及两比特饱和计数器。 </description>
+      <description>&lt;h2 id=&#34;功能列表feature-list&#34;&gt;功能列表（Feature List）&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;支持基于 FTB 项的预测&lt;/li&gt;&#xA;&lt;li&gt;支持两比特饱和计数器&lt;/li&gt;&#xA;&lt;li&gt;支持 s1 通道基础预测结果输出及 meta 信息输出&lt;/li&gt;&#xA;&lt;li&gt;支持更新请求响应，更新内部 FTB 及两比特饱和计数器。&lt;/li&gt;&#xA;&lt;/ol&gt;</description>
     </item>
   </channel>
 </rss>

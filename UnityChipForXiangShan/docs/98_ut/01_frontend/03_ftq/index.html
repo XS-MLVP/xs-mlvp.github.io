@@ -35,13 +35,62 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 后端重定向与更新：后端是实际执行指令的单元，通过后端的执行结果，才能确认一条指令是否执行错误，产生重定向，同时，在发生重定向时，根据后端实际执行结果生成更新信息。 指令commit：当一个分支预测块内的所有指令都被执行，在后端提交，这标志着FTQ队列中这个分支预测块对应的FTQ项已经结束了它的生命周期，可以从队列中移除了，这时候，我们就可以把它的更新信息发给FTQ了。 FTQ指针 FTQ的全名叫取值目标队列，队列中的一个项叫做FTQ项，BPU写入预测结果时是写入队列中哪个位置，IFU又是从哪个队列取FTQ项？这时候，我们需要一个FTQ指针去索引FTQ项，而由于和不同模块的交互需要索引不同的FTQ项，因此，有以下类型的FTQ指针，下面，由指令生命周期为例，大致介绍这些指针：
 指令在 FTQ 中的生存周期 指令以预测块为单位，从 BPU 预测后便送进 FTQ，直到指令所在的预测块中的所有指令全部在后端提交完成，FTQ 才会在存储结构中完全释放该预测块所对应的项。这个过程中发生的事如下：
 预测块从 BPU 发出，进入 FTQ，bpuPtr 指针加一，初始化对应 FTQ 项的各种状态，把各种预测信息写入存储结构；如果预测块来自 BPU 覆盖预测逻辑，则恢复 bpuPtr 和 ifuPtr FTQ 向 IFU 发出取指请求，ifuPtr 指针加一，等待预译码信息写回 IFU 写回预译码信息，ifuWbPtr 指针加一，如果预译码检测出了预测错误，则给 BPU 发送相应的重定向请求，恢复 bpuPtr 和 ifuPtr 指令进入后端执行，如果后端检测出了误预测，则通知 FTQ，给 IFU 和 BPU 发送重定向请求，恢复 bpuPtr、ifuPtr 和 ifuWbPtr 指令在后端提交，通知 FTQ，等 FTQ 项中所有的有效指令都已提交，commPtr 指针加一，从存储结构中读出相应的信息，送给 BPU 进行训练 预测块 n 内指令的生存周期会涉及到 FTQ 中的 bpuPtr、ifuPtr、ifuWbPtr 和 commPtr 四个指针，当 bpuPtr 开始指向 n&#43;1 时，预测块内的指令进入生存周期，当 commPtr 指向 n&#43;1 后，预测块内的指令完成生存周期。">
-<meta property="og:title" content="FTQ概述" />
-<meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/" />
-<meta itemprop="name" content="FTQ概述">
-<meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ概述"/>
-<meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."/>
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="FTQ概述">
+  <meta property="og:description" content="下文（包括所有的FTQ文档）中会提到一些关于BPU和IFU的相关知识，详情需要去查看对应的文档:
+BPU文档链接 IFU文档链接 hint：建议先从BPU基础设计中着重理解以下概念：
+什么是分支预测？ 什么是分支预测块？一个有帮助的链接：预测块 (可选)什么是重定向，什么是预测结果重定向？ (可选)分支预测的流水级 简介 FTQ 是分支预测和取指单元之间的缓冲队列，它的主要职能是暂存 BPU 预测的取指目标，并根据这些取指目标给 IFU 发送取指请求。它的另一重要职能是暂存 BPU 各个预测器的预测信息，在指令提交后把这些信息送回 BPU 用作预测器的训练，因此它需要维护指令从预测到提交的完整的生命周期。另外，后端将存储来自FTQ的取指目标PC，便于自身读取。
+![[Pasted image 20250222103931.png]]
+模块之间的中转站 从上图，FTQ很大程度上相当于一个中转站，中间人的角色，一方面，它承担着BPU和IFU之间的交互，这通常是因为BPU预测的速度快于IFU取值执行，所以使用FTQ作为缓冲。另一方面，它承担着后端与前端的交互，比如把前端将要执行的pc交给后端去执行。
+显然，FTQ的 中转远不止这么多，下面更具体地讨论一下FTQ怎么中转各个前端或后端模块的信息的。
+BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 FTQtoBPU：FTQ会将带元数据的训练信息和重定向信息发回给BPU
+请参照BPU文档链接 BPU 模块整体对外接口 (PredirectIO) FTQ和IFU FTQtoIFU：FTQ会将存储的取值目标发往IFU进行取值译码和把后端的重定向信息也移交给IFU
+取值目标同时也发给： toICache：同样的取值目标会被发给指令缓存单元，看对应的指令是否在缓存单元内存在，如果有会被直接发送给IFU加速取值效率 toPrefetch: prefetch是ICache的一个组件，负责预取功能 转发后端重定向： 后端重定向不仅需要转发给BPU帮助其回到正确状态，也同时需要转发给IFU帮助其回到正确状态 IFUtoFTQ：IFU将预译码信息和重定向信息写回FTQ
+预译码信息：包含分支预测块对应的预测宽度内所有指令的预译码信息 预测宽度：一个指令块预测块覆盖的指令范围，香山中是16条rvc指令 重定向信息其实也是根据预译码信息得到的：当预译码信息中指出预测块内某一条指令预测出错时，写回IFU重定向信息 后端和FTQ FTQ到后端：FTQ会将存储的取值目标发往后端，后端存储 PC后，在本地即可进行读取取指目标。
+除了IFU，预测块的取值目标也会发给后端，但这里有一点区别：IFU空闲时才能从FTQ中获取取值目标，但是后端会一直取得最新的预测块的取指目标 后端到FTQ：后端重定向和指令commit
+后端重定向与更新：后端是实际执行指令的单元，通过后端的执行结果，才能确认一条指令是否执行错误，产生重定向，同时，在发生重定向时，根据后端实际执行结果生成更新信息。 指令commit：当一个分支预测块内的所有指令都被执行，在后端提交，这标志着FTQ队列中这个分支预测块对应的FTQ项已经结束了它的生命周期，可以从队列中移除了，这时候，我们就可以把它的更新信息发给FTQ了。 FTQ指针 FTQ的全名叫取值目标队列，队列中的一个项叫做FTQ项，BPU写入预测结果时是写入队列中哪个位置，IFU又是从哪个队列取FTQ项？这时候，我们需要一个FTQ指针去索引FTQ项，而由于和不同模块的交互需要索引不同的FTQ项，因此，有以下类型的FTQ指针，下面，由指令生命周期为例，大致介绍这些指针：
+指令在 FTQ 中的生存周期 指令以预测块为单位，从 BPU 预测后便送进 FTQ，直到指令所在的预测块中的所有指令全部在后端提交完成，FTQ 才会在存储结构中完全释放该预测块所对应的项。这个过程中发生的事如下：
+预测块从 BPU 发出，进入 FTQ，bpuPtr 指针加一，初始化对应 FTQ 项的各种状态，把各种预测信息写入存储结构；如果预测块来自 BPU 覆盖预测逻辑，则恢复 bpuPtr 和 ifuPtr FTQ 向 IFU 发出取指请求，ifuPtr 指针加一，等待预译码信息写回 IFU 写回预译码信息，ifuWbPtr 指针加一，如果预译码检测出了预测错误，则给 BPU 发送相应的重定向请求，恢复 bpuPtr 和 ifuPtr 指令进入后端执行，如果后端检测出了误预测，则通知 FTQ，给 IFU 和 BPU 发送重定向请求，恢复 bpuPtr、ifuPtr 和 ifuWbPtr 指令在后端提交，通知 FTQ，等 FTQ 项中所有的有效指令都已提交，commPtr 指针加一，从存储结构中读出相应的信息，送给 BPU 进行训练 预测块 n 内指令的生存周期会涉及到 FTQ 中的 bpuPtr、ifuPtr、ifuWbPtr 和 commPtr 四个指针，当 bpuPtr 开始指向 n&#43;1 时，预测块内的指令进入生存周期，当 commPtr 指向 n&#43;1 后，预测块内的指令完成生存周期。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="FTQ概述">
+  <meta itemprop="description" content="下文（包括所有的FTQ文档）中会提到一些关于BPU和IFU的相关知识，详情需要去查看对应的文档:
+BPU文档链接 IFU文档链接 hint：建议先从BPU基础设计中着重理解以下概念：
+什么是分支预测？ 什么是分支预测块？一个有帮助的链接：预测块 (可选)什么是重定向，什么是预测结果重定向？ (可选)分支预测的流水级 简介 FTQ 是分支预测和取指单元之间的缓冲队列，它的主要职能是暂存 BPU 预测的取指目标，并根据这些取指目标给 IFU 发送取指请求。它的另一重要职能是暂存 BPU 各个预测器的预测信息，在指令提交后把这些信息送回 BPU 用作预测器的训练，因此它需要维护指令从预测到提交的完整的生命周期。另外，后端将存储来自FTQ的取指目标PC，便于自身读取。
+![[Pasted image 20250222103931.png]]
+模块之间的中转站 从上图，FTQ很大程度上相当于一个中转站，中间人的角色，一方面，它承担着BPU和IFU之间的交互，这通常是因为BPU预测的速度快于IFU取值执行，所以使用FTQ作为缓冲。另一方面，它承担着后端与前端的交互，比如把前端将要执行的pc交给后端去执行。
+显然，FTQ的 中转远不止这么多，下面更具体地讨论一下FTQ怎么中转各个前端或后端模块的信息的。
+BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 FTQtoBPU：FTQ会将带元数据的训练信息和重定向信息发回给BPU
+请参照BPU文档链接 BPU 模块整体对外接口 (PredirectIO) FTQ和IFU FTQtoIFU：FTQ会将存储的取值目标发往IFU进行取值译码和把后端的重定向信息也移交给IFU
+取值目标同时也发给： toICache：同样的取值目标会被发给指令缓存单元，看对应的指令是否在缓存单元内存在，如果有会被直接发送给IFU加速取值效率 toPrefetch: prefetch是ICache的一个组件，负责预取功能 转发后端重定向： 后端重定向不仅需要转发给BPU帮助其回到正确状态，也同时需要转发给IFU帮助其回到正确状态 IFUtoFTQ：IFU将预译码信息和重定向信息写回FTQ
+预译码信息：包含分支预测块对应的预测宽度内所有指令的预译码信息 预测宽度：一个指令块预测块覆盖的指令范围，香山中是16条rvc指令 重定向信息其实也是根据预译码信息得到的：当预译码信息中指出预测块内某一条指令预测出错时，写回IFU重定向信息 后端和FTQ FTQ到后端：FTQ会将存储的取值目标发往后端，后端存储 PC后，在本地即可进行读取取指目标。
+除了IFU，预测块的取值目标也会发给后端，但这里有一点区别：IFU空闲时才能从FTQ中获取取值目标，但是后端会一直取得最新的预测块的取指目标 后端到FTQ：后端重定向和指令commit
+后端重定向与更新：后端是实际执行指令的单元，通过后端的执行结果，才能确认一条指令是否执行错误，产生重定向，同时，在发生重定向时，根据后端实际执行结果生成更新信息。 指令commit：当一个分支预测块内的所有指令都被执行，在后端提交，这标志着FTQ队列中这个分支预测块对应的FTQ项已经结束了它的生命周期，可以从队列中移除了，这时候，我们就可以把它的更新信息发给FTQ了。 FTQ指针 FTQ的全名叫取值目标队列，队列中的一个项叫做FTQ项，BPU写入预测结果时是写入队列中哪个位置，IFU又是从哪个队列取FTQ项？这时候，我们需要一个FTQ指针去索引FTQ项，而由于和不同模块的交互需要索引不同的FTQ项，因此，有以下类型的FTQ指针，下面，由指令生命周期为例，大致介绍这些指针：
+指令在 FTQ 中的生存周期 指令以预测块为单位，从 BPU 预测后便送进 FTQ，直到指令所在的预测块中的所有指令全部在后端提交完成，FTQ 才会在存储结构中完全释放该预测块所对应的项。这个过程中发生的事如下：
+预测块从 BPU 发出，进入 FTQ，bpuPtr 指针加一，初始化对应 FTQ 项的各种状态，把各种预测信息写入存储结构；如果预测块来自 BPU 覆盖预测逻辑，则恢复 bpuPtr 和 ifuPtr FTQ 向 IFU 发出取指请求，ifuPtr 指针加一，等待预译码信息写回 IFU 写回预译码信息，ifuWbPtr 指针加一，如果预译码检测出了预测错误，则给 BPU 发送相应的重定向请求，恢复 bpuPtr 和 ifuPtr 指令进入后端执行，如果后端检测出了误预测，则通知 FTQ，给 IFU 和 BPU 发送重定向请求，恢复 bpuPtr、ifuPtr 和 ifuWbPtr 指令在后端提交，通知 FTQ，等 FTQ 项中所有的有效指令都已提交，commPtr 指针加一，从存储结构中读出相应的信息，送给 BPU 进行训练 预测块 n 内指令的生存周期会涉及到 FTQ 中的 bpuPtr、ifuPtr、ifuWbPtr 和 commPtr 四个指针，当 bpuPtr 开始指向 n&#43;1 时，预测块内的指令进入生存周期，当 commPtr 指向 n&#43;1 后，预测块内的指令完成生存周期。">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="126">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FTQ概述">
+  <meta name="twitter:description" content="下文（包括所有的FTQ文档）中会提到一些关于BPU和IFU的相关知识，详情需要去查看对应的文档:
+BPU文档链接 IFU文档链接 hint：建议先从BPU基础设计中着重理解以下概念：
+什么是分支预测？ 什么是分支预测块？一个有帮助的链接：预测块 (可选)什么是重定向，什么是预测结果重定向？ (可选)分支预测的流水级 简介 FTQ 是分支预测和取指单元之间的缓冲队列，它的主要职能是暂存 BPU 预测的取指目标，并根据这些取指目标给 IFU 发送取指请求。它的另一重要职能是暂存 BPU 各个预测器的预测信息，在指令提交后把这些信息送回 BPU 用作预测器的训练，因此它需要维护指令从预测到提交的完整的生命周期。另外，后端将存储来自FTQ的取指目标PC，便于自身读取。
+![[Pasted image 20250222103931.png]]
+模块之间的中转站 从上图，FTQ很大程度上相当于一个中转站，中间人的角色，一方面，它承担着BPU和IFU之间的交互，这通常是因为BPU预测的速度快于IFU取值执行，所以使用FTQ作为缓冲。另一方面，它承担着后端与前端的交互，比如把前端将要执行的pc交给后端去执行。
+显然，FTQ的 中转远不止这么多，下面更具体地讨论一下FTQ怎么中转各个前端或后端模块的信息的。
+BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 FTQtoBPU：FTQ会将带元数据的训练信息和重定向信息发回给BPU
+请参照BPU文档链接 BPU 模块整体对外接口 (PredirectIO) FTQ和IFU FTQtoIFU：FTQ会将存储的取值目标发往IFU进行取值译码和把后端的重定向信息也移交给IFU
+取值目标同时也发给： toICache：同样的取值目标会被发给指令缓存单元，看对应的指令是否在缓存单元内存在，如果有会被直接发送给IFU加速取值效率 toPrefetch: prefetch是ICache的一个组件，负责预取功能 转发后端重定向： 后端重定向不仅需要转发给BPU帮助其回到正确状态，也同时需要转发给IFU帮助其回到正确状态 IFUtoFTQ：IFU将预译码信息和重定向信息写回FTQ
+预译码信息：包含分支预测块对应的预测宽度内所有指令的预译码信息 预测宽度：一个指令块预测块覆盖的指令范围，香山中是16条rvc指令 重定向信息其实也是根据预译码信息得到的：当预译码信息中指出预测块内某一条指令预测出错时，写回IFU重定向信息 后端和FTQ FTQ到后端：FTQ会将存储的取值目标发往后端，后端存储 PC后，在本地即可进行读取取指目标。
+除了IFU，预测块的取值目标也会发给后端，但这里有一点区别：IFU空闲时才能从FTQ中获取取值目标，但是后端会一直取得最新的预测块的取指目标 后端到FTQ：后端重定向和指令commit
+后端重定向与更新：后端是实际执行指令的单元，通过后端的执行结果，才能确认一条指令是否执行错误，产生重定向，同时，在发生重定向时，根据后端实际执行结果生成更新信息。 指令commit：当一个分支预测块内的所有指令都被执行，在后端提交，这标志着FTQ队列中这个分支预测块对应的FTQ项已经结束了它的生命周期，可以从队列中移除了，这时候，我们就可以把它的更新信息发给FTQ了。 FTQ指针 FTQ的全名叫取值目标队列，队列中的一个项叫做FTQ项，BPU写入预测结果时是写入队列中哪个位置，IFU又是从哪个队列取FTQ项？这时候，我们需要一个FTQ指针去索引FTQ项，而由于和不同模块的交互需要索引不同的FTQ项，因此，有以下类型的FTQ指针，下面，由指令生命周期为例，大致介绍这些指针：
+指令在 FTQ 中的生存周期 指令以预测块为单位，从 BPU 预测后便送进 FTQ，直到指令所在的预测块中的所有指令全部在后端提交完成，FTQ 才会在存储结构中完全释放该预测块所对应的项。这个过程中发生的事如下：
+预测块从 BPU 发出，进入 FTQ，bpuPtr 指针加一，初始化对应 FTQ 项的各种状态，把各种预测信息写入存储结构；如果预测块来自 BPU 覆盖预测逻辑，则恢复 bpuPtr 和 ifuPtr FTQ 向 IFU 发出取指请求，ifuPtr 指针加一，等待预译码信息写回 IFU 写回预译码信息，ifuWbPtr 指针加一，如果预译码检测出了预测错误，则给 BPU 发送相应的重定向请求，恢复 bpuPtr 和 ifuPtr 指令进入后端执行，如果后端检测出了误预测，则通知 FTQ，给 IFU 和 BPU 发送重定向请求，恢复 bpuPtr、ifuPtr 和 ifuWbPtr 指令在后端提交，通知 FTQ，等 FTQ 项中所有的有效指令都已提交，commPtr 指针加一，从存储结构中读出相应的信息，送给 BPU 进行训练 预测块 n 内指令的生存周期会涉及到 FTQ 中的 bpuPtr、ifuPtr、ifuWbPtr 和 commPtr 四个指针，当 bpuPtr 开始指向 n&#43;1 时，预测块内的指令进入生存周期，当 commPtr 指向 n&#43;1 后，预测块内的指令完成生存周期。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -143,7 +192,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -167,7 +216,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -644,7 +693,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 </div>
 
@@ -686,7 +735,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

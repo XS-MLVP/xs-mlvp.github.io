@@ -19,22 +19,29 @@
 
 <title>RAS Branch Predictor | OpenVerify Courses</title>
 <meta name="description" content="RAS介绍 RAS stands for “Return Address Stack.” It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.
-function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add.">
-<meta property="og:title" content="RAS Branch Predictor" />
-<meta property="og:description" content="RAS介绍 RAS stands for &ldquo;Return Address Stack.&rdquo; It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.
-function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/xs-bpu/en/docs/modules/05_ras/" /><meta property="article:section" content="docs" />
+function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add. In this process, each call’s jump address and return address are fixed, and the return address can be obtained at the time of the call. The function call process is a “stack push and pop” process, so branch prediction can be performed using a “stack” structure: each time a call instruction is encountered, the current PC&#43;4 (compressed instructions and regular instructions have different offsets) is pushed onto the stack; when a return instruction is encountered, a pop operation is performed, and the address obtained is the target jump address. In the block-based BPU, RAS cannot know whether the current block is a call or ret, so it relies on other predictors, using the results of previous predictors for RAS operations.">
+<meta property="og:url" content="https://open-verify.cc/xs-bpu/en/docs/modules/05_ras/">
+  <meta property="og:site_name" content="OpenVerify Courses">
+  <meta property="og:title" content="RAS Branch Predictor">
+  <meta property="og:description" content="RAS介绍 RAS stands for “Return Address Stack.” It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.
+function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add. In this process, each call’s jump address and return address are fixed, and the return address can be obtained at the time of the call. The function call process is a “stack push and pop” process, so branch prediction can be performed using a “stack” structure: each time a call instruction is encountered, the current PC&#43;4 (compressed instructions and regular instructions have different offsets) is pushed onto the stack; when a return instruction is encountered, a pop operation is performed, and the address obtained is the target jump address. In the block-based BPU, RAS cannot know whether the current block is a call or ret, so it relies on other predictors, using the results of previous predictors for RAS operations.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:43:36+08:00">
+    <meta property="article:tag" content="Sub-Predictor">
+    <meta property="article:tag" content="RAS">
 
-<meta property="article:modified_time" content="2025-03-19T11:11:46+08:00" />
-<meta itemprop="name" content="RAS Branch Predictor">
-<meta itemprop="description" content="RAS介绍 RAS stands for &ldquo;Return Address Stack.&rdquo; It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.
-function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add.">
-<meta itemprop="dateModified" content="2025-03-19T11:11:46+08:00" />
-<meta itemprop="wordCount" content="1905">
-<meta itemprop="keywords" content="Sub-Predictor,RAS," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RAS Branch Predictor"/>
-<meta name="twitter:description" content="RAS介绍 RAS stands for &ldquo;Return Address Stack.&rdquo; It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.
-function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add."/>
+  <meta itemprop="name" content="RAS Branch Predictor">
+  <meta itemprop="description" content="RAS介绍 RAS stands for “Return Address Stack.” It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.
+function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add. In this process, each call’s jump address and return address are fixed, and the return address can be obtained at the time of the call. The function call process is a “stack push and pop” process, so branch prediction can be performed using a “stack” structure: each time a call instruction is encountered, the current PC&#43;4 (compressed instructions and regular instructions have different offsets) is pushed onto the stack; when a return instruction is encountered, a pop operation is performed, and the address obtained is the target jump address. In the block-based BPU, RAS cannot know whether the current block is a call or ret, so it relies on other predictors, using the results of previous predictors for RAS operations.">
+  <meta itemprop="dateModified" content="2025-04-28T17:43:36+08:00">
+  <meta itemprop="wordCount" content="1905">
+  <meta itemprop="keywords" content="Sub-Predictor,RAS">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="RAS Branch Predictor">
+  <meta name="twitter:description" content="RAS介绍 RAS stands for “Return Address Stack.” It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.
+function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add. In this process, each call’s jump address and return address are fixed, and the return address can be obtained at the time of the call. The function call process is a “stack push and pop” process, so branch prediction can be performed using a “stack” structure: each time a call instruction is encountered, the current PC&#43;4 (compressed instructions and regular instructions have different offsets) is pushed onto the stack; when a return instruction is encountered, a pop operation is performed, and the address obtained is the target jump address. In the block-based BPU, RAS cannot know whether the current block is a call or ret, so it relies on other predictors, using the results of previous predictors for RAS operations.">
 <link rel="preload" href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -93,7 +100,7 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -117,7 +124,7 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -405,35 +412,35 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
 <h3 id="how-to-handle-when-the-s3-prediction-result-is-inconsistent-with-s2-at-the-input-end"><strong>How to handle when the S3 prediction result is inconsistent with S2 at the input end?</strong></h3>
 <p>Since the S3 result is assumed to be better than S2, the RAS stack needs to be repaired again in case of inconsistency. The specific inconsistency and corresponding repair operations are shown in the table below:</p>
 <table>
-<thead>
-<tr>
-<th>S2 Pred. Res.</th>
-<th>S3 Pred. Res.</th>
-<th>Repair Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>push</td>
-<td>keep</td>
-<td>pop</td>
-</tr>
-<tr>
-<td>keep</td>
-<td>pop</td>
-<td>pop</td>
-</tr>
-<tr>
-<td>pop</td>
-<td>keep</td>
-<td>push</td>
-</tr>
-<tr>
-<td>keep</td>
-<td>push</td>
-<td>push</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>S2 Pred. Res.</th>
+          <th>S3 Pred. Res.</th>
+          <th>Repair Operation</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>push</td>
+          <td>keep</td>
+          <td>pop</td>
+      </tr>
+      <tr>
+          <td>keep</td>
+          <td>pop</td>
+          <td>pop</td>
+      </tr>
+      <tr>
+          <td>pop</td>
+          <td>keep</td>
+          <td>push</td>
+      </tr>
+      <tr>
+          <td>keep</td>
+          <td>push</td>
+          <td>push</td>
+      </tr>
+  </tbody>
 </table>
 <p>S2 and S3 operations do not exist, pop/push or push/pop scenarios (Why not exist?)</p>
 <h2 id="other-optimizations">Other Optimizations</h2>
@@ -443,260 +450,260 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
 <h2 id="interface-description">Interface Description</h2>
 <p>In the RAS predictor, the core component is the <strong>RASStack</strong>, with the following interface:</p>
 <table>
-<thead>
-<tr>
-<th><strong>接口名称</strong></th>
-<th><strong>功能描述</strong></th>
-<th><strong>接口名称</strong></th>
-<th><strong>功能描述</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>in.spec_push_valid</td>
-<td>预测有Call指令，Spec压栈</td>
-<td>in.s2_fire</td>
-<td>s2信号有效</td>
-</tr>
-<tr>
-<td>in.spec_pop_valid</td>
-<td>预测有Ret指令，Spec出栈</td>
-<td>in.s3_fire</td>
-<td>s3信号有效</td>
-</tr>
-<tr>
-<td>in.spec_push_addr</td>
-<td>Ret地址</td>
-<td>in.s3_cancel</td>
-<td>s3和s2的预测结果不一样，需要撤销s2的操作</td>
-</tr>
-<tr>
-<td>out.spec_pop_addr</td>
-<td>RAS的栈顶数据</td>
-<td>in.s3_meta</td>
-<td>s3需要的s2时的现场信息</td>
-</tr>
-<tr>
-<td>out.ssp</td>
-<td>commit栈顶指针</td>
-<td>in.s3_missed_pop</td>
-<td>s3判断需要再次进行pop</td>
-</tr>
-<tr>
-<td>out.sctr</td>
-<td>commit栈顶重复元素计数器</td>
-<td>in.s3_missed_push</td>
-<td>s3判断需要再次进行push</td>
-</tr>
-<tr>
-<td>out.nsp</td>
-<td>commit栈顶，会被ssp覆盖</td>
-<td>in.s3_pushAddr</td>
-<td>需要再次push时的地址</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>out.TOSR</td>
-<td>spec栈栈顶指针</td>
-<td>in.redirect_valid</td>
-<td>需要重定向</td>
-</tr>
-<tr>
-<td>out.TOSW</td>
-<td>spec栈数据分配指针</td>
-<td>in.redirect_isCall</td>
-<td>真实执行情况是Call</td>
-</tr>
-<tr>
-<td>out.BOS</td>
-<td>spec栈栈低指针</td>
-<td>in.redirect_isRet</td>
-<td>真实执行情况是Return</td>
-</tr>
-<tr>
-<td>in.commit_push_valid</td>
-<td>push操作正确</td>
-<td>in.redirect_meta_ssp</td>
-<td>之前预测时的现场信息ssp</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>in.commit_pop_valid</td>
-<td>FTQ执行结果为Call正确</td>
-<td>in.redirect_meta_sctr</td>
-<td>之前预测时的现场信息sctr</td>
-</tr>
-<tr>
-<td>in.commit_push_addr</td>
-<td>更新信息中的Ret地址</td>
-<td>in.redirect_meta_TOSW</td>
-<td>之前预测时的现场信息TOSW</td>
-</tr>
-<tr>
-<td>in.commit_meta_TOSW</td>
-<td>更新信息中的TOSW</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>in.redirect_meta_TOSR</td>
-<td>之前预测时的现场信息TOSR</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>in.commit_meta_TOSR</td>
-<td>更新信息中的TOSR</td>
-<td>in.redirect_meta_NOS</td>
-<td>之前预测时的现场信息NOS</td>
-</tr>
-<tr>
-<td>in.commit_meta_ssp</td>
-<td>更新信息中的现场信息SSP</td>
-<td>in.redirect_callAddr</td>
-<td>重定向地址</td>
-</tr>
-<tr>
-<td>in.commit_meta_sctr</td>
-<td>更新信息中的现场信息SCTR</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th><strong>接口名称</strong></th>
+          <th><strong>功能描述</strong></th>
+          <th><strong>接口名称</strong></th>
+          <th><strong>功能描述</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>in.spec_push_valid</td>
+          <td>预测有Call指令，Spec压栈</td>
+          <td>in.s2_fire</td>
+          <td>s2信号有效</td>
+      </tr>
+      <tr>
+          <td>in.spec_pop_valid</td>
+          <td>预测有Ret指令，Spec出栈</td>
+          <td>in.s3_fire</td>
+          <td>s3信号有效</td>
+      </tr>
+      <tr>
+          <td>in.spec_push_addr</td>
+          <td>Ret地址</td>
+          <td>in.s3_cancel</td>
+          <td>s3和s2的预测结果不一样，需要撤销s2的操作</td>
+      </tr>
+      <tr>
+          <td>out.spec_pop_addr</td>
+          <td>RAS的栈顶数据</td>
+          <td>in.s3_meta</td>
+          <td>s3需要的s2时的现场信息</td>
+      </tr>
+      <tr>
+          <td>out.ssp</td>
+          <td>commit栈顶指针</td>
+          <td>in.s3_missed_pop</td>
+          <td>s3判断需要再次进行pop</td>
+      </tr>
+      <tr>
+          <td>out.sctr</td>
+          <td>commit栈顶重复元素计数器</td>
+          <td>in.s3_missed_push</td>
+          <td>s3判断需要再次进行push</td>
+      </tr>
+      <tr>
+          <td>out.nsp</td>
+          <td>commit栈顶，会被ssp覆盖</td>
+          <td>in.s3_pushAddr</td>
+          <td>需要再次push时的地址</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>out.TOSR</td>
+          <td>spec栈栈顶指针</td>
+          <td>in.redirect_valid</td>
+          <td>需要重定向</td>
+      </tr>
+      <tr>
+          <td>out.TOSW</td>
+          <td>spec栈数据分配指针</td>
+          <td>in.redirect_isCall</td>
+          <td>真实执行情况是Call</td>
+      </tr>
+      <tr>
+          <td>out.BOS</td>
+          <td>spec栈栈低指针</td>
+          <td>in.redirect_isRet</td>
+          <td>真实执行情况是Return</td>
+      </tr>
+      <tr>
+          <td>in.commit_push_valid</td>
+          <td>push操作正确</td>
+          <td>in.redirect_meta_ssp</td>
+          <td>之前预测时的现场信息ssp</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>in.commit_pop_valid</td>
+          <td>FTQ执行结果为Call正确</td>
+          <td>in.redirect_meta_sctr</td>
+          <td>之前预测时的现场信息sctr</td>
+      </tr>
+      <tr>
+          <td>in.commit_push_addr</td>
+          <td>更新信息中的Ret地址</td>
+          <td>in.redirect_meta_TOSW</td>
+          <td>之前预测时的现场信息TOSW</td>
+      </tr>
+      <tr>
+          <td>in.commit_meta_TOSW</td>
+          <td>更新信息中的TOSW</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>in.redirect_meta_TOSR</td>
+          <td>之前预测时的现场信息TOSR</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>in.commit_meta_TOSR</td>
+          <td>更新信息中的TOSR</td>
+          <td>in.redirect_meta_NOS</td>
+          <td>之前预测时的现场信息NOS</td>
+      </tr>
+      <tr>
+          <td>in.commit_meta_ssp</td>
+          <td>更新信息中的现场信息SSP</td>
+          <td>in.redirect_callAddr</td>
+          <td>重定向地址</td>
+      </tr>
+      <tr>
+          <td>in.commit_meta_sctr</td>
+          <td>更新信息中的现场信息SCTR</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <p>The relationship between the RASStack module and the BasePredictor interface is as follows:</p>
 <table>
-<thead>
-<tr>
-<th><strong>stack接口</strong></th>
-<th><strong>转换过程</strong></th>
-<th><strong>描述</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>s.spec_push_valid</td>
-<td>io.s2_fire(2) &amp;&amp; s2_full_pred.hit_taken_on_call &amp;&amp; !io.s3_redirect(2)</td>
-<td>s2输入有效，且上级预测为call跳转</td>
-</tr>
-<tr>
-<td>s.spec_pop_valid</td>
-<td>io.s2_fire(2) &amp;&amp; s2_full_pred.hit_taken_on_ret  &amp;&amp; !io.s3_redirect(2)</td>
-<td>s2输入有效，且上级预测为ret跳转</td>
-</tr>
-<tr>
-<td>s.spec_push_addr</td>
-<td>s2_full_pred.fallThroughAddr + Mux(s2_full_pred.last_may_be_rvi_call, 2.U, 0.U)</td>
-<td>上级预测器s2预测的fallThroughAddr（即PC+2），判断是否压缩指令是否需要 +2</td>
-</tr>
-<tr>
-<td>s.redirect_isCall</td>
-<td>redirect.bits.level === 0.U &amp;&amp; recover_cfi.pd.isCall</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>s.redirect_isRet</td>
-<td>redirect.bits.level === 0.U &amp;&amp; recover_cfi.pd.isRet</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>s.redirect_meta_*</td>
-<td>redirect.bits.cfiUpdate.*</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>s.commit_push_valid</td>
-<td>io.update.is_call_taken</td>
-<td>call指令预测正确</td>
-</tr>
-<tr>
-<td>s.commit_push_valid</td>
-<td>io.update.is_ret_taken</td>
-<td>ret指令预测正确</td>
-</tr>
-<tr>
-<td>s.commit_push_addr</td>
-<td>update.ftb_entry.getFallThrough(update.pc) + Mux(update.ftb_entry.last_may_be_rvi_call, 2.U, 0.U)</td>
-<td>根据是否为压缩指令，进行地址+2或者+0</td>
-</tr>
-<tr>
-<td>s.commit_meta_*</td>
-<td>io.update.bits.meta.asTypeOf(new RASMeta)</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>io.out.last_stage_spec_info.*</td>
-<td>s3_meta.*</td>
-<td>s3_meta = RegEnable(s2_meta, io.s2_fire(2))由s2_meta延迟一怕得到</td>
-</tr>
-<tr>
-<td>io.out.last_stage_meta</td>
-<td>s3_meta</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>io.out.s2.full_pred.*.jalr_target</td>
-<td>:=stack.spec_pop_addr</td>
-<td>预测地址（栈顶地址，只预测ret）</td>
-</tr>
-<tr>
-<td>io.out.s3.full_pred.*.jalr_target</td>
-<td>:=RegEnable(stack.spec_pop_addr, io.s2_fire(2))</td>
-<td>由s2延迟一拍得到</td>
-</tr>
-<tr>
-<td>io.out.s2/3.full_pred.targets.last</td>
-<td>:=Mux(s2/3_is_jalr, s2/3_jalr_target, s2/3_last_target_in)</td>
-<td>如果时call执行，更新targets.last的结果</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th><strong>stack接口</strong></th>
+          <th><strong>转换过程</strong></th>
+          <th><strong>描述</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>s.spec_push_valid</td>
+          <td>io.s2_fire(2) &amp;&amp; s2_full_pred.hit_taken_on_call &amp;&amp; !io.s3_redirect(2)</td>
+          <td>s2输入有效，且上级预测为call跳转</td>
+      </tr>
+      <tr>
+          <td>s.spec_pop_valid</td>
+          <td>io.s2_fire(2) &amp;&amp; s2_full_pred.hit_taken_on_ret  &amp;&amp; !io.s3_redirect(2)</td>
+          <td>s2输入有效，且上级预测为ret跳转</td>
+      </tr>
+      <tr>
+          <td>s.spec_push_addr</td>
+          <td>s2_full_pred.fallThroughAddr + Mux(s2_full_pred.last_may_be_rvi_call, 2.U, 0.U)</td>
+          <td>上级预测器s2预测的fallThroughAddr（即PC+2），判断是否压缩指令是否需要 +2</td>
+      </tr>
+      <tr>
+          <td>s.redirect_isCall</td>
+          <td>redirect.bits.level === 0.U &amp;&amp; recover_cfi.pd.isCall</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>s.redirect_isRet</td>
+          <td>redirect.bits.level === 0.U &amp;&amp; recover_cfi.pd.isRet</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>s.redirect_meta_*</td>
+          <td>redirect.bits.cfiUpdate.*</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>s.commit_push_valid</td>
+          <td>io.update.is_call_taken</td>
+          <td>call指令预测正确</td>
+      </tr>
+      <tr>
+          <td>s.commit_push_valid</td>
+          <td>io.update.is_ret_taken</td>
+          <td>ret指令预测正确</td>
+      </tr>
+      <tr>
+          <td>s.commit_push_addr</td>
+          <td>update.ftb_entry.getFallThrough(update.pc) + Mux(update.ftb_entry.last_may_be_rvi_call, 2.U, 0.U)</td>
+          <td>根据是否为压缩指令，进行地址+2或者+0</td>
+      </tr>
+      <tr>
+          <td>s.commit_meta_*</td>
+          <td>io.update.bits.meta.asTypeOf(new RASMeta)</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>io.out.last_stage_spec_info.*</td>
+          <td>s3_meta.*</td>
+          <td>s3_meta = RegEnable(s2_meta, io.s2_fire(2))由s2_meta延迟一怕得到</td>
+      </tr>
+      <tr>
+          <td>io.out.last_stage_meta</td>
+          <td>s3_meta</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>io.out.s2.full_pred.*.jalr_target</td>
+          <td>:=stack.spec_pop_addr</td>
+          <td>预测地址（栈顶地址，只预测ret）</td>
+      </tr>
+      <tr>
+          <td>io.out.s3.full_pred.*.jalr_target</td>
+          <td>:=RegEnable(stack.spec_pop_addr, io.s2_fire(2))</td>
+          <td>由s2延迟一拍得到</td>
+      </tr>
+      <tr>
+          <td>io.out.s2/3.full_pred.targets.last</td>
+          <td>:=Mux(s2/3_is_jalr, s2/3_jalr_target, s2/3_last_target_in)</td>
+          <td>如果时call执行，更新targets.last的结果</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="timing-description">Timing Description</h2>
 <p>In RAS, there are only 2 stages, S2 and S3.</p>
@@ -720,7 +727,7 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
 <p>Since the RASStack appears to complete its tasks within a cycle, data bypassing is needed inside the stack to cache data for processing.</p>
 
 	<div class="td-page-meta__lastmod">
-  Last modified March 19, 2025: <a href="https://github.com/XS-MLVP/course/commit/6efab288a3d23d1d97fa483bb19209d5ae49789e">doc: adapted to the latest v0.11.0 of docsy (6efab28)</a>
+  Last modified April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/5c24d32b13e6e84ae1f86af59a596e9d23ae77df">Upgrade hugo version to 0.146.7 (5c24d32)</a>
 </div>
 
 </div>
@@ -764,7 +771,7 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
 </footer>
 
     </div>
-    <script src="/xs-bpu/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/xs-bpu/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script defer src="/xs-bpu/js/click-to-copy.min.73478a7d4807698aed7e355eb23f9890ca18fea3158604c8471746d046702bad.js" integrity="sha256-c0eKfUgHaYrtfjVesj&#43;YkMoY/qMVhgTIRxdG0EZwK60=" crossorigin="anonymous"></script>
 <script src='/xs-bpu/js/tabpane-persist.js'></script>
 

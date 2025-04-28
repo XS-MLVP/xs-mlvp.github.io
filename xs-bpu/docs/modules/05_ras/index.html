@@ -23,34 +23,69 @@
 function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } 如上图所示，在main函数中调用了add和sub，add又调用了函数_add。在该过程中，每次调用（call）的跳转地址和返回的地址固定，且在call的时候，就可以同时得到返回地址。函数的调用过程是一个“栈的出入”过程，因此可以通过“栈”结构进行分支预测：每遇到call指令，把当前PC&#43;4（压缩指令和普通指令的偏移不同）进行压栈push操作；遇到return指令，则进行进行pop操作，得到的地址即为目标跳转地址。在基于“预测块”的BPU中，RAS无法知道当前块是否是call或者ret，因此需要依赖其他预测器，利用前级预测器的结果进行RAS操作。
 具体的，在香山的RAS预测器中，其s2阶段，需要判断上一级s2的输出是否预测为call或者ret（即输入信号io.s2_full_pred.hit_taken_on_call/ret有效 ），如果是call则push其后续指令地址入栈，是ret则从栈中pop出地址作为预测结果。因为在BPU的预测器中，人为假定s3阶段得到的结果比s2阶段好，所以RAS预测器在s3阶段需要进行检查，如果上一级的s3预测结果与s2不一致，则采信s3的结果，并按需求判断是否需要撤销或者补齐之前s2阶段的栈操作。例如s2阶段预测为call指令，进行了push操作，而s3为普通分支指令，不需要进行任何操作，此时就需要撤销push；如果s2预测为普通分支指令，s3预测为call，则需要进行push操作补齐。
 RAS的栈操作 在普通的RAS设计中，通过栈进行预测函数返回地址。在理想情况下，本节假定RAS可进行随时备份，栈顶指针用sp表示，预测地址用paddr表示。RAS的基本操作有以下4种：
-PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。">
-<meta property="og:title" content="RAS 分支预测器" />
-<meta property="og:description" content="RAS介绍 RAS 指的是 &ldquo;Return Address Stack&rdquo;，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
+PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。
+POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时，预测的跳转地址 paddr = sp，然后进行出栈， sp = sp - 1。对当前栈进行快照，标记为s。
+重定向操作 由于BPU是对程序的分支进行预测，因此就有“预测对”和“预测错”两种情况，当CPU后端发现分支预测错误，就会进行重定向（redirect）操作，告诉BPU哪个地方预测错误，正确结果是多少。重定向时RAS模块会收到正确的分支和当时预测时RAS栈信息。根据正确分支指令类型不同，首先恢复快照s有如下情形：
+（1）之前被预测的指令，实际是 call指令，根据redirect中给的addr地址，执行push操作；
+（2）之前被预测的指令，实际是 ret指令，执行pop操作；
+提交操作 提交（Commit）操作即后端告诉前端，之前预测的结果正确。理想情况下，RAS预测器此时不需要进行任何操作。
+昆明湖中RAS的实现 由于处理器在执行过程中可能会进行错误的猜测，导致数据污染，RAS需要通过恢复机制来确保数据的准确性。特别是在昆明湖的实际电路设计中，不可能有无限大的栈，也无法随时备份数据。因此，昆明湖的RAS实现中，使用了基于持久化栈的返回地址预测器。具体来说，将RAS分为提交栈（commit stack）和推测栈（spec queue）两个部分，推测栈利用了香山BPU的预测结果来进行预测，然后根据后端返回的信息将数据压入提交栈中。下面详细介绍昆明湖的RAS设计：
+每次预测时，RAS栈的快照如何获得？ 为了实现对RAS栈进行快照的功能，昆明湖的RAS推测栈采用了基于循环数组的 “链式表示“ 。设计具体如下：">
+<meta property="og:url" content="https://open-verify.cc/xs-bpu/docs/modules/05_ras/">
+  <meta property="og:site_name" content="香山微架构开放验证第一期：昆明湖BPU模块UT验证实战">
+  <meta property="og:title" content="RAS 分支预测器">
+  <meta property="og:description" content="RAS介绍 RAS 指的是 “Return Address Stack”，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
 等。RAS分支预测器则专门针对 call/return类型。
 function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } 如上图所示，在main函数中调用了add和sub，add又调用了函数_add。在该过程中，每次调用（call）的跳转地址和返回的地址固定，且在call的时候，就可以同时得到返回地址。函数的调用过程是一个“栈的出入”过程，因此可以通过“栈”结构进行分支预测：每遇到call指令，把当前PC&#43;4（压缩指令和普通指令的偏移不同）进行压栈push操作；遇到return指令，则进行进行pop操作，得到的地址即为目标跳转地址。在基于“预测块”的BPU中，RAS无法知道当前块是否是call或者ret，因此需要依赖其他预测器，利用前级预测器的结果进行RAS操作。
 具体的，在香山的RAS预测器中，其s2阶段，需要判断上一级s2的输出是否预测为call或者ret（即输入信号io.s2_full_pred.hit_taken_on_call/ret有效 ），如果是call则push其后续指令地址入栈，是ret则从栈中pop出地址作为预测结果。因为在BPU的预测器中，人为假定s3阶段得到的结果比s2阶段好，所以RAS预测器在s3阶段需要进行检查，如果上一级的s3预测结果与s2不一致，则采信s3的结果，并按需求判断是否需要撤销或者补齐之前s2阶段的栈操作。例如s2阶段预测为call指令，进行了push操作，而s3为普通分支指令，不需要进行任何操作，此时就需要撤销push；如果s2预测为普通分支指令，s3预测为call，则需要进行push操作补齐。
 RAS的栈操作 在普通的RAS设计中，通过栈进行预测函数返回地址。在理想情况下，本节假定RAS可进行随时备份，栈顶指针用sp表示，预测地址用paddr表示。RAS的基本操作有以下4种：
-PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/xs-bpu/docs/modules/05_ras/" /><meta property="article:section" content="docs" />
+PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。
+POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时，预测的跳转地址 paddr = sp，然后进行出栈， sp = sp - 1。对当前栈进行快照，标记为s。
+重定向操作 由于BPU是对程序的分支进行预测，因此就有“预测对”和“预测错”两种情况，当CPU后端发现分支预测错误，就会进行重定向（redirect）操作，告诉BPU哪个地方预测错误，正确结果是多少。重定向时RAS模块会收到正确的分支和当时预测时RAS栈信息。根据正确分支指令类型不同，首先恢复快照s有如下情形：
+（1）之前被预测的指令，实际是 call指令，根据redirect中给的addr地址，执行push操作；
+（2）之前被预测的指令，实际是 ret指令，执行pop操作；
+提交操作 提交（Commit）操作即后端告诉前端，之前预测的结果正确。理想情况下，RAS预测器此时不需要进行任何操作。
+昆明湖中RAS的实现 由于处理器在执行过程中可能会进行错误的猜测，导致数据污染，RAS需要通过恢复机制来确保数据的准确性。特别是在昆明湖的实际电路设计中，不可能有无限大的栈，也无法随时备份数据。因此，昆明湖的RAS实现中，使用了基于持久化栈的返回地址预测器。具体来说，将RAS分为提交栈（commit stack）和推测栈（spec queue）两个部分，推测栈利用了香山BPU的预测结果来进行预测，然后根据后端返回的信息将数据压入提交栈中。下面详细介绍昆明湖的RAS设计：
+每次预测时，RAS栈的快照如何获得？ 为了实现对RAS栈进行快照的功能，昆明湖的RAS推测栈采用了基于循环数组的 “链式表示“ 。设计具体如下：">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:43:36+08:00">
+    <meta property="article:tag" content="子预测器">
+    <meta property="article:tag" content="RAS">
 
-<meta property="article:modified_time" content="2025-03-19T11:11:46+08:00" />
-<meta itemprop="name" content="RAS 分支预测器">
-<meta itemprop="description" content="RAS介绍 RAS 指的是 &ldquo;Return Address Stack&rdquo;，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
+  <meta itemprop="name" content="RAS 分支预测器">
+  <meta itemprop="description" content="RAS介绍 RAS 指的是 “Return Address Stack”，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
 等。RAS分支预测器则专门针对 call/return类型。
 function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } 如上图所示，在main函数中调用了add和sub，add又调用了函数_add。在该过程中，每次调用（call）的跳转地址和返回的地址固定，且在call的时候，就可以同时得到返回地址。函数的调用过程是一个“栈的出入”过程，因此可以通过“栈”结构进行分支预测：每遇到call指令，把当前PC&#43;4（压缩指令和普通指令的偏移不同）进行压栈push操作；遇到return指令，则进行进行pop操作，得到的地址即为目标跳转地址。在基于“预测块”的BPU中，RAS无法知道当前块是否是call或者ret，因此需要依赖其他预测器，利用前级预测器的结果进行RAS操作。
 具体的，在香山的RAS预测器中，其s2阶段，需要判断上一级s2的输出是否预测为call或者ret（即输入信号io.s2_full_pred.hit_taken_on_call/ret有效 ），如果是call则push其后续指令地址入栈，是ret则从栈中pop出地址作为预测结果。因为在BPU的预测器中，人为假定s3阶段得到的结果比s2阶段好，所以RAS预测器在s3阶段需要进行检查，如果上一级的s3预测结果与s2不一致，则采信s3的结果，并按需求判断是否需要撤销或者补齐之前s2阶段的栈操作。例如s2阶段预测为call指令，进行了push操作，而s3为普通分支指令，不需要进行任何操作，此时就需要撤销push；如果s2预测为普通分支指令，s3预测为call，则需要进行push操作补齐。
 RAS的栈操作 在普通的RAS设计中，通过栈进行预测函数返回地址。在理想情况下，本节假定RAS可进行随时备份，栈顶指针用sp表示，预测地址用paddr表示。RAS的基本操作有以下4种：
-PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。">
-<meta itemprop="dateModified" content="2025-03-19T11:11:46+08:00" />
-<meta itemprop="wordCount" content="311">
-<meta itemprop="keywords" content="子预测器,RAS," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RAS 分支预测器"/>
-<meta name="twitter:description" content="RAS介绍 RAS 指的是 &ldquo;Return Address Stack&rdquo;，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
+PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。
+POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时，预测的跳转地址 paddr = sp，然后进行出栈， sp = sp - 1。对当前栈进行快照，标记为s。
+重定向操作 由于BPU是对程序的分支进行预测，因此就有“预测对”和“预测错”两种情况，当CPU后端发现分支预测错误，就会进行重定向（redirect）操作，告诉BPU哪个地方预测错误，正确结果是多少。重定向时RAS模块会收到正确的分支和当时预测时RAS栈信息。根据正确分支指令类型不同，首先恢复快照s有如下情形：
+（1）之前被预测的指令，实际是 call指令，根据redirect中给的addr地址，执行push操作；
+（2）之前被预测的指令，实际是 ret指令，执行pop操作；
+提交操作 提交（Commit）操作即后端告诉前端，之前预测的结果正确。理想情况下，RAS预测器此时不需要进行任何操作。
+昆明湖中RAS的实现 由于处理器在执行过程中可能会进行错误的猜测，导致数据污染，RAS需要通过恢复机制来确保数据的准确性。特别是在昆明湖的实际电路设计中，不可能有无限大的栈，也无法随时备份数据。因此，昆明湖的RAS实现中，使用了基于持久化栈的返回地址预测器。具体来说，将RAS分为提交栈（commit stack）和推测栈（spec queue）两个部分，推测栈利用了香山BPU的预测结果来进行预测，然后根据后端返回的信息将数据压入提交栈中。下面详细介绍昆明湖的RAS设计：
+每次预测时，RAS栈的快照如何获得？ 为了实现对RAS栈进行快照的功能，昆明湖的RAS推测栈采用了基于循环数组的 “链式表示“ 。设计具体如下：">
+  <meta itemprop="dateModified" content="2025-04-28T17:43:36+08:00">
+  <meta itemprop="wordCount" content="311">
+  <meta itemprop="keywords" content="子预测器,RAS">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="RAS 分支预测器">
+  <meta name="twitter:description" content="RAS介绍 RAS 指的是 “Return Address Stack”，即返回地址栈。它通过跟踪程序的返回地址，帮助确定程序中的分支行为。由前所述，在程序中存在很多分支：if/else、 switch/case、while/for loop、iteration、call/return
 等。RAS分支预测器则专门针对 call/return类型。
 function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } 如上图所示，在main函数中调用了add和sub，add又调用了函数_add。在该过程中，每次调用（call）的跳转地址和返回的地址固定，且在call的时候，就可以同时得到返回地址。函数的调用过程是一个“栈的出入”过程，因此可以通过“栈”结构进行分支预测：每遇到call指令，把当前PC&#43;4（压缩指令和普通指令的偏移不同）进行压栈push操作；遇到return指令，则进行进行pop操作，得到的地址即为目标跳转地址。在基于“预测块”的BPU中，RAS无法知道当前块是否是call或者ret，因此需要依赖其他预测器，利用前级预测器的结果进行RAS操作。
 具体的，在香山的RAS预测器中，其s2阶段，需要判断上一级s2的输出是否预测为call或者ret（即输入信号io.s2_full_pred.hit_taken_on_call/ret有效 ），如果是call则push其后续指令地址入栈，是ret则从栈中pop出地址作为预测结果。因为在BPU的预测器中，人为假定s3阶段得到的结果比s2阶段好，所以RAS预测器在s3阶段需要进行检查，如果上一级的s3预测结果与s2不一致，则采信s3的结果，并按需求判断是否需要撤销或者补齐之前s2阶段的栈操作。例如s2阶段预测为call指令，进行了push操作，而s3为普通分支指令，不需要进行任何操作，此时就需要撤销push；如果s2预测为普通分支指令，s3预测为call，则需要进行push操作补齐。
 RAS的栈操作 在普通的RAS设计中，通过栈进行预测函数返回地址。在理想情况下，本节假定RAS可进行随时备份，栈顶指针用sp表示，预测地址用paddr表示。RAS的基本操作有以下4种：
-PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。"/>
+PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在push时需要对当前栈的状态进行备份（在软件领域，通常称为“快照”，本文在后继内容中也用快照进行称呼），标记为s。当遇到call指令时，获取call指令的返回地址 addr = 当前pc &#43; 4（如果是压缩指令则addr = pc&#43;2），然后压栈：sp = addr；sp &#43;= 1。
+POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时，预测的跳转地址 paddr = sp，然后进行出栈， sp = sp - 1。对当前栈进行快照，标记为s。
+重定向操作 由于BPU是对程序的分支进行预测，因此就有“预测对”和“预测错”两种情况，当CPU后端发现分支预测错误，就会进行重定向（redirect）操作，告诉BPU哪个地方预测错误，正确结果是多少。重定向时RAS模块会收到正确的分支和当时预测时RAS栈信息。根据正确分支指令类型不同，首先恢复快照s有如下情形：
+（1）之前被预测的指令，实际是 call指令，根据redirect中给的addr地址，执行push操作；
+（2）之前被预测的指令，实际是 ret指令，执行pop操作；
+提交操作 提交（Commit）操作即后端告诉前端，之前预测的结果正确。理想情况下，RAS预测器此时不需要进行任何操作。
+昆明湖中RAS的实现 由于处理器在执行过程中可能会进行错误的猜测，导致数据污染，RAS需要通过恢复机制来确保数据的准确性。特别是在昆明湖的实际电路设计中，不可能有无限大的栈，也无法随时备份数据。因此，昆明湖的RAS实现中，使用了基于持久化栈的返回地址预测器。具体来说，将RAS分为提交栈（commit stack）和推测栈（spec queue）两个部分，推测栈利用了香山BPU的预测结果来进行预测，然后根据后端返回的信息将数据压入提交栈中。下面详细介绍昆明湖的RAS设计：
+每次预测时，RAS栈的快照如何获得？ 为了实现对RAS栈进行快照的功能，昆明湖的RAS推测栈采用了基于循环数组的 “链式表示“ 。设计具体如下：">
 <link rel="preload" href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -109,7 +144,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -133,7 +168,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -413,35 +448,35 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
 <h3 id="输入端s3的预测结果和s2不一致时该如何处理"><strong>输入端，S3的预测结果和S2不一致时该如何处理？</strong></h3>
 <p>由于昆明湖 BPU 的假定S3的结果比S2好，因此发生不一致时，需要再次对RAS栈进行修复。具体不一致情况和对应的修复操作如下表所示：</p>
 <table>
-<thead>
-<tr>
-<th>S2预测结果</th>
-<th>S3预测结果</th>
-<th>修复操作</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>push</td>
-<td>keep</td>
-<td>pop</td>
-</tr>
-<tr>
-<td>keep</td>
-<td>pop</td>
-<td>pop</td>
-</tr>
-<tr>
-<td>pop</td>
-<td>keep</td>
-<td>push</td>
-</tr>
-<tr>
-<td>keep</td>
-<td>push</td>
-<td>push</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>S2预测结果</th>
+          <th>S3预测结果</th>
+          <th>修复操作</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>push</td>
+          <td>keep</td>
+          <td>pop</td>
+      </tr>
+      <tr>
+          <td>keep</td>
+          <td>pop</td>
+          <td>pop</td>
+      </tr>
+      <tr>
+          <td>pop</td>
+          <td>keep</td>
+          <td>push</td>
+      </tr>
+      <tr>
+          <td>keep</td>
+          <td>push</td>
+          <td>push</td>
+      </tr>
+  </tbody>
 </table>
 <p>因为SC预测器的特性，S2和S3的操作不存在pop/push或者push/pop情况</p>
 <h2 id="其他优化">其他优化</h2>
@@ -451,260 +486,260 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
 <h2 id="接口说明">接口说明</h2>
 <p>在RAS预测器中，核心组件为 <strong>RASStack</strong> ，其接口说明如下:</p>
 <table>
-<thead>
-<tr>
-<th><strong>接口名称</strong></th>
-<th><strong>功能描述</strong></th>
-<th><strong>接口名称</strong></th>
-<th><strong>功能描述</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>in.spec_push_valid</td>
-<td>预测有Call指令，Spec压栈</td>
-<td>in.s2_fire</td>
-<td>s2信号有效</td>
-</tr>
-<tr>
-<td>in.spec_pop_valid</td>
-<td>预测有Ret指令，Spec出栈</td>
-<td>in.s3_fire</td>
-<td>s3信号有效</td>
-</tr>
-<tr>
-<td>in.spec_push_addr</td>
-<td>Ret地址</td>
-<td>in.s3_cancel</td>
-<td>s3和s2的预测结果不一样，需要撤销s2的操作</td>
-</tr>
-<tr>
-<td>out.spec_pop_addr</td>
-<td>RAS的栈顶数据</td>
-<td>in.s3_meta</td>
-<td>s3需要的s2时的现场信息</td>
-</tr>
-<tr>
-<td>out.ssp</td>
-<td>commit栈顶指针</td>
-<td>in.s3_missed_pop</td>
-<td>s3判断需要再次进行pop</td>
-</tr>
-<tr>
-<td>out.sctr</td>
-<td>commit栈顶重复元素计数器</td>
-<td>in.s3_missed_push</td>
-<td>s3判断需要再次进行push</td>
-</tr>
-<tr>
-<td>out.nsp</td>
-<td>commit栈顶，会被ssp覆盖</td>
-<td>in.s3_pushAddr</td>
-<td>需要再次push时的地址</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>out.TOSR</td>
-<td>spec栈栈顶指针</td>
-<td>in.redirect_valid</td>
-<td>需要重定向</td>
-</tr>
-<tr>
-<td>out.TOSW</td>
-<td>spec栈数据分配指针</td>
-<td>in.redirect_isCall</td>
-<td>真实执行情况是Call</td>
-</tr>
-<tr>
-<td>out.BOS</td>
-<td>spec栈栈底指针</td>
-<td>in.redirect_isRet</td>
-<td>真实执行情况是Return</td>
-</tr>
-<tr>
-<td>in.commit_push_valid</td>
-<td>FTQ执行结果为Call正确</td>
-<td>in.redirect_meta_ssp</td>
-<td>之前预测时的现场信息ssp</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>in.commit_pop_valid</td>
-<td>FTQ执行结果为Ret正确</td>
-<td>in.redirect_meta_sctr</td>
-<td>之前预测时的现场信息sctr</td>
-</tr>
-<tr>
-<td>in.commit_push_addr</td>
-<td>更新信息中的Ret地址</td>
-<td>in.redirect_meta_TOSW</td>
-<td>之前预测时的现场信息TOSW</td>
-</tr>
-<tr>
-<td>in.commit_meta_TOSW</td>
-<td>更新信息中的TOSW</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>in.redirect_meta_TOSR</td>
-<td>之前预测时的现场信息TOSR</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>in.commit_meta_TOSR</td>
-<td>更新信息中的TOSR</td>
-<td>in.redirect_meta_NOS</td>
-<td>之前预测时的现场信息NOS</td>
-</tr>
-<tr>
-<td>in.commit_meta_ssp</td>
-<td>更新信息中的现场信息SSP</td>
-<td>in.redirect_callAddr</td>
-<td>重定向地址</td>
-</tr>
-<tr>
-<td>in.commit_meta_sctr</td>
-<td>更新信息中的现场信息SCTR</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th><strong>接口名称</strong></th>
+          <th><strong>功能描述</strong></th>
+          <th><strong>接口名称</strong></th>
+          <th><strong>功能描述</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>in.spec_push_valid</td>
+          <td>预测有Call指令，Spec压栈</td>
+          <td>in.s2_fire</td>
+          <td>s2信号有效</td>
+      </tr>
+      <tr>
+          <td>in.spec_pop_valid</td>
+          <td>预测有Ret指令，Spec出栈</td>
+          <td>in.s3_fire</td>
+          <td>s3信号有效</td>
+      </tr>
+      <tr>
+          <td>in.spec_push_addr</td>
+          <td>Ret地址</td>
+          <td>in.s3_cancel</td>
+          <td>s3和s2的预测结果不一样，需要撤销s2的操作</td>
+      </tr>
+      <tr>
+          <td>out.spec_pop_addr</td>
+          <td>RAS的栈顶数据</td>
+          <td>in.s3_meta</td>
+          <td>s3需要的s2时的现场信息</td>
+      </tr>
+      <tr>
+          <td>out.ssp</td>
+          <td>commit栈顶指针</td>
+          <td>in.s3_missed_pop</td>
+          <td>s3判断需要再次进行pop</td>
+      </tr>
+      <tr>
+          <td>out.sctr</td>
+          <td>commit栈顶重复元素计数器</td>
+          <td>in.s3_missed_push</td>
+          <td>s3判断需要再次进行push</td>
+      </tr>
+      <tr>
+          <td>out.nsp</td>
+          <td>commit栈顶，会被ssp覆盖</td>
+          <td>in.s3_pushAddr</td>
+          <td>需要再次push时的地址</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>out.TOSR</td>
+          <td>spec栈栈顶指针</td>
+          <td>in.redirect_valid</td>
+          <td>需要重定向</td>
+      </tr>
+      <tr>
+          <td>out.TOSW</td>
+          <td>spec栈数据分配指针</td>
+          <td>in.redirect_isCall</td>
+          <td>真实执行情况是Call</td>
+      </tr>
+      <tr>
+          <td>out.BOS</td>
+          <td>spec栈栈底指针</td>
+          <td>in.redirect_isRet</td>
+          <td>真实执行情况是Return</td>
+      </tr>
+      <tr>
+          <td>in.commit_push_valid</td>
+          <td>FTQ执行结果为Call正确</td>
+          <td>in.redirect_meta_ssp</td>
+          <td>之前预测时的现场信息ssp</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>in.commit_pop_valid</td>
+          <td>FTQ执行结果为Ret正确</td>
+          <td>in.redirect_meta_sctr</td>
+          <td>之前预测时的现场信息sctr</td>
+      </tr>
+      <tr>
+          <td>in.commit_push_addr</td>
+          <td>更新信息中的Ret地址</td>
+          <td>in.redirect_meta_TOSW</td>
+          <td>之前预测时的现场信息TOSW</td>
+      </tr>
+      <tr>
+          <td>in.commit_meta_TOSW</td>
+          <td>更新信息中的TOSW</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>in.redirect_meta_TOSR</td>
+          <td>之前预测时的现场信息TOSR</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>in.commit_meta_TOSR</td>
+          <td>更新信息中的TOSR</td>
+          <td>in.redirect_meta_NOS</td>
+          <td>之前预测时的现场信息NOS</td>
+      </tr>
+      <tr>
+          <td>in.commit_meta_ssp</td>
+          <td>更新信息中的现场信息SSP</td>
+          <td>in.redirect_callAddr</td>
+          <td>重定向地址</td>
+      </tr>
+      <tr>
+          <td>in.commit_meta_sctr</td>
+          <td>更新信息中的现场信息SCTR</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <p>RASStack模块与BasePredictor的接口关系如下：</p>
 <table>
-<thead>
-<tr>
-<th><strong>stack接口</strong></th>
-<th><strong>转换过程</strong></th>
-<th><strong>描述</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>s.spec_push_valid</td>
-<td>io.s2_fire(2) &amp;&amp; s2_full_pred.hit_taken_on_call &amp;&amp; !io.s3_redirect(2)</td>
-<td>s2输入有效，且上级预测为call跳转</td>
-</tr>
-<tr>
-<td>s.spec_pop_valid</td>
-<td>io.s2_fire(2) &amp;&amp; s2_full_pred.hit_taken_on_ret  &amp;&amp; !io.s3_redirect(2)</td>
-<td>s2输入有效，且上级预测为ret跳转</td>
-</tr>
-<tr>
-<td>s.spec_push_addr</td>
-<td>s2_full_pred.fallThroughAddr + Mux(s2_full_pred.last_may_be_rvi_call, 2.U, 0.U)</td>
-<td>上级预测器s2预测的fallThroughAddr（即PC+2），判断是否压缩指令是否需要 +2</td>
-</tr>
-<tr>
-<td>s.redirect_isCall</td>
-<td>redirect.bits.level === 0.U &amp;&amp; recover_cfi.pd.isCall</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>s.redirect_isRet</td>
-<td>redirect.bits.level === 0.U &amp;&amp; recover_cfi.pd.isRet</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>s.redirect_meta_*</td>
-<td>redirect.bits.cfiUpdate.*</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>s.commit_push_valid</td>
-<td>io.update.is_call_taken</td>
-<td>call指令预测正确</td>
-</tr>
-<tr>
-<td>s.commit_push_valid</td>
-<td>io.update.is_ret_taken</td>
-<td>ret指令预测正确</td>
-</tr>
-<tr>
-<td>s.commit_push_addr</td>
-<td>update.ftb_entry.getFallThrough(update.pc) + Mux(update.ftb_entry.last_may_be_rvi_call, 2.U, 0.U)</td>
-<td>根据是否为压缩指令，进行地址+2或者+0</td>
-</tr>
-<tr>
-<td>s.commit_meta_*</td>
-<td>io.update.bits.meta.asTypeOf(new RASMeta)</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>io.out.last_stage_spec_info.*</td>
-<td>s3_meta.*</td>
-<td>s3_meta = RegEnable(s2_meta, io.s2_fire(2))由s2_meta延迟一怕得到</td>
-</tr>
-<tr>
-<td>io.out.last_stage_meta</td>
-<td>s3_meta</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>io.out.s2.full_pred.*.jalr_target</td>
-<td>:=stack.spec_pop_addr</td>
-<td>预测地址（栈顶地址，只预测ret）</td>
-</tr>
-<tr>
-<td>io.out.s3.full_pred.*.jalr_target</td>
-<td>:=RegEnable(stack.spec_pop_addr, io.s2_fire(2))</td>
-<td>由s2延迟一拍得到</td>
-</tr>
-<tr>
-<td>io.out.s2/3.full_pred.targets.last</td>
-<td>:=Mux(s2/3_is_jalr, s2/3_jalr_target, s2/3_last_target_in)</td>
-<td>如果时call执行，更新targets.last的结果</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th><strong>stack接口</strong></th>
+          <th><strong>转换过程</strong></th>
+          <th><strong>描述</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>s.spec_push_valid</td>
+          <td>io.s2_fire(2) &amp;&amp; s2_full_pred.hit_taken_on_call &amp;&amp; !io.s3_redirect(2)</td>
+          <td>s2输入有效，且上级预测为call跳转</td>
+      </tr>
+      <tr>
+          <td>s.spec_pop_valid</td>
+          <td>io.s2_fire(2) &amp;&amp; s2_full_pred.hit_taken_on_ret  &amp;&amp; !io.s3_redirect(2)</td>
+          <td>s2输入有效，且上级预测为ret跳转</td>
+      </tr>
+      <tr>
+          <td>s.spec_push_addr</td>
+          <td>s2_full_pred.fallThroughAddr + Mux(s2_full_pred.last_may_be_rvi_call, 2.U, 0.U)</td>
+          <td>上级预测器s2预测的fallThroughAddr（即PC+2），判断是否压缩指令是否需要 +2</td>
+      </tr>
+      <tr>
+          <td>s.redirect_isCall</td>
+          <td>redirect.bits.level === 0.U &amp;&amp; recover_cfi.pd.isCall</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>s.redirect_isRet</td>
+          <td>redirect.bits.level === 0.U &amp;&amp; recover_cfi.pd.isRet</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>s.redirect_meta_*</td>
+          <td>redirect.bits.cfiUpdate.*</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>s.commit_push_valid</td>
+          <td>io.update.is_call_taken</td>
+          <td>call指令预测正确</td>
+      </tr>
+      <tr>
+          <td>s.commit_push_valid</td>
+          <td>io.update.is_ret_taken</td>
+          <td>ret指令预测正确</td>
+      </tr>
+      <tr>
+          <td>s.commit_push_addr</td>
+          <td>update.ftb_entry.getFallThrough(update.pc) + Mux(update.ftb_entry.last_may_be_rvi_call, 2.U, 0.U)</td>
+          <td>根据是否为压缩指令，进行地址+2或者+0</td>
+      </tr>
+      <tr>
+          <td>s.commit_meta_*</td>
+          <td>io.update.bits.meta.asTypeOf(new RASMeta)</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>io.out.last_stage_spec_info.*</td>
+          <td>s3_meta.*</td>
+          <td>s3_meta = RegEnable(s2_meta, io.s2_fire(2))由s2_meta延迟一怕得到</td>
+      </tr>
+      <tr>
+          <td>io.out.last_stage_meta</td>
+          <td>s3_meta</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>io.out.s2.full_pred.*.jalr_target</td>
+          <td>:=stack.spec_pop_addr</td>
+          <td>预测地址（栈顶地址，只预测ret）</td>
+      </tr>
+      <tr>
+          <td>io.out.s3.full_pred.*.jalr_target</td>
+          <td>:=RegEnable(stack.spec_pop_addr, io.s2_fire(2))</td>
+          <td>由s2延迟一拍得到</td>
+      </tr>
+      <tr>
+          <td>io.out.s2/3.full_pred.targets.last</td>
+          <td>:=Mux(s2/3_is_jalr, s2/3_jalr_target, s2/3_last_target_in)</td>
+          <td>如果时call执行，更新targets.last的结果</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="时序说明">时序说明</h2>
 <p>在RAS中，只涉及到2拍，S2和S3。</p>
@@ -717,7 +752,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
 <p>3、执行重定向（重定向信息由前一拍获得）操作</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 19, 2025: <a href="https://github.com/XS-MLVP/course/commit/6efab288a3d23d1d97fa483bb19209d5ae49789e">doc: adapted to the latest v0.11.0 of docsy (6efab28)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/5c24d32b13e6e84ae1f86af59a596e9d23ae77df">Upgrade hugo version to 0.146.7 (5c24d32)</a>
 </div>
 
 </div>
@@ -761,7 +796,7 @@ PUSH 由于预测可能会出错，出错时需要回到原始状态，因此在
 </footer>
 
     </div>
-    <script src="/xs-bpu/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/xs-bpu/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script defer src="/xs-bpu/js/click-to-copy.min.73478a7d4807698aed7e355eb23f9890ca18fea3158604c8471746d046702bad.js" integrity="sha256-c0eKfUgHaYrtfjVesj&#43;YkMoY/qMVhgTIRxdG0EZwK60=" crossorigin="anonymous"></script>
 <script src='/xs-bpu/js/tabpane-persist.js'></script>
 

@@ -19,18 +19,25 @@
 
 <title>创建DUT | 开放验证平台学习资源</title>
 <meta name="description" content="以果壳cache为例，介绍如何创建基于chisel的DUT">
-<meta property="og:title" content="创建DUT" />
-<meta property="og:description" content="以果壳cache为例，介绍如何创建基于chisel的DUT" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/docs/basic/create_dut/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/mlvp/docs/basic/create_dut/">
+  <meta property="og:site_name" content="开放验证平台学习资源">
+  <meta property="og:title" content="创建DUT">
+  <meta property="og:description" content="以果壳cache为例，介绍如何创建基于chisel的DUT">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:44:02+08:00">
+    <meta property="article:tag" content="Examples">
+    <meta property="article:tag" content="Docs">
 
-<meta property="article:modified_time" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="name" content="创建DUT">
-<meta itemprop="description" content="以果壳cache为例，介绍如何创建基于chisel的DUT">
-<meta itemprop="dateModified" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="wordCount" content="177">
-<meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="创建DUT"/>
-<meta name="twitter:description" content="以果壳cache为例，介绍如何创建基于chisel的DUT"/>
+  <meta itemprop="name" content="创建DUT">
+  <meta itemprop="description" content="以果壳cache为例，介绍如何创建基于chisel的DUT">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="177">
+  <meta itemprop="keywords" content="Examples,Docs">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="创建DUT">
+  <meta name="twitter:description" content="以果壳cache为例，介绍如何创建基于chisel的DUT">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -130,7 +137,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +161,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -363,7 +370,7 @@
 <p>果壳是使用 Chisel 语言模块化设计的、基于 RISC-V RV64 开放指令集的顺序单发射处理器实现。果壳更详细的介绍请参考链接：<a href="https://oscpu.github.io/NutShell-doc/">https://oscpu.github.io/NutShell-doc/</a></p>
 <h2 id="果壳-cache">果壳 cache</h2>
 <p>果壳cache（Nutshell Cache）是果壳处理器中使用的缓存模块。其采用三级流水设计，当第三级流水检出当前请求为MMIO或者发生重填（refill）时，会阻塞流水线。同时，果壳cache采用可定制的模块化设计，通过改变参数可以生成存储空间大小不同的一级cache（L1 Cache）或者二级cache（L2 Cache）。此外，果壳cache留有一致性（coherence）接口，可以处理一致性相关的请求。</p>
-<p><img alt="nt_cache" src="nt_cache.png"></p>
+<p><img src="nt_cache.png" alt="nt_cache"></p>
 <h2 id="chisel-转-verilog">Chisel 转 Verilog</h2>
 <p>Chisel中的<code>stage</code>库可以帮助由Chisel代码生成Verilog、System Verilog等传统的HDL代码。以下将简单介绍如何由基于Chisel的cache实现转换成对应的Verilog电路描述。</p>
 <h3 id="初始化果壳环境">初始化果壳环境</h3>
@@ -425,7 +432,7 @@
 <p>一般情况下，如果需要DUT生成波形、覆盖率等会导致DUT的执行速度变慢，因此在通过picker工具生成python模块时会根据多种配置进行生成：（1）关闭所有debug信息；（2）开启波形；（3）开启代码行覆盖率。其中第一种配置的目标是快速构建环境，进行回归测试等；第二种配置用于分析具体错误，时序等；第三种用于提升覆盖率。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 25, 2025: <a href="https://github.com/XS-MLVP/course/commit/1a44bfa239ee57ae2f3162e4a24390caa05f9553">update Toffee document address (1a44bfa)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/d04c617785d261fcdfbe044e537c68a450369c09">Upgrade hugo version to 0.146.7 (d04c617)</a>
 </div>
 
 </div>
@@ -469,7 +476,7 @@
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

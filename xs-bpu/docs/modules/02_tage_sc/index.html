@@ -25,36 +25,43 @@
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
 如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
-<meta property="og:title" content="TAGE-SC 分支预测器" />
-<meta property="og:description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
-标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
-昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
-基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
-对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
-对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
-如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/xs-bpu/docs/modules/02_tage_sc/" /><meta property="article:section" content="docs" />
-
-<meta property="article:modified_time" content="2025-03-19T11:11:46+08:00" />
-<meta itemprop="name" content="TAGE-SC 分支预测器">
-<meta itemprop="description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+<meta property="og:url" content="https://open-verify.cc/xs-bpu/docs/modules/02_tage_sc/">
+  <meta property="og:site_name" content="香山微架构开放验证第一期：昆明湖BPU模块UT验证实战">
+  <meta property="og:title" content="TAGE-SC 分支预测器">
+  <meta property="og:description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
 昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
 基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
 如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
-<meta itemprop="dateModified" content="2025-03-19T11:11:46+08:00" />
-<meta itemprop="wordCount" content="1100">
-<meta itemprop="keywords" content="子预测器,TAGE-SC," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="TAGE-SC 分支预测器"/>
-<meta name="twitter:description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:43:36+08:00">
+    <meta property="article:tag" content="子预测器">
+    <meta property="article:tag" content="TAGE-SC">
+
+  <meta itemprop="name" content="TAGE-SC 分支预测器">
+  <meta itemprop="description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
 标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
 昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
 基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
 对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
 对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
-如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。"/>
+如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
+  <meta itemprop="dateModified" content="2025-04-28T17:43:36+08:00">
+  <meta itemprop="wordCount" content="1100">
+  <meta itemprop="keywords" content="子预测器,TAGE-SC">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="TAGE-SC 分支预测器">
+  <meta name="twitter:description" content="功能介绍 TAGE-SC 是南湖架构条件分支的主预测器，属于精确预测器（Accurate Predictor，简称 APD）。TAGE-SC 可以看作两个功能相对独立的组件：预测部分 TAGE 和 校验部分 SC。
+标记几何历史长度预测器 TAGE （Tagged Geometric History Length Predictor）利用历史长度不同的多个预测表，可以挖掘极长的分支历史信息。TAGE功能是预测一个跳转指令是跳转（Taken），还是不跳转（不Taken）， 它由一个基预测表和多个历史表组成，首先通过多个历史表进行分支预测，如果没有预测结果，则再采用基础预测表的预测结果。 SC (Statistical Corrector) 是统计校正器。当 SC 会参考 TAGE 的预测结果和统计偏向的结果。并根据这两个结果，矫正最终的预测结果。 在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多同时预测 2 条条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并基于相同的全局历史进行预测。
+昆明湖Tage分支预测器 基本功能 TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 1&#43;N 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。
+基于 T0 表的预测器为基础预测器。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。
+对于 T0 以外的表，我们用 Tn 进行表示。在查表时除了 PC 外，还需要用到全局跳转历史信息H进行查找。查找命中后，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。
+对于每一次预测，TAGE 从所有 Tn 命中表项中选择全局跳转历史最长的表项。
+如果该表项存在，且预测结果置信度高就用该项作为最终预测结果。 如果置信度低，就通过另外一个内部计数器来判断选择该项还是 T0 作为最后预测。 在实现上，为了节约空间，检索 Tn 表时，输入的跳转历史信息H需要进行压缩，该过程也称为历史折叠。">
 <link rel="preload" href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -113,7 +120,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -137,7 +144,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -366,7 +373,7 @@
 <p>在昆明湖中，由于每个预测块，最多可以有2条跳转指令，因此TAGE在每次预测最多<strong>同时预测 2 条</strong>条件分支指令。在访问 TAGE 的各个历史表时，用预测块的起始地址作为 PC，同时取出两个预测结果，并<strong>基于相同的全局历史</strong>进行预测。</p>
 <h2 id="昆明湖tage分支预测器">昆明湖Tage分支预测器</h2>
 <h3 id="基本功能">基本功能</h3>
-<p><img alt="img" src="tage.PNG"></p>
+<p><img src="tage.PNG" alt="img"></p>
 <p>TAGE预测器的核心思路是提供不同历史长度的预测结果，并选择最合适的结果进行反馈。在TAGE预测器中，一共有 <strong>1+N</strong> 个表历史记录表，N 为可配置选项。以昆明湖为例，N=4。</p>
 <p>基于 T0 表的预测器为<strong>基础预测器</strong>。在预测时，直接通过预测块的 PC 地址在 T0 表中查找到该地址对应的 “2 bit 饱和计数器表示的跳转历史信息” ，然后根据历史信息做出预测结果。T0表的表项只有2bit，所以能记录的历史状态有限。</p>
 <p>对于 T0 以外的表，我们用 <strong>Tn</strong> <strong>进行表示</strong>。在查表时除了 PC 外，还需要用到<strong>全局跳转历史信息H</strong>进行查找。<strong>查找命中后</strong>，根据 “3bit饱和预测器” 进行跳转或者不跳转的预测。Tn 表的n越大，其用到的H中的位数越多。</p>
@@ -413,28 +420,28 @@
 <ol>
 <li>
 <table>
-<thead>
-<tr>
-<th><strong>预测器</strong></th>
-<th><strong>作用</strong></th>
-<th><strong>表项构成</strong></th>
-<th><strong>项数</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>基准预测器T0</td>
-<td>用于在其他预测器的预测结果都无效时输出预测结果</td>
-<td>2 bit ctr 饱和计数器最高位决定跳转方向</td>
-<td>2路各2048项，每路对于一条分支指令</td>
-</tr>
-<tr>
-<td>预测表T1-T4</td>
-<td>对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为最后预测结果。历史记录长度由输入的H决定</td>
-<td>1 bit valid 有效位 3 bit ctr 饱和计数器8 bit tag 校验命中1 bit us 作为usefulness计数器</td>
-<td>4096项、奇数项对应第一条分支指令，偶数项对应第二条分支指令</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th><strong>预测器</strong></th>
+          <th><strong>作用</strong></th>
+          <th><strong>表项构成</strong></th>
+          <th><strong>项数</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>基准预测器T0</td>
+          <td>用于在其他预测器的预测结果都无效时输出预测结果</td>
+          <td>2 bit ctr 饱和计数器最高位决定跳转方向</td>
+          <td>2路各2048项，每路对于一条分支指令</td>
+      </tr>
+      <tr>
+          <td>预测表T1-T4</td>
+          <td>对每个预测块的输入，所有Tn表都进行预测，在所有预测有效的结果中，选择历史记录最长的结果作为最后预测结果。历史记录长度由输入的H决定</td>
+          <td>1 bit valid 有效位 3 bit ctr 饱和计数器8 bit tag 校验命中1 bit us 作为usefulness计数器</td>
+          <td>4096项、奇数项对应第一条分支指令，偶数项对应第二条分支指令</td>
+      </tr>
+  </tbody>
 </table>
 </li>
 </ol>
@@ -450,61 +457,61 @@
 <li>对于表Tn，除了 PC[11:1] 外，<strong>还需要</strong>基于全局分支历史进行检索。在昆明湖中，顶层分支预测器维护了一个256bit的全局历史记录GH，可以根据子预测器需要将GH的最近n位历史信息，按目标位数x进行折叠。 即把n，以长度x为基本单元，拆分成ceil(x/n)个长为x的数，然后<strong>按位进行异或</strong>得到。通常用FH（Folded History）表示，具体流程请参考 <a href="../00_bpu_top/#%E5%88%86%E6%94%AF%E6%8A%98%E5%8F%A0%E5%8E%86%E5%8F%B2">分支折叠历史章节</a>。TAGE预测器查找Tn的表项时，用到了index和tag，他们的计算公式如下表所示：</li>
 </ul>
 <table>
-<thead>
-<tr>
-<th><strong>计算方法 公式</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>index = FH ^ ((pc&raquo;1)低位)</td>
-</tr>
-<tr>
-<td>tag = FH1 ^ FH2 ^ ((pc&raquo;1)低位)</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th><strong>计算方法 公式</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>index = FH ^ ((pc&raquo;1)低位)</td>
+      </tr>
+      <tr>
+          <td>tag = FH1 ^ FH2 ^ ((pc&raquo;1)低位)</td>
+      </tr>
+  </tbody>
 </table>
 <p>其中FH、FH1、FH2表示按一定规范折叠后的全局分支历史。对于Tn而言，其FH、FH1、FH2都有各自的对于折叠位数，不一定相同。在昆明湖实现中，T0和Tn表的配置如下：</p>
 <table>
-<thead>
-<tr>
-<th><strong>表名称</strong></th>
-<th><strong>FH长度</strong></th>
-<th><strong>FH1长度</strong></th>
-<th><strong>FH2长度</strong></th>
-<th><strong>最近历史长度（用到GH中的位数）</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>T1</td>
-<td>8比特</td>
-<td>8比特</td>
-<td>7比特</td>
-<td>低8位，即把最新8位历史，折叠成FH、FH1、FH2</td>
-</tr>
-<tr>
-<td>T2</td>
-<td>11比特</td>
-<td>8比特</td>
-<td>7比特</td>
-<td>低13位，即把最新13位历史，折叠成FH、FH1、FH2</td>
-</tr>
-<tr>
-<td>T3</td>
-<td>11比特</td>
-<td>8比特</td>
-<td>7比特</td>
-<td>低32位，即把最新32位历史，折叠成FH、FH1、FH2</td>
-</tr>
-<tr>
-<td>T4</td>
-<td>11比特</td>
-<td>8比特</td>
-<td>7比特</td>
-<td>低119位，即把最新119位历史，折叠成FH、FH1、FH2</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th><strong>表名称</strong></th>
+          <th><strong>FH长度</strong></th>
+          <th><strong>FH1长度</strong></th>
+          <th><strong>FH2长度</strong></th>
+          <th><strong>最近历史长度（用到GH中的位数）</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>T1</td>
+          <td>8比特</td>
+          <td>8比特</td>
+          <td>7比特</td>
+          <td>低8位，即把最新8位历史，折叠成FH、FH1、FH2</td>
+      </tr>
+      <tr>
+          <td>T2</td>
+          <td>11比特</td>
+          <td>8比特</td>
+          <td>7比特</td>
+          <td>低13位，即把最新13位历史，折叠成FH、FH1、FH2</td>
+      </tr>
+      <tr>
+          <td>T3</td>
+          <td>11比特</td>
+          <td>8比特</td>
+          <td>7比特</td>
+          <td>低32位，即把最新32位历史，折叠成FH、FH1、FH2</td>
+      </tr>
+      <tr>
+          <td>T4</td>
+          <td>11比特</td>
+          <td>8比特</td>
+          <td>7比特</td>
+          <td>低119位，即把最新119位历史，折叠成FH、FH1、FH2</td>
+      </tr>
+  </tbody>
 </table>
 <p>注：pc&raquo;1是因为使用了RISC-C拓展，2Byte对齐，而PC本身已经省略了1B对齐，所以只用1b</p>
 <h3 id="替代预测器">替代预测器</h3>
@@ -575,53 +582,53 @@
 <p>与TAGE类似，在SC中通常有多个表Tn，他们对应了不同历史长度的跳转统计。不同点在于，在预测按PC检索时，每个表Tn都会命中，然后SC把每个命中的表项进行求和，计算总的“饱和计数器”跳转信息，最后根<strong>据总的跳转信息判断是否跳转</strong>。一般情况下，SC采用“有符号饱和计数器”，计数器值大于0时表示跳转，小于0时表示不跳转。计数器的绝对值越大，表示其预测置信度越高。</p>
 <p>在SC预测器中，SC也由多个表组成（例如T1，T2，T3，T4），但相对TAGE预测器少了基础预测表T0。SC中Tn表有6 bit的<strong>有符号</strong>饱和计数器。SC表的索引方式如下：</p>
 <table>
-<thead>
-<tr>
-<th><strong>计算方式</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Index = (FH) ^ ((pc&raquo;1)低位)</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th><strong>计算方式</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Index = (FH) ^ ((pc&raquo;1)低位)</td>
+      </tr>
+  </tbody>
 </table>
 <p>对应每个表，其表项数和用到的折叠历史长度如下：</p>
 <table>
-<thead>
-<tr>
-<th>表名</th>
-<th>表项数</th>
-<th>FH长度</th>
-<th>折叠历史范围</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>T1</td>
-<td>512</td>
-<td>0</td>
-<td>不折叠</td>
-</tr>
-<tr>
-<td>T2</td>
-<td>512</td>
-<td>4</td>
-<td>把历史信息的低4位，折叠成FH</td>
-</tr>
-<tr>
-<td>T3</td>
-<td>512</td>
-<td>8</td>
-<td>把历史信息的低10位，折叠成FH</td>
-</tr>
-<tr>
-<td>T4</td>
-<td>512</td>
-<td>8</td>
-<td>把历史信息的低16位，折叠成FH</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>表名</th>
+          <th>表项数</th>
+          <th>FH长度</th>
+          <th>折叠历史范围</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>T1</td>
+          <td>512</td>
+          <td>0</td>
+          <td>不折叠</td>
+      </tr>
+      <tr>
+          <td>T2</td>
+          <td>512</td>
+          <td>4</td>
+          <td>把历史信息的低4位，折叠成FH</td>
+      </tr>
+      <tr>
+          <td>T3</td>
+          <td>512</td>
+          <td>8</td>
+          <td>把历史信息的低10位，折叠成FH</td>
+      </tr>
+      <tr>
+          <td>T4</td>
+          <td>512</td>
+          <td>8</td>
+          <td>把历史信息的低16位，折叠成FH</td>
+      </tr>
+  </tbody>
 </table>
 <p>在计算统计预测结果时，总得统计结果计算公式如下：</p>
 
@@ -738,737 +745,737 @@ tageCtrCentered
 <h2 id="接口列表">接口列表</h2>
 <h3 id="tagesc">TageSC</h3>
 <table>
-<thead>
-<tr>
-<th>信号类型</th>
-<th>信号宽度</th>
-<th>信号名</th>
-<th>信号描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>clock</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>reset</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[35:0]</td>
-<td>io_reset_vector</td>
-<td>用于reset时，reset s1_pc_dup_0 提供的值</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[40:0]</td>
-<td>io_in_bits_s0_pc_0</td>
-<td>复制的s0_pc的dup数组的第1个，给顶层BPU的PC</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[40:0]</td>
-<td>io_in_bits_s0_pc_1</td>
-<td>复制的s0_pc第2个，给Tage的PC</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[40:0]</td>
-<td>io_in_bits_s0_pc_3</td>
-<td>复制的s0_pc的第4个，给SC的PC</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[10:0]</td>
-<td>io_in_bits_folded_hist_1_hist_17_folded_hist</td>
-<td>TageTable 2 用到的11bits 折叠历史 从多长历史范围折叠到11bit见前文所述的表 注意TageTable下标+1，此处 T2 是前文 T3</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[10:0]</td>
-<td>io_in_bits_folded_hist_1_hist_16_folded_hist</td>
-<td>TageTable 3 用到的11bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[6:0]</td>
-<td>io_in_bits_folded_hist_1_hist_15_folded_hist</td>
-<td>TageTable 1 用到的7bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_in_bits_folded_hist_1_hist_14_folded_hist</td>
-<td>TageTable 0 用到的8bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[6:0]</td>
-<td>io_in_bits_folded_hist_1_hist_9_folded_hist</td>
-<td>TageTable 2 用到的7bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_in_bits_folded_hist_1_hist_8_folded_hist</td>
-<td>TageTable 3 用到的8bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[6:0]</td>
-<td>io_in_bits_folded_hist_1_hist_7_folded_hist</td>
-<td>TageTable 0 用到的7bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[6:0]</td>
-<td>io_in_bits_folded_hist_1_hist_5_folded_hist</td>
-<td>TageTable 3 用到的7bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_in_bits_folded_hist_1_hist_4_folded_hist</td>
-<td>TageTable 1 用到的8bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_in_bits_folded_hist_1_hist_3_folded_hist</td>
-<td>TageTable 2 用到的8bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[10:0]</td>
-<td>io_in_bits_folded_hist_1_hist_1_folded_hist</td>
-<td>TageTable 1 用到的11bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[3:0]</td>
-<td>io_in_bits_folded_hist_3_hist_12_folded_hist</td>
-<td>SCTable 1 用到的 4bit 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_in_bits_folded_hist_3_hist_11_folded_hist</td>
-<td>SCTable 2 用到的 8bit 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_in_bits_folded_hist_3_hist_2_folded_hist</td>
-<td>SCTable 3 用到的 8bit 折叠历史</td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s2_full_pred_0_br_taken_mask_0</td>
-<td>io_out_s2_full_pred_{i}<em>br_taken_mask</em>{j} Tage 在 s2流水级输出的，复制4份 预测块中第 j 条分支指令TAGE预测结果  这里不该叫mask吧</td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s2_full_pred_0_br_taken_mask_1</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s2_full_pred_1_br_taken_mask_0</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s2_full_pred_1_br_taken_mask_1</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s2_full_pred_2_br_taken_mask_0</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s2_full_pred_2_br_taken_mask_1</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s2_full_pred_3_br_taken_mask_0</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s2_full_pred_3_br_taken_mask_1</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s3_full_pred_0_br_taken_mask_0</td>
-<td>io_out_s3_full_pred_{i}<em>br_taken_mask</em>{j} Tage 在 s3流水级输出的，复制4份 预测块中第 j 条分支指令SC预测结果</td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s3_full_pred_0_br_taken_mask_1</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s3_full_pred_1_br_taken_mask_0</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s3_full_pred_1_br_taken_mask_1</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s3_full_pred_2_br_taken_mask_0</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s3_full_pred_2_br_taken_mask_1</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s3_full_pred_3_br_taken_mask_0</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_out_s3_full_pred_3_br_taken_mask_1</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*[222:0]</td>
-<td>io_out_last_stage_meta</td>
-<td>见附表</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_ctrl_tage_enable</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_ctrl_sc_enable</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s0_fire_0</td>
-<td>s0 阶段流水线控制 相同信号复制多份，0给BPU，1给Tage，3给SC</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s0_fire_1</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s0_fire_3</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s1_fire_0</td>
-<td>s1 阶段流水线控制</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s1_fire_1</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s1_fire_2</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s1_fire_3</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s2_fire_0</td>
-<td>s2 阶段流水线控制</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s2_fire_1</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s2_fire_2</td>
-<td></td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_s2_fire_3</td>
-<td></td>
-</tr>
-<tr>
-<td>output</td>
-<td>*</td>
-<td>io_s1_ready</td>
-<td>tage的所有表，可以执行读取结果的操作</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_valid</td>
-<td>从FTQ发向BPU的后端执行结果（更新信号）是否有效</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[40:0]</td>
-<td>io_update_bits_pc</td>
-<td>（后端执行过的）预测块的PC</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[10:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_17_folded_hist</td>
-<td>TageTable 2 用到的11bits 折叠历史 预测时使用的分支历史结果，没有更新，转了一圈回来了</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[10:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_16_folded_hist</td>
-<td>TageTable 3 用到的11bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[6:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_15_folded_hist</td>
-<td>TageTable 1 用到的7bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_14_folded_hist</td>
-<td>TageTable 0 用到的8bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[3:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_12_folded_hist</td>
-<td>SCTable 1 用到的 4bit 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_11_folded_hist</td>
-<td>SCTable 2 用到的 8bit 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[6:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_9_folded_hist</td>
-<td>TageTable 2 用到的7bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_8_folded_hist</td>
-<td>TageTable 3 用到的8bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[6:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_7_folded_hist</td>
-<td>TageTable 0 用到的7bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[6:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_5_folded_hist</td>
-<td>TageTable 3 用到的7bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_4_folded_hist</td>
-<td>TageTable 1 用到的8bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_3_folded_hist</td>
-<td>TageTable 2 用到的8bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[7:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_2_folded_hist</td>
-<td>SCTable 3 用到的 8bit 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[10:0]</td>
-<td>io_update_bits_spec_info_folded_hist_hist_1_folded_hist</td>
-<td>TageTable 1 用到的11bits 折叠历史</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_bits_ftb_entry_brSlots_0_valid</td>
-<td>FTB 表项的第一个slot是否有效（存储了跳转指令）</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_bits_ftb_entry_tailSlot_sharing</td>
-<td>FTB 表项的最后一个slot是否存储了条件分支而非无条件跳转</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_bits_ftb_entry_tailSlot_valid</td>
-<td>FTB 表项的最后一个slot是否有效</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_bits_ftb_entry_always_taken_0</td>
-<td>历史上slot 0 指令总是跳转</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_bits_ftb_entry_always_taken_1</td>
-<td>历史上slot 1 指令总是跳转</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_bits_br_taken_mask_0</td>
-<td>solt 0 是否 taken</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_bits_br_taken_mask_1</td>
-<td>solt 1 是否 taken</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_bits_mispred_mask_0</td>
-<td>solt 0 是否预测正确</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*</td>
-<td>io_update_bits_mispred_mask_1</td>
-<td>solt 1 是否预测正确</td>
-</tr>
-<tr>
-<td>input</td>
-<td>*[222:0]</td>
-<td>io_update_bits_meta</td>
-<td>见附表</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>信号类型</th>
+          <th>信号宽度</th>
+          <th>信号名</th>
+          <th>信号描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>clock</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>reset</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[35:0]</td>
+          <td>io_reset_vector</td>
+          <td>用于reset时，reset s1_pc_dup_0 提供的值</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[40:0]</td>
+          <td>io_in_bits_s0_pc_0</td>
+          <td>复制的s0_pc的dup数组的第1个，给顶层BPU的PC</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[40:0]</td>
+          <td>io_in_bits_s0_pc_1</td>
+          <td>复制的s0_pc第2个，给Tage的PC</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[40:0]</td>
+          <td>io_in_bits_s0_pc_3</td>
+          <td>复制的s0_pc的第4个，给SC的PC</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[10:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_17_folded_hist</td>
+          <td>TageTable 2 用到的11bits 折叠历史 从多长历史范围折叠到11bit见前文所述的表 注意TageTable下标+1，此处 T2 是前文 T3</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[10:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_16_folded_hist</td>
+          <td>TageTable 3 用到的11bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[6:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_15_folded_hist</td>
+          <td>TageTable 1 用到的7bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_14_folded_hist</td>
+          <td>TageTable 0 用到的8bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[6:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_9_folded_hist</td>
+          <td>TageTable 2 用到的7bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_8_folded_hist</td>
+          <td>TageTable 3 用到的8bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[6:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_7_folded_hist</td>
+          <td>TageTable 0 用到的7bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[6:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_5_folded_hist</td>
+          <td>TageTable 3 用到的7bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_4_folded_hist</td>
+          <td>TageTable 1 用到的8bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_3_folded_hist</td>
+          <td>TageTable 2 用到的8bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[10:0]</td>
+          <td>io_in_bits_folded_hist_1_hist_1_folded_hist</td>
+          <td>TageTable 1 用到的11bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[3:0]</td>
+          <td>io_in_bits_folded_hist_3_hist_12_folded_hist</td>
+          <td>SCTable 1 用到的 4bit 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_in_bits_folded_hist_3_hist_11_folded_hist</td>
+          <td>SCTable 2 用到的 8bit 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_in_bits_folded_hist_3_hist_2_folded_hist</td>
+          <td>SCTable 3 用到的 8bit 折叠历史</td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s2_full_pred_0_br_taken_mask_0</td>
+          <td>io_out_s2_full_pred_{i}<em>br_taken_mask</em>{j} Tage 在 s2流水级输出的，复制4份 预测块中第 j 条分支指令TAGE预测结果  这里不该叫mask吧</td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s2_full_pred_0_br_taken_mask_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s2_full_pred_1_br_taken_mask_0</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s2_full_pred_1_br_taken_mask_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s2_full_pred_2_br_taken_mask_0</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s2_full_pred_2_br_taken_mask_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s2_full_pred_3_br_taken_mask_0</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s2_full_pred_3_br_taken_mask_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s3_full_pred_0_br_taken_mask_0</td>
+          <td>io_out_s3_full_pred_{i}<em>br_taken_mask</em>{j} Tage 在 s3流水级输出的，复制4份 预测块中第 j 条分支指令SC预测结果</td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s3_full_pred_0_br_taken_mask_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s3_full_pred_1_br_taken_mask_0</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s3_full_pred_1_br_taken_mask_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s3_full_pred_2_br_taken_mask_0</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s3_full_pred_2_br_taken_mask_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s3_full_pred_3_br_taken_mask_0</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_out_s3_full_pred_3_br_taken_mask_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*[222:0]</td>
+          <td>io_out_last_stage_meta</td>
+          <td>见附表</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_ctrl_tage_enable</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_ctrl_sc_enable</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s0_fire_0</td>
+          <td>s0 阶段流水线控制 相同信号复制多份，0给BPU，1给Tage，3给SC</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s0_fire_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s0_fire_3</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s1_fire_0</td>
+          <td>s1 阶段流水线控制</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s1_fire_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s1_fire_2</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s1_fire_3</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s2_fire_0</td>
+          <td>s2 阶段流水线控制</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s2_fire_1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s2_fire_2</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_s2_fire_3</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>output</td>
+          <td>*</td>
+          <td>io_s1_ready</td>
+          <td>tage的所有表，可以执行读取结果的操作</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_valid</td>
+          <td>从FTQ发向BPU的后端执行结果（更新信号）是否有效</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[40:0]</td>
+          <td>io_update_bits_pc</td>
+          <td>（后端执行过的）预测块的PC</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[10:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_17_folded_hist</td>
+          <td>TageTable 2 用到的11bits 折叠历史 预测时使用的分支历史结果，没有更新，转了一圈回来了</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[10:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_16_folded_hist</td>
+          <td>TageTable 3 用到的11bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[6:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_15_folded_hist</td>
+          <td>TageTable 1 用到的7bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_14_folded_hist</td>
+          <td>TageTable 0 用到的8bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[3:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_12_folded_hist</td>
+          <td>SCTable 1 用到的 4bit 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_11_folded_hist</td>
+          <td>SCTable 2 用到的 8bit 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[6:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_9_folded_hist</td>
+          <td>TageTable 2 用到的7bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_8_folded_hist</td>
+          <td>TageTable 3 用到的8bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[6:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_7_folded_hist</td>
+          <td>TageTable 0 用到的7bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[6:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_5_folded_hist</td>
+          <td>TageTable 3 用到的7bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_4_folded_hist</td>
+          <td>TageTable 1 用到的8bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_3_folded_hist</td>
+          <td>TageTable 2 用到的8bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[7:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_2_folded_hist</td>
+          <td>SCTable 3 用到的 8bit 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[10:0]</td>
+          <td>io_update_bits_spec_info_folded_hist_hist_1_folded_hist</td>
+          <td>TageTable 1 用到的11bits 折叠历史</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_bits_ftb_entry_brSlots_0_valid</td>
+          <td>FTB 表项的第一个slot是否有效（存储了跳转指令）</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_bits_ftb_entry_tailSlot_sharing</td>
+          <td>FTB 表项的最后一个slot是否存储了条件分支而非无条件跳转</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_bits_ftb_entry_tailSlot_valid</td>
+          <td>FTB 表项的最后一个slot是否有效</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_bits_ftb_entry_always_taken_0</td>
+          <td>历史上slot 0 指令总是跳转</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_bits_ftb_entry_always_taken_1</td>
+          <td>历史上slot 1 指令总是跳转</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_bits_br_taken_mask_0</td>
+          <td>solt 0 是否 taken</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_bits_br_taken_mask_1</td>
+          <td>solt 1 是否 taken</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_bits_mispred_mask_0</td>
+          <td>solt 0 是否预测正确</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*</td>
+          <td>io_update_bits_mispred_mask_1</td>
+          <td>solt 1 是否预测正确</td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>*[222:0]</td>
+          <td>io_update_bits_meta</td>
+          <td>见附表</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="io_out_last_stage_meta">io_out_last_stage_meta</h3>
 <p>需要设计参与优化！</p>
 <table>
-<thead>
-<tr>
-<th>信号类型</th>
-<th>信号位</th>
-<th>信号名</th>
-<th>信号描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>output</td>
-<td>[218:88]</td>
-<td>0</td>
-<td>占位，全为0，传递到composer时会忽略</td>
-</tr>
-<tr>
-<td></td>
-<td>87</td>
-<td>resp_meta_providers_1_valid_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>[86:85]</td>
-<td>resp_meta_providers_1_bits_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>84</td>
-<td>resp_meta_providers_0_valid_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>[83:82]</td>
-<td>resp_meta_providers_0_bits_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>[81:79]</td>
-<td>resp_meta_providerResps_1_r_ctr</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>78</td>
-<td>resp_meta_providerResps_1_r_u</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>77</td>
-<td>resp_meta_providerResps_1_r_unconf</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>[76:74]</td>
-<td>resp_meta_providerResps_0_r_ctr</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>73</td>
-<td>resp_meta_providerResps_0_r_u</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>72</td>
-<td>resp_meta_providerResps_0_r_unconf</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>71</td>
-<td>resp_meta_altUsed_1_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>70</td>
-<td>resp_meta_altUsed_0_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>69</td>
-<td>resp_meta_altDiffers_1_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>68</td>
-<td>resp_meta_altDiffers_0_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>[67:66]</td>
-<td>resp_meta_basecnts_1_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>[65:64]</td>
-<td>resp_meta_basecnts_0_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>[63:60]</td>
-<td>resp_meta_allocates_1_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>[59:56]</td>
-<td>resp_meta_allocates_0_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>55</td>
-<td>resp_meta_takens_1_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>54</td>
-<td>resp_meta_takens_0_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>53</td>
-<td>resp_meta_scMeta_tageTakens_1_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>52</td>
-<td>resp_meta_scMeta_tageTakens_0_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>51</td>
-<td>resp_meta_scMeta_scUsed_1_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>50</td>
-<td>resp_meta_scMeta_scUsed_0_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>49</td>
-<td>resp_meta_scMeta_scPreds_1_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>48</td>
-<td>resp_meta_scMeta_scPreds_0_r</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td>[47:42]</td>
-<td>r_1_3</td>
-<td>scMeta(预测时的状态)中第2路的第4个sc_ctr的值</td>
-</tr>
-<tr>
-<td></td>
-<td>[41:36]</td>
-<td>r_1_2</td>
-<td>scMeta中第2路的第3个sc_ctr的值</td>
-</tr>
-<tr>
-<td></td>
-<td>[35:30]</td>
-<td>r_1_1</td>
-<td>scMeta中第2路的第2个sc_ctr的值</td>
-</tr>
-<tr>
-<td></td>
-<td>[29:24]</td>
-<td>r_1_0</td>
-<td>scMeta中第2路的第1个sc_ctr的值</td>
-</tr>
-<tr>
-<td></td>
-<td>[23:18]</td>
-<td>r_3</td>
-<td>scMeta中第1路的第4个sc_ctr的值</td>
-</tr>
-<tr>
-<td></td>
-<td>[17:12]</td>
-<td>r_2</td>
-<td>scMeta中第1路的第3个sc_ctr的值</td>
-</tr>
-<tr>
-<td></td>
-<td>[11:6]</td>
-<td>r_1</td>
-<td>scMeta中第1路的第2个sc_ctr的值</td>
-</tr>
-<tr>
-<td></td>
-<td>[5:0]</td>
-<td>r_0</td>
-<td>scMeta中第1路的第1个sc_ctr的值</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>信号类型</th>
+          <th>信号位</th>
+          <th>信号名</th>
+          <th>信号描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>output</td>
+          <td>[218:88]</td>
+          <td>0</td>
+          <td>占位，全为0，传递到composer时会忽略</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>87</td>
+          <td>resp_meta_providers_1_valid_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[86:85]</td>
+          <td>resp_meta_providers_1_bits_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>84</td>
+          <td>resp_meta_providers_0_valid_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[83:82]</td>
+          <td>resp_meta_providers_0_bits_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[81:79]</td>
+          <td>resp_meta_providerResps_1_r_ctr</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>78</td>
+          <td>resp_meta_providerResps_1_r_u</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>77</td>
+          <td>resp_meta_providerResps_1_r_unconf</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[76:74]</td>
+          <td>resp_meta_providerResps_0_r_ctr</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>73</td>
+          <td>resp_meta_providerResps_0_r_u</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>72</td>
+          <td>resp_meta_providerResps_0_r_unconf</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>71</td>
+          <td>resp_meta_altUsed_1_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>70</td>
+          <td>resp_meta_altUsed_0_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>69</td>
+          <td>resp_meta_altDiffers_1_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>68</td>
+          <td>resp_meta_altDiffers_0_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[67:66]</td>
+          <td>resp_meta_basecnts_1_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[65:64]</td>
+          <td>resp_meta_basecnts_0_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[63:60]</td>
+          <td>resp_meta_allocates_1_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[59:56]</td>
+          <td>resp_meta_allocates_0_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>55</td>
+          <td>resp_meta_takens_1_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>54</td>
+          <td>resp_meta_takens_0_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>53</td>
+          <td>resp_meta_scMeta_tageTakens_1_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>52</td>
+          <td>resp_meta_scMeta_tageTakens_0_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>51</td>
+          <td>resp_meta_scMeta_scUsed_1_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>50</td>
+          <td>resp_meta_scMeta_scUsed_0_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>49</td>
+          <td>resp_meta_scMeta_scPreds_1_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>48</td>
+          <td>resp_meta_scMeta_scPreds_0_r</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[47:42]</td>
+          <td>r_1_3</td>
+          <td>scMeta(预测时的状态)中第2路的第4个sc_ctr的值</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[41:36]</td>
+          <td>r_1_2</td>
+          <td>scMeta中第2路的第3个sc_ctr的值</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[35:30]</td>
+          <td>r_1_1</td>
+          <td>scMeta中第2路的第2个sc_ctr的值</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[29:24]</td>
+          <td>r_1_0</td>
+          <td>scMeta中第2路的第1个sc_ctr的值</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[23:18]</td>
+          <td>r_3</td>
+          <td>scMeta中第1路的第4个sc_ctr的值</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[17:12]</td>
+          <td>r_2</td>
+          <td>scMeta中第1路的第3个sc_ctr的值</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[11:6]</td>
+          <td>r_1</td>
+          <td>scMeta中第1路的第2个sc_ctr的值</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[5:0]</td>
+          <td>r_0</td>
+          <td>scMeta中第1路的第1个sc_ctr的值</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="io_update_bits_meta">io_update_bits_meta</h3>
 <table>
-<thead>
-<tr>
-<th>信号类型</th>
-<th>信号位</th>
-<th>信号名</th>
-<th>信号描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>input</td>
-<td>[218:94]</td>
-<td></td>
-<td>FTB, ITAGE, RAS 模块传给 FTQ 的 META 信息，忽略</td>
-</tr>
-<tr>
-<td></td>
-<td>[93:6]</td>
-<td>io_out_last_stage_meta[87:0] 偏移 6bit 后的结果</td>
-<td>TAGE 输出给 FTQ 的 META</td>
-</tr>
-<tr>
-<td></td>
-<td>[5:0]</td>
-<td></td>
-<td>uFTB 输出给 FTQ 的 META</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>信号类型</th>
+          <th>信号位</th>
+          <th>信号名</th>
+          <th>信号描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>input</td>
+          <td>[218:94]</td>
+          <td></td>
+          <td>FTB, ITAGE, RAS 模块传给 FTQ 的 META 信息，忽略</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[93:6]</td>
+          <td>io_out_last_stage_meta[87:0] 偏移 6bit 后的结果</td>
+          <td>TAGE 输出给 FTQ 的 META</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>[5:0]</td>
+          <td></td>
+          <td>uFTB 输出给 FTQ 的 META</td>
+      </tr>
+  </tbody>
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 19, 2025: <a href="https://github.com/XS-MLVP/course/commit/6efab288a3d23d1d97fa483bb19209d5ae49789e">doc: adapted to the latest v0.11.0 of docsy (6efab28)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/5c24d32b13e6e84ae1f86af59a596e9d23ae77df">Upgrade hugo version to 0.146.7 (5c24d32)</a>
 </div>
 
 </div>
@@ -1522,7 +1529,7 @@ tageCtrCentered
        integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous"
        onload='renderMathInElement(document.body, null);'>
 </script>
-<script src="/xs-bpu/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+<script src="/xs-bpu/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script defer src="/xs-bpu/js/click-to-copy.min.73478a7d4807698aed7e355eb23f9890ca18fea3158604c8471746d046702bad.js" integrity="sha256-c0eKfUgHaYrtfjVesj&#43;YkMoY/qMVhgTIRxdG0EZwK60=" crossorigin="anonymous"></script>
 <script src='/xs-bpu/js/tabpane-persist.js'></script>
 

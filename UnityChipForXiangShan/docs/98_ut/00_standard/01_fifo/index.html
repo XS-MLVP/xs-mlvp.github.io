@@ -19,22 +19,38 @@
 
 <title>FIFO文档案例 | 万众一芯之香山处理器</title>
 <meta name="description" content="以下以FIFO为例，展示了一个简单的文档案例
-`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!">
-<meta property="og:title" content="FIFO文档案例" />
-<meta property="og:description" content="以下以FIFO为例，展示了一个简单的文档案例
-`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/" /><meta property="article:section" content="docs" />
+`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!rst_n) wr_ptr &lt;= 4&#39;d0; else if(wr_en &amp;&amp; !full)begin data[wr_addr] &lt;= wdata; wr_ptr &lt;= wr_ptr &#43; 4&#39;d1; end end always@(posedge clk or negedge rst_n)begin //读数据 if(!rst_n) rd_ptr &lt;= &#39;d0; else if(rd_en &amp;&amp; !empty)begin rdata_reg &lt;= data[rd_addr]; rd_ptr &lt;= rd_ptr &#43; 4&#39;d1; end end assign empty = (wr_ptr == rd_ptr); //读空 assign full = (wr_ptr == {~rd_ptr[3],rd_ptr[2:0]}); //写满 endmodule FIFO 模块验证文档 文档概述 本文档描述FIFO的功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。
+术语说明 缩写 全称 定义 FIFO First In First Out 先进先出的数据缓冲队列 功能说明 本次需要验证的是FIFO，一种常见的硬件缓冲模块，在硬件电路中临时存储数据，并按照数据到达的顺序进行处理。
+本次需要验证的FIFO每次可写可读8位数据，容量为8。
+1. 读FIFO操作 1.1. 常规读取 功能描述：当rd_en=1且empty=0时，在时钟上升沿输出rdata">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="FIFO文档案例">
+  <meta property="og:description" content="以下以FIFO为例，展示了一个简单的文档案例
+`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!rst_n) wr_ptr &lt;= 4&#39;d0; else if(wr_en &amp;&amp; !full)begin data[wr_addr] &lt;= wdata; wr_ptr &lt;= wr_ptr &#43; 4&#39;d1; end end always@(posedge clk or negedge rst_n)begin //读数据 if(!rst_n) rd_ptr &lt;= &#39;d0; else if(rd_en &amp;&amp; !empty)begin rdata_reg &lt;= data[rd_addr]; rd_ptr &lt;= rd_ptr &#43; 4&#39;d1; end end assign empty = (wr_ptr == rd_ptr); //读空 assign full = (wr_ptr == {~rd_ptr[3],rd_ptr[2:0]}); //写满 endmodule FIFO 模块验证文档 文档概述 本文档描述FIFO的功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。
+术语说明 缩写 全称 定义 FIFO First In First Out 先进先出的数据缓冲队列 功能说明 本次需要验证的是FIFO，一种常见的硬件缓冲模块，在硬件电路中临时存储数据，并按照数据到达的顺序进行处理。
+本次需要验证的FIFO每次可写可读8位数据，容量为8。
+1. 读FIFO操作 1.1. 常规读取 功能描述：当rd_en=1且empty=0时，在时钟上升沿输出rdata">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
 
-<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="name" content="FIFO文档案例">
-<meta itemprop="description" content="以下以FIFO为例，展示了一个简单的文档案例
-`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!">
-<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="wordCount" content="294">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FIFO文档案例"/>
-<meta name="twitter:description" content="以下以FIFO为例，展示了一个简单的文档案例
-`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!"/>
+  <meta itemprop="name" content="FIFO文档案例">
+  <meta itemprop="description" content="以下以FIFO为例，展示了一个简单的文档案例
+`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!rst_n) wr_ptr &lt;= 4&#39;d0; else if(wr_en &amp;&amp; !full)begin data[wr_addr] &lt;= wdata; wr_ptr &lt;= wr_ptr &#43; 4&#39;d1; end end always@(posedge clk or negedge rst_n)begin //读数据 if(!rst_n) rd_ptr &lt;= &#39;d0; else if(rd_en &amp;&amp; !empty)begin rdata_reg &lt;= data[rd_addr]; rd_ptr &lt;= rd_ptr &#43; 4&#39;d1; end end assign empty = (wr_ptr == rd_ptr); //读空 assign full = (wr_ptr == {~rd_ptr[3],rd_ptr[2:0]}); //写满 endmodule FIFO 模块验证文档 文档概述 本文档描述FIFO的功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。
+术语说明 缩写 全称 定义 FIFO First In First Out 先进先出的数据缓冲队列 功能说明 本次需要验证的是FIFO，一种常见的硬件缓冲模块，在硬件电路中临时存储数据，并按照数据到达的顺序进行处理。
+本次需要验证的FIFO每次可写可读8位数据，容量为8。
+1. 读FIFO操作 1.1. 常规读取 功能描述：当rd_en=1且empty=0时，在时钟上升沿输出rdata">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="294">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FIFO文档案例">
+  <meta name="twitter:description" content="以下以FIFO为例，展示了一个简单的文档案例
+`timescale 1ns / 1ps module FIFO ( //data_width = 8 data depth =8 input clk, input rst_n, input wr_en, //写使能 input rd_en, //读使能 input [7:0]wdata, //写入数据输入 output [7:0]rdata, //读取数据输出 output empty, //读空标志信号 output full //写满标志信号 ); reg [7:0] rdata_reg = 8&#39;d0; assign rdata = rdata_reg; reg [7:0] data [7:0]; //数据存储单元(8bit数据8个) reg [3:0] wr_ptr = 4&#39;d0; //写指针 reg [3:0] rd_ptr = 4&#39;d0; //读指针 wire [2:0] wr_addr; //写地址(写指针的低3位) wire [2:0] rd_addr; //读地址(读指针的低3位) assign wr_addr = wr_ptr[2:0]; assign rd_addr = rd_ptr[2:0]; always@(posedge clk or negedge rst_n)begin //写数据 if(!rst_n) wr_ptr &lt;= 4&#39;d0; else if(wr_en &amp;&amp; !full)begin data[wr_addr] &lt;= wdata; wr_ptr &lt;= wr_ptr &#43; 4&#39;d1; end end always@(posedge clk or negedge rst_n)begin //读数据 if(!rst_n) rd_ptr &lt;= &#39;d0; else if(rd_en &amp;&amp; !empty)begin rdata_reg &lt;= data[rd_addr]; rd_ptr &lt;= rd_ptr &#43; 4&#39;d1; end end assign empty = (wr_ptr == rd_ptr); //读空 assign full = (wr_ptr == {~rd_ptr[3],rd_ptr[2:0]}); //写满 endmodule FIFO 模块验证文档 文档概述 本文档描述FIFO的功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。
+术语说明 缩写 全称 定义 FIFO First In First Out 先进先出的数据缓冲队列 功能说明 本次需要验证的是FIFO，一种常见的硬件缓冲模块，在硬件电路中临时存储数据，并按照数据到达的顺序进行处理。
+本次需要验证的FIFO每次可写可读8位数据，容量为8。
+1. 读FIFO操作 1.1. 常规读取 功能描述：当rd_en=1且empty=0时，在时钟上升沿输出rdata">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -136,7 +152,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -160,7 +176,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -549,20 +565,20 @@
 <p>本文档描述FIFO的功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>缩写</th>
-<th>全称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>FIFO</td>
-<td>First In First Out</td>
-<td>先进先出的数据缓冲队列</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>缩写</th>
+          <th>全称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>FIFO</td>
+          <td>First In First Out</td>
+          <td>先进先出的数据缓冲队列</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="功能说明">功能说明</h2>
 <p>本次需要验证的是FIFO，一种常见的硬件缓冲模块，在硬件电路中临时存储数据，并按照数据到达的顺序进行处理。</p>
@@ -620,169 +636,169 @@
 </ul>
 <h2 id="常量说明">常量说明</h2>
 <table>
-<thead>
-<tr>
-<th>常量名</th>
-<th>常量值</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>FIFO_DEPTH</td>
-<td>8</td>
-<td>FIFO存储单元数量</td>
-</tr>
-<tr>
-<td>DATA_WIDTH</td>
-<td>8</td>
-<td>数据总线位宽</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>常量名</th>
+          <th>常量值</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>FIFO_DEPTH</td>
+          <td>8</td>
+          <td>FIFO存储单元数量</td>
+      </tr>
+      <tr>
+          <td>DATA_WIDTH</td>
+          <td>8</td>
+          <td>数据总线位宽</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="接口说明">接口说明</h2>
 <h3 id="输入接口">输入接口</h3>
 <table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>clk</td>
-<td>Input</td>
-<td>1</td>
-<td>主时钟</td>
-<td></td>
-</tr>
-<tr>
-<td>rst_n</td>
-<td>Input</td>
-<td>1</td>
-<td>异步复位</td>
-<td></td>
-</tr>
-<tr>
-<td>wr_en</td>
-<td>Input</td>
-<td>1</td>
-<td>写使能</td>
-<td></td>
-</tr>
-<tr>
-<td>wdata</td>
-<td>Input</td>
-<td>8</td>
-<td>写入数据</td>
-<td></td>
-</tr>
-<tr>
-<td>rd_en</td>
-<td>Input</td>
-<td>1</td>
-<td>读使能</td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>信号名</th>
+          <th>方向</th>
+          <th>位宽</th>
+          <th>描述</th>
+          <th></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>clk</td>
+          <td>Input</td>
+          <td>1</td>
+          <td>主时钟</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>rst_n</td>
+          <td>Input</td>
+          <td>1</td>
+          <td>异步复位</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>wr_en</td>
+          <td>Input</td>
+          <td>1</td>
+          <td>写使能</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>wdata</td>
+          <td>Input</td>
+          <td>8</td>
+          <td>写入数据</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>rd_en</td>
+          <td>Input</td>
+          <td>1</td>
+          <td>读使能</td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="输出接口">输出接口</h3>
 <table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>rdata</td>
-<td>Output</td>
-<td>8</td>
-<td>读出数据</td>
-</tr>
-<tr>
-<td>empty</td>
-<td>Output</td>
-<td>1</td>
-<td>FIFO空标志（高有效）</td>
-</tr>
-<tr>
-<td>full</td>
-<td>Output</td>
-<td>1</td>
-<td>FIFO满标志（高有效）</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>信号名</th>
+          <th>方向</th>
+          <th>位宽</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>rdata</td>
+          <td>Output</td>
+          <td>8</td>
+          <td>读出数据</td>
+      </tr>
+      <tr>
+          <td>empty</td>
+          <td>Output</td>
+          <td>1</td>
+          <td>FIFO空标志（高有效）</td>
+      </tr>
+      <tr>
+          <td>full</td>
+          <td>Output</td>
+          <td>1</td>
+          <td>FIFO满标志（高有效）</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <p>建议各个测试点的覆盖组使用下表描述的功能和测试点名称进行命名。</p>
 <p>比如FIFO_READ的测试点NORMAL，其覆盖点建议命名为FIFO_READ_NORMAL</p>
 <mrs-testpoints>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#1-读fifo操作">FIFO_READ</a></td>
-<td>NORMAL</td>
-<td>fifo有数据时，设置读使能，可以读出数据</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>FIFO_READ</td>
-<td>EMPTY</td>
-<td>fifo为空时，设置读使能，无法读出数据</td>
-</tr>
-<tr>
-<td>1.3</td>
-<td>FIFO_READ</td>
-<td>NO_EN</td>
-<td>fifo有数据时，不设置读使能，无法读出数据</td>
-</tr>
-<tr>
-<td>2.1</td>
-<td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#2-写fifo操作">FIFO_WRITE</a></td>
-<td>NORMAL</td>
-<td>fifo未满时，设置写使能，可以写入数据</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>FIFO_WRITE</td>
-<td>FULL</td>
-<td>fifo已满时，设置写使能，可以写入数据</td>
-</tr>
-<tr>
-<td>2.3</td>
-<td>FIFO_WRITE</td>
-<td>NO_EN</td>
-<td>fifo未满时，不设置写使能，无法写入数据</td>
-</tr>
-<tr>
-<td>3.1</td>
-<td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#3-复位操作">FIFO_RESET</a></td>
-<td>RESET</td>
-<td>重置后，栈为空</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#1-%e8%af%bbfifo%e6%93%8d%e4%bd%9c">FIFO_READ</a></td>
+          <td>NORMAL</td>
+          <td>fifo有数据时，设置读使能，可以读出数据</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>FIFO_READ</td>
+          <td>EMPTY</td>
+          <td>fifo为空时，设置读使能，无法读出数据</td>
+      </tr>
+      <tr>
+          <td>1.3</td>
+          <td>FIFO_READ</td>
+          <td>NO_EN</td>
+          <td>fifo有数据时，不设置读使能，无法读出数据</td>
+      </tr>
+      <tr>
+          <td>2.1</td>
+          <td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#2-%e5%86%99fifo%e6%93%8d%e4%bd%9c">FIFO_WRITE</a></td>
+          <td>NORMAL</td>
+          <td>fifo未满时，设置写使能，可以写入数据</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>FIFO_WRITE</td>
+          <td>FULL</td>
+          <td>fifo已满时，设置写使能，可以写入数据</td>
+      </tr>
+      <tr>
+          <td>2.3</td>
+          <td>FIFO_WRITE</td>
+          <td>NO_EN</td>
+          <td>fifo未满时，不设置写使能，无法写入数据</td>
+      </tr>
+      <tr>
+          <td>3.1</td>
+          <td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#3-%e5%a4%8d%e4%bd%8d%e6%93%8d%e4%bd%9c">FIFO_RESET</a></td>
+          <td>RESET</td>
+          <td>重置后，栈为空</td>
+      </tr>
+  </tbody>
 </table>
 </mrs-testpoints>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 
 </div>
@@ -826,7 +842,7 @@
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

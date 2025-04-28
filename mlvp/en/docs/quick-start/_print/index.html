@@ -21,13 +21,21 @@
 
 <title>Quick Start | UnityChip Verification</title>
 <meta name="description" content="How to use the open verification platform to participate in hardware verification.">
-<meta property="og:title" content="Quick Start" />
-<meta property="og:description" content="How to use the open verification platform to participate in hardware verification." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/quick-start/" />
-<meta itemprop="name" content="Quick Start">
-<meta itemprop="description" content="How to use the open verification platform to participate in hardware verification."><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Quick Start"/>
-<meta name="twitter:description" content="How to use the open verification platform to participate in hardware verification."/>
+<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/quick-start/">
+  <meta property="og:site_name" content="UnityChip Verification">
+  <meta property="og:title" content="Quick Start">
+  <meta property="og:description" content="How to use the open verification platform to participate in hardware verification.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="Quick Start">
+  <meta itemprop="description" content="How to use the open verification platform to participate in hardware verification.">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="527">
+  <meta itemprop="keywords" content="Examples,Docs">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Quick Start">
+  <meta name="twitter:description" content="How to use the open verification platform to participate in hardware verification.">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -127,7 +135,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -293,8 +301,7 @@ In the development and research of system architecture, Linux is the most common
 </li>
 </ol>
 <blockquote>
-<p>Please ensure that the tools like <code>verible-verilog-format</code> have been added to the environment variable <code>$PATH</code>, so they can be called directly from the command line.</p>
-</blockquote>
+<p>Please ensure that the tools like <code>verible-verilog-format</code> have been added to the environment variable <code>$PATH</code>, so they can be called directly from the command line.</p></blockquote>
 <h3 id="source-code-download">Source Code Download</h3>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/picker.git --depth<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">1</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> picker
@@ -310,9 +317,8 @@ In the development and research of system architecture, Linux is the most common
 </span></span></code></pre></div><blockquote>
 <p>The default installation path is <code>/usr/local</code>, with binary files placed in <code>/usr/local/bin</code> and template files in <code>/usr/local/share/picker</code>.
 If you need to change the installation directory, you can pass arguments to cmake by specifying ARGS, for example: <code>make ARGS=&quot;-DCMAKE_INSTALL_PREFIX=your_install_dir&quot;</code>
-The installation will automatically install the <code>xspcomm</code> base library (<a href="https://github.com/XS-MLVP/xcomm)">https://github.com/XS-MLVP/xcomm)</a>, which is used to encapsulate the basic types of <code>RTL</code> modules, located at <code>/usr/local/lib/libxspcomm.so</code>. <strong>You may need to manually set the link directory parameters (-L) during compilation.</strong><br>
-If support for languages such as Java is enabled, the corresponding <code>xspcomm</code> multi-language packages will also be installed.</p>
-</blockquote>
+The installation will automatically install the <code>xspcomm</code> base library (<a href="https://github.com/XS-MLVP/xcomm%29">https://github.com/XS-MLVP/xcomm)</a>, which is used to encapsulate the basic types of <code>RTL</code> modules, located at <code>/usr/local/lib/libxspcomm.so</code>. <strong>You may need to manually set the link directory parameters (-L) during compilation.</strong><br>
+If support for languages such as Java is enabled, the corresponding <code>xspcomm</code> multi-language packages will also be installed.</p></blockquote>
 <p><strong>picker can also be compiled into a wheel file and installed via pip</strong></p>
 <p>To package picker into a wheel installation package, use the following command:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make wheel <span style="color:#8f5902;font-style:italic"># or BUILD_XSPCOMM_SWIG=python,java,scala,golang make wheel</span>
@@ -349,8 +355,7 @@ Subcommands:
 <p>picker currently has two subcommands: <code>export</code> and <code>pack</code>.</p>
 <p>The <code>export</code> subcommand is used to convert RTL designs into &ldquo;libraries&rdquo; corresponding to other high-level programming languages, which can be driven through software.</p>
 <blockquote>
-<p>$picker export &ndash;help</p>
-</blockquote>
+<p>$picker export &ndash;help</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Export RTL Projects Sources as Software libraries such as C++/Python
 </span></span><span style="display:flex;"><span>Usage: picker <span style="color:#204a87">export</span> <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file...
 </span></span><span style="display:flex;"><span>
@@ -397,8 +402,7 @@ Subcommands:
 </ul>
 <p>The <code>pack</code> subcommand is used to convert UVM <code>sequence_item</code> into other languages and then communicate through TLM (currently supports Python, other languages are under development).</p>
 <blockquote>
-<p>$picker pack &ndash;help</p>
-</blockquote>
+<p>$picker pack &ndash;help</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Pack uvm transaction as a uvm agent and python class
 </span></span><span style="display:flex;"><span>Usage: picker pack <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span> file...
 </span></span><span style="display:flex;"><span>
@@ -520,8 +524,7 @@ The output directory structure is as follows. <strong>Note that these are all in
 <p>Navigate to the <code>picker_out_adder</code> directory and execute the <code>make</code> command to generate the final files.</p>
 <blockquote>
 <p>Use the simulator invocation script defined by <code>cmake/*.cmake</code> to compile <code>Adder_top.sv</code> and related files into the <code>libDPIAdder.so</code> dynamic library.Use the compilation script defined by <code>CMakeLists.txt</code> to wrap <code>libDPIAdder.so</code> into the <code>libUTAdder.so</code> dynamic library through <code>dut_base.cpp</code>. Both outputs from steps 1 and 2 are copied to the <code>UT_Adder</code> directory.Generate the wrapper layer using the <code>SWIG</code> tool with <code>dut_base.hpp</code> and <code>dut.hpp</code> header files, and finally build a Python module in the <code>UT_Adder</code> directory.If the <code>-e</code> parameter is included, the pre-defined <code>example.py</code> is placed in the parent directory of the <code>UT_Adder</code> directory as a sample code for calling this Python module.
-The final directory structure is:</p>
-</blockquote>
+The final directory structure is:</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>.
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- Adder.fst <span style="color:#8f5902;font-style:italic"># Waveform file for testing</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- UT_Adder
@@ -535,8 +538,7 @@ The final directory structure is:</p>
 </span></span><span style="display:flex;"><span><span style="color:#4e9a06">`</span>-- example.py <span style="color:#8f5902;font-style:italic"># Sample code</span>
 </span></span></code></pre></div><h3 id="setting-up-test-code">Setting Up Test Code</h3>
 <blockquote>
-<p>Replace the content in <code>example.py</code> with the following Python test code.</p>
-</blockquote>
+<p>Replace the content in <code>example.py</code> with the following Python test code.</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">Adder</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
 </span></span><span style="display:flex;"><span>
@@ -664,8 +666,7 @@ The output directory structure is similar to <a href="https://chatgpt.com/docs/q
 <p>Navigate to the <code>picker_out_rmg</code> directory and execute the <code>make</code> command to generate the final files.</p>
 <blockquote>
 <p>Note: The compilation process is similar to <a href="https://chatgpt.com/docs/quick-start/eg-adder/#building-intermediate-files">Adder Verification - Compilation Process</a> , so it will not be elaborated here.
-The final directory structure will be:</p>
-</blockquote>
+The final directory structure will be:</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>picker_out_rmg
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst <span style="color:#8f5902;font-style:italic"># Waveform file from the test</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- UT_RandomGenerator
@@ -679,8 +680,7 @@ The final directory structure will be:</p>
 </span></span><span style="display:flex;"><span><span style="color:#4e9a06">`</span>-- example.py <span style="color:#8f5902;font-style:italic"># Example code</span>
 </span></span></code></pre></div><h3 id="configuring-the-test-code">Configuring the Test Code</h3>
 <blockquote>
-<p>Replace the content of <code>example.py</code> with the following code.</p>
-</blockquote>
+<p>Replace the content of <code>example.py</code> with the following code.</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">RandomGenerator</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
 </span></span><span style="display:flex;"><span>
@@ -718,8 +718,7 @@ The final directory structure will be:</p>
 <p>Execute <code>python example.py</code> in the <code>picker_out_rmg</code> directory to run the test program. After the execution, if <code>Test Passed</code> is output, the test is considered passed. After the run is complete, a waveform file <code>RandomGenerator.fst</code> will be generated, which can be viewed in the terminal using the following command:</p>
 <blockquote>
 <p>gtkwave RandomGenerator.fst
-Example output:</p>
-</blockquote>
+Example output:</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>···
 </span></span><span style="display:flex;"><span>Cycle 65529, DUT: d9ea, REF: d9ea
 </span></span><span style="display:flex;"><span>Cycle 65530, DUT: b3d4, REF: b3d4
@@ -1341,7 +1340,7 @@ At this point, you&rsquo;ll need a set of coroutine writing standards and design
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

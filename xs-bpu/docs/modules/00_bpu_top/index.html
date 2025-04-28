@@ -25,40 +25,62 @@ npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全�
 在代码中你可以看到生成器用类似下面这种方式进行定义：
 val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
 npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
-s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。">
-<meta property="og:title" content="BPU 顶层模块" />
-<meta property="og:description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
+s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。
+我们可以得出所有生成器产生 s0 信号的方法：在所有数据有效信号中，如果只有一个有效的，则选取它对应的数据，如果有多个数据有效信号生效，则选取优先级最高的数据。
+全局分支历史 我们知道，全局分支历史在 BPU 顶层进行维护，维护的策略与 PC 的维护策略一致。即在每个阶段流水级预测结果产生之后，会根据相应信号对全局分支历史进行更新。
+顶层为了维护全局分支历史定义了两组信号">
+<meta property="og:url" content="https://open-verify.cc/xs-bpu/docs/modules/00_bpu_top/">
+  <meta property="og:site_name" content="香山微架构开放验证第一期：昆明湖BPU模块UT验证实战">
+  <meta property="og:title" content="BPU 顶层模块">
+  <meta property="og:description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
 生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。
 BPU 顶层中所有的生成器共有 6 个：
 npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全局历史写入数据 foledGhGen 维护折叠历史 lastBrNumOHGen 维护上周期最后一个生效的分支指令位置 aheadFhObGen 维护分支历史最老位 其中，除了 npcGen 以外，其余生成器都会在本文档中进行介绍。本节中我们着重探讨一下生成器的产生下一次预测的方法。
 在代码中你可以看到生成器用类似下面这种方式进行定义：
 val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
 npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
-s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/xs-bpu/docs/modules/00_bpu_top/" /><meta property="article:section" content="docs" />
+s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。
+我们可以得出所有生成器产生 s0 信号的方法：在所有数据有效信号中，如果只有一个有效的，则选取它对应的数据，如果有多个数据有效信号生效，则选取优先级最高的数据。
+全局分支历史 我们知道，全局分支历史在 BPU 顶层进行维护，维护的策略与 PC 的维护策略一致。即在每个阶段流水级预测结果产生之后，会根据相应信号对全局分支历史进行更新。
+顶层为了维护全局分支历史定义了两组信号">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:43:36+08:00">
+    <meta property="article:tag" content="香山">
+    <meta property="article:tag" content="BPU 顶层">
+    <meta property="article:tag" content="全局分支历史">
+    <meta property="article:tag" content="分支折叠历史">
+    <meta property="article:tag" content="流水线控制">
 
-<meta property="article:modified_time" content="2025-03-19T11:11:46+08:00" />
-<meta itemprop="name" content="BPU 顶层模块">
-<meta itemprop="description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
+  <meta itemprop="name" content="BPU 顶层模块">
+  <meta itemprop="description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
 生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。
 BPU 顶层中所有的生成器共有 6 个：
 npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全局历史写入数据 foledGhGen 维护折叠历史 lastBrNumOHGen 维护上周期最后一个生效的分支指令位置 aheadFhObGen 维护分支历史最老位 其中，除了 npcGen 以外，其余生成器都会在本文档中进行介绍。本节中我们着重探讨一下生成器的产生下一次预测的方法。
 在代码中你可以看到生成器用类似下面这种方式进行定义：
 val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
 npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
-s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。">
-<meta itemprop="dateModified" content="2025-03-19T11:11:46+08:00" />
-<meta itemprop="wordCount" content="633">
-<meta itemprop="keywords" content="香山,BPU 顶层,全局分支历史,分支折叠历史,流水线控制," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="BPU 顶层模块"/>
-<meta name="twitter:description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
+s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。
+我们可以得出所有生成器产生 s0 信号的方法：在所有数据有效信号中，如果只有一个有效的，则选取它对应的数据，如果有多个数据有效信号生效，则选取优先级最高的数据。
+全局分支历史 我们知道，全局分支历史在 BPU 顶层进行维护，维护的策略与 PC 的维护策略一致。即在每个阶段流水级预测结果产生之后，会根据相应信号对全局分支历史进行更新。
+顶层为了维护全局分支历史定义了两组信号">
+  <meta itemprop="dateModified" content="2025-04-28T17:43:36+08:00">
+  <meta itemprop="wordCount" content="633">
+  <meta itemprop="keywords" content="香山,BPU 顶层,全局分支历史,分支折叠历史,流水线控制">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="BPU 顶层模块">
+  <meta name="twitter:description" content="BPU 顶层整体的功能和结构已经在之前的文档中粗略的描述，对于验证 BPU 顶层的同学来说，可能还需要更加细致的描述。由于 BPU 顶层功能较多，本节将 BPU 划分为了几大功能点进行更进一步的描述。但由于 BPU 顶层细节过多，更进一步的细节需参照代码进行理解。
 生成器维护方法 通过香山的基础设计文档，我们知道，BPU 顶层是通过一个个生成器来维护 s0 周期的各类变量的，例如 PC、分支历史等，并且其核心概念是，通过预测结果重定向信号决定采用哪个流水级的结果。
 BPU 顶层中所有的生成器共有 6 个：
 npcGen 维护 pc ghistPtrGen 维护全局历史指针 ghvBitWriteGens 维护全局历史写入数据 foledGhGen 维护折叠历史 lastBrNumOHGen 维护上周期最后一个生效的分支指令位置 aheadFhObGen 维护分支历史最老位 其中，除了 npcGen 以外，其余生成器都会在本文档中进行介绍。本节中我们着重探讨一下生成器的产生下一次预测的方法。
 在代码中你可以看到生成器用类似下面这种方式进行定义：
 val npcGen = new PhyPriorityMuxGenerator[UInt] 接下来，代码通过多条语句对生成器的数据来源进行注册：
 npcGen.register(true.B, reg， ...) npcGen.register(s1_valid, s1_target, ...) npcGen.register(s2_redirect, s2_target, ...) npcGen.register(s3_redirect, s3_target, ...) npcGen.register(do_redirect.valid, do_redirect.bits.cfiUpdate.target, ...) 每一行被称作一次注册，在一次注册中第一个信号参数是数据有效信号，第二个信号参数包含具体的数据。 生成器的优先级也是按照注册的顺序来决定，越往后优先级越高，因此，同一时刻的优先级从低到高依次为：
-s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。"/>
+s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结果更新后的数据 根据 s3 预测结果更新后的数据 BPU 外部重定向中的数据 这样一来，我们就可以在预测结果重定向有效时，避免采用较早流水级的预测结果，而采用纠正后的预测结果。也使得我们可以将外部重定向请求作为最高优先级去处理。
+我们可以得出所有生成器产生 s0 信号的方法：在所有数据有效信号中，如果只有一个有效的，则选取它对应的数据，如果有多个数据有效信号生效，则选取优先级最高的数据。
+全局分支历史 我们知道，全局分支历史在 BPU 顶层进行维护，维护的策略与 PC 的维护策略一致。即在每个阶段流水级预测结果产生之后，会根据相应信号对全局分支历史进行更新。
+顶层为了维护全局分支历史定义了两组信号">
 <link rel="preload" href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -117,7 +139,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -141,7 +163,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.91289d6d4e1ea19901c407f53cb9dc9e.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -539,7 +561,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
 <p>所以在重定向恢复时，不仅需要将重定向接口中的信息恢复，还需要将这条预测错误的指令的执行情况也更新到历史中去。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 19, 2025: <a href="https://github.com/XS-MLVP/course/commit/6efab288a3d23d1d97fa483bb19209d5ae49789e">doc: adapted to the latest v0.11.0 of docsy (6efab28)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/5c24d32b13e6e84ae1f86af59a596e9d23ae77df">Upgrade hugo version to 0.146.7 (5c24d32)</a>
 </div>
 
 </div>
@@ -583,7 +605,7 @@ s0 阻塞的数据 根据 s1 预测结果更新后的数据 根据 s2 预测结�
 </footer>
 
     </div>
-    <script src="/xs-bpu/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/xs-bpu/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script defer src="/xs-bpu/js/click-to-copy.min.73478a7d4807698aed7e355eb23f9890ca18fea3158604c8471746d046702bad.js" integrity="sha256-c0eKfUgHaYrtfjVesj&#43;YkMoY/qMVhgTIRxdG0EZwK60=" crossorigin="anonymous"></script>
 <script src='/xs-bpu/js/tabpane-persist.js'></script>
 

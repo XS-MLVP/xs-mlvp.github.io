@@ -28,9 +28,11 @@
 它是一个寄存器堆，由64（FtqSize）个表项（Ftq_Redirect_SRAMEntry）构成。支持同步读写操作。有3个读端口和1个写端口，每个读端口负责与不同的模块交互。
 1.1 ftq_redirect_mem读操作 读操作： 输入： 需要使能ren，这是一个向量，可指定任意读端口可读 对应接口：ren 从任意读端口中输入要读取的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：raddr 输出： 从发起输入的读端口对应的读出端口中读出Ftq_Redirect_SRAMEntry。 对应接口：rdata 1.2 ftq_redirect_mem写操作 写操作 输入： 需要使能wen，可指定写端口可写 对应接口：wen 向写端口中输入要写入的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：waddr 向wdata中写入Ftq_Redirect_SRAMEntry 对应接口：wdata 多端口读：可以从多个读端口读取结果 每个子队列的读写基本都是类似的，后面不再赘述
 Ftq_Redirect_SRAMEntry ftq_redirect_mem存储的表项。继承自SpeculativeInfo，存储RAS预测器相关重定向信息，根据这些信息回溯到之前的状态
-sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize.">
-<meta property="og:title" content="FTQ子队列" />
-<meta property="og:description" content="文档概述 请注意：从本篇开始，就涉及待验证的功能点和测试点了
+sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize.W TOSW：重定向请求指令对应的 RAS 推测栈（队列）写指针 接口类型：RASPtr TOSR：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr NOS：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr topAddr： 接口类型：UInt(VAddrBits.W) 序号 功能名称 测试点名称 描述 1.1 FTQ_REDIRECT_MEM WRITE 向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata 1.2 FTQ_REDIRECT_MEM READ 向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取 2. ftq_pd_mem存储预译码信息 由64（FtqSize）个表项（Ftq_pd_Entry）构成。支持同步读写操作。有2个读端口和1个写端口。具有读写使能信号。">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/02_subqueue/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="FTQ子队列">
+  <meta property="og:description" content="文档概述 请注意：从本篇开始，就涉及待验证的功能点和测试点了
 在之前的介绍中，我们采用FTQ项这个术语描述描述FTQ队列中的每一个元素，实际上，这只是一种便于抽象的说法。
 实际上的FTQ队列，是由好多个子队列共同构成的，一些子队列维护一类信息，另一些子队列维护另一类信息，相同ftqIdx索引的子队列信息共同构成一个完整的FTQ项。
 为什么要把它们分开成多个子队列呢？因为某些模块只需要FTQ项中的某一些信息，比如IFU想要取值目标，它只需要专门存储取值目标的子队列提供的信息就行了。另外，在我们更改FTQ项的内容时，也只需要写入需要更新的子队列，比如IFU预译码写回时，只需要写回专门存储预译码信息的队列了。
@@ -40,13 +42,14 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 它是一个寄存器堆，由64（FtqSize）个表项（Ftq_Redirect_SRAMEntry）构成。支持同步读写操作。有3个读端口和1个写端口，每个读端口负责与不同的模块交互。
 1.1 ftq_redirect_mem读操作 读操作： 输入： 需要使能ren，这是一个向量，可指定任意读端口可读 对应接口：ren 从任意读端口中输入要读取的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：raddr 输出： 从发起输入的读端口对应的读出端口中读出Ftq_Redirect_SRAMEntry。 对应接口：rdata 1.2 ftq_redirect_mem写操作 写操作 输入： 需要使能wen，可指定写端口可写 对应接口：wen 向写端口中输入要写入的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：waddr 向wdata中写入Ftq_Redirect_SRAMEntry 对应接口：wdata 多端口读：可以从多个读端口读取结果 每个子队列的读写基本都是类似的，后面不再赘述
 Ftq_Redirect_SRAMEntry ftq_redirect_mem存储的表项。继承自SpeculativeInfo，存储RAS预测器相关重定向信息，根据这些信息回溯到之前的状态
-sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/02_subqueue/" /><meta property="article:section" content="docs" />
+sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize.W TOSW：重定向请求指令对应的 RAS 推测栈（队列）写指针 接口类型：RASPtr TOSR：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr NOS：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr topAddr： 接口类型：UInt(VAddrBits.W) 序号 功能名称 测试点名称 描述 1.1 FTQ_REDIRECT_MEM WRITE 向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata 1.2 FTQ_REDIRECT_MEM READ 向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取 2. ftq_pd_mem存储预译码信息 由64（FtqSize）个表项（Ftq_pd_Entry）构成。支持同步读写操作。有2个读端口和1个写端口。具有读写使能信号。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
 
-<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="name" content="FTQ子队列">
-<meta itemprop="description" content="文档概述 请注意：从本篇开始，就涉及待验证的功能点和测试点了
+  <meta itemprop="name" content="FTQ子队列">
+  <meta itemprop="description" content="文档概述 请注意：从本篇开始，就涉及待验证的功能点和测试点了
 在之前的介绍中，我们采用FTQ项这个术语描述描述FTQ队列中的每一个元素，实际上，这只是一种便于抽象的说法。
 实际上的FTQ队列，是由好多个子队列共同构成的，一些子队列维护一类信息，另一些子队列维护另一类信息，相同ftqIdx索引的子队列信息共同构成一个完整的FTQ项。
 为什么要把它们分开成多个子队列呢？因为某些模块只需要FTQ项中的某一些信息，比如IFU想要取值目标，它只需要专门存储取值目标的子队列提供的信息就行了。另外，在我们更改FTQ项的内容时，也只需要写入需要更新的子队列，比如IFU预译码写回时，只需要写回专门存储预译码信息的队列了。
@@ -56,11 +59,12 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 它是一个寄存器堆，由64（FtqSize）个表项（Ftq_Redirect_SRAMEntry）构成。支持同步读写操作。有3个读端口和1个写端口，每个读端口负责与不同的模块交互。
 1.1 ftq_redirect_mem读操作 读操作： 输入： 需要使能ren，这是一个向量，可指定任意读端口可读 对应接口：ren 从任意读端口中输入要读取的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：raddr 输出： 从发起输入的读端口对应的读出端口中读出Ftq_Redirect_SRAMEntry。 对应接口：rdata 1.2 ftq_redirect_mem写操作 写操作 输入： 需要使能wen，可指定写端口可写 对应接口：wen 向写端口中输入要写入的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：waddr 向wdata中写入Ftq_Redirect_SRAMEntry 对应接口：wdata 多端口读：可以从多个读端口读取结果 每个子队列的读写基本都是类似的，后面不再赘述
 Ftq_Redirect_SRAMEntry ftq_redirect_mem存储的表项。继承自SpeculativeInfo，存储RAS预测器相关重定向信息，根据这些信息回溯到之前的状态
-sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize.">
-<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="wordCount" content="399">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ子队列"/>
-<meta name="twitter:description" content="文档概述 请注意：从本篇开始，就涉及待验证的功能点和测试点了
+sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize.W TOSW：重定向请求指令对应的 RAS 推测栈（队列）写指针 接口类型：RASPtr TOSR：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr NOS：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr topAddr： 接口类型：UInt(VAddrBits.W) 序号 功能名称 测试点名称 描述 1.1 FTQ_REDIRECT_MEM WRITE 向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata 1.2 FTQ_REDIRECT_MEM READ 向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取 2. ftq_pd_mem存储预译码信息 由64（FtqSize）个表项（Ftq_pd_Entry）构成。支持同步读写操作。有2个读端口和1个写端口。具有读写使能信号。">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="399">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FTQ子队列">
+  <meta name="twitter:description" content="文档概述 请注意：从本篇开始，就涉及待验证的功能点和测试点了
 在之前的介绍中，我们采用FTQ项这个术语描述描述FTQ队列中的每一个元素，实际上，这只是一种便于抽象的说法。
 实际上的FTQ队列，是由好多个子队列共同构成的，一些子队列维护一类信息，另一些子队列维护另一类信息，相同ftqIdx索引的子队列信息共同构成一个完整的FTQ项。
 为什么要把它们分开成多个子队列呢？因为某些模块只需要FTQ项中的某一些信息，比如IFU想要取值目标，它只需要专门存储取值目标的子队列提供的信息就行了。另外，在我们更改FTQ项的内容时，也只需要写入需要更新的子队列，比如IFU预译码写回时，只需要写回专门存储预译码信息的队列了。
@@ -70,7 +74,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 它是一个寄存器堆，由64（FtqSize）个表项（Ftq_Redirect_SRAMEntry）构成。支持同步读写操作。有3个读端口和1个写端口，每个读端口负责与不同的模块交互。
 1.1 ftq_redirect_mem读操作 读操作： 输入： 需要使能ren，这是一个向量，可指定任意读端口可读 对应接口：ren 从任意读端口中输入要读取的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：raddr 输出： 从发起输入的读端口对应的读出端口中读出Ftq_Redirect_SRAMEntry。 对应接口：rdata 1.2 ftq_redirect_mem写操作 写操作 输入： 需要使能wen，可指定写端口可写 对应接口：wen 向写端口中输入要写入的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：waddr 向wdata中写入Ftq_Redirect_SRAMEntry 对应接口：wdata 多端口读：可以从多个读端口读取结果 每个子队列的读写基本都是类似的，后面不再赘述
 Ftq_Redirect_SRAMEntry ftq_redirect_mem存储的表项。继承自SpeculativeInfo，存储RAS预测器相关重定向信息，根据这些信息回溯到之前的状态
-sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize."/>
+sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize.W TOSW：重定向请求指令对应的 RAS 推测栈（队列）写指针 接口类型：RASPtr TOSR：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr NOS：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr topAddr： 接口类型：UInt(VAddrBits.W) 序号 功能名称 测试点名称 描述 1.1 FTQ_REDIRECT_MEM WRITE 向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata 1.2 FTQ_REDIRECT_MEM READ 向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取 2. ftq_pd_mem存储预译码信息 由64（FtqSize）个表项（Ftq_pd_Entry）构成。支持同步读写操作。有2个读端口和1个写端口。具有读写使能信号。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -172,7 +176,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -196,7 +200,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -554,49 +558,49 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 <p>下面来介绍一些FTQ的主要子队列，以及它们内部存储的数据结构。此外，FTQ还有一些存储中间状态的更小的队列</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://open-verify.cc/xs-bpu/docs/ports/00_ftb/">FTB项</a></td>
-<td>分支预测结果的基本组成项，包含对预测块中分支指令和跳转指令的预测</td>
-</tr>
-<tr>
-<td>取指目标</td>
-<td>一个预测块内包含的所有指令PC，当然，它不是直接发送所有PC，而是发送部分信号，接收方可由该信号推出所有PC</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://open-verify.cc/xs-bpu/docs/ports/00_ftb/">FTB项</a></td>
+          <td>分支预测结果的基本组成项，包含对预测块中分支指令和跳转指令的预测</td>
+      </tr>
+      <tr>
+          <td>取指目标</td>
+          <td>一个预测块内包含的所有指令PC，当然，它不是直接发送所有PC，而是发送部分信号，接收方可由该信号推出所有PC</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="子模块列表">子模块列表</h2>
 <table>
-<thead>
-<tr>
-<th>子模块</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ftq_redirect_mem<br></td>
-<td>重定向存储子队列，存储来自分支预测结果的重定向信息</td>
-</tr>
-<tr>
-<td>ftq_pd_mem</td>
-<td>预译码存储子队列，存储来自IFU的对指令块的预译码信息</td>
-</tr>
-<tr>
-<td>ftb_entry_mem</td>
-<td>FTB项存储子队列，存储自分支预测结果中的ftb项</td>
-</tr>
-<tr>
-<td>ftq_pc_mem</td>
-<td>取指目标子队列，存储来自分支预测结果的取指目标</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>子模块</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ftq_redirect_mem<br></td>
+          <td>重定向存储子队列，存储来自分支预测结果的重定向信息</td>
+      </tr>
+      <tr>
+          <td>ftq_pd_mem</td>
+          <td>预译码存储子队列，存储来自IFU的对指令块的预译码信息</td>
+      </tr>
+      <tr>
+          <td>ftb_entry_mem</td>
+          <td>FTB项存储子队列，存储自分支预测结果中的ftb项</td>
+      </tr>
+      <tr>
+          <td>ftq_pc_mem</td>
+          <td>取指目标子队列，存储来自分支预测结果的取指目标</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-ftq_redirect_mem存储重定向信息">1. ftq_redirect_mem存储重定向信息</h3>
@@ -722,28 +726,28 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 </li>
 </ul>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>FTQ_REDIRECT_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>FTQ_REDIRECT_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>FTQ_REDIRECT_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>FTQ_REDIRECT_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="2-ftq_pd_mem存储预译码信息">2. ftq_pd_mem存储预译码信息</h3>
 <p>由64（FtqSize）个表项（Ftq_pd_Entry）构成。支持同步读写操作。有2个读端口和1个写端口。具有读写使能信号。</p>
@@ -774,7 +778,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 </li>
 </ul>
 <h3 id="21-ftq_pd_mem写操作">2.1 ftq_pd_mem写操作</h3>
-<h4 id="predecodewritebackbundleifutoftqio如何写入ftq_pd_mem的一条ftq_pd_entry"><strong>PredecodeWritebackBundle（IfuToFtqIO）如何写入ftq_pd_mem的一条Ftq_pd_Entry</strong></h4>
+<h4 id="predecodewritebackbundleifutoftqio如何写入ftq_"><strong>PredecodeWritebackBundle（IfuToFtqIO）如何写入ftq_pd_mem的一条Ftq_pd_Entry</strong></h4>
 <p>Ftq_pd_Entry项的写入是通过PredecodeWritebackBundle这个接口进行写入的（其实也就是IfuToFtqIO）
 <em>从fromPdWb接口中接收信号生成表项</em>：</p>
 <ul>
@@ -790,7 +794,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 <li>jalTarget：原封不动接收同名信号</li>
 </ul>
 <h3 id="22-ftq_pd_mem写操作">2.2 ftq_pd_mem写操作</h3>
-<h4 id="ftq_pd_mem的一条ftq_pd_entry如何以predecodeinfoto-pd的形式输出"><strong>ftq_pd_mem的一条Ftq_pd_Entry如何以PreDecodeInfo（to pd）的形式输出</strong></h4>
+<h4 id="ftq_"><strong>ftq_pd_mem的一条Ftq_pd_Entry如何以PreDecodeInfo（to pd）的形式输出</strong></h4>
 <p>PreDecodeInfo是一个Ftq_pd_Entry中的一条指令的预译码，需要输入offset，指定该预译码指令在预测块内的偏移</p>
 <ul>
 <li>
@@ -807,28 +811,28 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 </li>
 </ul>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2.1</td>
-<td>FTQ_PD_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>FTQ_PD_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2.1</td>
+          <td>FTQ_PD_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>FTQ_PD_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="3-ftb_entry_mem存储ftb项">3. ftb_entry_mem存储FTB项</h3>
 <p>有两个读端口，一个写端口，FtqSize个表项，存储的数据项为FTBEntry_FtqMem，FTBEntry_FtqMem与FTBEntry基本上是一致的。</p>
@@ -910,28 +914,28 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 </li>
 </ul>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3.1</td>
-<td>FTQ_ENTRY_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>FTQ_ENTRY_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>3.1</td>
+          <td>FTQ_ENTRY_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>FTQ_ENTRY_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="4-ftq_pc_mem存储取指目标">4. ftq_pc_mem存储取指目标</h3>
 <p>pc存储子队列。存储项为Ftq_RF_Components，用来读取取指信息，取值信息交给IFU进行取指。</p>
@@ -961,28 +965,28 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 <p><strong>写入时机</strong>：BPU流水级的S1阶段，创建新的预测entry时写入
 <strong>读出时机</strong>： 读数据每个时钟周期都会存进Reg。如果IFU不需要从bypass中读取数据，Reg数据直连给Icache和IFU，如果IFU不需要从bypass中读取数据，Reg数据直连给Icache和IFU</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>4.1</td>
-<td>FTQ_PC_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>4.2</td>
-<td>FTQ_PC_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>4.1</td>
+          <td>FTQ_PC_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>4.2</td>
+          <td>FTQ_PC_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="5-ftq_meta_1r_sram存储meta信息">5. ftq_meta_1r_sram存储meta信息</h3>
 <p>存储的数据为Ftq_1R_SRAMEntry，同样有FtqSize项
@@ -993,28 +997,28 @@ Ftq_1R_SRAMEntry接口列表</p>
 <strong>写入时机</strong>：在 BPU的s3阶段接收信息，因为对于一个指令预测块，只有在其s3阶段才能获取完整的mata信息，同样被接收的还有最后阶段ftqentry信息</li>
 </ul>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>5.1</td>
-<td>FTQ_META_1R_SRAM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>5.2</td>
-<td>FTQ_META_1R_SRAM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>5.1</td>
+          <td>FTQ_META_1R_SRAM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>5.2</td>
+          <td>FTQ_META_1R_SRAM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="接口说明">接口说明</h2>
 <h3 id="ftq_redirect_sramentry-1">Ftq_Redirect_SRAMEntry</h3>
@@ -1104,76 +1108,76 @@ Ftq_1R_SRAMEntry接口列表</p>
 </ul>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>FTQ_REDIRECT_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>FTQ_REDIRECT_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-<tr>
-<td>2.1</td>
-<td>FTQ_PD_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>FTQ_PD_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-<tr>
-<td>3.1</td>
-<td>FTQ_ENTRY_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>FTQ_ENTRY_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-<tr>
-<td>4.1</td>
-<td>FTQ_PC_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>4.2</td>
-<td>FTQ_PC_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-<tr>
-<td>5.1</td>
-<td>FTQ_META_1R_SRAM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>5.2</td>
-<td>FTQ_META_1R_SRAM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>FTQ_REDIRECT_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>FTQ_REDIRECT_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+      <tr>
+          <td>2.1</td>
+          <td>FTQ_PD_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>FTQ_PD_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+      <tr>
+          <td>3.1</td>
+          <td>FTQ_ENTRY_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>FTQ_ENTRY_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+      <tr>
+          <td>4.1</td>
+          <td>FTQ_PC_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>4.2</td>
+          <td>FTQ_PC_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+      <tr>
+          <td>5.1</td>
+          <td>FTQ_META_1R_SRAM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>5.2</td>
+          <td>FTQ_META_1R_SRAM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="附录">附录</h2>
 <p><em><strong>虽然列在附录，但实际上这段内容依然十分重要，当你需要的时候请一定要查看。</strong></em></p>
@@ -1202,7 +1206,7 @@ Ftq_1R_SRAMEntry接口列表</p>
 <p>newest_entry_ptr，newest_entry_target这几个内部信号，它们不是队列，但是它们很重要，表明我们当前应该关注的最新的FTQ项及对应的跳转目标。BPU新的写入，重定向等等都会对最新FTQ项进行新的安排，在涉及到修改该信号的相应的文档中，对其生成方式做具体的描述。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 
 </div>
@@ -1246,7 +1250,7 @@ Ftq_1R_SRAMEntry接口列表</p>
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

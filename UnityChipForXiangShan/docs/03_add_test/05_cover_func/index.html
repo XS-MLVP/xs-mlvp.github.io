@@ -26,9 +26,14 @@
 在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py中进行如下调用：
 from comm import UT_FCOV # 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper # 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper # UT_FCOV会默认去掉前缀 ut_ g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;)) # name = UT_FCOV(&#34;../../../CLASSIC&#34;) name 的值为frontend.ifu.rvc_expander.CLASSIC，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）
 创建覆盖率组 使用toffee的funcov可以创建覆盖率组。
-import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。">
-<meta property="og:title" content="功能覆盖率" />
-<meta property="og:description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
+import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。
+添加观察点和反标 在每个测试用例内部，可以使用add_watch_point（add_cover_point是其别名，二者完全一致）来添加观察点和mark_function来添加反标。 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。 反标是，将功能点和测试用例进行关联，这样在统计时，就能看到每个功能点对应了哪些测试用例。
+对于观察点的位置，需要根据实际情况来定，一般来说，在测试用例外直接添加观察点是没有问题的。 不过有时候我们可以更加的灵活。
+在测试用例之外（decode_wrapper.py中） def init_rvc_expander_funcov(expander, g: fc.CovGroup): &#34;&#34;&#34;Add watch points to the RVCExpander module to collect function coverage information&#34;&#34;&#34; # 1. Add point RVC_EXPAND_RET to check expander return value: # - bin ERROR. The instruction is not illegal # - bin SUCCE. The instruction is not expanded g.add_watch_point(expander, { &#34;ERROR&#34;: lambda x: x.stat()[&#34;ilegal&#34;] == False, &#34;SUCCE&#34;: lambda x: x.stat()[&#34;ilegal&#34;] != False, }, name = &#34;RVC_EXPAND_RET&#34;) # 5. Reverse mark function coverage to the check point def _M(name): # get the module name return module_name_with(name, &#34;../../test_rv_decode&#34;) # - mark RVC_EXPAND_RET g.mark_function(&#34;RVC_EXPAND_RET&#34;,_M([&#34;test_rvc_expand_16bit_full&#34;, &#34;test_rvc_expand_32bit_full&#34;, &#34;test_rvc_expand_32bit_randomN&#34;]), bin_name=[&#34;ERROR&#34;, &#34;SUCCE&#34;]) # The End return None 这个例子的第一个g.add_watch_point是放在测试用例之外的，因为它和现有的测试用例没有直接关系，放在测试用例之外反而更加方便。添加观察点之后，只要add_watch_point方法中的bins条件触发了，我们的toffee-test框架就能够收集到对应的功能点。">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/05_cover_func/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="功能覆盖率">
+  <meta property="og:description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
 反标是指将功能点与测试用例对应起来。这样，在统计时，就能看到每个功能点对应了哪些测试用例，从而方便查看哪些功能点用的测试用例多，哪些功能点用的测试用例少，有利于后期的测试用例优化。
 本项目中相关涉及位置 功能覆盖率需要我们先定义了才能统计，主要是在构建测试环境的时候涉及。
 在构建测试环境中：
@@ -36,13 +41,17 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py中进行如下调用：
 from comm import UT_FCOV # 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper # 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper # UT_FCOV会默认去掉前缀 ut_ g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;)) # name = UT_FCOV(&#34;../../../CLASSIC&#34;) name 的值为frontend.ifu.rvc_expander.CLASSIC，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）
 创建覆盖率组 使用toffee的funcov可以创建覆盖率组。
-import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&quot;../../../CLASSIC&quot;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" /><meta property="article:section" content="docs" />
+import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。
+添加观察点和反标 在每个测试用例内部，可以使用add_watch_point（add_cover_point是其别名，二者完全一致）来添加观察点和mark_function来添加反标。 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。 反标是，将功能点和测试用例进行关联，这样在统计时，就能看到每个功能点对应了哪些测试用例。
+对于观察点的位置，需要根据实际情况来定，一般来说，在测试用例外直接添加观察点是没有问题的。 不过有时候我们可以更加的灵活。
+在测试用例之外（decode_wrapper.py中） def init_rvc_expander_funcov(expander, g: fc.CovGroup): &#34;&#34;&#34;Add watch points to the RVCExpander module to collect function coverage information&#34;&#34;&#34; # 1. Add point RVC_EXPAND_RET to check expander return value: # - bin ERROR. The instruction is not illegal # - bin SUCCE. The instruction is not expanded g.add_watch_point(expander, { &#34;ERROR&#34;: lambda x: x.stat()[&#34;ilegal&#34;] == False, &#34;SUCCE&#34;: lambda x: x.stat()[&#34;ilegal&#34;] != False, }, name = &#34;RVC_EXPAND_RET&#34;) # 5. Reverse mark function coverage to the check point def _M(name): # get the module name return module_name_with(name, &#34;../../test_rv_decode&#34;) # - mark RVC_EXPAND_RET g.mark_function(&#34;RVC_EXPAND_RET&#34;,_M([&#34;test_rvc_expand_16bit_full&#34;, &#34;test_rvc_expand_32bit_full&#34;, &#34;test_rvc_expand_32bit_randomN&#34;]), bin_name=[&#34;ERROR&#34;, &#34;SUCCE&#34;]) # The End return None 这个例子的第一个g.add_watch_point是放在测试用例之外的，因为它和现有的测试用例没有直接关系，放在测试用例之外反而更加方便。添加观察点之后，只要add_watch_point方法中的bins条件触发了，我们的toffee-test框架就能够收集到对应的功能点。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
 
-<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="name" content="功能覆盖率">
-<meta itemprop="description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
+  <meta itemprop="name" content="功能覆盖率">
+  <meta itemprop="description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
 反标是指将功能点与测试用例对应起来。这样，在统计时，就能看到每个功能点对应了哪些测试用例，从而方便查看哪些功能点用的测试用例多，哪些功能点用的测试用例少，有利于后期的测试用例优化。
 本项目中相关涉及位置 功能覆盖率需要我们先定义了才能统计，主要是在构建测试环境的时候涉及。
 在构建测试环境中：
@@ -50,11 +59,15 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py中进行如下调用：
 from comm import UT_FCOV # 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper # 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper # UT_FCOV会默认去掉前缀 ut_ g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;)) # name = UT_FCOV(&#34;../../../CLASSIC&#34;) name 的值为frontend.ifu.rvc_expander.CLASSIC，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）
 创建覆盖率组 使用toffee的funcov可以创建覆盖率组。
-import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&quot;../../../CLASSIC&quot;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。">
-<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="wordCount" content="356">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="功能覆盖率"/>
-<meta name="twitter:description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
+import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。
+添加观察点和反标 在每个测试用例内部，可以使用add_watch_point（add_cover_point是其别名，二者完全一致）来添加观察点和mark_function来添加反标。 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。 反标是，将功能点和测试用例进行关联，这样在统计时，就能看到每个功能点对应了哪些测试用例。
+对于观察点的位置，需要根据实际情况来定，一般来说，在测试用例外直接添加观察点是没有问题的。 不过有时候我们可以更加的灵活。
+在测试用例之外（decode_wrapper.py中） def init_rvc_expander_funcov(expander, g: fc.CovGroup): &#34;&#34;&#34;Add watch points to the RVCExpander module to collect function coverage information&#34;&#34;&#34; # 1. Add point RVC_EXPAND_RET to check expander return value: # - bin ERROR. The instruction is not illegal # - bin SUCCE. The instruction is not expanded g.add_watch_point(expander, { &#34;ERROR&#34;: lambda x: x.stat()[&#34;ilegal&#34;] == False, &#34;SUCCE&#34;: lambda x: x.stat()[&#34;ilegal&#34;] != False, }, name = &#34;RVC_EXPAND_RET&#34;) # 5. Reverse mark function coverage to the check point def _M(name): # get the module name return module_name_with(name, &#34;../../test_rv_decode&#34;) # - mark RVC_EXPAND_RET g.mark_function(&#34;RVC_EXPAND_RET&#34;,_M([&#34;test_rvc_expand_16bit_full&#34;, &#34;test_rvc_expand_32bit_full&#34;, &#34;test_rvc_expand_32bit_randomN&#34;]), bin_name=[&#34;ERROR&#34;, &#34;SUCCE&#34;]) # The End return None 这个例子的第一个g.add_watch_point是放在测试用例之外的，因为它和现有的测试用例没有直接关系，放在测试用例之外反而更加方便。添加观察点之后，只要add_watch_point方法中的bins条件触发了，我们的toffee-test框架就能够收集到对应的功能点。">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="356">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="功能覆盖率">
+  <meta name="twitter:description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
 反标是指将功能点与测试用例对应起来。这样，在统计时，就能看到每个功能点对应了哪些测试用例，从而方便查看哪些功能点用的测试用例多，哪些功能点用的测试用例少，有利于后期的测试用例优化。
 本项目中相关涉及位置 功能覆盖率需要我们先定义了才能统计，主要是在构建测试环境的时候涉及。
 在构建测试环境中：
@@ -62,7 +75,10 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 在 Test case 中使用，可以在每个测试用例里也编写一个功能点。 功能覆盖率使用流程 指定 Group 名称 测试报告通过 Group 名字和 DUT 名字进行匹配，利用 comm.UT_FCOV 获取 DUT 前缀，例如在 Python 模块ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py中进行如下调用：
 from comm import UT_FCOV # 本模块名为：ut_frontend.ifu.rvc_expander.classical_version.env.rvc_expander_wrapper # 通过../../../去掉了classical_version和上级模块env，rvc_expander_wrapper # UT_FCOV会默认去掉前缀 ut_ g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;)) # name = UT_FCOV(&#34;../../../CLASSIC&#34;) name 的值为frontend.ifu.rvc_expander.CLASSIC，在最后统计结果时，会按照最长前缀匹配到目标 UT（即匹配到：frontend.ifu.rvc_expander 模块）
 创建覆盖率组 使用toffee的funcov可以创建覆盖率组。
-import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&quot;../../../CLASSIC&quot;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。"/>
+import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(name) 这两步也可以合成一句g = fc.CovGroup(UT_FCOV(&#34;../../../CLASSIC&#34;))。 创建的g对象就表示了一个功能覆盖率组，可以使用其来提供观察点和反标。
+添加观察点和反标 在每个测试用例内部，可以使用add_watch_point（add_cover_point是其别名，二者完全一致）来添加观察点和mark_function来添加反标。 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。 反标是，将功能点和测试用例进行关联，这样在统计时，就能看到每个功能点对应了哪些测试用例。
+对于观察点的位置，需要根据实际情况来定，一般来说，在测试用例外直接添加观察点是没有问题的。 不过有时候我们可以更加的灵活。
+在测试用例之外（decode_wrapper.py中） def init_rvc_expander_funcov(expander, g: fc.CovGroup): &#34;&#34;&#34;Add watch points to the RVCExpander module to collect function coverage information&#34;&#34;&#34; # 1. Add point RVC_EXPAND_RET to check expander return value: # - bin ERROR. The instruction is not illegal # - bin SUCCE. The instruction is not expanded g.add_watch_point(expander, { &#34;ERROR&#34;: lambda x: x.stat()[&#34;ilegal&#34;] == False, &#34;SUCCE&#34;: lambda x: x.stat()[&#34;ilegal&#34;] != False, }, name = &#34;RVC_EXPAND_RET&#34;) # 5. Reverse mark function coverage to the check point def _M(name): # get the module name return module_name_with(name, &#34;../../test_rv_decode&#34;) # - mark RVC_EXPAND_RET g.mark_function(&#34;RVC_EXPAND_RET&#34;,_M([&#34;test_rvc_expand_16bit_full&#34;, &#34;test_rvc_expand_32bit_full&#34;, &#34;test_rvc_expand_32bit_randomN&#34;]), bin_name=[&#34;ERROR&#34;, &#34;SUCCE&#34;]) # The End return None 这个例子的第一个g.add_watch_point是放在测试用例之外的，因为它和现有的测试用例没有直接关系，放在测试用例之外反而更加方便。添加观察点之后，只要add_watch_point方法中的bins条件触发了，我们的toffee-test框架就能够收集到对应的功能点。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -164,7 +180,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -188,7 +204,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -522,9 +538,9 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 <p>功能覆盖率需要我们先定义了才能统计，主要是在构建测试环境的时候涉及。</p>
 <p>在<a href="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/02_build_env/">构建测试环境</a>中：</p>
 <ul>
-<li><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/#2-定义功能覆盖率">定义功能覆盖率</a>： 创建了功能覆盖率组,添加观察点和反标</li>
-<li><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/#3-定义必要fixture">定义必要 fixture</a>： 把统计结果传递给 toffee-report</li>
-<li><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/#4-统计覆盖率">统计覆盖率</a>： 添加观察点和反标</li>
+<li><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/#2-%e5%ae%9a%e4%b9%89%e5%8a%9f%e8%83%bd%e8%a6%86%e7%9b%96%e7%8e%87">定义功能覆盖率</a>： 创建了功能覆盖率组,添加观察点和反标</li>
+<li><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/#3-%e5%ae%9a%e4%b9%89%e5%bf%85%e8%a6%81fixture">定义必要 fixture</a>： 把统计结果传递给 toffee-report</li>
+<li><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/#4-%e7%bb%9f%e8%ae%a1%e8%a6%86%e7%9b%96%e7%8e%87">统计覆盖率</a>： 添加观察点和反标</li>
 </ul>
 <p>其他：</p>
 <ul>
@@ -635,7 +651,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 <p><code>StepRis</code>函数的作用是在每个时钟周期的上升沿执行传入的函数，详情可参照<a href="https://open-verify.cc/mlvp/docs/env_usage/picker_usage/">picker使用介绍</a></p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 
 </div>
@@ -679,7 +695,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

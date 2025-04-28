@@ -26,9 +26,11 @@
 BPU预测结果发生重定向的具体标志：fromBpu的resp接口的s2（s2阶段的预测信息）有效，且s2的hasRedirect拉高，表示在s2阶段发生了重定向，s3阶段重定向是一样的。 综合两种形式的BPU入队，这里称之为广义BPU入队方便区分，记为bpu_in_fire，该信号拉高，表明发生广义BPU入队。
 2. 写入FTQ项 之前已经说明过了，FTQ项只是一个抽象的概念，FTQ有很多个子队列组成，它们的项共同构成一个FTQ项，所以，向FTQ中写入FTQ项，实际上就是就是把BPU的预测信息写到对应的FTQ子队列中。
 FTQ主要获取以下信息作为bpu_in_resp
-bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2.">
-<meta property="og:title" content="FTQ接收BPU分支预测结果" />
-<meta property="og:description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
+bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2.1 写入FTQ子队列： 2.1.1 写入ftq_pc_mem ftq_pc_mem: 来自BPU的selectedResp预测信息被写入ftq_pc_mem, 该存储结构有ftqsize个表项，对应队列中的所有ftq表项，每个存储元素可以推出对应的ftq表项中每条指令的pc地址 接收信号列表： wen：接收bpu_in_fire作为写使能信号 waddr：接收selectedResp的ftq_idx wdata：selectedResp的相应信号 2.1.2 写入ftq_redirect_mem ftq_redirect_mem: 在BPU的s3（也就是最终阶段）接收信息，因为重定向信息只有在s3阶段才能得到。里面存储了RAS重定向相关的信息帮助BPU进行重定向。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx.value wdata：从BPU回应的last_stage_spec_info 2.1.3 写入ftq_meta_1r_sram ftq_meta_1r_sram：在 BPU的s3阶段接收信息，同样是因为对于一个指令预测块，只有在其s3阶段才能获取完整的mata信息，同样被接收的还有最后阶段ftqentry信息 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value wdata： meta：从BPU回应的last_stage_meta ftb_entry：从BPU回应的last_stage_ftb_entry 2.1.4 写入ftb_entry_mem ftb_entry_mem：虽然ftq_meta_1r_sram中存储有最后阶段ftbentry，但此处出于更高效率读取专门把它存在ftb_entry_mem中。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value字段 wdata：从BPU回应的last_stage_ftb_entry 从中可以看到，FTQ虽然名字上听起来是一个队列，实际上内部却是由数个队列组成，他们共同构成了FTQ这个大队列 2.2 写入状态队列 上述存储结构是FTQ中比较核心的存储结构，实际上，还有一些子队列用来存储一些状态信息，也同样都是存储ftqsize个（64）元素，需要被写入，写入时机是在发生bpu_in_fire的下一个周期，或者再下一个周期 。主要有以下：">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/03_enqfrombpu/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="FTQ接收BPU分支预测结果">
+  <meta property="og:description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
 从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
 1.2 允许BPU入队allowBpuIn 重定向发生时，会回滚到之前的状态，新发送的BPU预测信息自然就不需要了。允许BPU入队时不能发生重定向 1.2.1 后端重定向发生 后端重定向发生： 标志：接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向realAhdValid(参见FTQ接收后端重定向一文)，则下一个周期也不允许入队。 1.2.2 IFU重定向发生 IFU重定向发生： 标志：IFU重定向信息生成的两个周期，均不许入队（参见FTQ接收IFU重定向一文了解IFU重定向信息的生成） 只要避免上述两种重定向出现的情况，就可以允许BPU入队,即可以把发送到FTQ的数据，写入FTQ项
 1.3 以BPU预测结果重定向的方式入队 上述的BPU入队方式是一个全新的预测块进队，即BPU分支预测的s1阶段结果入队，此时未发生预测结果重定向。
@@ -36,13 +38,14 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
 BPU预测结果发生重定向的具体标志：fromBpu的resp接口的s2（s2阶段的预测信息）有效，且s2的hasRedirect拉高，表示在s2阶段发生了重定向，s3阶段重定向是一样的。 综合两种形式的BPU入队，这里称之为广义BPU入队方便区分，记为bpu_in_fire，该信号拉高，表明发生广义BPU入队。
 2. 写入FTQ项 之前已经说明过了，FTQ项只是一个抽象的概念，FTQ有很多个子队列组成，它们的项共同构成一个FTQ项，所以，向FTQ中写入FTQ项，实际上就是就是把BPU的预测信息写到对应的FTQ子队列中。
 FTQ主要获取以下信息作为bpu_in_resp
-bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/03_enqfrombpu/" /><meta property="article:section" content="docs" />
+bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2.1 写入FTQ子队列： 2.1.1 写入ftq_pc_mem ftq_pc_mem: 来自BPU的selectedResp预测信息被写入ftq_pc_mem, 该存储结构有ftqsize个表项，对应队列中的所有ftq表项，每个存储元素可以推出对应的ftq表项中每条指令的pc地址 接收信号列表： wen：接收bpu_in_fire作为写使能信号 waddr：接收selectedResp的ftq_idx wdata：selectedResp的相应信号 2.1.2 写入ftq_redirect_mem ftq_redirect_mem: 在BPU的s3（也就是最终阶段）接收信息，因为重定向信息只有在s3阶段才能得到。里面存储了RAS重定向相关的信息帮助BPU进行重定向。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx.value wdata：从BPU回应的last_stage_spec_info 2.1.3 写入ftq_meta_1r_sram ftq_meta_1r_sram：在 BPU的s3阶段接收信息，同样是因为对于一个指令预测块，只有在其s3阶段才能获取完整的mata信息，同样被接收的还有最后阶段ftqentry信息 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value wdata： meta：从BPU回应的last_stage_meta ftb_entry：从BPU回应的last_stage_ftb_entry 2.1.4 写入ftb_entry_mem ftb_entry_mem：虽然ftq_meta_1r_sram中存储有最后阶段ftbentry，但此处出于更高效率读取专门把它存在ftb_entry_mem中。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value字段 wdata：从BPU回应的last_stage_ftb_entry 从中可以看到，FTQ虽然名字上听起来是一个队列，实际上内部却是由数个队列组成，他们共同构成了FTQ这个大队列 2.2 写入状态队列 上述存储结构是FTQ中比较核心的存储结构，实际上，还有一些子队列用来存储一些状态信息，也同样都是存储ftqsize个（64）元素，需要被写入，写入时机是在发生bpu_in_fire的下一个周期，或者再下一个周期 。主要有以下：">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
 
-<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="name" content="FTQ接收BPU分支预测结果">
-<meta itemprop="description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
+  <meta itemprop="name" content="FTQ接收BPU分支预测结果">
+  <meta itemprop="description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
 从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
 1.2 允许BPU入队allowBpuIn 重定向发生时，会回滚到之前的状态，新发送的BPU预测信息自然就不需要了。允许BPU入队时不能发生重定向 1.2.1 后端重定向发生 后端重定向发生： 标志：接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向realAhdValid(参见FTQ接收后端重定向一文)，则下一个周期也不允许入队。 1.2.2 IFU重定向发生 IFU重定向发生： 标志：IFU重定向信息生成的两个周期，均不许入队（参见FTQ接收IFU重定向一文了解IFU重定向信息的生成） 只要避免上述两种重定向出现的情况，就可以允许BPU入队,即可以把发送到FTQ的数据，写入FTQ项
 1.3 以BPU预测结果重定向的方式入队 上述的BPU入队方式是一个全新的预测块进队，即BPU分支预测的s1阶段结果入队，此时未发生预测结果重定向。
@@ -50,11 +53,12 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
 BPU预测结果发生重定向的具体标志：fromBpu的resp接口的s2（s2阶段的预测信息）有效，且s2的hasRedirect拉高，表示在s2阶段发生了重定向，s3阶段重定向是一样的。 综合两种形式的BPU入队，这里称之为广义BPU入队方便区分，记为bpu_in_fire，该信号拉高，表明发生广义BPU入队。
 2. 写入FTQ项 之前已经说明过了，FTQ项只是一个抽象的概念，FTQ有很多个子队列组成，它们的项共同构成一个FTQ项，所以，向FTQ中写入FTQ项，实际上就是就是把BPU的预测信息写到对应的FTQ子队列中。
 FTQ主要获取以下信息作为bpu_in_resp
-bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2.">
-<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="wordCount" content="294">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ接收BPU分支预测结果"/>
-<meta name="twitter:description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
+bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2.1 写入FTQ子队列： 2.1.1 写入ftq_pc_mem ftq_pc_mem: 来自BPU的selectedResp预测信息被写入ftq_pc_mem, 该存储结构有ftqsize个表项，对应队列中的所有ftq表项，每个存储元素可以推出对应的ftq表项中每条指令的pc地址 接收信号列表： wen：接收bpu_in_fire作为写使能信号 waddr：接收selectedResp的ftq_idx wdata：selectedResp的相应信号 2.1.2 写入ftq_redirect_mem ftq_redirect_mem: 在BPU的s3（也就是最终阶段）接收信息，因为重定向信息只有在s3阶段才能得到。里面存储了RAS重定向相关的信息帮助BPU进行重定向。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx.value wdata：从BPU回应的last_stage_spec_info 2.1.3 写入ftq_meta_1r_sram ftq_meta_1r_sram：在 BPU的s3阶段接收信息，同样是因为对于一个指令预测块，只有在其s3阶段才能获取完整的mata信息，同样被接收的还有最后阶段ftqentry信息 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value wdata： meta：从BPU回应的last_stage_meta ftb_entry：从BPU回应的last_stage_ftb_entry 2.1.4 写入ftb_entry_mem ftb_entry_mem：虽然ftq_meta_1r_sram中存储有最后阶段ftbentry，但此处出于更高效率读取专门把它存在ftb_entry_mem中。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value字段 wdata：从BPU回应的last_stage_ftb_entry 从中可以看到，FTQ虽然名字上听起来是一个队列，实际上内部却是由数个队列组成，他们共同构成了FTQ这个大队列 2.2 写入状态队列 上述存储结构是FTQ中比较核心的存储结构，实际上，还有一些子队列用来存储一些状态信息，也同样都是存储ftqsize个（64）元素，需要被写入，写入时机是在发生bpu_in_fire的下一个周期，或者再下一个周期 。主要有以下：">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="294">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FTQ接收BPU分支预测结果">
+  <meta name="twitter:description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
 从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 术语说明 名称 定义 BPU (Branch Prediction Unit) 分支预测单元 FTQ (Fetch Target Queue) 采集目标队列 IFU (Instruction Fetch Unit) 指令采集单元 RAS (Return Address Stack) 返回地址堆 FTQ Entry FTQ队列中的单个表项 模块功能说明 1. 新的预测块进队条件 1.1 成功接收数据 1.1.1 FTQ准备好接收信号 FTQ准备好接收信号： 当FTQ队列中元素小于FtqSize或者可以提交指令块（canCommit拉高，说明可以提交指令块，在后面的文档: FTQ向BPU发送更新信息中介绍怎么判断是否可以提交指令块）的时候，来自BPU的新的指令预测块可以进入FTQ队列，队列准备好接收新的预测块，fromBpu的resp接口ready信号拉高。 1.1.2 BPU准备好要发送的信号 BPU准备好要发送的信号： 当BPU发往FTQ的接口vaid信号拉高，表示发送信号准备好 满足以上两个条件时,fromBpu的resp接口fire，表示接口数据被成功发送到FTQ中。
 1.2 允许BPU入队allowBpuIn 重定向发生时，会回滚到之前的状态，新发送的BPU预测信息自然就不需要了。允许BPU入队时不能发生重定向 1.2.1 后端重定向发生 后端重定向发生： 标志：接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向realAhdValid(参见FTQ接收后端重定向一文)，则下一个周期也不允许入队。 1.2.2 IFU重定向发生 IFU重定向发生： 标志：IFU重定向信息生成的两个周期，均不许入队（参见FTQ接收IFU重定向一文了解IFU重定向信息的生成） 只要避免上述两种重定向出现的情况，就可以允许BPU入队,即可以把发送到FTQ的数据，写入FTQ项
 1.3 以BPU预测结果重定向的方式入队 上述的BPU入队方式是一个全新的预测块进队，即BPU分支预测的s1阶段结果入队，此时未发生预测结果重定向。
@@ -62,7 +66,7 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
 BPU预测结果发生重定向的具体标志：fromBpu的resp接口的s2（s2阶段的预测信息）有效，且s2的hasRedirect拉高，表示在s2阶段发生了重定向，s3阶段重定向是一样的。 综合两种形式的BPU入队，这里称之为广义BPU入队方便区分，记为bpu_in_fire，该信号拉高，表明发生广义BPU入队。
 2. 写入FTQ项 之前已经说明过了，FTQ项只是一个抽象的概念，FTQ有很多个子队列组成，它们的项共同构成一个FTQ项，所以，向FTQ中写入FTQ项，实际上就是就是把BPU的预测信息写到对应的FTQ子队列中。
 FTQ主要获取以下信息作为bpu_in_resp
-bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2."/>
+bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2.1 写入FTQ子队列： 2.1.1 写入ftq_pc_mem ftq_pc_mem: 来自BPU的selectedResp预测信息被写入ftq_pc_mem, 该存储结构有ftqsize个表项，对应队列中的所有ftq表项，每个存储元素可以推出对应的ftq表项中每条指令的pc地址 接收信号列表： wen：接收bpu_in_fire作为写使能信号 waddr：接收selectedResp的ftq_idx wdata：selectedResp的相应信号 2.1.2 写入ftq_redirect_mem ftq_redirect_mem: 在BPU的s3（也就是最终阶段）接收信息，因为重定向信息只有在s3阶段才能得到。里面存储了RAS重定向相关的信息帮助BPU进行重定向。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx.value wdata：从BPU回应的last_stage_spec_info 2.1.3 写入ftq_meta_1r_sram ftq_meta_1r_sram：在 BPU的s3阶段接收信息，同样是因为对于一个指令预测块，只有在其s3阶段才能获取完整的mata信息，同样被接收的还有最后阶段ftqentry信息 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value wdata： meta：从BPU回应的last_stage_meta ftb_entry：从BPU回应的last_stage_ftb_entry 2.1.4 写入ftb_entry_mem ftb_entry_mem：虽然ftq_meta_1r_sram中存储有最后阶段ftbentry，但此处出于更高效率读取专门把它存在ftb_entry_mem中。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value字段 wdata：从BPU回应的last_stage_ftb_entry 从中可以看到，FTQ虽然名字上听起来是一个队列，实际上内部却是由数个队列组成，他们共同构成了FTQ这个大队列 2.2 写入状态队列 上述存储结构是FTQ中比较核心的存储结构，实际上，还有一些子队列用来存储一些状态信息，也同样都是存储ftqsize个（64）元素，需要被写入，写入时机是在发生bpu_in_fire的下一个周期，或者再下一个周期 。主要有以下：">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -164,7 +168,7 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -188,7 +192,7 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -532,34 +536,34 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
 </ul>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>BPU (Branch Prediction Unit)</td>
-<td>分支预测单元</td>
-</tr>
-<tr>
-<td>FTQ (Fetch Target Queue)</td>
-<td>采集目标队列</td>
-</tr>
-<tr>
-<td>IFU (Instruction Fetch Unit)</td>
-<td>指令采集单元</td>
-</tr>
-<tr>
-<td>RAS (Return Address Stack)</td>
-<td>返回地址堆</td>
-</tr>
-<tr>
-<td>FTQ Entry</td>
-<td>FTQ队列中的单个表项</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>BPU (Branch Prediction Unit)</td>
+          <td>分支预测单元</td>
+      </tr>
+      <tr>
+          <td>FTQ (Fetch Target Queue)</td>
+          <td>采集目标队列</td>
+      </tr>
+      <tr>
+          <td>IFU (Instruction Fetch Unit)</td>
+          <td>指令采集单元</td>
+      </tr>
+      <tr>
+          <td>RAS (Return Address Stack)</td>
+          <td>返回地址堆</td>
+      </tr>
+      <tr>
+          <td>FTQ Entry</td>
+          <td>FTQ队列中的单个表项</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-新的预测块进队条件">1. 新的预测块进队条件</h3>
@@ -752,171 +756,171 @@ s3阶段向IFU以及Prefetch的重定向传递与s2阶段的重定向信号传�
 <h2 id="接口说明">接口说明</h2>
 <p>FTQ接收BPU分支预测结果工程中涉及到的IO接口如下，在FTQ顶层IO一文中有详细说明</p>
 <table>
-<thead>
-<tr>
-<th>接口</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>fromBackend</td>
-<td>根据是否有重定向确认是否允许BPU预测结果入队</td>
-</tr>
-<tr>
-<td>fromBPU</td>
-<td>接收BPU预测结果</td>
-</tr>
-<tr>
-<td>toIfu</td>
-<td>发送更新的IFU指针，转发BPU预测结果重定向</td>
-</tr>
-<tr>
-<td>toPrefetch</td>
-<td>发送更新的Prefetch指针，转发BPU预测结果重定向</td>
-</tr>
-<tr>
-<td>toBpu</td>
-<td>发送更新的BPU指针</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>接口</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>fromBackend</td>
+          <td>根据是否有重定向确认是否允许BPU预测结果入队</td>
+      </tr>
+      <tr>
+          <td>fromBPU</td>
+          <td>接收BPU预测结果</td>
+      </tr>
+      <tr>
+          <td>toIfu</td>
+          <td>发送更新的IFU指针，转发BPU预测结果重定向</td>
+      </tr>
+      <tr>
+          <td>toPrefetch</td>
+          <td>发送更新的Prefetch指针，转发BPU预测结果重定向</td>
+      </tr>
+      <tr>
+          <td>toBpu</td>
+          <td>发送更新的BPU指针</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1.1</td>
-<td>BPU_IN_RECEIVE</td>
-<td>FTQ_READY</td>
-<td>当FTQ队列中元素小于FtqSize或者可以提交指令块的时候，队列准备好接收新的预测块</td>
-</tr>
-<tr>
-<td>1.1.2</td>
-<td>BPU_IN_RECEIVE</td>
-<td>BPU_VALID</td>
-<td>BPU准备好要发送的信号</td>
-</tr>
-<tr>
-<td>1.2.1</td>
-<td>BPU_IN_ALLOW</td>
-<td>BACKEND</td>
-<td>接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向，则下一个周期也不允许入队</td>
-</tr>
-<tr>
-<td>1.2.2</td>
-<td>BPU_IN_ALLOW</td>
-<td>IFU</td>
-<td>IFU重定向信息生成的两个周期，均不许入队</td>
-</tr>
-<tr>
-<td>1.3.1</td>
-<td>BPU_IN_BY_REDIRECT</td>
-<td>REDIRECT</td>
-<td>当BPU发生预测结果重定向时，只要<strong>允许BPU入队allowBpuIn</strong>，也可以看作预测结果入队</td>
-</tr>
-<tr>
-<td>2.1.1</td>
-<td>WRITE_FTQ_SUBQUEUE</td>
-<td>FTQ_PC</td>
-<td>根据BPU预测结果写入ftq_pc_mem</td>
-</tr>
-<tr>
-<td>2.1.2</td>
-<td>WRITE_FTQ_SUBQUEUE</td>
-<td>FTQ_REDIRECT</td>
-<td>根据BPU预测结果写入ftq_redirect_mem</td>
-</tr>
-<tr>
-<td>2.1.3</td>
-<td>WRITE_FTQ_SUBQUEUE</td>
-<td>FTQ_MATA</td>
-<td>根据BPU预测结果写入ftq_meta_1r_sram</td>
-</tr>
-<tr>
-<td>2.1.4</td>
-<td>WRITE_FTQ_SUBQUEUE</td>
-<td>FTQ_ENTRY</td>
-<td>根据BPU预测结果写入ftb_entry_mem</td>
-</tr>
-<tr>
-<td>2.2.1</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>UPDATED_TARGET</td>
-<td>根据BPU预测结果写入update_target</td>
-</tr>
-<tr>
-<td>2.2.2</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>CFIINDEX</td>
-<td>根据BPU预测结果写入cfiIndex_vec</td>
-</tr>
-<tr>
-<td>2.2.3</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>MISPREDICT</td>
-<td>根据BPU预测结果写入mispredict_vec</td>
-</tr>
-<tr>
-<td>2.2.4</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>PRED_STAGE</td>
-<td>根据BPU预测结果写入pred_stage</td>
-</tr>
-<tr>
-<td>2.2.5</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>COMMITSTATE</td>
-<td>根据BPU预测结果写入commitStateQueueReg</td>
-</tr>
-<tr>
-<td>2.2.6</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>ENTRY_FETCH_STATU</td>
-<td>根据BPU预测结果写入entry_fetch_status</td>
-</tr>
-<tr>
-<td>2.2.7</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>ENTRY_HIT_STATU</td>
-<td>根据BPU预测结果写入entry_hit_status</td>
-</tr>
-<tr>
-<td>3.1</td>
-<td>TRANSFER_BPU_REDIRECT</td>
-<td>IFU</td>
-<td>转发分支预测重定向给IFU</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>TRANSFER_BPU_REDIRECT</td>
-<td>PREFETCH</td>
-<td>转发分支预测重定向给PREFETCH</td>
-</tr>
-<tr>
-<td>4.1</td>
-<td>UPDATE_FTQ_PTR</td>
-<td>NORMAL</td>
-<td>正常情况下修改FTQ指针</td>
-</tr>
-<tr>
-<td>4.2</td>
-<td>UPDATE_FTQ_PTR</td>
-<td>REDIRECT</td>
-<td>发生重定向时修改FTQ指针</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1.1</td>
+          <td>BPU_IN_RECEIVE</td>
+          <td>FTQ_READY</td>
+          <td>当FTQ队列中元素小于FtqSize或者可以提交指令块的时候，队列准备好接收新的预测块</td>
+      </tr>
+      <tr>
+          <td>1.1.2</td>
+          <td>BPU_IN_RECEIVE</td>
+          <td>BPU_VALID</td>
+          <td>BPU准备好要发送的信号</td>
+      </tr>
+      <tr>
+          <td>1.2.1</td>
+          <td>BPU_IN_ALLOW</td>
+          <td>BACKEND</td>
+          <td>接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向，则下一个周期也不允许入队</td>
+      </tr>
+      <tr>
+          <td>1.2.2</td>
+          <td>BPU_IN_ALLOW</td>
+          <td>IFU</td>
+          <td>IFU重定向信息生成的两个周期，均不许入队</td>
+      </tr>
+      <tr>
+          <td>1.3.1</td>
+          <td>BPU_IN_BY_REDIRECT</td>
+          <td>REDIRECT</td>
+          <td>当BPU发生预测结果重定向时，只要<strong>允许BPU入队allowBpuIn</strong>，也可以看作预测结果入队</td>
+      </tr>
+      <tr>
+          <td>2.1.1</td>
+          <td>WRITE_FTQ_SUBQUEUE</td>
+          <td>FTQ_PC</td>
+          <td>根据BPU预测结果写入ftq_pc_mem</td>
+      </tr>
+      <tr>
+          <td>2.1.2</td>
+          <td>WRITE_FTQ_SUBQUEUE</td>
+          <td>FTQ_REDIRECT</td>
+          <td>根据BPU预测结果写入ftq_redirect_mem</td>
+      </tr>
+      <tr>
+          <td>2.1.3</td>
+          <td>WRITE_FTQ_SUBQUEUE</td>
+          <td>FTQ_MATA</td>
+          <td>根据BPU预测结果写入ftq_meta_1r_sram</td>
+      </tr>
+      <tr>
+          <td>2.1.4</td>
+          <td>WRITE_FTQ_SUBQUEUE</td>
+          <td>FTQ_ENTRY</td>
+          <td>根据BPU预测结果写入ftb_entry_mem</td>
+      </tr>
+      <tr>
+          <td>2.2.1</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>UPDATED_TARGET</td>
+          <td>根据BPU预测结果写入update_target</td>
+      </tr>
+      <tr>
+          <td>2.2.2</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>CFIINDEX</td>
+          <td>根据BPU预测结果写入cfiIndex_vec</td>
+      </tr>
+      <tr>
+          <td>2.2.3</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>MISPREDICT</td>
+          <td>根据BPU预测结果写入mispredict_vec</td>
+      </tr>
+      <tr>
+          <td>2.2.4</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>PRED_STAGE</td>
+          <td>根据BPU预测结果写入pred_stage</td>
+      </tr>
+      <tr>
+          <td>2.2.5</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>COMMITSTATE</td>
+          <td>根据BPU预测结果写入commitStateQueueReg</td>
+      </tr>
+      <tr>
+          <td>2.2.6</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>ENTRY_FETCH_STATU</td>
+          <td>根据BPU预测结果写入entry_fetch_status</td>
+      </tr>
+      <tr>
+          <td>2.2.7</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>ENTRY_HIT_STATU</td>
+          <td>根据BPU预测结果写入entry_hit_status</td>
+      </tr>
+      <tr>
+          <td>3.1</td>
+          <td>TRANSFER_BPU_REDIRECT</td>
+          <td>IFU</td>
+          <td>转发分支预测重定向给IFU</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>TRANSFER_BPU_REDIRECT</td>
+          <td>PREFETCH</td>
+          <td>转发分支预测重定向给PREFETCH</td>
+      </tr>
+      <tr>
+          <td>4.1</td>
+          <td>UPDATE_FTQ_PTR</td>
+          <td>NORMAL</td>
+          <td>正常情况下修改FTQ指针</td>
+      </tr>
+      <tr>
+          <td>4.2</td>
+          <td>UPDATE_FTQ_PTR</td>
+          <td>REDIRECT</td>
+          <td>发生重定向时修改FTQ指针</td>
+      </tr>
+  </tbody>
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 
 </div>
@@ -960,7 +964,7 @@ s3阶段向IFU以及Prefetch的重定向传递与s2阶段的重定向信号传�
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

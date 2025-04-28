@@ -26,9 +26,11 @@
 robCommPtr 在 commPtr 之后（ptr更大）。也就是说，后端已经开始提交之后 entry 的指令，在 robCommPtr 指向的 entry 之前的 entry 一定都已经提交完成 commitStateQueue 中的某个指令块内最后一条有效范围内指令被提交。FTQ项中该指令被提交意味着这FTQ项内的指令已经全部被提交 在此以外，还必须要考虑到，后端存在 flush itself 的 redirect 请求，这意味着这条指令自身也需要重新执行，这包括异常、load replay 等情况。在这种情况下，这一FTQ项不应当被提交以更新 BPU，否则会导致 BPU 准确率显著下降。
 3.1 canCommit 具体来看，判断commPtr指向的指令块能否提交，如果可以提交记为canCommit。
 canCommit的设置条件如下：
-3.1.1 COND1 当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后。之所以要求commPtr不等于ifuWbPtr是因为，前面说过了必须先预译码写回FTQ项才能提交 3.">
-<meta property="og:title" content="FTQ向BPU发送更新与重定向信息" />
-<meta property="og:description" content="文档概述 FTQ将已提交指令的更新信息发往BPU进行训练，同时转发重定向信息。
+3.1.1 COND1 当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后。之所以要求commPtr不等于ifuWbPtr是因为，前面说过了必须先预译码写回FTQ项才能提交 3.1.2 COND2 commitStateQueue 中commPtr对应指令块有指令处于c_toCommit 或c_committed状态。且指令块中最后一条处于c_toCommit 或c_committed状态的指令是c_committed的。 这两种情况下，canCommit拉高，说明可以提交该指令块">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="FTQ向BPU发送更新与重定向信息">
+  <meta property="og:description" content="文档概述 FTQ将已提交指令的更新信息发往BPU进行训练，同时转发重定向信息。
 术语说明 名称 定义 暂无 暂无 模块功能说明 1. 转发重定向 向toBPU接口进行转发：
 1.1 IFU重定向结果有效 redirctFromIFU：IFU重定向结果有效时，拉高该信号（注意：IFU重定向有效的时机有两种说法，因为IFU重定向结果生成需要两个周期，此处取后者，即，IFU重定向生成过程的第二个周期有效，也是IFU生成完整重定向结果的周期） 1.2 选择后端重定向或者IFU重定向 redirect：如果后端重定向结果fromBackendRedirect有效，选用fromBackendRedirect，否则选用IFU重定向结果ifuRedirectToBpu 2 BPU更新暂停 BPU的更新需要两个周期，故需要三种状态去表明我们当前的更新状态：更新的第一个周期，第二个周期，更新完成。 当发生更新的时候，会暂停FTQ对指令块的提交以及发送更新信息。
 3 提交指令块 FTQ需要对当前comPtr指向的当前提交指令块，进行判断是否能够提交。 这个过程比较复杂。 由于 香山V2版本 的后端会在 ROB 中重新压缩 FTQ entry，因此并不能保证提交一个 entry 中的每条指令，甚至不能保证每一个 entry 都有指令提交。
@@ -36,13 +38,14 @@ canCommit的设置条件如下：
 robCommPtr 在 commPtr 之后（ptr更大）。也就是说，后端已经开始提交之后 entry 的指令，在 robCommPtr 指向的 entry 之前的 entry 一定都已经提交完成 commitStateQueue 中的某个指令块内最后一条有效范围内指令被提交。FTQ项中该指令被提交意味着这FTQ项内的指令已经全部被提交 在此以外，还必须要考虑到，后端存在 flush itself 的 redirect 请求，这意味着这条指令自身也需要重新执行，这包括异常、load replay 等情况。在这种情况下，这一FTQ项不应当被提交以更新 BPU，否则会导致 BPU 准确率显著下降。
 3.1 canCommit 具体来看，判断commPtr指向的指令块能否提交，如果可以提交记为canCommit。
 canCommit的设置条件如下：
-3.1.1 COND1 当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后。之所以要求commPtr不等于ifuWbPtr是因为，前面说过了必须先预译码写回FTQ项才能提交 3." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" /><meta property="article:section" content="docs" />
+3.1.1 COND1 当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后。之所以要求commPtr不等于ifuWbPtr是因为，前面说过了必须先预译码写回FTQ项才能提交 3.1.2 COND2 commitStateQueue 中commPtr对应指令块有指令处于c_toCommit 或c_committed状态。且指令块中最后一条处于c_toCommit 或c_committed状态的指令是c_committed的。 这两种情况下，canCommit拉高，说明可以提交该指令块">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
 
-<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="name" content="FTQ向BPU发送更新与重定向信息">
-<meta itemprop="description" content="文档概述 FTQ将已提交指令的更新信息发往BPU进行训练，同时转发重定向信息。
+  <meta itemprop="name" content="FTQ向BPU发送更新与重定向信息">
+  <meta itemprop="description" content="文档概述 FTQ将已提交指令的更新信息发往BPU进行训练，同时转发重定向信息。
 术语说明 名称 定义 暂无 暂无 模块功能说明 1. 转发重定向 向toBPU接口进行转发：
 1.1 IFU重定向结果有效 redirctFromIFU：IFU重定向结果有效时，拉高该信号（注意：IFU重定向有效的时机有两种说法，因为IFU重定向结果生成需要两个周期，此处取后者，即，IFU重定向生成过程的第二个周期有效，也是IFU生成完整重定向结果的周期） 1.2 选择后端重定向或者IFU重定向 redirect：如果后端重定向结果fromBackendRedirect有效，选用fromBackendRedirect，否则选用IFU重定向结果ifuRedirectToBpu 2 BPU更新暂停 BPU的更新需要两个周期，故需要三种状态去表明我们当前的更新状态：更新的第一个周期，第二个周期，更新完成。 当发生更新的时候，会暂停FTQ对指令块的提交以及发送更新信息。
 3 提交指令块 FTQ需要对当前comPtr指向的当前提交指令块，进行判断是否能够提交。 这个过程比较复杂。 由于 香山V2版本 的后端会在 ROB 中重新压缩 FTQ entry，因此并不能保证提交一个 entry 中的每条指令，甚至不能保证每一个 entry 都有指令提交。
@@ -50,11 +53,12 @@ canCommit的设置条件如下：
 robCommPtr 在 commPtr 之后（ptr更大）。也就是说，后端已经开始提交之后 entry 的指令，在 robCommPtr 指向的 entry 之前的 entry 一定都已经提交完成 commitStateQueue 中的某个指令块内最后一条有效范围内指令被提交。FTQ项中该指令被提交意味着这FTQ项内的指令已经全部被提交 在此以外，还必须要考虑到，后端存在 flush itself 的 redirect 请求，这意味着这条指令自身也需要重新执行，这包括异常、load replay 等情况。在这种情况下，这一FTQ项不应当被提交以更新 BPU，否则会导致 BPU 准确率显著下降。
 3.1 canCommit 具体来看，判断commPtr指向的指令块能否提交，如果可以提交记为canCommit。
 canCommit的设置条件如下：
-3.1.1 COND1 当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后。之所以要求commPtr不等于ifuWbPtr是因为，前面说过了必须先预译码写回FTQ项才能提交 3.">
-<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="wordCount" content="352">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ向BPU发送更新与重定向信息"/>
-<meta name="twitter:description" content="文档概述 FTQ将已提交指令的更新信息发往BPU进行训练，同时转发重定向信息。
+3.1.1 COND1 当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后。之所以要求commPtr不等于ifuWbPtr是因为，前面说过了必须先预译码写回FTQ项才能提交 3.1.2 COND2 commitStateQueue 中commPtr对应指令块有指令处于c_toCommit 或c_committed状态。且指令块中最后一条处于c_toCommit 或c_committed状态的指令是c_committed的。 这两种情况下，canCommit拉高，说明可以提交该指令块">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="352">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FTQ向BPU发送更新与重定向信息">
+  <meta name="twitter:description" content="文档概述 FTQ将已提交指令的更新信息发往BPU进行训练，同时转发重定向信息。
 术语说明 名称 定义 暂无 暂无 模块功能说明 1. 转发重定向 向toBPU接口进行转发：
 1.1 IFU重定向结果有效 redirctFromIFU：IFU重定向结果有效时，拉高该信号（注意：IFU重定向有效的时机有两种说法，因为IFU重定向结果生成需要两个周期，此处取后者，即，IFU重定向生成过程的第二个周期有效，也是IFU生成完整重定向结果的周期） 1.2 选择后端重定向或者IFU重定向 redirect：如果后端重定向结果fromBackendRedirect有效，选用fromBackendRedirect，否则选用IFU重定向结果ifuRedirectToBpu 2 BPU更新暂停 BPU的更新需要两个周期，故需要三种状态去表明我们当前的更新状态：更新的第一个周期，第二个周期，更新完成。 当发生更新的时候，会暂停FTQ对指令块的提交以及发送更新信息。
 3 提交指令块 FTQ需要对当前comPtr指向的当前提交指令块，进行判断是否能够提交。 这个过程比较复杂。 由于 香山V2版本 的后端会在 ROB 中重新压缩 FTQ entry，因此并不能保证提交一个 entry 中的每条指令，甚至不能保证每一个 entry 都有指令提交。
@@ -62,7 +66,7 @@ canCommit的设置条件如下：
 robCommPtr 在 commPtr 之后（ptr更大）。也就是说，后端已经开始提交之后 entry 的指令，在 robCommPtr 指向的 entry 之前的 entry 一定都已经提交完成 commitStateQueue 中的某个指令块内最后一条有效范围内指令被提交。FTQ项中该指令被提交意味着这FTQ项内的指令已经全部被提交 在此以外，还必须要考虑到，后端存在 flush itself 的 redirect 请求，这意味着这条指令自身也需要重新执行，这包括异常、load replay 等情况。在这种情况下，这一FTQ项不应当被提交以更新 BPU，否则会导致 BPU 准确率显著下降。
 3.1 canCommit 具体来看，判断commPtr指向的指令块能否提交，如果可以提交记为canCommit。
 canCommit的设置条件如下：
-3.1.1 COND1 当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后。之所以要求commPtr不等于ifuWbPtr是因为，前面说过了必须先预译码写回FTQ项才能提交 3."/>
+3.1.1 COND1 当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后。之所以要求commPtr不等于ifuWbPtr是因为，前面说过了必须先预译码写回FTQ项才能提交 3.1.2 COND2 commitStateQueue 中commPtr对应指令块有指令处于c_toCommit 或c_committed状态。且指令块中最后一条处于c_toCommit 或c_committed状态的指令是c_committed的。 这两种情况下，canCommit拉高，说明可以提交该指令块">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -164,7 +168,7 @@ canCommit的设置条件如下：
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -188,7 +192,7 @@ canCommit的设置条件如下：
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -530,18 +534,18 @@ canCommit的设置条件如下：
 <p>FTQ将已提交指令的更新信息发往BPU进行训练，同时转发重定向信息。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>暂无</td>
-<td>暂无</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>暂无</td>
+          <td>暂无</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-转发重定向">1. 转发重定向</h3>
@@ -809,150 +813,150 @@ FTB项生成逻辑：</p>
 </ul>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>顶层IO</th>
-<th></th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>toBpu</td>
-<td></td>
-<td>向BPU发送重定向信息与更新信息</td>
-</tr>
-<tr>
-<td>fromBackend</td>
-<td></td>
-<td>获取指令交割信息，判断指令块是否被提交</td>
-</tr>
-<tr>
-<td>mmioCommiRead</td>
-<td></td>
-<td>发送mmio指令的提交信息</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>顶层IO</th>
+          <th></th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>toBpu</td>
+          <td></td>
+          <td>向BPU发送重定向信息与更新信息</td>
+      </tr>
+      <tr>
+          <td>fromBackend</td>
+          <td></td>
+          <td>获取指令交割信息，判断指令块是否被提交</td>
+      </tr>
+      <tr>
+          <td>mmioCommiRead</td>
+          <td></td>
+          <td>发送mmio指令的提交信息</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表-必填项针对细分的测试点列出表格">测试点总表 (【必填项】针对细分的测试点，列出表格)</h2>
 <p>实际使用下面的表格时，请用有意义的英文大写的功能名称和测试点名称替换下面表格中的名称</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>TRANSFER_REDIRECT</td>
-<td>REDIRECT_FROM_FLUSH</td>
-<td>IFU重定向结果有效时，拉高该信号</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>TRANSFER_REDIRECT</td>
-<td>CHOOSE_REDIRECT</td>
-<td>如果后端重定向结果fromBackendRedirect有效，选用fromBackendRedirect，否则选用IFU重定向结果ifuRedirectToBpu</td>
-</tr>
-<tr>
-<td>2</td>
-<td>UPDATE_STALL</td>
-<td>UPDATE_STALL</td>
-<td>当发生BPU的更新时候，会暂停FTQ对指令块的提交以及发送更新信息</td>
-</tr>
-<tr>
-<td>3.1.1</td>
-<td>CAN_COMMIT_ENTRY</td>
-<td>COND1</td>
-<td>当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后,canCommit拉高</td>
-</tr>
-<tr>
-<td>3.1.2</td>
-<td>CAN_COMMIT_ENTRY</td>
-<td>COND2</td>
-<td>commitStateQueue 中commPtr对应指令块有指令处于c_toCommit 或c_committed状态。且指令块中最后一条处于c_toCommit 或c_committed状态的指令是c_committed的,canCommit拉高</td>
-</tr>
-<tr>
-<td>3.2.1</td>
-<td>MOVECOMMPTR</td>
-<td>BY_ROB_COMMIT</td>
-<td>在commPtr指向的指令块如果能提交,可以移动CommPtr</td>
-</tr>
-<tr>
-<td>3.2.2</td>
-<td>MOVECOMMPTR</td>
-<td>BY_FLUSH</td>
-<td>commitStateQueue 中commPtr对应指令块的第一条指令被后端重定向冲刷掉,可以移动CommPtr</td>
-</tr>
-<tr>
-<td>3.3.1</td>
-<td>UPDATE_ROB_COMM_PTR</td>
-<td>COND1</td>
-<td>当来自后端接口fromBackend的rob_commits信息中，有信息有效时，取最后一条有效交割信息的ftqIdx作为robCommPtr</td>
-</tr>
-<tr>
-<td>3.3.2</td>
-<td>UPDATE_ROB_COMM_PTR</td>
-<td>COND2</td>
-<td>不满足情况1，选取commPtr, robCommPtr中较大的那个</td>
-</tr>
-<tr>
-<td>3.4.1</td>
-<td>MMIO_LAST_COMMIT</td>
-<td>COND1</td>
-<td>当commPtr比来自mmioCommitRead接口的mmioFtqPtr大时,mmioLastCommit信号在下一个周期被拉高</td>
-</tr>
-<tr>
-<td>3.4.2</td>
-<td>MMIO_LAST_COMMIT</td>
-<td>COND2</td>
-<td>两者正好相等，且commPtr指向的指令块中有c_toCommit 或c_committed状态的指令，最后一条处于c_toCommit 或c_committed状态的指令是c_committed的,mmioLastCommit信号在下一个周期被拉高</td>
-</tr>
-<tr>
-<td>4.1</td>
-<td>SEND_UPDATE_TO_BPU</td>
-<td>SEND_SUBQUEUE_INFO_TO_UPDATE</td>
-<td>将提交项的子队列读取信息发向更新通道</td>
-</tr>
-<tr>
-<td>4.2.1</td>
-<td>UPDATE_FTB_ENTRY</td>
-<td>CREATE_NEW</td>
-<td>FTB未命中，创建一个新的FTB项</td>
-</tr>
-<tr>
-<td>4.2.2.1</td>
-<td>CREATE_NEW_FTB_ENTRY</td>
-<td>INSERT</td>
-<td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，插入新的slot</td>
-</tr>
-<tr>
-<td>4.2.2.2</td>
-<td>CREATE_NEW_FTB_ENTRY</td>
-<td>jmp target</td>
-<td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，<strong>当cfi指令是一个jalr指令</strong>，且旧的tailslot对应的是一个jump的指令，但tailslot指示的target与提交项指示的target不同时，说明需要对跳转目标进行修改</td>
-</tr>
-<tr>
-<td>4.2.2.3</td>
-<td>CREATE_NEW_FTB_ENTRY</td>
-<td>bias</td>
-<td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，<strong>当cfi指令就是原FTB项的条件跳转指令</strong>，只需要根据跳转情况设置跳转的强弱</td>
-</tr>
-<tr>
-<td>4.3</td>
-<td>SEND_UPDATE_TO_BPU</td>
-<td>SEND_NEW_FTB_RELATED</td>
-<td>根据是否hit，我们已经得到更新后的FTB项了，在这个基础上我们继续更新一些相关信号以发送到FTQ更新接口。</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>TRANSFER_REDIRECT</td>
+          <td>REDIRECT_FROM_FLUSH</td>
+          <td>IFU重定向结果有效时，拉高该信号</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>TRANSFER_REDIRECT</td>
+          <td>CHOOSE_REDIRECT</td>
+          <td>如果后端重定向结果fromBackendRedirect有效，选用fromBackendRedirect，否则选用IFU重定向结果ifuRedirectToBpu</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>UPDATE_STALL</td>
+          <td>UPDATE_STALL</td>
+          <td>当发生BPU的更新时候，会暂停FTQ对指令块的提交以及发送更新信息</td>
+      </tr>
+      <tr>
+          <td>3.1.1</td>
+          <td>CAN_COMMIT_ENTRY</td>
+          <td>COND1</td>
+          <td>当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后,canCommit拉高</td>
+      </tr>
+      <tr>
+          <td>3.1.2</td>
+          <td>CAN_COMMIT_ENTRY</td>
+          <td>COND2</td>
+          <td>commitStateQueue 中commPtr对应指令块有指令处于c_toCommit 或c_committed状态。且指令块中最后一条处于c_toCommit 或c_committed状态的指令是c_committed的,canCommit拉高</td>
+      </tr>
+      <tr>
+          <td>3.2.1</td>
+          <td>MOVECOMMPTR</td>
+          <td>BY_ROB_COMMIT</td>
+          <td>在commPtr指向的指令块如果能提交,可以移动CommPtr</td>
+      </tr>
+      <tr>
+          <td>3.2.2</td>
+          <td>MOVECOMMPTR</td>
+          <td>BY_FLUSH</td>
+          <td>commitStateQueue 中commPtr对应指令块的第一条指令被后端重定向冲刷掉,可以移动CommPtr</td>
+      </tr>
+      <tr>
+          <td>3.3.1</td>
+          <td>UPDATE_ROB_COMM_PTR</td>
+          <td>COND1</td>
+          <td>当来自后端接口fromBackend的rob_commits信息中，有信息有效时，取最后一条有效交割信息的ftqIdx作为robCommPtr</td>
+      </tr>
+      <tr>
+          <td>3.3.2</td>
+          <td>UPDATE_ROB_COMM_PTR</td>
+          <td>COND2</td>
+          <td>不满足情况1，选取commPtr, robCommPtr中较大的那个</td>
+      </tr>
+      <tr>
+          <td>3.4.1</td>
+          <td>MMIO_LAST_COMMIT</td>
+          <td>COND1</td>
+          <td>当commPtr比来自mmioCommitRead接口的mmioFtqPtr大时,mmioLastCommit信号在下一个周期被拉高</td>
+      </tr>
+      <tr>
+          <td>3.4.2</td>
+          <td>MMIO_LAST_COMMIT</td>
+          <td>COND2</td>
+          <td>两者正好相等，且commPtr指向的指令块中有c_toCommit 或c_committed状态的指令，最后一条处于c_toCommit 或c_committed状态的指令是c_committed的,mmioLastCommit信号在下一个周期被拉高</td>
+      </tr>
+      <tr>
+          <td>4.1</td>
+          <td>SEND_UPDATE_TO_BPU</td>
+          <td>SEND_SUBQUEUE_INFO_TO_UPDATE</td>
+          <td>将提交项的子队列读取信息发向更新通道</td>
+      </tr>
+      <tr>
+          <td>4.2.1</td>
+          <td>UPDATE_FTB_ENTRY</td>
+          <td>CREATE_NEW</td>
+          <td>FTB未命中，创建一个新的FTB项</td>
+      </tr>
+      <tr>
+          <td>4.2.2.1</td>
+          <td>CREATE_NEW_FTB_ENTRY</td>
+          <td>INSERT</td>
+          <td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，插入新的slot</td>
+      </tr>
+      <tr>
+          <td>4.2.2.2</td>
+          <td>CREATE_NEW_FTB_ENTRY</td>
+          <td>jmp target</td>
+          <td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，<strong>当cfi指令是一个jalr指令</strong>，且旧的tailslot对应的是一个jump的指令，但tailslot指示的target与提交项指示的target不同时，说明需要对跳转目标进行修改</td>
+      </tr>
+      <tr>
+          <td>4.2.2.3</td>
+          <td>CREATE_NEW_FTB_ENTRY</td>
+          <td>bias</td>
+          <td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，<strong>当cfi指令就是原FTB项的条件跳转指令</strong>，只需要根据跳转情况设置跳转的强弱</td>
+      </tr>
+      <tr>
+          <td>4.3</td>
+          <td>SEND_UPDATE_TO_BPU</td>
+          <td>SEND_NEW_FTB_RELATED</td>
+          <td>根据是否hit，我们已经得到更新后的FTB项了，在这个基础上我们继续更新一些相关信号以发送到FTQ更新接口。</td>
+      </tr>
+  </tbody>
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 
 </div>
@@ -996,7 +1000,7 @@ FTB项生成逻辑：</p>
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

@@ -34,13 +34,59 @@
 st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
 考虑以下伪代码示例：
 ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
-<meta property="og:title" content="验证文档规范" />
-<meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/" />
-<meta itemprop="name" content="验证文档规范">
-<meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="验证文档规范"/>
-<meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."/>
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="验证文档规范">
+  <meta property="og:description" content="本规范规定了“万众一芯”验证文档的必要形式和结构（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+万众一芯验证文档格式规范 验证文档标题请用一号标题格式（一个#），以加法器验证文档为例，其标题可以为：进位加法器设计与验证。
+文档概述 文档概述标题请用二号标题格式（两个#）。
+【必填项】 在该部分对整个文档进行简约描述，例如内容概述，待验证模块的基本功能、特殊需求、特定规格、目标读者、知识前置等。目的是通过对该部分，读者便了解是否具有其感兴趣的内容。例如本文档是对验证文档的编写要求进行描述，便于多文档协作，规范验证的数据输入，特定数据标签等。
+术语说明 术语说明标题请用二号标题格式（两个#）。
+【必填项】 该部分需要列出术语和关键概念解释，方便读者参考。
+优先解释模块专有缩写（如TLB， FIFO等），且用缩写（全名）的格式填写在“名称”一栏中。 对容易混淆的概念请务必明确（如虚拟地址和物理地址等） 示例格式如下： 名称 定义 TLB（Translation Lookaside Buffer） 地址转换的缓存单元，用于加速虚拟地址到物理的转换 FIFO（First In First Out） 先进先出队列 写回 发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置 如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。
+前置知识 前置知识标题请用二号标题格式（两个#）。
+【可选项】 在阅读文档或进行验证之前，建议掌握一些关键前置知识，以便更深入理解相关内容。例如，在撰写LoadStoreQueue（LSQ）文档时，讲述RAW（Read After Write）违例有助于理解操作之间的依赖关系。在撰写Icache或L2Cache文档时，介绍缓存层级、替换策略和一致性模型等基本概念也有助于读者理解。如果涉及复杂算法，也应对其进行简要描述。
+基本要求：
+该部分内容应简洁，易于理解。如篇幅较长，可将内容移至附录。 针对较为复杂的内容，可以通过图像、伪代码和案例进行解释，以降低理解难度。 下面是一个举例：
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="验证文档规范">
+  <meta itemprop="description" content="本规范规定了“万众一芯”验证文档的必要形式和结构（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+万众一芯验证文档格式规范 验证文档标题请用一号标题格式（一个#），以加法器验证文档为例，其标题可以为：进位加法器设计与验证。
+文档概述 文档概述标题请用二号标题格式（两个#）。
+【必填项】 在该部分对整个文档进行简约描述，例如内容概述，待验证模块的基本功能、特殊需求、特定规格、目标读者、知识前置等。目的是通过对该部分，读者便了解是否具有其感兴趣的内容。例如本文档是对验证文档的编写要求进行描述，便于多文档协作，规范验证的数据输入，特定数据标签等。
+术语说明 术语说明标题请用二号标题格式（两个#）。
+【必填项】 该部分需要列出术语和关键概念解释，方便读者参考。
+优先解释模块专有缩写（如TLB， FIFO等），且用缩写（全名）的格式填写在“名称”一栏中。 对容易混淆的概念请务必明确（如虚拟地址和物理地址等） 示例格式如下： 名称 定义 TLB（Translation Lookaside Buffer） 地址转换的缓存单元，用于加速虚拟地址到物理的转换 FIFO（First In First Out） 先进先出队列 写回 发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置 如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。
+前置知识 前置知识标题请用二号标题格式（两个#）。
+【可选项】 在阅读文档或进行验证之前，建议掌握一些关键前置知识，以便更深入理解相关内容。例如，在撰写LoadStoreQueue（LSQ）文档时，讲述RAW（Read After Write）违例有助于理解操作之间的依赖关系。在撰写Icache或L2Cache文档时，介绍缓存层级、替换策略和一致性模型等基本概念也有助于读者理解。如果涉及复杂算法，也应对其进行简要描述。
+基本要求：
+该部分内容应简洁，易于理解。如篇幅较长，可将内容移至附录。 针对较为复杂的内容，可以通过图像、伪代码和案例进行解释，以降低理解难度。 下面是一个举例：
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="420">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="验证文档规范">
+  <meta name="twitter:description" content="本规范规定了“万众一芯”验证文档的必要形式和结构（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+万众一芯验证文档格式规范 验证文档标题请用一号标题格式（一个#），以加法器验证文档为例，其标题可以为：进位加法器设计与验证。
+文档概述 文档概述标题请用二号标题格式（两个#）。
+【必填项】 在该部分对整个文档进行简约描述，例如内容概述，待验证模块的基本功能、特殊需求、特定规格、目标读者、知识前置等。目的是通过对该部分，读者便了解是否具有其感兴趣的内容。例如本文档是对验证文档的编写要求进行描述，便于多文档协作，规范验证的数据输入，特定数据标签等。
+术语说明 术语说明标题请用二号标题格式（两个#）。
+【必填项】 该部分需要列出术语和关键概念解释，方便读者参考。
+优先解释模块专有缩写（如TLB， FIFO等），且用缩写（全名）的格式填写在“名称”一栏中。 对容易混淆的概念请务必明确（如虚拟地址和物理地址等） 示例格式如下： 名称 定义 TLB（Translation Lookaside Buffer） 地址转换的缓存单元，用于加速虚拟地址到物理的转换 FIFO（First In First Out） 先进先出队列 写回 发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置 如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。
+前置知识 前置知识标题请用二号标题格式（两个#）。
+【可选项】 在阅读文档或进行验证之前，建议掌握一些关键前置知识，以便更深入理解相关内容。例如，在撰写LoadStoreQueue（LSQ）文档时，讲述RAW（Read After Write）违例有助于理解操作之间的依赖关系。在撰写Icache或L2Cache文档时，介绍缓存层级、替换策略和一致性模型等基本概念也有助于读者理解。如果涉及复杂算法，也应对其进行简要描述。
+基本要求：
+该部分内容应简洁，易于理解。如篇幅较长，可将内容移至附录。 针对较为复杂的内容，可以通过图像、伪代码和案例进行解释，以降低理解难度。 下面是一个举例：
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -142,7 +188,7 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -166,7 +212,7 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -540,26 +586,26 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
 <li>示例格式如下：</li>
 </ol>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>TLB（Translation Lookaside Buffer）</td>
-<td>地址转换的缓存单元，用于加速虚拟地址到物理的转换</td>
-</tr>
-<tr>
-<td>FIFO（First In First Out）</td>
-<td>先进先出队列</td>
-</tr>
-<tr>
-<td>写回</td>
-<td>发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>TLB（Translation Lookaside Buffer）</td>
+          <td>地址转换的缓存单元，用于加速虚拟地址到物理的转换</td>
+      </tr>
+      <tr>
+          <td>FIFO（First In First Out）</td>
+          <td>先进先出队列</td>
+      </tr>
+      <tr>
+          <td>写回</td>
+          <td>发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置</td>
+      </tr>
+  </tbody>
 </table>
 <p>如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。</p>
 <h2 id="前置知识">前置知识</h2>
@@ -616,34 +662,34 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p><strong>【可选项】</strong> 如果一个模块由多个子模块组成，则需要在此处列出所有相关的子模块，并进行简要说明。这有助于清晰地展示模块的结构和功能，便于读者理解各个子模块之间的关系及其在整体系统中的作用。</p>
 <p>以下是IFU top文档中的一个示例：</p>
 <table>
-<thead>
-<tr>
-<th>子模块</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="01_predecode.md">PreDecoder</a></td>
-<td>预译码模块，用于生成有效指令标识和类型信息</td>
-</tr>
-<tr>
-<td><a href="02_f3predecoder.md">F3Predecoder</a></td>
-<td>F3阶段预译码模块，从PreDecoder中时序优化出来的模块，负责判定CFI指令的类型</td>
-</tr>
-<tr>
-<td><a href="03_ifu_rvc_exp.md">RVCExpander</a></td>
-<td>RVC指令扩展模块，负责对传入的指令进行指令扩展，并解码计算非法信息</td>
-</tr>
-<tr>
-<td><a href="04_pred_checker.md">PredChecker</a></td>
-<td>预检查模块，校验并修正预测信息</td>
-</tr>
-<tr>
-<td><a href="05_frontend_trigger.md">FrontendTrigger</a></td>
-<td>前端断点模块，用于在前端设置硬件断点和检查</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>子模块</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="01_predecode.md">PreDecoder</a></td>
+          <td>预译码模块，用于生成有效指令标识和类型信息</td>
+      </tr>
+      <tr>
+          <td><a href="02_f3predecoder.md">F3Predecoder</a></td>
+          <td>F3阶段预译码模块，从PreDecoder中时序优化出来的模块，负责判定CFI指令的类型</td>
+      </tr>
+      <tr>
+          <td><a href="03_ifu_rvc_exp.md">RVCExpander</a></td>
+          <td>RVC指令扩展模块，负责对传入的指令进行指令扩展，并解码计算非法信息</td>
+      </tr>
+      <tr>
+          <td><a href="04_pred_checker.md">PredChecker</a></td>
+          <td>预检查模块，校验并修正预测信息</td>
+      </tr>
+      <tr>
+          <td><a href="05_frontend_trigger.md">FrontendTrigger</a></td>
+          <td>前端断点模块，用于在前端设置硬件断点和检查</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <p>模块功能说明标题请用二号标题格式（两个#）。</p>
@@ -682,22 +728,22 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>IFU应当能向FTQ报告自己已ready。</p>
 <p>所以，对于这一测试点我们只需要在发送请求后检查和ftq相关的的ready情况即可。</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>IFU_RCV_REQ</td>
-<td>READY</td>
-<td>IFU接收FTQ请求后，设置ready</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>IFU_RCV_REQ</td>
+          <td>READY</td>
+          <td>IFU接收FTQ请求后，设置ready</td>
+      </tr>
+  </tbody>
 </table>
 </mrs-functions>
 <h2 id="常量说明">常量说明</h2>
@@ -705,25 +751,25 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p><strong>【可选项】</strong> 需要列出模块中所有可配置参数及其物理意义，以便于用户理解各参数的作用和影响。</p>
 <p><strong>示例：</strong></p>
 <table>
-<thead>
-<tr>
-<th>常量名</th>
-<th>常量值</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ADDR_WIDTH</td>
-<td>64</td>
-<td>地址总线位宽</td>
-</tr>
-<tr>
-<td>FIFO_DEPTH</td>
-<td>8</td>
-<td>深度配置</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>常量名</th>
+          <th>常量值</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ADDR_WIDTH</td>
+          <td>64</td>
+          <td>地址总线位宽</td>
+      </tr>
+      <tr>
+          <td>FIFO_DEPTH</td>
+          <td>8</td>
+          <td>深度配置</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="接口说明">接口说明</h2>
 <p>接口说明标题请用二号标题格式（两个#）。</p>
@@ -768,40 +814,40 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>以下是节选自IFU top文档的一个例子:</p>
 <mrs-testpoints>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>IFU_RCV_REQ</td>
-<td>READY</td>
-<td>IFU接收FTQ请求后，设置ready</td>
-</tr>
-<tr>
-<td>2.1.1</td>
-<td>IFU_F1_INFOS</td>
-<td>PC</td>
-<td>IFU接收FTQ请求后，在F1流水级生成PC</td>
-</tr>
-<tr>
-<td>2.1.2</td>
-<td>IFU_F1_INFOS</td>
-<td>CUT_PTR</td>
-<td>IFU接收FTQ请求后，在F1流水级生成后续切取缓存行的指针</td>
-</tr>
-<tr>
-<td>2.2.1</td>
-<td>IFU_F2_INFOS</td>
-<td>EXCP_VEC</td>
-<td>IFU接收ICache内容后，会根据ICache的结果生成属于每个指令的异常向量</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>IFU_RCV_REQ</td>
+          <td>READY</td>
+          <td>IFU接收FTQ请求后，设置ready</td>
+      </tr>
+      <tr>
+          <td>2.1.1</td>
+          <td>IFU_F1_INFOS</td>
+          <td>PC</td>
+          <td>IFU接收FTQ请求后，在F1流水级生成PC</td>
+      </tr>
+      <tr>
+          <td>2.1.2</td>
+          <td>IFU_F1_INFOS</td>
+          <td>CUT_PTR</td>
+          <td>IFU接收FTQ请求后，在F1流水级生成后续切取缓存行的指针</td>
+      </tr>
+      <tr>
+          <td>2.2.1</td>
+          <td>IFU_F2_INFOS</td>
+          <td>EXCP_VEC</td>
+          <td>IFU接收ICache内容后，会根据ICache的结果生成属于每个指令的异常向量</td>
+      </tr>
+  </tbody>
 </table>
 </mrs-testpoints>
 <h2 id="附录">附录</h2>
@@ -812,54 +858,54 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。</p>
 <p>对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)</p>
 <table>
-<thead>
-<tr>
-<th>op\funct</th>
-<th>000</th>
-<th>001</th>
-<th>010</th>
-<th>011</th>
-<th>100</th>
-<th>101</th>
-<th>110</th>
-<th>111</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>00</td>
-<td>addi4spn</td>
-<td>fld</td>
-<td>lw</td>
-<td>ld</td>
-<td>lbu<br>lhu;lh<br>sb;sh</td>
-<td>fsd</td>
-<td>sw</td>
-<td>sd</td>
-</tr>
-<tr>
-<td>01</td>
-<td>addi</td>
-<td>addiw</td>
-<td>li</td>
-<td>lui<br>addi16sp<br>zcmop</td>
-<td>ARITHs<br>zcb</td>
-<td>j</td>
-<td>beqz</td>
-<td>bnez</td>
-</tr>
-<tr>
-<td>10</td>
-<td>slli</td>
-<td>fldsp</td>
-<td>lwsp</td>
-<td>ldsp</td>
-<td>jr;mv<br>ebreak<br>jalr;add</td>
-<td>fsdsp</td>
-<td>fwsp</td>
-<td>sdsp</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>op\funct</th>
+          <th>000</th>
+          <th>001</th>
+          <th>010</th>
+          <th>011</th>
+          <th>100</th>
+          <th>101</th>
+          <th>110</th>
+          <th>111</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>00</td>
+          <td>addi4spn</td>
+          <td>fld</td>
+          <td>lw</td>
+          <td>ld</td>
+          <td>lbu<br>lhu;lh<br>sb;sh</td>
+          <td>fsd</td>
+          <td>sw</td>
+          <td>sd</td>
+      </tr>
+      <tr>
+          <td>01</td>
+          <td>addi</td>
+          <td>addiw</td>
+          <td>li</td>
+          <td>lui<br>addi16sp<br>zcmop</td>
+          <td>ARITHs<br>zcb</td>
+          <td>j</td>
+          <td>beqz</td>
+          <td>bnez</td>
+      </tr>
+      <tr>
+          <td>10</td>
+          <td>slli</td>
+          <td>fldsp</td>
+          <td>lwsp</td>
+          <td>ldsp</td>
+          <td>jr;mv<br>ebreak<br>jalr;add</td>
+          <td>fsdsp</td>
+          <td>fwsp</td>
+          <td>sdsp</td>
+      </tr>
+  </tbody>
 </table>
 <p>在开始阅读各指令的扩展规则时，需要了解一些RVC扩展的前置知识，比如：</p>
 <p>rd&rsquo;, rs1&rsquo;和rs2&rsquo;寄存器：受限于16位指令的位宽限制，这几个寄存器只有3位来表示，他们对应到x8~x15寄存器。</p>
@@ -897,7 +943,7 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 </div>
 
@@ -939,7 +985,7 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

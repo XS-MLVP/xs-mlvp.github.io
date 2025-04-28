@@ -35,13 +35,62 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 后端重定向与更新：后端是实际执行指令的单元，通过后端的执行结果，才能确认一条指令是否执行错误，产生重定向，同时，在发生重定向时，根据后端实际执行结果生成更新信息。 指令commit：当一个分支预测块内的所有指令都被执行，在后端提交，这标志着FTQ队列中这个分支预测块对应的FTQ项已经结束了它的生命周期，可以从队列中移除了，这时候，我们就可以把它的更新信息发给FTQ了。 FTQ指针 FTQ的全名叫取值目标队列，队列中的一个项叫做FTQ项，BPU写入预测结果时是写入队列中哪个位置，IFU又是从哪个队列取FTQ项？这时候，我们需要一个FTQ指针去索引FTQ项，而由于和不同模块的交互需要索引不同的FTQ项，因此，有以下类型的FTQ指针，下面，由指令生命周期为例，大致介绍这些指针：
 指令在 FTQ 中的生存周期 指令以预测块为单位，从 BPU 预测后便送进 FTQ，直到指令所在的预测块中的所有指令全部在后端提交完成，FTQ 才会在存储结构中完全释放该预测块所对应的项。这个过程中发生的事如下：
 预测块从 BPU 发出，进入 FTQ，bpuPtr 指针加一，初始化对应 FTQ 项的各种状态，把各种预测信息写入存储结构；如果预测块来自 BPU 覆盖预测逻辑，则恢复 bpuPtr 和 ifuPtr FTQ 向 IFU 发出取指请求，ifuPtr 指针加一，等待预译码信息写回 IFU 写回预译码信息，ifuWbPtr 指针加一，如果预译码检测出了预测错误，则给 BPU 发送相应的重定向请求，恢复 bpuPtr 和 ifuPtr 指令进入后端执行，如果后端检测出了误预测，则通知 FTQ，给 IFU 和 BPU 发送重定向请求，恢复 bpuPtr、ifuPtr 和 ifuWbPtr 指令在后端提交，通知 FTQ，等 FTQ 项中所有的有效指令都已提交，commPtr 指针加一，从存储结构中读出相应的信息，送给 BPU 进行训练 预测块 n 内指令的生存周期会涉及到 FTQ 中的 bpuPtr、ifuPtr、ifuWbPtr 和 commPtr 四个指针，当 bpuPtr 开始指向 n&#43;1 时，预测块内的指令进入生存周期，当 commPtr 指向 n&#43;1 后，预测块内的指令完成生存周期。">
-<meta property="og:title" content="FTQ概述" />
-<meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/" />
-<meta itemprop="name" content="FTQ概述">
-<meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="FTQ概述"/>
-<meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."/>
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="FTQ概述">
+  <meta property="og:description" content="下文（包括所有的FTQ文档）中会提到一些关于BPU和IFU的相关知识，详情需要去查看对应的文档:
+BPU文档链接 IFU文档链接 hint：建议先从BPU基础设计中着重理解以下概念：
+什么是分支预测？ 什么是分支预测块？一个有帮助的链接：预测块 (可选)什么是重定向，什么是预测结果重定向？ (可选)分支预测的流水级 简介 FTQ 是分支预测和取指单元之间的缓冲队列，它的主要职能是暂存 BPU 预测的取指目标，并根据这些取指目标给 IFU 发送取指请求。它的另一重要职能是暂存 BPU 各个预测器的预测信息，在指令提交后把这些信息送回 BPU 用作预测器的训练，因此它需要维护指令从预测到提交的完整的生命周期。另外，后端将存储来自FTQ的取指目标PC，便于自身读取。
+![[Pasted image 20250222103931.png]]
+模块之间的中转站 从上图，FTQ很大程度上相当于一个中转站，中间人的角色，一方面，它承担着BPU和IFU之间的交互，这通常是因为BPU预测的速度快于IFU取值执行，所以使用FTQ作为缓冲。另一方面，它承担着后端与前端的交互，比如把前端将要执行的pc交给后端去执行。
+显然，FTQ的 中转远不止这么多，下面更具体地讨论一下FTQ怎么中转各个前端或后端模块的信息的。
+BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 FTQtoBPU：FTQ会将带元数据的训练信息和重定向信息发回给BPU
+请参照BPU文档链接 BPU 模块整体对外接口 (PredirectIO) FTQ和IFU FTQtoIFU：FTQ会将存储的取值目标发往IFU进行取值译码和把后端的重定向信息也移交给IFU
+取值目标同时也发给： toICache：同样的取值目标会被发给指令缓存单元，看对应的指令是否在缓存单元内存在，如果有会被直接发送给IFU加速取值效率 toPrefetch: prefetch是ICache的一个组件，负责预取功能 转发后端重定向： 后端重定向不仅需要转发给BPU帮助其回到正确状态，也同时需要转发给IFU帮助其回到正确状态 IFUtoFTQ：IFU将预译码信息和重定向信息写回FTQ
+预译码信息：包含分支预测块对应的预测宽度内所有指令的预译码信息 预测宽度：一个指令块预测块覆盖的指令范围，香山中是16条rvc指令 重定向信息其实也是根据预译码信息得到的：当预译码信息中指出预测块内某一条指令预测出错时，写回IFU重定向信息 后端和FTQ FTQ到后端：FTQ会将存储的取值目标发往后端，后端存储 PC后，在本地即可进行读取取指目标。
+除了IFU，预测块的取值目标也会发给后端，但这里有一点区别：IFU空闲时才能从FTQ中获取取值目标，但是后端会一直取得最新的预测块的取指目标 后端到FTQ：后端重定向和指令commit
+后端重定向与更新：后端是实际执行指令的单元，通过后端的执行结果，才能确认一条指令是否执行错误，产生重定向，同时，在发生重定向时，根据后端实际执行结果生成更新信息。 指令commit：当一个分支预测块内的所有指令都被执行，在后端提交，这标志着FTQ队列中这个分支预测块对应的FTQ项已经结束了它的生命周期，可以从队列中移除了，这时候，我们就可以把它的更新信息发给FTQ了。 FTQ指针 FTQ的全名叫取值目标队列，队列中的一个项叫做FTQ项，BPU写入预测结果时是写入队列中哪个位置，IFU又是从哪个队列取FTQ项？这时候，我们需要一个FTQ指针去索引FTQ项，而由于和不同模块的交互需要索引不同的FTQ项，因此，有以下类型的FTQ指针，下面，由指令生命周期为例，大致介绍这些指针：
+指令在 FTQ 中的生存周期 指令以预测块为单位，从 BPU 预测后便送进 FTQ，直到指令所在的预测块中的所有指令全部在后端提交完成，FTQ 才会在存储结构中完全释放该预测块所对应的项。这个过程中发生的事如下：
+预测块从 BPU 发出，进入 FTQ，bpuPtr 指针加一，初始化对应 FTQ 项的各种状态，把各种预测信息写入存储结构；如果预测块来自 BPU 覆盖预测逻辑，则恢复 bpuPtr 和 ifuPtr FTQ 向 IFU 发出取指请求，ifuPtr 指针加一，等待预译码信息写回 IFU 写回预译码信息，ifuWbPtr 指针加一，如果预译码检测出了预测错误，则给 BPU 发送相应的重定向请求，恢复 bpuPtr 和 ifuPtr 指令进入后端执行，如果后端检测出了误预测，则通知 FTQ，给 IFU 和 BPU 发送重定向请求，恢复 bpuPtr、ifuPtr 和 ifuWbPtr 指令在后端提交，通知 FTQ，等 FTQ 项中所有的有效指令都已提交，commPtr 指针加一，从存储结构中读出相应的信息，送给 BPU 进行训练 预测块 n 内指令的生存周期会涉及到 FTQ 中的 bpuPtr、ifuPtr、ifuWbPtr 和 commPtr 四个指针，当 bpuPtr 开始指向 n&#43;1 时，预测块内的指令进入生存周期，当 commPtr 指向 n&#43;1 后，预测块内的指令完成生存周期。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="FTQ概述">
+  <meta itemprop="description" content="下文（包括所有的FTQ文档）中会提到一些关于BPU和IFU的相关知识，详情需要去查看对应的文档:
+BPU文档链接 IFU文档链接 hint：建议先从BPU基础设计中着重理解以下概念：
+什么是分支预测？ 什么是分支预测块？一个有帮助的链接：预测块 (可选)什么是重定向，什么是预测结果重定向？ (可选)分支预测的流水级 简介 FTQ 是分支预测和取指单元之间的缓冲队列，它的主要职能是暂存 BPU 预测的取指目标，并根据这些取指目标给 IFU 发送取指请求。它的另一重要职能是暂存 BPU 各个预测器的预测信息，在指令提交后把这些信息送回 BPU 用作预测器的训练，因此它需要维护指令从预测到提交的完整的生命周期。另外，后端将存储来自FTQ的取指目标PC，便于自身读取。
+![[Pasted image 20250222103931.png]]
+模块之间的中转站 从上图，FTQ很大程度上相当于一个中转站，中间人的角色，一方面，它承担着BPU和IFU之间的交互，这通常是因为BPU预测的速度快于IFU取值执行，所以使用FTQ作为缓冲。另一方面，它承担着后端与前端的交互，比如把前端将要执行的pc交给后端去执行。
+显然，FTQ的 中转远不止这么多，下面更具体地讨论一下FTQ怎么中转各个前端或后端模块的信息的。
+BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 FTQtoBPU：FTQ会将带元数据的训练信息和重定向信息发回给BPU
+请参照BPU文档链接 BPU 模块整体对外接口 (PredirectIO) FTQ和IFU FTQtoIFU：FTQ会将存储的取值目标发往IFU进行取值译码和把后端的重定向信息也移交给IFU
+取值目标同时也发给： toICache：同样的取值目标会被发给指令缓存单元，看对应的指令是否在缓存单元内存在，如果有会被直接发送给IFU加速取值效率 toPrefetch: prefetch是ICache的一个组件，负责预取功能 转发后端重定向： 后端重定向不仅需要转发给BPU帮助其回到正确状态，也同时需要转发给IFU帮助其回到正确状态 IFUtoFTQ：IFU将预译码信息和重定向信息写回FTQ
+预译码信息：包含分支预测块对应的预测宽度内所有指令的预译码信息 预测宽度：一个指令块预测块覆盖的指令范围，香山中是16条rvc指令 重定向信息其实也是根据预译码信息得到的：当预译码信息中指出预测块内某一条指令预测出错时，写回IFU重定向信息 后端和FTQ FTQ到后端：FTQ会将存储的取值目标发往后端，后端存储 PC后，在本地即可进行读取取指目标。
+除了IFU，预测块的取值目标也会发给后端，但这里有一点区别：IFU空闲时才能从FTQ中获取取值目标，但是后端会一直取得最新的预测块的取指目标 后端到FTQ：后端重定向和指令commit
+后端重定向与更新：后端是实际执行指令的单元，通过后端的执行结果，才能确认一条指令是否执行错误，产生重定向，同时，在发生重定向时，根据后端实际执行结果生成更新信息。 指令commit：当一个分支预测块内的所有指令都被执行，在后端提交，这标志着FTQ队列中这个分支预测块对应的FTQ项已经结束了它的生命周期，可以从队列中移除了，这时候，我们就可以把它的更新信息发给FTQ了。 FTQ指针 FTQ的全名叫取值目标队列，队列中的一个项叫做FTQ项，BPU写入预测结果时是写入队列中哪个位置，IFU又是从哪个队列取FTQ项？这时候，我们需要一个FTQ指针去索引FTQ项，而由于和不同模块的交互需要索引不同的FTQ项，因此，有以下类型的FTQ指针，下面，由指令生命周期为例，大致介绍这些指针：
+指令在 FTQ 中的生存周期 指令以预测块为单位，从 BPU 预测后便送进 FTQ，直到指令所在的预测块中的所有指令全部在后端提交完成，FTQ 才会在存储结构中完全释放该预测块所对应的项。这个过程中发生的事如下：
+预测块从 BPU 发出，进入 FTQ，bpuPtr 指针加一，初始化对应 FTQ 项的各种状态，把各种预测信息写入存储结构；如果预测块来自 BPU 覆盖预测逻辑，则恢复 bpuPtr 和 ifuPtr FTQ 向 IFU 发出取指请求，ifuPtr 指针加一，等待预译码信息写回 IFU 写回预译码信息，ifuWbPtr 指针加一，如果预译码检测出了预测错误，则给 BPU 发送相应的重定向请求，恢复 bpuPtr 和 ifuPtr 指令进入后端执行，如果后端检测出了误预测，则通知 FTQ，给 IFU 和 BPU 发送重定向请求，恢复 bpuPtr、ifuPtr 和 ifuWbPtr 指令在后端提交，通知 FTQ，等 FTQ 项中所有的有效指令都已提交，commPtr 指针加一，从存储结构中读出相应的信息，送给 BPU 进行训练 预测块 n 内指令的生存周期会涉及到 FTQ 中的 bpuPtr、ifuPtr、ifuWbPtr 和 commPtr 四个指针，当 bpuPtr 开始指向 n&#43;1 时，预测块内的指令进入生存周期，当 commPtr 指向 n&#43;1 后，预测块内的指令完成生存周期。">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="126">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FTQ概述">
+  <meta name="twitter:description" content="下文（包括所有的FTQ文档）中会提到一些关于BPU和IFU的相关知识，详情需要去查看对应的文档:
+BPU文档链接 IFU文档链接 hint：建议先从BPU基础设计中着重理解以下概念：
+什么是分支预测？ 什么是分支预测块？一个有帮助的链接：预测块 (可选)什么是重定向，什么是预测结果重定向？ (可选)分支预测的流水级 简介 FTQ 是分支预测和取指单元之间的缓冲队列，它的主要职能是暂存 BPU 预测的取指目标，并根据这些取指目标给 IFU 发送取指请求。它的另一重要职能是暂存 BPU 各个预测器的预测信息，在指令提交后把这些信息送回 BPU 用作预测器的训练，因此它需要维护指令从预测到提交的完整的生命周期。另外，后端将存储来自FTQ的取指目标PC，便于自身读取。
+![[Pasted image 20250222103931.png]]
+模块之间的中转站 从上图，FTQ很大程度上相当于一个中转站，中间人的角色，一方面，它承担着BPU和IFU之间的交互，这通常是因为BPU预测的速度快于IFU取值执行，所以使用FTQ作为缓冲。另一方面，它承担着后端与前端的交互，比如把前端将要执行的pc交给后端去执行。
+显然，FTQ的 中转远不止这么多，下面更具体地讨论一下FTQ怎么中转各个前端或后端模块的信息的。
+BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
+从分支预测结果中，我们可以提取出分支预测块对应的取值目标，比如，一个不跨缓存行且所有指令均为RVC指令的分支预测块对应的取值目标，是从分支预测块起始地址开始的以2B为间隔的连续16条指令。 meta信息则存储了各个预测器相关的预测信息，由于BPU预测有三个流水级，每个流水级都有相应的预测器，所以只有到s3阶段才有可能收集到所有预测器的预测信息，直到此时FTQ才接受到完整的meta，这些信息会在该分支预测块的全部指令被后端提交时交给BPU进行训练 FTBEntry：严格来说，它其实也是meta的一部分，但是因为更新的时候ftb_entry需要在原来的基础上继续修改，为了不重新读一遍ftb，另外给它存储一个副本。 FTQtoBPU：FTQ会将带元数据的训练信息和重定向信息发回给BPU
+请参照BPU文档链接 BPU 模块整体对外接口 (PredirectIO) FTQ和IFU FTQtoIFU：FTQ会将存储的取值目标发往IFU进行取值译码和把后端的重定向信息也移交给IFU
+取值目标同时也发给： toICache：同样的取值目标会被发给指令缓存单元，看对应的指令是否在缓存单元内存在，如果有会被直接发送给IFU加速取值效率 toPrefetch: prefetch是ICache的一个组件，负责预取功能 转发后端重定向： 后端重定向不仅需要转发给BPU帮助其回到正确状态，也同时需要转发给IFU帮助其回到正确状态 IFUtoFTQ：IFU将预译码信息和重定向信息写回FTQ
+预译码信息：包含分支预测块对应的预测宽度内所有指令的预译码信息 预测宽度：一个指令块预测块覆盖的指令范围，香山中是16条rvc指令 重定向信息其实也是根据预译码信息得到的：当预译码信息中指出预测块内某一条指令预测出错时，写回IFU重定向信息 后端和FTQ FTQ到后端：FTQ会将存储的取值目标发往后端，后端存储 PC后，在本地即可进行读取取指目标。
+除了IFU，预测块的取值目标也会发给后端，但这里有一点区别：IFU空闲时才能从FTQ中获取取值目标，但是后端会一直取得最新的预测块的取指目标 后端到FTQ：后端重定向和指令commit
+后端重定向与更新：后端是实际执行指令的单元，通过后端的执行结果，才能确认一条指令是否执行错误，产生重定向，同时，在发生重定向时，根据后端实际执行结果生成更新信息。 指令commit：当一个分支预测块内的所有指令都被执行，在后端提交，这标志着FTQ队列中这个分支预测块对应的FTQ项已经结束了它的生命周期，可以从队列中移除了，这时候，我们就可以把它的更新信息发给FTQ了。 FTQ指针 FTQ的全名叫取值目标队列，队列中的一个项叫做FTQ项，BPU写入预测结果时是写入队列中哪个位置，IFU又是从哪个队列取FTQ项？这时候，我们需要一个FTQ指针去索引FTQ项，而由于和不同模块的交互需要索引不同的FTQ项，因此，有以下类型的FTQ指针，下面，由指令生命周期为例，大致介绍这些指针：
+指令在 FTQ 中的生存周期 指令以预测块为单位，从 BPU 预测后便送进 FTQ，直到指令所在的预测块中的所有指令全部在后端提交完成，FTQ 才会在存储结构中完全释放该预测块所对应的项。这个过程中发生的事如下：
+预测块从 BPU 发出，进入 FTQ，bpuPtr 指针加一，初始化对应 FTQ 项的各种状态，把各种预测信息写入存储结构；如果预测块来自 BPU 覆盖预测逻辑，则恢复 bpuPtr 和 ifuPtr FTQ 向 IFU 发出取指请求，ifuPtr 指针加一，等待预译码信息写回 IFU 写回预译码信息，ifuWbPtr 指针加一，如果预译码检测出了预测错误，则给 BPU 发送相应的重定向请求，恢复 bpuPtr 和 ifuPtr 指令进入后端执行，如果后端检测出了误预测，则通知 FTQ，给 IFU 和 BPU 发送重定向请求，恢复 bpuPtr、ifuPtr 和 ifuWbPtr 指令在后端提交，通知 FTQ，等 FTQ 项中所有的有效指令都已提交，commPtr 指针加一，从存储结构中读出相应的信息，送给 BPU 进行训练 预测块 n 内指令的生存周期会涉及到 FTQ 中的 bpuPtr、ifuPtr、ifuWbPtr 和 commPtr 四个指针，当 bpuPtr 开始指向 n&#43;1 时，预测块内的指令进入生存周期，当 commPtr 指向 n&#43;1 后，预测块内的指令完成生存周期。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -143,7 +192,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -396,7 +445,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 </ul>
 <h2 id="其他">其他</h2>
 <p>上述是主要的IO接口，此外，还有一些用于性能统计的IO接口，比如对BPU预测正确和错误结果次数进行统计，并进行转发的IO, 还有转发BPU各预测器预测信息的IO。</p>
-<h1 id="bputoftqiohttpsopen-verifyccxs-bpudocsports02_global_ports"><a href="https://open-verify.cc/xs-bpu/docs/ports/02_global_ports/">BpuToFtqIO</a></h1>
+<h1 id="bputoftqio"><a href="https://open-verify.cc/xs-bpu/docs/ports/02_global_ports/">BpuToFtqIO</a></h1>
 <h1 id="ifutoftqio">IfuToFtqIO</h1>
 <p>我们知道从IFU，我们会得到预译码信息和重定向信息，而后者其实也是从预译码信息中生成。所以从IFU到FTQ的接口主要就是用来传递预译码信息的</p>
 <ul>
@@ -528,7 +577,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 </ul>
 </li>
 </ul>
-<h1 id="ftqtobpuiohttpsopen-verifyccxs-bpudocsports02_global_ports"><a href="https://open-verify.cc/xs-bpu/docs/ports/02_global_ports/">FtqToBpuIO</a></h1>
+<h1 id="ftqtobpuio"><a href="https://open-verify.cc/xs-bpu/docs/ports/02_global_ports/">FtqToBpuIO</a></h1>
 <h1 id="ftqtoicacheio">FtqToICacheIO</h1>
 <p>FTQ向IFU发送取值目标，ICache是指令缓存，如果取值目标在ICache中命中，由ICache将指令发给IFU</p>
 <ul>
@@ -674,49 +723,49 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 <p>下面来介绍一些FTQ的主要子队列，以及它们内部存储的数据结构。此外，FTQ还有一些存储中间状态的更小的队列</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://open-verify.cc/xs-bpu/docs/ports/00_ftb/">FTB项</a></td>
-<td>分支预测结果的基本组成项，包含对预测块中分支指令和跳转指令的预测</td>
-</tr>
-<tr>
-<td>取指目标</td>
-<td>一个预测块内包含的所有指令PC，当然，它不是直接发送所有PC，而是发送部分信号，接收方可由该信号推出所有PC</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://open-verify.cc/xs-bpu/docs/ports/00_ftb/">FTB项</a></td>
+          <td>分支预测结果的基本组成项，包含对预测块中分支指令和跳转指令的预测</td>
+      </tr>
+      <tr>
+          <td>取指目标</td>
+          <td>一个预测块内包含的所有指令PC，当然，它不是直接发送所有PC，而是发送部分信号，接收方可由该信号推出所有PC</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="子模块列表">子模块列表</h2>
 <table>
-<thead>
-<tr>
-<th>子模块</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ftq_redirect_mem<br></td>
-<td>重定向存储子队列，存储来自分支预测结果的重定向信息</td>
-</tr>
-<tr>
-<td>ftq_pd_mem</td>
-<td>预译码存储子队列，存储来自IFU的对指令块的预译码信息</td>
-</tr>
-<tr>
-<td>ftb_entry_mem</td>
-<td>FTB项存储子队列，存储自分支预测结果中的ftb项</td>
-</tr>
-<tr>
-<td>ftq_pc_mem</td>
-<td>取指目标子队列，存储来自分支预测结果的取指目标</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>子模块</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ftq_redirect_mem<br></td>
+          <td>重定向存储子队列，存储来自分支预测结果的重定向信息</td>
+      </tr>
+      <tr>
+          <td>ftq_pd_mem</td>
+          <td>预译码存储子队列，存储来自IFU的对指令块的预译码信息</td>
+      </tr>
+      <tr>
+          <td>ftb_entry_mem</td>
+          <td>FTB项存储子队列，存储自分支预测结果中的ftb项</td>
+      </tr>
+      <tr>
+          <td>ftq_pc_mem</td>
+          <td>取指目标子队列，存储来自分支预测结果的取指目标</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-ftq_redirect_mem存储重定向信息">1. ftq_redirect_mem存储重定向信息</h3>
@@ -842,28 +891,28 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 </li>
 </ul>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>FTQ_REDIRECT_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>FTQ_REDIRECT_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>FTQ_REDIRECT_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>FTQ_REDIRECT_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="2-ftq_pd_mem存储预译码信息">2. ftq_pd_mem存储预译码信息</h3>
 <p>由64（FtqSize）个表项（Ftq_pd_Entry）构成。支持同步读写操作。有2个读端口和1个写端口。具有读写使能信号。</p>
@@ -894,7 +943,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 </li>
 </ul>
 <h3 id="21-ftq_pd_mem写操作">2.1 ftq_pd_mem写操作</h3>
-<h4 id="predecodewritebackbundleifutoftqio如何写入ftq_pd_mem的一条ftq_pd_entry"><strong>PredecodeWritebackBundle（IfuToFtqIO）如何写入ftq_pd_mem的一条Ftq_pd_Entry</strong></h4>
+<h4 id="predecodewritebackbundleifutoftqio如何写入ftq_"><strong>PredecodeWritebackBundle（IfuToFtqIO）如何写入ftq_pd_mem的一条Ftq_pd_Entry</strong></h4>
 <p>Ftq_pd_Entry项的写入是通过PredecodeWritebackBundle这个接口进行写入的（其实也就是IfuToFtqIO）
 <em>从fromPdWb接口中接收信号生成表项</em>：</p>
 <ul>
@@ -910,7 +959,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 <li>jalTarget：原封不动接收同名信号</li>
 </ul>
 <h3 id="22-ftq_pd_mem写操作">2.2 ftq_pd_mem写操作</h3>
-<h4 id="ftq_pd_mem的一条ftq_pd_entry如何以predecodeinfoto-pd的形式输出"><strong>ftq_pd_mem的一条Ftq_pd_Entry如何以PreDecodeInfo（to pd）的形式输出</strong></h4>
+<h4 id="ftq_"><strong>ftq_pd_mem的一条Ftq_pd_Entry如何以PreDecodeInfo（to pd）的形式输出</strong></h4>
 <p>PreDecodeInfo是一个Ftq_pd_Entry中的一条指令的预译码，需要输入offset，指定该预译码指令在预测块内的偏移</p>
 <ul>
 <li>
@@ -927,28 +976,28 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 </li>
 </ul>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2.1</td>
-<td>FTQ_PD_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>FTQ_PD_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2.1</td>
+          <td>FTQ_PD_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>FTQ_PD_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="3-ftb_entry_mem存储ftb项">3. ftb_entry_mem存储FTB项</h3>
 <p>有两个读端口，一个写端口，FtqSize个表项，存储的数据项为FTBEntry_FtqMem，FTBEntry_FtqMem与FTBEntry基本上是一致的。</p>
@@ -1030,28 +1079,28 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 </li>
 </ul>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3.1</td>
-<td>FTQ_ENTRY_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>FTQ_ENTRY_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>3.1</td>
+          <td>FTQ_ENTRY_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>FTQ_ENTRY_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="4-ftq_pc_mem存储取指目标">4. ftq_pc_mem存储取指目标</h3>
 <p>pc存储子队列。存储项为Ftq_RF_Components，用来读取取指信息，取值信息交给IFU进行取指。</p>
@@ -1081,28 +1130,28 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 <p><strong>写入时机</strong>：BPU流水级的S1阶段，创建新的预测entry时写入
 <strong>读出时机</strong>： 读数据每个时钟周期都会存进Reg。如果IFU不需要从bypass中读取数据，Reg数据直连给Icache和IFU，如果IFU不需要从bypass中读取数据，Reg数据直连给Icache和IFU</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>4.1</td>
-<td>FTQ_PC_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>4.2</td>
-<td>FTQ_PC_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>4.1</td>
+          <td>FTQ_PC_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>4.2</td>
+          <td>FTQ_PC_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="5-ftq_meta_1r_sram存储meta信息">5. ftq_meta_1r_sram存储meta信息</h3>
 <p>存储的数据为Ftq_1R_SRAMEntry，同样有FtqSize项
@@ -1113,28 +1162,28 @@ Ftq_1R_SRAMEntry接口列表</p>
 <strong>写入时机</strong>：在 BPU的s3阶段接收信息，因为对于一个指令预测块，只有在其s3阶段才能获取完整的mata信息，同样被接收的还有最后阶段ftqentry信息</li>
 </ul>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>5.1</td>
-<td>FTQ_META_1R_SRAM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>5.2</td>
-<td>FTQ_META_1R_SRAM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>5.1</td>
+          <td>FTQ_META_1R_SRAM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>5.2</td>
+          <td>FTQ_META_1R_SRAM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="接口说明">接口说明</h2>
 <h3 id="ftq_redirect_sramentry-1">Ftq_Redirect_SRAMEntry</h3>
@@ -1224,76 +1273,76 @@ Ftq_1R_SRAMEntry接口列表</p>
 </ul>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>FTQ_REDIRECT_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>FTQ_REDIRECT_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-<tr>
-<td>2.1</td>
-<td>FTQ_PD_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>FTQ_PD_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-<tr>
-<td>3.1</td>
-<td>FTQ_ENTRY_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>FTQ_ENTRY_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-<tr>
-<td>4.1</td>
-<td>FTQ_PC_MEM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>4.2</td>
-<td>FTQ_PC_MEM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-<tr>
-<td>5.1</td>
-<td>FTQ_META_1R_SRAM</td>
-<td>WRITE</td>
-<td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
-</tr>
-<tr>
-<td>5.2</td>
-<td>FTQ_META_1R_SRAM</td>
-<td>READ</td>
-<td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>FTQ_REDIRECT_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>FTQ_REDIRECT_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+      <tr>
+          <td>2.1</td>
+          <td>FTQ_PD_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>FTQ_PD_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+      <tr>
+          <td>3.1</td>
+          <td>FTQ_ENTRY_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>FTQ_ENTRY_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+      <tr>
+          <td>4.1</td>
+          <td>FTQ_PC_MEM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>4.2</td>
+          <td>FTQ_PC_MEM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+      <tr>
+          <td>5.1</td>
+          <td>FTQ_META_1R_SRAM</td>
+          <td>WRITE</td>
+          <td>向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata</td>
+      </tr>
+      <tr>
+          <td>5.2</td>
+          <td>FTQ_META_1R_SRAM</td>
+          <td>READ</td>
+          <td>向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="附录">附录</h2>
 <p><em><strong>虽然列在附录，但实际上这段内容依然十分重要，当你需要的时候请一定要查看。</strong></em></p>
@@ -1346,34 +1395,34 @@ Ftq_1R_SRAMEntry接口列表</p>
 </ul>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>BPU (Branch Prediction Unit)</td>
-<td>分支预测单元</td>
-</tr>
-<tr>
-<td>FTQ (Fetch Target Queue)</td>
-<td>采集目标队列</td>
-</tr>
-<tr>
-<td>IFU (Instruction Fetch Unit)</td>
-<td>指令采集单元</td>
-</tr>
-<tr>
-<td>RAS (Return Address Stack)</td>
-<td>返回地址堆</td>
-</tr>
-<tr>
-<td>FTQ Entry</td>
-<td>FTQ队列中的单个表项</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>BPU (Branch Prediction Unit)</td>
+          <td>分支预测单元</td>
+      </tr>
+      <tr>
+          <td>FTQ (Fetch Target Queue)</td>
+          <td>采集目标队列</td>
+      </tr>
+      <tr>
+          <td>IFU (Instruction Fetch Unit)</td>
+          <td>指令采集单元</td>
+      </tr>
+      <tr>
+          <td>RAS (Return Address Stack)</td>
+          <td>返回地址堆</td>
+      </tr>
+      <tr>
+          <td>FTQ Entry</td>
+          <td>FTQ队列中的单个表项</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-新的预测块进队条件">1. 新的预测块进队条件</h3>
@@ -1566,167 +1615,167 @@ s3阶段向IFU以及Prefetch的重定向传递与s2阶段的重定向信号传�
 <h2 id="接口说明">接口说明</h2>
 <p>FTQ接收BPU分支预测结果工程中涉及到的IO接口如下，在FTQ顶层IO一文中有详细说明</p>
 <table>
-<thead>
-<tr>
-<th>接口</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>fromBackend</td>
-<td>根据是否有重定向确认是否允许BPU预测结果入队</td>
-</tr>
-<tr>
-<td>fromBPU</td>
-<td>接收BPU预测结果</td>
-</tr>
-<tr>
-<td>toIfu</td>
-<td>发送更新的IFU指针，转发BPU预测结果重定向</td>
-</tr>
-<tr>
-<td>toPrefetch</td>
-<td>发送更新的Prefetch指针，转发BPU预测结果重定向</td>
-</tr>
-<tr>
-<td>toBpu</td>
-<td>发送更新的BPU指针</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>接口</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>fromBackend</td>
+          <td>根据是否有重定向确认是否允许BPU预测结果入队</td>
+      </tr>
+      <tr>
+          <td>fromBPU</td>
+          <td>接收BPU预测结果</td>
+      </tr>
+      <tr>
+          <td>toIfu</td>
+          <td>发送更新的IFU指针，转发BPU预测结果重定向</td>
+      </tr>
+      <tr>
+          <td>toPrefetch</td>
+          <td>发送更新的Prefetch指针，转发BPU预测结果重定向</td>
+      </tr>
+      <tr>
+          <td>toBpu</td>
+          <td>发送更新的BPU指针</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1.1</td>
-<td>BPU_IN_RECEIVE</td>
-<td>FTQ_READY</td>
-<td>当FTQ队列中元素小于FtqSize或者可以提交指令块的时候，队列准备好接收新的预测块</td>
-</tr>
-<tr>
-<td>1.1.2</td>
-<td>BPU_IN_RECEIVE</td>
-<td>BPU_VALID</td>
-<td>BPU准备好要发送的信号</td>
-</tr>
-<tr>
-<td>1.2.1</td>
-<td>BPU_IN_ALLOW</td>
-<td>BACKEND</td>
-<td>接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向，则下一个周期也不允许入队</td>
-</tr>
-<tr>
-<td>1.2.2</td>
-<td>BPU_IN_ALLOW</td>
-<td>IFU</td>
-<td>IFU重定向信息生成的两个周期，均不许入队</td>
-</tr>
-<tr>
-<td>1.3.1</td>
-<td>BPU_IN_BY_REDIRECT</td>
-<td>REDIRECT</td>
-<td>当BPU发生预测结果重定向时，只要<strong>允许BPU入队allowBpuIn</strong>，也可以看作预测结果入队</td>
-</tr>
-<tr>
-<td>2.1.1</td>
-<td>WRITE_FTQ_SUBQUEUE</td>
-<td>FTQ_PC</td>
-<td>根据BPU预测结果写入ftq_pc_mem</td>
-</tr>
-<tr>
-<td>2.1.2</td>
-<td>WRITE_FTQ_SUBQUEUE</td>
-<td>FTQ_REDIRECT</td>
-<td>根据BPU预测结果写入ftq_redirect_mem</td>
-</tr>
-<tr>
-<td>2.1.3</td>
-<td>WRITE_FTQ_SUBQUEUE</td>
-<td>FTQ_MATA</td>
-<td>根据BPU预测结果写入ftq_meta_1r_sram</td>
-</tr>
-<tr>
-<td>2.1.4</td>
-<td>WRITE_FTQ_SUBQUEUE</td>
-<td>FTQ_ENTRY</td>
-<td>根据BPU预测结果写入ftb_entry_mem</td>
-</tr>
-<tr>
-<td>2.2.1</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>UPDATED_TARGET</td>
-<td>根据BPU预测结果写入update_target</td>
-</tr>
-<tr>
-<td>2.2.2</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>CFIINDEX</td>
-<td>根据BPU预测结果写入cfiIndex_vec</td>
-</tr>
-<tr>
-<td>2.2.3</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>MISPREDICT</td>
-<td>根据BPU预测结果写入mispredict_vec</td>
-</tr>
-<tr>
-<td>2.2.4</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>PRED_STAGE</td>
-<td>根据BPU预测结果写入pred_stage</td>
-</tr>
-<tr>
-<td>2.2.5</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>COMMITSTATE</td>
-<td>根据BPU预测结果写入commitStateQueueReg</td>
-</tr>
-<tr>
-<td>2.2.6</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>ENTRY_FETCH_STATU</td>
-<td>根据BPU预测结果写入entry_fetch_status</td>
-</tr>
-<tr>
-<td>2.2.7</td>
-<td>WRITE_FTQ_STATEQUEUE</td>
-<td>ENTRY_HIT_STATU</td>
-<td>根据BPU预测结果写入entry_hit_status</td>
-</tr>
-<tr>
-<td>3.1</td>
-<td>TRANSFER_BPU_REDIRECT</td>
-<td>IFU</td>
-<td>转发分支预测重定向给IFU</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>TRANSFER_BPU_REDIRECT</td>
-<td>PREFETCH</td>
-<td>转发分支预测重定向给PREFETCH</td>
-</tr>
-<tr>
-<td>4.1</td>
-<td>UPDATE_FTQ_PTR</td>
-<td>NORMAL</td>
-<td>正常情况下修改FTQ指针</td>
-</tr>
-<tr>
-<td>4.2</td>
-<td>UPDATE_FTQ_PTR</td>
-<td>REDIRECT</td>
-<td>发生重定向时修改FTQ指针</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1.1</td>
+          <td>BPU_IN_RECEIVE</td>
+          <td>FTQ_READY</td>
+          <td>当FTQ队列中元素小于FtqSize或者可以提交指令块的时候，队列准备好接收新的预测块</td>
+      </tr>
+      <tr>
+          <td>1.1.2</td>
+          <td>BPU_IN_RECEIVE</td>
+          <td>BPU_VALID</td>
+          <td>BPU准备好要发送的信号</td>
+      </tr>
+      <tr>
+          <td>1.2.1</td>
+          <td>BPU_IN_ALLOW</td>
+          <td>BACKEND</td>
+          <td>接收后端写回信息的接口fromBackend的重定向接口redirect有效，则该周期不允许入队，如果没有发生真实提前重定向，则下一个周期也不允许入队</td>
+      </tr>
+      <tr>
+          <td>1.2.2</td>
+          <td>BPU_IN_ALLOW</td>
+          <td>IFU</td>
+          <td>IFU重定向信息生成的两个周期，均不许入队</td>
+      </tr>
+      <tr>
+          <td>1.3.1</td>
+          <td>BPU_IN_BY_REDIRECT</td>
+          <td>REDIRECT</td>
+          <td>当BPU发生预测结果重定向时，只要<strong>允许BPU入队allowBpuIn</strong>，也可以看作预测结果入队</td>
+      </tr>
+      <tr>
+          <td>2.1.1</td>
+          <td>WRITE_FTQ_SUBQUEUE</td>
+          <td>FTQ_PC</td>
+          <td>根据BPU预测结果写入ftq_pc_mem</td>
+      </tr>
+      <tr>
+          <td>2.1.2</td>
+          <td>WRITE_FTQ_SUBQUEUE</td>
+          <td>FTQ_REDIRECT</td>
+          <td>根据BPU预测结果写入ftq_redirect_mem</td>
+      </tr>
+      <tr>
+          <td>2.1.3</td>
+          <td>WRITE_FTQ_SUBQUEUE</td>
+          <td>FTQ_MATA</td>
+          <td>根据BPU预测结果写入ftq_meta_1r_sram</td>
+      </tr>
+      <tr>
+          <td>2.1.4</td>
+          <td>WRITE_FTQ_SUBQUEUE</td>
+          <td>FTQ_ENTRY</td>
+          <td>根据BPU预测结果写入ftb_entry_mem</td>
+      </tr>
+      <tr>
+          <td>2.2.1</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>UPDATED_TARGET</td>
+          <td>根据BPU预测结果写入update_target</td>
+      </tr>
+      <tr>
+          <td>2.2.2</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>CFIINDEX</td>
+          <td>根据BPU预测结果写入cfiIndex_vec</td>
+      </tr>
+      <tr>
+          <td>2.2.3</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>MISPREDICT</td>
+          <td>根据BPU预测结果写入mispredict_vec</td>
+      </tr>
+      <tr>
+          <td>2.2.4</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>PRED_STAGE</td>
+          <td>根据BPU预测结果写入pred_stage</td>
+      </tr>
+      <tr>
+          <td>2.2.5</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>COMMITSTATE</td>
+          <td>根据BPU预测结果写入commitStateQueueReg</td>
+      </tr>
+      <tr>
+          <td>2.2.6</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>ENTRY_FETCH_STATU</td>
+          <td>根据BPU预测结果写入entry_fetch_status</td>
+      </tr>
+      <tr>
+          <td>2.2.7</td>
+          <td>WRITE_FTQ_STATEQUEUE</td>
+          <td>ENTRY_HIT_STATU</td>
+          <td>根据BPU预测结果写入entry_hit_status</td>
+      </tr>
+      <tr>
+          <td>3.1</td>
+          <td>TRANSFER_BPU_REDIRECT</td>
+          <td>IFU</td>
+          <td>转发分支预测重定向给IFU</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>TRANSFER_BPU_REDIRECT</td>
+          <td>PREFETCH</td>
+          <td>转发分支预测重定向给PREFETCH</td>
+      </tr>
+      <tr>
+          <td>4.1</td>
+          <td>UPDATE_FTQ_PTR</td>
+          <td>NORMAL</td>
+          <td>正常情况下修改FTQ指针</td>
+      </tr>
+      <tr>
+          <td>4.2</td>
+          <td>UPDATE_FTQ_PTR</td>
+          <td>REDIRECT</td>
+          <td>发生重定向时修改FTQ指针</td>
+      </tr>
+  </tbody>
 </table>
 
 </div>
@@ -1865,138 +1914,138 @@ FTQ通过该接口向ICache发送取指信号：</p>
 entry_fetch_status状态队列中ifuptr对应项的发送状态置为f_sent。表示该ftq项被成功发送 了</p>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>顶层IO</th>
-<th>子接口</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>toIFU</td>
-<td>req</td>
-<td>发送取指目标</td>
-</tr>
-<tr>
-<td>toIFU</td>
-<td>flushfrombpu</td>
-<td>冲刷掉发送给IFU的取指目标</td>
-</tr>
-<tr>
-<td>toICache</td>
-<td>req</td>
-<td>发送取指目标</td>
-</tr>
-<tr>
-<td>toPrefetch</td>
-<td>req</td>
-<td>发送取指目标</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>顶层IO</th>
+          <th>子接口</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>toIFU</td>
+          <td>req</td>
+          <td>发送取指目标</td>
+      </tr>
+      <tr>
+          <td>toIFU</td>
+          <td>flushfrombpu</td>
+          <td>冲刷掉发送给IFU的取指目标</td>
+      </tr>
+      <tr>
+          <td>toICache</td>
+          <td>req</td>
+          <td>发送取指目标</td>
+      </tr>
+      <tr>
+          <td>toPrefetch</td>
+          <td>req</td>
+          <td>发送取指目标</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1.1</td>
-<td>GET_PC_FOR_ICACHE</td>
-<td>COND1</td>
-<td>旁路生效，即旁路bpu指针等于ifuptr，且上一周期bpu输入有效结果有效，直接向toICache接口输入旁路pc信息bpu_in_bypass_buf</td>
-</tr>
-<tr>
-<td>1.1.2</td>
-<td>GET_PC_FOR_ICACHE</td>
-<td>COND2</td>
-<td>不满足情况1，但是上一周期发生ifu_fire，成功传输信号，此时toICache中被写入pc存储子队列ftq_pc_mem中ifuptr+1对应项的结果</td>
-</tr>
-<tr>
-<td>1.1.3</td>
-<td>GET_PC_FOR_ICACHE</td>
-<td>COND3</td>
-<td>前两种情况都不满足，此时toICache中被写入pc存储队列中ifuptr对应项的结果</td>
-</tr>
-<tr>
-<td>1.2.1</td>
-<td>GET_PC_FOR_PREFETCH</td>
-<td>COND1</td>
-<td>bpu有信号写入，同时bpu_in_resp_ptr等于pfptr的写入信号pfptr_write, 读取bpu向pc存储队列的写入信号wdata，下一周期写入ToPrefetch</td>
-</tr>
-<tr>
-<td>1.2.2</td>
-<td>GET_PC_FOR_PREFETCH</td>
-<td>COND2</td>
-<td>不满足情况1，且由bpu到prefetch的接口发生fire，即bpu向预取单元成功发送信号，pc存储单元的pfPtrPlus1_rdata下一周期写入ToPrefetch接口</td>
-</tr>
-<tr>
-<td>1.2.3</td>
-<td>GET_PC_FOR_PREFETCH</td>
-<td>COND3</td>
-<td>不满足以上两种情况：pc存储单元的pfPtr_rdata在下一周期被写入ToPrefetch接口</td>
-</tr>
-<tr>
-<td>1.3.1</td>
-<td>SET_NEXT_ADDR</td>
-<td>COND1</td>
-<td>上一周期bpu写入信号，且旁路指针等于ifuptr时设置下一个发送的指令块的起始地址</td>
-</tr>
-<tr>
-<td>1.3.2</td>
-<td>SET_NEXT_ADDR</td>
-<td>COND2</td>
-<td>不满足情况1，bpu到ifu的接口发生fire时设置下一个发送的指令块的起始地址</td>
-</tr>
-<tr>
-<td>1.3.3</td>
-<td>SET_NEXT_ADDR</td>
-<td>COND3</td>
-<td>不满足情况1，2时设置下一个发送的指令块的起始地址</td>
-</tr>
-<tr>
-<td>2.1.1</td>
-<td>SEND_PC</td>
-<td>IFU</td>
-<td>向IFU发送取指目标</td>
-</tr>
-<tr>
-<td>2.1.2</td>
-<td>SEND_PC</td>
-<td>ICACHE</td>
-<td>向ICache发送取指目标</td>
-</tr>
-<tr>
-<td>2.1.3</td>
-<td>SEND_PC</td>
-<td>PREFETCH</td>
-<td>向Prefetch发送取指目标</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>FALSE_HIT</td>
-<td>FALSE_HIT</td>
-<td>当发往Ifu的pc接口toIfu中发生fallThruError，且FTB项命中时判断是否是错误命中</td>
-</tr>
-<tr>
-<td>2.3</td>
-<td>FLUSH_FROM_BPU</td>
-<td>FLUSH_FROM_BPU</td>
-<td>发往ifu的flushfrombpu(来自bpu的冲刷)接口中的s2，s3阶段的指针其中一条指针不大于发往ifu的req接口的ftqIdx的时候，应该冲刷掉新的发送给FTQ的预测信息</td>
-</tr>
-<tr>
-<td>2.4</td>
-<td>UPDATE_SEND_STATU</td>
-<td>UPDATE_SEND_STATU</td>
-<td>发往ifu的req接口发生fire，且req不被来自bpu的flush给冲刷掉时：<br>entry_fetch_status状态队列中ifuptr对应项的发送状态置为f_sent</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1.1</td>
+          <td>GET_PC_FOR_ICACHE</td>
+          <td>COND1</td>
+          <td>旁路生效，即旁路bpu指针等于ifuptr，且上一周期bpu输入有效结果有效，直接向toICache接口输入旁路pc信息bpu_in_bypass_buf</td>
+      </tr>
+      <tr>
+          <td>1.1.2</td>
+          <td>GET_PC_FOR_ICACHE</td>
+          <td>COND2</td>
+          <td>不满足情况1，但是上一周期发生ifu_fire，成功传输信号，此时toICache中被写入pc存储子队列ftq_pc_mem中ifuptr+1对应项的结果</td>
+      </tr>
+      <tr>
+          <td>1.1.3</td>
+          <td>GET_PC_FOR_ICACHE</td>
+          <td>COND3</td>
+          <td>前两种情况都不满足，此时toICache中被写入pc存储队列中ifuptr对应项的结果</td>
+      </tr>
+      <tr>
+          <td>1.2.1</td>
+          <td>GET_PC_FOR_PREFETCH</td>
+          <td>COND1</td>
+          <td>bpu有信号写入，同时bpu_in_resp_ptr等于pfptr的写入信号pfptr_write, 读取bpu向pc存储队列的写入信号wdata，下一周期写入ToPrefetch</td>
+      </tr>
+      <tr>
+          <td>1.2.2</td>
+          <td>GET_PC_FOR_PREFETCH</td>
+          <td>COND2</td>
+          <td>不满足情况1，且由bpu到prefetch的接口发生fire，即bpu向预取单元成功发送信号，pc存储单元的pfPtrPlus1_rdata下一周期写入ToPrefetch接口</td>
+      </tr>
+      <tr>
+          <td>1.2.3</td>
+          <td>GET_PC_FOR_PREFETCH</td>
+          <td>COND3</td>
+          <td>不满足以上两种情况：pc存储单元的pfPtr_rdata在下一周期被写入ToPrefetch接口</td>
+      </tr>
+      <tr>
+          <td>1.3.1</td>
+          <td>SET_NEXT_ADDR</td>
+          <td>COND1</td>
+          <td>上一周期bpu写入信号，且旁路指针等于ifuptr时设置下一个发送的指令块的起始地址</td>
+      </tr>
+      <tr>
+          <td>1.3.2</td>
+          <td>SET_NEXT_ADDR</td>
+          <td>COND2</td>
+          <td>不满足情况1，bpu到ifu的接口发生fire时设置下一个发送的指令块的起始地址</td>
+      </tr>
+      <tr>
+          <td>1.3.3</td>
+          <td>SET_NEXT_ADDR</td>
+          <td>COND3</td>
+          <td>不满足情况1，2时设置下一个发送的指令块的起始地址</td>
+      </tr>
+      <tr>
+          <td>2.1.1</td>
+          <td>SEND_PC</td>
+          <td>IFU</td>
+          <td>向IFU发送取指目标</td>
+      </tr>
+      <tr>
+          <td>2.1.2</td>
+          <td>SEND_PC</td>
+          <td>ICACHE</td>
+          <td>向ICache发送取指目标</td>
+      </tr>
+      <tr>
+          <td>2.1.3</td>
+          <td>SEND_PC</td>
+          <td>PREFETCH</td>
+          <td>向Prefetch发送取指目标</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>FALSE_HIT</td>
+          <td>FALSE_HIT</td>
+          <td>当发往Ifu的pc接口toIfu中发生fallThruError，且FTB项命中时判断是否是错误命中</td>
+      </tr>
+      <tr>
+          <td>2.3</td>
+          <td>FLUSH_FROM_BPU</td>
+          <td>FLUSH_FROM_BPU</td>
+          <td>发往ifu的flushfrombpu(来自bpu的冲刷)接口中的s2，s3阶段的指针其中一条指针不大于发往ifu的req接口的ftqIdx的时候，应该冲刷掉新的发送给FTQ的预测信息</td>
+      </tr>
+      <tr>
+          <td>2.4</td>
+          <td>UPDATE_SEND_STATU</td>
+          <td>UPDATE_SEND_STATU</td>
+          <td>发往ifu的req接口发生fire，且req不被来自bpu的flush给冲刷掉时：<br>entry_fetch_status状态队列中ifuptr对应项的发送状态置为f_sent</td>
+      </tr>
+  </tbody>
 </table>
 
 </div>
@@ -2040,22 +2089,22 @@ entry_fetch_status状态队列中ifuptr对应项的发送状态置为f_sent。�
 </ul>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>预译码</td>
-<td>IFU会对取指目标进预译码，之后写回FTQ</td>
-</tr>
-<tr>
-<td>ifuWbPtr</td>
-<td>IFU写回指针，知识IFU预译码要写入FTQ的位置</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>预译码</td>
+          <td>IFU会对取指目标进预译码，之后写回FTQ</td>
+      </tr>
+      <tr>
+          <td>ifuWbPtr</td>
+          <td>IFU写回指针，知识IFU预译码要写入FTQ的位置</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-预译码写回ftq_pd_mem">1. 预译码写回ftq_pd_mem</h3>
@@ -2104,79 +2153,79 @@ entry_fetch_status状态队列中ifuptr对应项的发送状态置为f_sent。�
 <p>ifu_wb_valid拉高，表示写回有效，将ifuWbPtr更新为原值加1。</p>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>顶层IO</th>
-<th>子接口</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>fromIfu</td>
-<td>pdWb</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>顶层IO</th>
+          <th>子接口</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>fromIfu</td>
+          <td>pdWb</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>WB_PD</td>
-<td>WB_PD</td>
-<td>向ftq_pd_mem中写回预译码信息</td>
-</tr>
-<tr>
-<td>2</td>
-<td>UPDATE_COMMITSTATE</td>
-<td>UPDATE_COMMITSTATE</td>
-<td>当预译码信息pdWb有效时，根据预译码信息中每条指令的有效情况和该指令是否在有效范围内，判断指令的提交状态是否可以修改，若可以修改，则将提交状态队列，写回项中的指令状态修改</td>
-</tr>
-<tr>
-<td>3.1.1</td>
-<td>BR_FALSE_HIT</td>
-<td>COND1</td>
-<td>brSlots的任意一项有效，同时在预译码信息中不满足这一项对应的pd有效且isBr字段拉高</td>
-</tr>
-<tr>
-<td>3.1.2</td>
-<td>BR_FALSE_HIT</td>
-<td>COND2</td>
-<td>taiSlot有效且sharing字段拉高表明该slot为分支slot，同时在预译码信息中不满足这一项对应的pd有效且isBr字段拉高</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>JAL_FALSE_HIT</td>
-<td>JAL_FALSE_HIT</td>
-<td>指令预测有效，且其中isJal拉高或者指明是isjalr指令</td>
-</tr>
-<tr>
-<td>4</td>
-<td>PD_MISS</td>
-<td>PD_MISS</td>
-<td>如果回写项ftb命中且missoffset字段有效表明有错误预测的指令，hit_pd_mispred信号拉高</td>
-</tr>
-<tr>
-<td>5</td>
-<td>FALSE_HIT</td>
-<td>FALSE_HIT</td>
-<td>综合比对预测结果与预译码结果得到的错误信息，与预译码错误直接获得的预测错误，任意一种发生时has_false_hit拉高表示有预测错误，此时，命中状态队列entry_hit_status中写回项的状态置为h_false_hit</td>
-</tr>
-<tr>
-<td>6</td>
-<td>UPDATE_IFU_WB_PTR</td>
-<td>UPDATE_IFU_WB_PTR</td>
-<td>ifu_wb_valid拉高，将ifuWbPtr更新为原值加1</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>WB_PD</td>
+          <td>WB_PD</td>
+          <td>向ftq_pd_mem中写回预译码信息</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>UPDATE_COMMITSTATE</td>
+          <td>UPDATE_COMMITSTATE</td>
+          <td>当预译码信息pdWb有效时，根据预译码信息中每条指令的有效情况和该指令是否在有效范围内，判断指令的提交状态是否可以修改，若可以修改，则将提交状态队列，写回项中的指令状态修改</td>
+      </tr>
+      <tr>
+          <td>3.1.1</td>
+          <td>BR_FALSE_HIT</td>
+          <td>COND1</td>
+          <td>brSlots的任意一项有效，同时在预译码信息中不满足这一项对应的pd有效且isBr字段拉高</td>
+      </tr>
+      <tr>
+          <td>3.1.2</td>
+          <td>BR_FALSE_HIT</td>
+          <td>COND2</td>
+          <td>taiSlot有效且sharing字段拉高表明该slot为分支slot，同时在预译码信息中不满足这一项对应的pd有效且isBr字段拉高</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>JAL_FALSE_HIT</td>
+          <td>JAL_FALSE_HIT</td>
+          <td>指令预测有效，且其中isJal拉高或者指明是isjalr指令</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>PD_MISS</td>
+          <td>PD_MISS</td>
+          <td>如果回写项ftb命中且missoffset字段有效表明有错误预测的指令，hit_pd_mispred信号拉高</td>
+      </tr>
+      <tr>
+          <td>5</td>
+          <td>FALSE_HIT</td>
+          <td>FALSE_HIT</td>
+          <td>综合比对预测结果与预译码结果得到的错误信息，与预译码错误直接获得的预测错误，任意一种发生时has_false_hit拉高表示有预测错误，此时，命中状态队列entry_hit_status中写回项的状态置为h_false_hit</td>
+      </tr>
+      <tr>
+          <td>6</td>
+          <td>UPDATE_IFU_WB_PTR</td>
+          <td>UPDATE_IFU_WB_PTR</td>
+          <td>ifu_wb_valid拉高，将ifuWbPtr更新为原值加1</td>
+      </tr>
+  </tbody>
 </table>
 
 </div>
@@ -2200,18 +2249,18 @@ entry_fetch_status状态队列中ifuptr对应项的发送状态置为f_sent。�
 <p>对于重定向，后端有提前重定向机制，为了实现提前一拍读出在ftq中存储的重定向数据，减少redirect损失，后端会向ftq提前一拍（相对正式的后端redirect信号）传送ftqIdxAhead信号和ftqIdxSelOH信号。ftqIdxSelOH信号出现的原因，是早期版本要读多个ftqIdxAhead信号，以独热码的形式选其中一路作为最终确认的提前索引值，但现在只需要从一个端口获取ftqIdx信号了，ftqIdxAhead只能确认这一个端口了。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>sc_disagree</td>
-<td>统计SC预测错误用的性能计数器中需要用到的值，SC预测器是BPU子预测器TAGE-SC预测器的一个部分</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>sc_disagree</td>
+          <td>统计SC预测错误用的性能计数器中需要用到的值，SC预测器是BPU子预测器TAGE-SC预测器的一个部分</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-接收后端重定向信号">1. 接收后端重定向信号</h3>
@@ -2283,73 +2332,73 @@ entry_fetch_status状态队列中ifuptr对应项的发送状态置为f_sent。�
 </ul>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>顶层IO</th>
-<th>功能</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>fromBackend</td>
-<td>接收后端重定向信息</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>顶层IO</th>
+          <th>功能</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>fromBackend</td>
+          <td>接收后端重定向信息</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>RECERIVE_BACKEND_REDIRECT</td>
-<td>REDIRECT_AHEAD</td>
-<td>后端重定向写回时，首先会从后端到FTQ的IO接口（CtrltoFtqIO）中，看ftqIdx是不是有效信号，且此时后端正式重定向信号redirect无效，这时，提前重定向信号aheadValid有效</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>RECERIVE_BACKEND_REDIRECT</td>
-<td>REAL_REDIRECT_AHEAD</td>
-<td>如果此时后端正式重定向信号有效了，且ftqIdxSelOH拉高，同时上一周期重定向信号aheadValid是有效的，则真实提前重定向信号realAhdValid拉高</td>
-</tr>
-<tr>
-<td>1.3</td>
-<td>RECERIVE_BACKEND_REDIRECT</td>
-<td>STORE_REDIRECT</td>
-<td>后端真实重定向无效时写入寄存器</td>
-</tr>
-<tr>
-<td>2</td>
-<td>CHOOSE_AHEAD</td>
-<td>CHOOSE_AHEAD</td>
-<td>真实重定向有效时，直接将后端重定向信息传递给FTQ，否则，取重定向寄存器内的信号作为重定向信息传递给FTQ</td>
-</tr>
-<tr>
-<td>3.1.1</td>
-<td>READ_FTQ_SUBQUEUE</td>
-<td>READ_AHEAD</td>
-<td>发生提前重定向时，读取子队列需要两个周期</td>
-</tr>
-<tr>
-<td>3.1.2</td>
-<td>READ_FTQ_SUBQUEUE</td>
-<td>READ_NO_AHEAD</td>
-<td>未发生提前重定向时，读取子队列需要三个周期</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>ADD_SUBQUEUE_INFO</td>
-<td>ADD_SUBQUEUE_INFO</td>
-<td>将子队列信息整合到后端重定向信号</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>RECERIVE_BACKEND_REDIRECT</td>
+          <td>REDIRECT_AHEAD</td>
+          <td>后端重定向写回时，首先会从后端到FTQ的IO接口（CtrltoFtqIO）中，看ftqIdx是不是有效信号，且此时后端正式重定向信号redirect无效，这时，提前重定向信号aheadValid有效</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>RECERIVE_BACKEND_REDIRECT</td>
+          <td>REAL_REDIRECT_AHEAD</td>
+          <td>如果此时后端正式重定向信号有效了，且ftqIdxSelOH拉高，同时上一周期重定向信号aheadValid是有效的，则真实提前重定向信号realAhdValid拉高</td>
+      </tr>
+      <tr>
+          <td>1.3</td>
+          <td>RECERIVE_BACKEND_REDIRECT</td>
+          <td>STORE_REDIRECT</td>
+          <td>后端真实重定向无效时写入寄存器</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>CHOOSE_AHEAD</td>
+          <td>CHOOSE_AHEAD</td>
+          <td>真实重定向有效时，直接将后端重定向信息传递给FTQ，否则，取重定向寄存器内的信号作为重定向信息传递给FTQ</td>
+      </tr>
+      <tr>
+          <td>3.1.1</td>
+          <td>READ_FTQ_SUBQUEUE</td>
+          <td>READ_AHEAD</td>
+          <td>发生提前重定向时，读取子队列需要两个周期</td>
+      </tr>
+      <tr>
+          <td>3.1.2</td>
+          <td>READ_FTQ_SUBQUEUE</td>
+          <td>READ_NO_AHEAD</td>
+          <td>未发生提前重定向时，读取子队列需要三个周期</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>ADD_SUBQUEUE_INFO</td>
+          <td>ADD_SUBQUEUE_INFO</td>
+          <td>将子队列信息整合到后端重定向信号</td>
+      </tr>
+  </tbody>
 </table>
 
 </div>
@@ -2372,18 +2421,18 @@ entry_fetch_status状态队列中ifuptr对应项的发送状态置为f_sent。�
 <p>除了后端，IFU也会发送重定向相关消息，和后端不同，IFU的重定向信息来自于预译码写回信息。相同的是，它们都是通过BranchPredictionRedirect的接口传递重定向信息。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>RedirectLevel</td>
-<td>重定向等级，重定向请求是否包括本位置，低表示在本位置后重定向，高表示在本位置重定向。它在之后决定了由重定向导致的冲刷信号是否会影响到发生重定向的指令</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>RedirectLevel</td>
+          <td>重定向等级，重定向请求是否包括本位置，低表示在本位置后重定向，高表示在本位置重定向。它在之后决定了由重定向导致的冲刷信号是否会影响到发生重定向的指令</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-ifu重定向信号生成">1. IFU重定向信号生成</h3>
@@ -2436,56 +2485,56 @@ ifuFlush：来自IFU的冲刷信号，主要是由IFU重定向造成的，生成
 </ul>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>顶层IO</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>fromIFU</td>
-<td>接收来自IFU的预译码信息</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>顶层IO</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>fromIFU</td>
+          <td>接收来自IFU的预译码信息</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="接口时序">接口时序</h2>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>IFU_REDIRECT</td>
-<td>IFU_REDIRECT_GRN_VALID</td>
-<td>当预译码写回pdWb有效，且pdWb的missOffset字段有效表明存在预测错误的指令，同时后端冲刷信号backendFlush无效时，valid信号有效</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>IFU_REDIRECT</td>
-<td>IFU_REDIRECT_GEN</td>
-<td>允许生成IFU重定向时，在两周期内生成具体信号</td>
-</tr>
-<tr>
-<td>2</td>
-<td>IFU_REDIRECT_TO_BPU</td>
-<td>IFU_REDIRECT_TO_BPU</td>
-<td>IFU重定向生成后，IFU重定向结果生效</td>
-</tr>
-<tr>
-<td>3</td>
-<td>IFU_FLUSH</td>
-<td>IFU_FLUSH</td>
-<td>生成IFU重定向信息的两个周期内，ifuFlush信号都拉高</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>IFU_REDIRECT</td>
+          <td>IFU_REDIRECT_GRN_VALID</td>
+          <td>当预译码写回pdWb有效，且pdWb的missOffset字段有效表明存在预测错误的指令，同时后端冲刷信号backendFlush无效时，valid信号有效</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>IFU_REDIRECT</td>
+          <td>IFU_REDIRECT_GEN</td>
+          <td>允许生成IFU重定向时，在两周期内生成具体信号</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>IFU_REDIRECT_TO_BPU</td>
+          <td>IFU_REDIRECT_TO_BPU</td>
+          <td>IFU重定向生成后，IFU重定向结果生效</td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td>IFU_FLUSH</td>
+          <td>IFU_FLUSH</td>
+          <td>生成IFU重定向信息的两个周期内，ifuFlush信号都拉高</td>
+      </tr>
+  </tbody>
 </table>
 </mrs-testpoints>
 
@@ -2510,18 +2559,18 @@ ifuFlush：来自IFU的冲刷信号，主要是由IFU重定向造成的，生成
 <p>怎样算是一个最新的FTQ项，BPU最新发送的预测块可以是最新的FTQ项，其次，重定向发生时，需要回滚到发生错误预测之前的状态，从指定的FTQ项开始重新开始预测，预译码等等，这也可以是被更新的最新的FTQ项。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>暂无</td>
-<td>暂无</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>暂无</td>
+          <td>暂无</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h4 id="流程">流程</h4>
@@ -2560,43 +2609,43 @@ newest_entry_ptr，newest_entry_target这几个都是同名的内部信号，如
 </ul>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>顶层IO</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>toBackend</td>
-<td>发送取指令目标，让后端进行储存</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>顶层IO</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>toBackend</td>
+          <td>发送取指令目标，让后端进行储存</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>SEND_PC_TO_BACKEND</td>
-<td>SEND_PC</td>
-<td>发送取值目标到pc mem</td>
-</tr>
-<tr>
-<td>2</td>
-<td>SEND_PC_TO_BACKEND</td>
-<td>UPDATE_NEWEST</td>
-<td>更新最新的FTQ项</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>SEND_PC_TO_BACKEND</td>
+          <td>SEND_PC</td>
+          <td>发送取值目标到pc mem</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>SEND_PC_TO_BACKEND</td>
+          <td>UPDATE_NEWEST</td>
+          <td>更新最新的FTQ项</td>
+      </tr>
+  </tbody>
 </table>
 </mrs-testpoints>
 
@@ -2620,26 +2669,26 @@ newest_entry_ptr，newest_entry_target这几个都是同名的内部信号，如
 <p>后端的写回信息，包括重定向信息和更新信息，实际上都是执行之后，由实际执行单元根据结果发回的</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>cfiIndex_vec</td>
-<td>控制流指令索引队列，记录每个指令块中控制流指令的索引</td>
-</tr>
-<tr>
-<td>update_target</td>
-<td>更新目标队列，记录每个指令块的跳转目标</td>
-</tr>
-<tr>
-<td>FTQ最新项</td>
-<td>BPU新的写入，重定向等等都会对最新FTQ项进行新的安排，表明我们当前关注的最新FTQ项。</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>cfiIndex_vec</td>
+          <td>控制流指令索引队列，记录每个指令块中控制流指令的索引</td>
+      </tr>
+      <tr>
+          <td>update_target</td>
+          <td>更新目标队列，记录每个指令块的跳转目标</td>
+      </tr>
+      <tr>
+          <td>FTQ最新项</td>
+          <td>BPU新的写入，重定向等等都会对最新FTQ项进行新的安排，表明我们当前关注的最新FTQ项。</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-由后端的写回信号修改ftq状态">1. 由后端的写回信号修改FTQ状态</h3>
@@ -2699,103 +2748,103 @@ newest_entry_ptr，newest_entry_target这几个都是同名的内部信号，如
 <h4 id="22-修改ftq最新项">2.2 修改FTQ最新项</h4>
 <h2 id="常量说明">常量说明</h2>
 <table>
-<thead>
-<tr>
-<th>常量名</th>
-<th>常量值</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>常量1</td>
-<td>64</td>
-<td>常量1解释</td>
-</tr>
-<tr>
-<td>常量2</td>
-<td>8</td>
-<td>常量2解释</td>
-</tr>
-<tr>
-<td>常量3</td>
-<td>16</td>
-<td>常量3解释</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>常量名</th>
+          <th>常量值</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>常量1</td>
+          <td>64</td>
+          <td>常量1解释</td>
+      </tr>
+      <tr>
+          <td>常量2</td>
+          <td>8</td>
+          <td>常量2解释</td>
+      </tr>
+      <tr>
+          <td>常量3</td>
+          <td>16</td>
+          <td>常量3解释</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>顶层IO</th>
-<th>子接口</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>fromBackend</td>
-<td>redirect</td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>顶层IO</th>
+          <th>子接口</th>
+          <th></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>fromBackend</td>
+          <td>redirect</td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <p>实际使用下面的表格时，请用有意义的英文大写的功能名称和测试点名称替换下面表格中的名称</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1.1</td>
-<td>BACKEDN_REDIRECT_UPDATE_STATE</td>
-<td>UPDATE_CFIINDEXVEC</td>
-<td>后端重定向修改cfiinedex状态队列</td>
-</tr>
-<tr>
-<td>1.1.2</td>
-<td>BACKEDN_REDIRECT_UPDATE_STATE</td>
-<td>UPDATE_UPDATE_TARGET</td>
-<td>后端重定向修改update_target状态队列</td>
-</tr>
-<tr>
-<td>1.1.3</td>
-<td>BACKEDN_REDIRECT_UPDATE_STATE</td>
-<td>UPDATE_MISPREDICTVEC</td>
-<td>后端重定向修改mispredict状态队列</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>BACKEDN_REDIRECT_UPDATE_NEWEST</td>
-<td>BACKEDN_REDIRECT_UPDATE_NEWEST</td>
-<td>后端重定向修改FTQ最新项</td>
-</tr>
-<tr>
-<td>2.1.1</td>
-<td>IFU_REDIRECT_UPDATE_STATE</td>
-<td>UPDATE_CFIINDEXVEC</td>
-<td>IFU重定向修改cfiinedex状态队列</td>
-</tr>
-<tr>
-<td>2.1.2</td>
-<td>IFU_REDIRECT_UPDATE_STATE</td>
-<td>UPDATE_UPDATE_TARGET</td>
-<td>IFU重定向修改update_target状态队列</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>IFU_REDIRECT_UPDATE_NEWEST</td>
-<td>IFU_REDIRECT_UPDATE_NEWEST</td>
-<td>IFU重定向修改FTQ最新项</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1.1</td>
+          <td>BACKEDN_REDIRECT_UPDATE_STATE</td>
+          <td>UPDATE_CFIINDEXVEC</td>
+          <td>后端重定向修改cfiinedex状态队列</td>
+      </tr>
+      <tr>
+          <td>1.1.2</td>
+          <td>BACKEDN_REDIRECT_UPDATE_STATE</td>
+          <td>UPDATE_UPDATE_TARGET</td>
+          <td>后端重定向修改update_target状态队列</td>
+      </tr>
+      <tr>
+          <td>1.1.3</td>
+          <td>BACKEDN_REDIRECT_UPDATE_STATE</td>
+          <td>UPDATE_MISPREDICTVEC</td>
+          <td>后端重定向修改mispredict状态队列</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>BACKEDN_REDIRECT_UPDATE_NEWEST</td>
+          <td>BACKEDN_REDIRECT_UPDATE_NEWEST</td>
+          <td>后端重定向修改FTQ最新项</td>
+      </tr>
+      <tr>
+          <td>2.1.1</td>
+          <td>IFU_REDIRECT_UPDATE_STATE</td>
+          <td>UPDATE_CFIINDEXVEC</td>
+          <td>IFU重定向修改cfiinedex状态队列</td>
+      </tr>
+      <tr>
+          <td>2.1.2</td>
+          <td>IFU_REDIRECT_UPDATE_STATE</td>
+          <td>UPDATE_UPDATE_TARGET</td>
+          <td>IFU重定向修改update_target状态队列</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>IFU_REDIRECT_UPDATE_NEWEST</td>
+          <td>IFU_REDIRECT_UPDATE_NEWEST</td>
+          <td>IFU重定向修改FTQ最新项</td>
+      </tr>
+  </tbody>
 </table>
 
 </div>
@@ -2818,26 +2867,26 @@ newest_entry_ptr，newest_entry_target这几个都是同名的内部信号，如
 <p>之前讲了，后端和IFU重定向写回会修改一些状态队列。此外，FtqPtr也是一种比较重要的维护信息。由后端或者IFU引起的重定向，需要恢复各种类型用来索引FTQ项的FtqPtr。而当重定向是由后端发起的时候，还要修改提交状态队列，说明指令已经被执行。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>FTQ指针</td>
-<td>用来索引FTQ项，有不同类型的FTQ指针，比如bpuPtr，ifuPtr</td>
-</tr>
-<tr>
-<td>flush</td>
-<td>冲刷，发生时需要重置FTQ指针，以及重置其他状态</td>
-</tr>
-<tr>
-<td>融合指令</td>
-<td>一条指令可以和其他指令融合，形成融合指令</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>FTQ指针</td>
+          <td>用来索引FTQ项，有不同类型的FTQ指针，比如bpuPtr，ifuPtr</td>
+      </tr>
+      <tr>
+          <td>flush</td>
+          <td>冲刷，发生时需要重置FTQ指针，以及重置其他状态</td>
+      </tr>
+      <tr>
+          <td>融合指令</td>
+          <td>一条指令可以和其他指令融合，形成融合指令</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-冲刷ftq指针及提交状态队列">1. 冲刷FTQ指针及提交状态队列</h3>
@@ -2913,85 +2962,85 @@ newest_entry_ptr，newest_entry_target这几个都是同名的内部信号，如
 </ul>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>顶层IO</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>fromBackend</td>
-<td>接收后端重定向和指令提交</td>
-</tr>
-<tr>
-<td>fromIfu</td>
-<td>接收IFU重定向</td>
-</tr>
-<tr>
-<td>icacheFlush</td>
-<td>将flush信号转发到icache</td>
-</tr>
-<tr>
-<td>toIFU</td>
-<td>将后端重定向转发到IFU</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>顶层IO</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>fromBackend</td>
+          <td>接收后端重定向和指令提交</td>
+      </tr>
+      <tr>
+          <td>fromIfu</td>
+          <td>接收IFU重定向</td>
+      </tr>
+      <tr>
+          <td>icacheFlush</td>
+          <td>将flush信号转发到icache</td>
+      </tr>
+      <tr>
+          <td>toIFU</td>
+          <td>将后端重定向转发到IFU</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>FLUSH_FTQPTR_AND_COMMITSTATE</td>
-<td>FLUSH_COND</td>
-<td>后端写回接口fromBackend有效，或者IFU重定向有效时，进行冲刷</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>FLUSH_FTQPTR_AND_COMMITSTATE</td>
-<td>FLUSH_FTQ_PTR</td>
-<td>优先采用后端重定向信息冲刷FTQ指针</td>
-</tr>
-<tr>
-<td>1.3</td>
-<td>FLUSH_FTQPTR_AND_COMMITSTATE</td>
-<td>FLUSH_COMMIT_STATE</td>
-<td>发生后端重定向时，进一步修改提交状态队列</td>
-</tr>
-<tr>
-<td>2.1</td>
-<td>TRANSFER_TO_TOP</td>
-<td>FLUSH</td>
-<td>后端和IFU的重定向信号可能冲刷指针，拉高FTQ顶层IO接口中的icacheFlush信号</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>TRANSFER_TO_TOP</td>
-<td>IFU</td>
-<td>将重定向信号转发到IFU</td>
-</tr>
-<tr>
-<td>3.1</td>
-<td>COMMIT_BY_ROB</td>
-<td>NORMAL</td>
-<td>对于普通指令，根据rob_commits的ftqIdx和ftqOffset索引提交状态队列中的某条指令，将对应的提交状态设置为c_commited</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>COMMIT_BY_ROB</td>
-<td>FUSION</td>
-<td>对于融合指令，根据提交类型commitType对被索引的指令和另一与之融合的指令进行提交，将对应的提交状态设置为c_commited</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>FLUSH_FTQPTR_AND_COMMITSTATE</td>
+          <td>FLUSH_COND</td>
+          <td>后端写回接口fromBackend有效，或者IFU重定向有效时，进行冲刷</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>FLUSH_FTQPTR_AND_COMMITSTATE</td>
+          <td>FLUSH_FTQ_PTR</td>
+          <td>优先采用后端重定向信息冲刷FTQ指针</td>
+      </tr>
+      <tr>
+          <td>1.3</td>
+          <td>FLUSH_FTQPTR_AND_COMMITSTATE</td>
+          <td>FLUSH_COMMIT_STATE</td>
+          <td>发生后端重定向时，进一步修改提交状态队列</td>
+      </tr>
+      <tr>
+          <td>2.1</td>
+          <td>TRANSFER_TO_TOP</td>
+          <td>FLUSH</td>
+          <td>后端和IFU的重定向信号可能冲刷指针，拉高FTQ顶层IO接口中的icacheFlush信号</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>TRANSFER_TO_TOP</td>
+          <td>IFU</td>
+          <td>将重定向信号转发到IFU</td>
+      </tr>
+      <tr>
+          <td>3.1</td>
+          <td>COMMIT_BY_ROB</td>
+          <td>NORMAL</td>
+          <td>对于普通指令，根据rob_commits的ftqIdx和ftqOffset索引提交状态队列中的某条指令，将对应的提交状态设置为c_commited</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>COMMIT_BY_ROB</td>
+          <td>FUSION</td>
+          <td>对于融合指令，根据提交类型commitType对被索引的指令和另一与之融合的指令进行提交，将对应的提交状态设置为c_commited</td>
+      </tr>
+  </tbody>
 </table>
 
 </div>
@@ -3014,18 +3063,18 @@ newest_entry_ptr，newest_entry_target这几个都是同名的内部信号，如
 <p>FTQ将已提交指令的更新信息发往BPU进行训练，同时转发重定向信息。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>暂无</td>
-<td>暂无</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>暂无</td>
+          <td>暂无</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <h3 id="1-转发重定向">1. 转发重定向</h3>
@@ -3293,146 +3342,146 @@ FTB项生成逻辑：</p>
 </ul>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>顶层IO</th>
-<th></th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>toBpu</td>
-<td></td>
-<td>向BPU发送重定向信息与更新信息</td>
-</tr>
-<tr>
-<td>fromBackend</td>
-<td></td>
-<td>获取指令交割信息，判断指令块是否被提交</td>
-</tr>
-<tr>
-<td>mmioCommiRead</td>
-<td></td>
-<td>发送mmio指令的提交信息</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>顶层IO</th>
+          <th></th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>toBpu</td>
+          <td></td>
+          <td>向BPU发送重定向信息与更新信息</td>
+      </tr>
+      <tr>
+          <td>fromBackend</td>
+          <td></td>
+          <td>获取指令交割信息，判断指令块是否被提交</td>
+      </tr>
+      <tr>
+          <td>mmioCommiRead</td>
+          <td></td>
+          <td>发送mmio指令的提交信息</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表-必填项针对细分的测试点列出表格">测试点总表 (【必填项】针对细分的测试点，列出表格)</h2>
 <p>实际使用下面的表格时，请用有意义的英文大写的功能名称和测试点名称替换下面表格中的名称</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>TRANSFER_REDIRECT</td>
-<td>REDIRECT_FROM_FLUSH</td>
-<td>IFU重定向结果有效时，拉高该信号</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>TRANSFER_REDIRECT</td>
-<td>CHOOSE_REDIRECT</td>
-<td>如果后端重定向结果fromBackendRedirect有效，选用fromBackendRedirect，否则选用IFU重定向结果ifuRedirectToBpu</td>
-</tr>
-<tr>
-<td>2</td>
-<td>UPDATE_STALL</td>
-<td>UPDATE_STALL</td>
-<td>当发生BPU的更新时候，会暂停FTQ对指令块的提交以及发送更新信息</td>
-</tr>
-<tr>
-<td>3.1.1</td>
-<td>CAN_COMMIT_ENTRY</td>
-<td>COND1</td>
-<td>当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后,canCommit拉高</td>
-</tr>
-<tr>
-<td>3.1.2</td>
-<td>CAN_COMMIT_ENTRY</td>
-<td>COND2</td>
-<td>commitStateQueue 中commPtr对应指令块有指令处于c_toCommit 或c_committed状态。且指令块中最后一条处于c_toCommit 或c_committed状态的指令是c_committed的,canCommit拉高</td>
-</tr>
-<tr>
-<td>3.2.1</td>
-<td>MOVECOMMPTR</td>
-<td>BY_ROB_COMMIT</td>
-<td>在commPtr指向的指令块如果能提交,可以移动CommPtr</td>
-</tr>
-<tr>
-<td>3.2.2</td>
-<td>MOVECOMMPTR</td>
-<td>BY_FLUSH</td>
-<td>commitStateQueue 中commPtr对应指令块的第一条指令被后端重定向冲刷掉,可以移动CommPtr</td>
-</tr>
-<tr>
-<td>3.3.1</td>
-<td>UPDATE_ROB_COMM_PTR</td>
-<td>COND1</td>
-<td>当来自后端接口fromBackend的rob_commits信息中，有信息有效时，取最后一条有效交割信息的ftqIdx作为robCommPtr</td>
-</tr>
-<tr>
-<td>3.3.2</td>
-<td>UPDATE_ROB_COMM_PTR</td>
-<td>COND2</td>
-<td>不满足情况1，选取commPtr, robCommPtr中较大的那个</td>
-</tr>
-<tr>
-<td>3.4.1</td>
-<td>MMIO_LAST_COMMIT</td>
-<td>COND1</td>
-<td>当commPtr比来自mmioCommitRead接口的mmioFtqPtr大时,mmioLastCommit信号在下一个周期被拉高</td>
-</tr>
-<tr>
-<td>3.4.2</td>
-<td>MMIO_LAST_COMMIT</td>
-<td>COND2</td>
-<td>两者正好相等，且commPtr指向的指令块中有c_toCommit 或c_committed状态的指令，最后一条处于c_toCommit 或c_committed状态的指令是c_committed的,mmioLastCommit信号在下一个周期被拉高</td>
-</tr>
-<tr>
-<td>4.1</td>
-<td>SEND_UPDATE_TO_BPU</td>
-<td>SEND_SUBQUEUE_INFO_TO_UPDATE</td>
-<td>将提交项的子队列读取信息发向更新通道</td>
-</tr>
-<tr>
-<td>4.2.1</td>
-<td>UPDATE_FTB_ENTRY</td>
-<td>CREATE_NEW</td>
-<td>FTB未命中，创建一个新的FTB项</td>
-</tr>
-<tr>
-<td>4.2.2.1</td>
-<td>CREATE_NEW_FTB_ENTRY</td>
-<td>INSERT</td>
-<td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，插入新的slot</td>
-</tr>
-<tr>
-<td>4.2.2.2</td>
-<td>CREATE_NEW_FTB_ENTRY</td>
-<td>jmp target</td>
-<td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，<strong>当cfi指令是一个jalr指令</strong>，且旧的tailslot对应的是一个jump的指令，但tailslot指示的target与提交项指示的target不同时，说明需要对跳转目标进行修改</td>
-</tr>
-<tr>
-<td>4.2.2.3</td>
-<td>CREATE_NEW_FTB_ENTRY</td>
-<td>bias</td>
-<td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，<strong>当cfi指令就是原FTB项的条件跳转指令</strong>，只需要根据跳转情况设置跳转的强弱</td>
-</tr>
-<tr>
-<td>4.3</td>
-<td>SEND_UPDATE_TO_BPU</td>
-<td>SEND_NEW_FTB_RELATED</td>
-<td>根据是否hit，我们已经得到更新后的FTB项了，在这个基础上我们继续更新一些相关信号以发送到FTQ更新接口。</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>TRANSFER_REDIRECT</td>
+          <td>REDIRECT_FROM_FLUSH</td>
+          <td>IFU重定向结果有效时，拉高该信号</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>TRANSFER_REDIRECT</td>
+          <td>CHOOSE_REDIRECT</td>
+          <td>如果后端重定向结果fromBackendRedirect有效，选用fromBackendRedirect，否则选用IFU重定向结果ifuRedirectToBpu</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>UPDATE_STALL</td>
+          <td>UPDATE_STALL</td>
+          <td>当发生BPU的更新时候，会暂停FTQ对指令块的提交以及发送更新信息</td>
+      </tr>
+      <tr>
+          <td>3.1.1</td>
+          <td>CAN_COMMIT_ENTRY</td>
+          <td>COND1</td>
+          <td>当commPtr不等于ifuWbPtr，且没有因为BPU更新而暂停，同时robCommPtr在commPtr之后,canCommit拉高</td>
+      </tr>
+      <tr>
+          <td>3.1.2</td>
+          <td>CAN_COMMIT_ENTRY</td>
+          <td>COND2</td>
+          <td>commitStateQueue 中commPtr对应指令块有指令处于c_toCommit 或c_committed状态。且指令块中最后一条处于c_toCommit 或c_committed状态的指令是c_committed的,canCommit拉高</td>
+      </tr>
+      <tr>
+          <td>3.2.1</td>
+          <td>MOVECOMMPTR</td>
+          <td>BY_ROB_COMMIT</td>
+          <td>在commPtr指向的指令块如果能提交,可以移动CommPtr</td>
+      </tr>
+      <tr>
+          <td>3.2.2</td>
+          <td>MOVECOMMPTR</td>
+          <td>BY_FLUSH</td>
+          <td>commitStateQueue 中commPtr对应指令块的第一条指令被后端重定向冲刷掉,可以移动CommPtr</td>
+      </tr>
+      <tr>
+          <td>3.3.1</td>
+          <td>UPDATE_ROB_COMM_PTR</td>
+          <td>COND1</td>
+          <td>当来自后端接口fromBackend的rob_commits信息中，有信息有效时，取最后一条有效交割信息的ftqIdx作为robCommPtr</td>
+      </tr>
+      <tr>
+          <td>3.3.2</td>
+          <td>UPDATE_ROB_COMM_PTR</td>
+          <td>COND2</td>
+          <td>不满足情况1，选取commPtr, robCommPtr中较大的那个</td>
+      </tr>
+      <tr>
+          <td>3.4.1</td>
+          <td>MMIO_LAST_COMMIT</td>
+          <td>COND1</td>
+          <td>当commPtr比来自mmioCommitRead接口的mmioFtqPtr大时,mmioLastCommit信号在下一个周期被拉高</td>
+      </tr>
+      <tr>
+          <td>3.4.2</td>
+          <td>MMIO_LAST_COMMIT</td>
+          <td>COND2</td>
+          <td>两者正好相等，且commPtr指向的指令块中有c_toCommit 或c_committed状态的指令，最后一条处于c_toCommit 或c_committed状态的指令是c_committed的,mmioLastCommit信号在下一个周期被拉高</td>
+      </tr>
+      <tr>
+          <td>4.1</td>
+          <td>SEND_UPDATE_TO_BPU</td>
+          <td>SEND_SUBQUEUE_INFO_TO_UPDATE</td>
+          <td>将提交项的子队列读取信息发向更新通道</td>
+      </tr>
+      <tr>
+          <td>4.2.1</td>
+          <td>UPDATE_FTB_ENTRY</td>
+          <td>CREATE_NEW</td>
+          <td>FTB未命中，创建一个新的FTB项</td>
+      </tr>
+      <tr>
+          <td>4.2.2.1</td>
+          <td>CREATE_NEW_FTB_ENTRY</td>
+          <td>INSERT</td>
+          <td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，插入新的slot</td>
+      </tr>
+      <tr>
+          <td>4.2.2.2</td>
+          <td>CREATE_NEW_FTB_ENTRY</td>
+          <td>jmp target</td>
+          <td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，<strong>当cfi指令是一个jalr指令</strong>，且旧的tailslot对应的是一个jump的指令，但tailslot指示的target与提交项指示的target不同时，说明需要对跳转目标进行修改</td>
+      </tr>
+      <tr>
+          <td>4.2.2.3</td>
+          <td>CREATE_NEW_FTB_ENTRY</td>
+          <td>bias</td>
+          <td>FTB未命中，创建一个新的FTB项,在原来的基础上改动即可，<strong>当cfi指令就是原FTB项的条件跳转指令</strong>，只需要根据跳转情况设置跳转的强弱</td>
+      </tr>
+      <tr>
+          <td>4.3</td>
+          <td>SEND_UPDATE_TO_BPU</td>
+          <td>SEND_NEW_FTB_RELATED</td>
+          <td>根据是否hit，我们已经得到更新后的FTB项了，在这个基础上我们继续更新一些相关信号以发送到FTQ更新接口。</td>
+      </tr>
+  </tbody>
 </table>
 
 </div>
@@ -3483,7 +3532,7 @@ FTB项生成逻辑：</p>
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

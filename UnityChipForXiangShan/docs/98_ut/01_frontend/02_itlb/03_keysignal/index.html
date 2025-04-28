@@ -19,22 +19,30 @@
 
 <title>关键信号说明 | 万众一芯之香山处理器</title>
 <meta name="description" content="相关 CSR 寄存器 val csr = Input(new TlbCsrBundle) csr：包含 satp、vsatp、hgatp 三个寄存器的信息以及一些权限信息。
-class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new TlbSatpBundle() val vsatp = new TlbSatpBundle() val hgatp = new TlbHgatpBundle() val priv = new Bundle { val mxr = Bool() val sum = Bool() val vmxr = Bool() val vsum = Bool() val virt = Bool() val spvp = UInt(1.W) val imode = UInt(2.W) val dmode = UInt(2.">
-<meta property="og:title" content="关键信号说明" />
-<meta property="og:description" content="相关 CSR 寄存器 val csr = Input(new TlbCsrBundle) csr：包含 satp、vsatp、hgatp 三个寄存器的信息以及一些权限信息。
-class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new TlbSatpBundle() val vsatp = new TlbSatpBundle() val hgatp = new TlbHgatpBundle() val priv = new Bundle { val mxr = Bool() val sum = Bool() val vmxr = Bool() val vsum = Bool() val virt = Bool() val spvp = UInt(1.W) val imode = UInt(2.W) val dmode = UInt(2." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/03_keysignal/" /><meta property="article:section" content="docs" />
+class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new TlbSatpBundle() val vsatp = new TlbSatpBundle() val hgatp = new TlbHgatpBundle() val priv = new Bundle { val mxr = Bool() val sum = Bool() val vmxr = Bool() val vsum = Bool() val virt = Bool() val spvp = UInt(1.W) val imode = UInt(2.W) val dmode = UInt(2.W) } override def toPrintable: Printable = { p&#34;Satp mode:0x${Hexadecimal(satp.mode)} asid:0x${Hexadecimal(satp.asid)} ppn:0x${Hexadecimal(satp.ppn)} &#34; &#43; p&#34;Priv mxr:${priv.mxr} sum:${priv.sum} imode:${priv.imode} dmode:${priv.dmode}&#34; } } TlbCsrBundle 中包含了 satp、vsatp、hgatp 以及 priv 特权标志。其中 satp 与 vsatp 通过 TlbSatpBundle 实现，包括 mode、asid、ppn、changed 以及一个 apply 方法：
+class SatpStruct(implicit p: Parameters) extends XSBundle { val mode = UInt(4.W) val asid = UInt(16.W) val ppn = UInt(44.W) } class TlbSatpBundle(implicit p: Parameters) extends SatpStruct { val changed = Bool() // Todo: remove it def apply(satp_value: UInt): Unit = { require(satp_value.getWidth == XLEN) val sa = satp_value.asTypeOf(new SatpStruct) mode := sa.mode asid := sa.asid ppn := sa.ppn changed := DataChanged(sa.asid) // when ppn is changed, software need do the flush } } hgatp 通过 TlbHgatpBundle 实现，区别在于将 asid 替换为 vmid：">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/03_keysignal/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="关键信号说明">
+  <meta property="og:description" content="相关 CSR 寄存器 val csr = Input(new TlbCsrBundle) csr：包含 satp、vsatp、hgatp 三个寄存器的信息以及一些权限信息。
+class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new TlbSatpBundle() val vsatp = new TlbSatpBundle() val hgatp = new TlbHgatpBundle() val priv = new Bundle { val mxr = Bool() val sum = Bool() val vmxr = Bool() val vsum = Bool() val virt = Bool() val spvp = UInt(1.W) val imode = UInt(2.W) val dmode = UInt(2.W) } override def toPrintable: Printable = { p&#34;Satp mode:0x${Hexadecimal(satp.mode)} asid:0x${Hexadecimal(satp.asid)} ppn:0x${Hexadecimal(satp.ppn)} &#34; &#43; p&#34;Priv mxr:${priv.mxr} sum:${priv.sum} imode:${priv.imode} dmode:${priv.dmode}&#34; } } TlbCsrBundle 中包含了 satp、vsatp、hgatp 以及 priv 特权标志。其中 satp 与 vsatp 通过 TlbSatpBundle 实现，包括 mode、asid、ppn、changed 以及一个 apply 方法：
+class SatpStruct(implicit p: Parameters) extends XSBundle { val mode = UInt(4.W) val asid = UInt(16.W) val ppn = UInt(44.W) } class TlbSatpBundle(implicit p: Parameters) extends SatpStruct { val changed = Bool() // Todo: remove it def apply(satp_value: UInt): Unit = { require(satp_value.getWidth == XLEN) val sa = satp_value.asTypeOf(new SatpStruct) mode := sa.mode asid := sa.asid ppn := sa.ppn changed := DataChanged(sa.asid) // when ppn is changed, software need do the flush } } hgatp 通过 TlbHgatpBundle 实现，区别在于将 asid 替换为 vmid：">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
 
-<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="name" content="关键信号说明">
-<meta itemprop="description" content="相关 CSR 寄存器 val csr = Input(new TlbCsrBundle) csr：包含 satp、vsatp、hgatp 三个寄存器的信息以及一些权限信息。
-class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new TlbSatpBundle() val vsatp = new TlbSatpBundle() val hgatp = new TlbHgatpBundle() val priv = new Bundle { val mxr = Bool() val sum = Bool() val vmxr = Bool() val vsum = Bool() val virt = Bool() val spvp = UInt(1.W) val imode = UInt(2.W) val dmode = UInt(2.">
-<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="wordCount" content="847">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="关键信号说明"/>
-<meta name="twitter:description" content="相关 CSR 寄存器 val csr = Input(new TlbCsrBundle) csr：包含 satp、vsatp、hgatp 三个寄存器的信息以及一些权限信息。
-class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new TlbSatpBundle() val vsatp = new TlbSatpBundle() val hgatp = new TlbHgatpBundle() val priv = new Bundle { val mxr = Bool() val sum = Bool() val vmxr = Bool() val vsum = Bool() val virt = Bool() val spvp = UInt(1.W) val imode = UInt(2.W) val dmode = UInt(2."/>
+  <meta itemprop="name" content="关键信号说明">
+  <meta itemprop="description" content="相关 CSR 寄存器 val csr = Input(new TlbCsrBundle) csr：包含 satp、vsatp、hgatp 三个寄存器的信息以及一些权限信息。
+class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new TlbSatpBundle() val vsatp = new TlbSatpBundle() val hgatp = new TlbHgatpBundle() val priv = new Bundle { val mxr = Bool() val sum = Bool() val vmxr = Bool() val vsum = Bool() val virt = Bool() val spvp = UInt(1.W) val imode = UInt(2.W) val dmode = UInt(2.W) } override def toPrintable: Printable = { p&#34;Satp mode:0x${Hexadecimal(satp.mode)} asid:0x${Hexadecimal(satp.asid)} ppn:0x${Hexadecimal(satp.ppn)} &#34; &#43; p&#34;Priv mxr:${priv.mxr} sum:${priv.sum} imode:${priv.imode} dmode:${priv.dmode}&#34; } } TlbCsrBundle 中包含了 satp、vsatp、hgatp 以及 priv 特权标志。其中 satp 与 vsatp 通过 TlbSatpBundle 实现，包括 mode、asid、ppn、changed 以及一个 apply 方法：
+class SatpStruct(implicit p: Parameters) extends XSBundle { val mode = UInt(4.W) val asid = UInt(16.W) val ppn = UInt(44.W) } class TlbSatpBundle(implicit p: Parameters) extends SatpStruct { val changed = Bool() // Todo: remove it def apply(satp_value: UInt): Unit = { require(satp_value.getWidth == XLEN) val sa = satp_value.asTypeOf(new SatpStruct) mode := sa.mode asid := sa.asid ppn := sa.ppn changed := DataChanged(sa.asid) // when ppn is changed, software need do the flush } } hgatp 通过 TlbHgatpBundle 实现，区别在于将 asid 替换为 vmid：">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="847">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="关键信号说明">
+  <meta name="twitter:description" content="相关 CSR 寄存器 val csr = Input(new TlbCsrBundle) csr：包含 satp、vsatp、hgatp 三个寄存器的信息以及一些权限信息。
+class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new TlbSatpBundle() val vsatp = new TlbSatpBundle() val hgatp = new TlbHgatpBundle() val priv = new Bundle { val mxr = Bool() val sum = Bool() val vmxr = Bool() val vsum = Bool() val virt = Bool() val spvp = UInt(1.W) val imode = UInt(2.W) val dmode = UInt(2.W) } override def toPrintable: Printable = { p&#34;Satp mode:0x${Hexadecimal(satp.mode)} asid:0x${Hexadecimal(satp.asid)} ppn:0x${Hexadecimal(satp.ppn)} &#34; &#43; p&#34;Priv mxr:${priv.mxr} sum:${priv.sum} imode:${priv.imode} dmode:${priv.dmode}&#34; } } TlbCsrBundle 中包含了 satp、vsatp、hgatp 以及 priv 特权标志。其中 satp 与 vsatp 通过 TlbSatpBundle 实现，包括 mode、asid、ppn、changed 以及一个 apply 方法：
+class SatpStruct(implicit p: Parameters) extends XSBundle { val mode = UInt(4.W) val asid = UInt(16.W) val ppn = UInt(44.W) } class TlbSatpBundle(implicit p: Parameters) extends SatpStruct { val changed = Bool() // Todo: remove it def apply(satp_value: UInt): Unit = { require(satp_value.getWidth == XLEN) val sa = satp_value.asTypeOf(new SatpStruct) mode := sa.mode asid := sa.asid ppn := sa.ppn changed := DataChanged(sa.asid) // when ppn is changed, software need do the flush } } hgatp 通过 TlbHgatpBundle 实现，区别在于将 asid 替换为 vmid：">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -136,7 +144,7 @@ class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new Tlb
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -160,7 +168,7 @@ class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new Tlb
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -576,7 +584,7 @@ class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new Tlb
 <li><code>asid</code>：地址空间标识符，用于区分不同进程，香山昆明湖架构使用的 <code>SV48</code> 中最大长度为 <code>16</code>。</li>
 <li><code>ppn</code>：<code>Page Table Pointer</code>，根页表的物理页框号，其位宽为 <code>44</code> 位，由物理地址右移 <code>12</code> 位得到。</li>
 </ul>
-<p><img alt="SATP" src="satp.png"></p>
+<p><img src="satp.png" alt="SATP"></p>
 <h4 id="vsatp"><code>VSATP</code></h4>
 <ul>
 <li><code>vsatp (Virtual Supervisor Address Translation and Protection)</code> 是虚拟机中客体操作系统的地址转换寄存器，提供虚拟机的虚拟地址到中间物理地址（<code>IPA</code>）的转换。</li>
@@ -584,7 +592,7 @@ class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new Tlb
 <li><code>asid</code>：虚拟机内地址空间标识符。</li>
 <li><code>ppn</code>：虚拟机页表的物理基地址。</li>
 </ul>
-<p><img alt="VSATP" src="vsatp.png"></p>
+<p><img src="vsatp.png" alt="VSATP"></p>
 <h4 id="hgatp"><code>HGATP</code></h4>
 <ul>
 <li><code>hgatp (Hypervisor Guest Address Translation and Protection)</code> 是虚拟机监控程序（<code>Hypervisor</code>）的二级地址转换寄存器，用于将虚拟机的中间物理地址（<code>IPA</code>）转换为主机物理地址（<code>HPA</code>）。</li>
@@ -598,7 +606,7 @@ class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new Tlb
 <li><code>vmid</code>：虚拟机标识符，区分不同虚拟机。</li>
 <li><code>ppn</code>：二级页表的物理基地址。</li>
 </ul>
-<p><img alt="HGATP" src="hgatp.png"></p>
+<p><img src="hgatp.png" alt="HGATP"></p>
 <p><code>satp</code> 管理主机地址空间的虚拟地址到物理地址的转换，<code>vsatp</code> 用于虚拟机中的虚拟地址到中间物理地址（<code>IPA</code>）的转换，而 <code>hgatp</code> 则负责虚拟机二级地址转换，将 <code>IPA</code> 转换为主机物理地址。</p>
 <h4 id="priv"><code>PRIV</code></h4>
 <ul>
@@ -720,34 +728,34 @@ class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new Tlb
 </span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">with</span> <span style="color:#000">HasCSRConst</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">with</span> <span style="color:#000">HasPerfEvents</span>
 </span></span></code></pre></div><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Width: Int</code></td>
-<td>指示 <code>requestor</code> 的数量</td>
-</tr>
-<tr>
-<td><code>nRespDups: Int = 1</code></td>
-<td>需要复制 <code>response</code> 的数目，默认为 <code>1</code>（不复制）</td>
-</tr>
-<tr>
-<td><code>Block: Seq[Boolean]</code></td>
-<td>指示每个 <code>requestor</code> 是否被阻塞</td>
-</tr>
-<tr>
-<td><code>q: TLBParameters</code></td>
-<td>TLB 使用的参数</td>
-</tr>
-<tr>
-<td><code>p: Parameter</code></td>
-<td>全局参数（香山架构参数）</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>参数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>Width: Int</code></td>
+          <td>指示 <code>requestor</code> 的数量</td>
+      </tr>
+      <tr>
+          <td><code>nRespDups: Int = 1</code></td>
+          <td>需要复制 <code>response</code> 的数目，默认为 <code>1</code>（不复制）</td>
+      </tr>
+      <tr>
+          <td><code>Block: Seq[Boolean]</code></td>
+          <td>指示每个 <code>requestor</code> 是否被阻塞</td>
+      </tr>
+      <tr>
+          <td><code>q: TLBParameters</code></td>
+          <td>TLB 使用的参数</td>
+      </tr>
+      <tr>
+          <td><code>p: Parameter</code></td>
+          <td>全局参数（香山架构参数）</td>
+      </tr>
+  </tbody>
 </table>
 <p>实例化 <code>TLB</code> 时以香山架构的 <code>itlb</code> 为例：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">itlb</span> <span style="color:#204a87;font-weight:bold">=</span> <span style="color:#000">Module</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">TLB</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">coreParams</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">itlbPortNum</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">nRespDups</span> <span style="color:#204a87;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Seq</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">fill</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">PortNumber</span><span style="color:#ce5c00;font-weight:bold">)(</span><span style="color:#204a87;font-weight:bold">false</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">++</span> <span style="color:#000">Seq</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#ce5c00;font-weight:bold">),</span> <span style="color:#000">itlbParams</span><span style="color:#ce5c00;font-weight:bold">))</span>
@@ -813,7 +821,7 @@ class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new Tlb
 </ul>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 
 </div>
@@ -857,7 +865,7 @@ class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new Tlb
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

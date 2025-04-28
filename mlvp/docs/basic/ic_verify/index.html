@@ -19,21 +19,22 @@
 
 <title>芯片验证 | 开放验证平台学习资源</title>
 <meta name="description" content="关于芯片验证的基本概念">
-<meta property="og:title" content="芯片验证" />
-<meta property="og:description" content="关于芯片验证的基本概念
-" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/docs/basic/ic_verify/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/mlvp/docs/basic/ic_verify/">
+  <meta property="og:site_name" content="开放验证平台学习资源">
+  <meta property="og:title" content="芯片验证">
+  <meta property="og:description" content="关于芯片验证的基本概念">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:44:02+08:00">
 
-<meta property="article:modified_time" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="name" content="芯片验证">
-<meta itemprop="description" content="关于芯片验证的基本概念
-">
-<meta itemprop="dateModified" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="wordCount" content="144">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="芯片验证"/>
-<meta name="twitter:description" content="关于芯片验证的基本概念
-"/>
+  <meta itemprop="name" content="芯片验证">
+  <meta itemprop="description" content="关于芯片验证的基本概念">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="144">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="芯片验证">
+  <meta name="twitter:description" content="关于芯片验证的基本概念">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -133,7 +134,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -157,7 +158,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -359,7 +360,7 @@
 </p></blockquote>
 <h2 id="芯片验证流程">芯片验证流程</h2>
 <hr>
-<p><img alt="验证在芯片设计中的位置" src="ic-verify.drawio.svg"></p>
+<p><img src="ic-verify.drawio.svg" alt="验证在芯片设计中的位置"></p>
 <p>芯片设计和验证的耦合关系如上图所示，设计和验证有同样的输入，即规范文档（specification）。参考规范，设计与验证人员双方按照各自的理解，以及各自的需求进行独立编码实现。设计方需要满足的前提是编码的RTL代码“可综合”，需要考虑电路特性，而验证方一般只要考虑功能是否满足要求，编码限制少。双方完成模块开发后，需要进行健全性对比测试（Sanity Test），判定功能是否表现一致，若不一致需要进行协同排查，确定问题所在并进行修复，再进行对比测试，直到所有功能点都满足预期。由于芯片设计和芯片验证耦合度很高，因此有些企业在研发队伍上也进行了直接耦合，为每个子模块的设计团队都配置了对应的验证团队（DV）。上图中的设计与验证的耦合流程为粗粒度的关系，具体到具体芯片（例如Soc、DDR）、具体企业等都有其适合自身的合作模式。</p>
 <p>在上述对比测试中，设计方的产出的模块通常称为DUT（Design Under Test），验证方开发的模型通常称为RM（Reference Model）。针对图中的验证工作，按照流程可以有：编写验证计划、创建验证平台、整理功能点、构建测试用例、运行调试、收集Bug/覆盖率、回归测试、编写测试报告等多个阶段。</p>
 <blockquote><p>
@@ -419,7 +420,7 @@
 <h2 id="芯片验证众包">芯片验证众包</h2>
 <hr>
 <p>相比与硬件，软件领域为了减少软件测试成本，测试外包（分包）已经成为常态，该领域的分包业务非常成熟，市场规模已经是千亿人民币级别，并朝万亿级别规模进发。从工作内容上看，软件测试和硬件验证，有非常大的共同特征（系统的目的不同的对象），如果以软件的方式对硬件验证进行分包是否可行？</p>
-<p><img alt="软件外包市场" src="maket_of_soft_test.png"></p>
+<p><img src="maket_of_soft_test.png" alt="软件外包市场"></p>
 <blockquote><p>
 把芯片验证工作进行外包（分包）面临诸多挑战，例如：
 <p><strong>从业人员基数少：</strong> 相比软件领域，硬件开发者数量少了几个数量级。例如在github的统计上（https://madnight.github.io/githut/#/pull_requests/2023/2），传统软件编程语言占（Python、Java、C++，Go）比接近 50%， 而硬件描述语言，verilog占比仅 0.076%，这能从侧面反应出各自领域的开发者数量。</p>
@@ -449,7 +450,7 @@
 
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 25, 2025: <a href="https://github.com/XS-MLVP/course/commit/1a44bfa239ee57ae2f3162e4a24390caa05f9553">update Toffee document address (1a44bfa)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/d04c617785d261fcdfbe044e537c68a450369c09">Upgrade hugo version to 0.146.7 (d04c617)</a>
 </div>
 
 </div>
@@ -493,7 +494,7 @@
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

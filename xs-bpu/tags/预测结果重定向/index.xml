@@ -4,7 +4,7 @@
     <title>预测结果重定向 on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</title>
     <link>https://open-verify.cc/xs-bpu/tags/%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%87%8D%E5%AE%9A%E5%90%91/</link>
     <description>Recent content in 预测结果重定向 on 香山微架构开放验证第一期：昆明湖BPU模块UT验证实战</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>zh-cn</language>
     <atom:link href="https://open-verify.cc/xs-bpu/tags/%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%87%8D%E5%AE%9A%E5%90%91/index.xml" rel="self" type="application/rss+xml" />
     <item>
@@ -12,7 +12,7 @@
       <link>https://open-verify.cc/xs-bpu/docs/basic/03_xsbpu_timing/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://open-verify.cc/xs-bpu/docs/basic/03_xsbpu_timing/</guid>
-      <description>一周期无空泡预测 uFTB 是香山 BPU 中唯一一个可以在一周期便可以产生预测结果的预测器，上图中展示了 uFTB 的预测过程。s0_pc 由 BPU 顶层送入，s1 周期生效时，s1_pc 保存了上一周期 s0_pc 的值，依次类推。也就是说传入的 s0_pc 的值会随流水线向下移动。&#xA;在 s1 周期生效时，uFTB 会接收到本周期传来的 s1_fire 信号，并根据 s1_pc 指示的地址，在本周期生成预测结果，在预测结果中可以获取新的 PC 值。&#xA;如图所示，BPU 顶层根据 s1 预测结果通道，分析出下一个 PC 值的位置（即图中的 target），并将其送往 npc_Gen （即新PC生成器）中，用于产生下一个周期的 s0_pc。&#xA;于是下一周期，uFTB 获取到了新的 PC 值，并开始了新 PC 值预测块的产生。由此可见，仅凭借 s1 周期，便可以以一周期一个预测块的速度来产生预测结果。&#xA;预测结果重定向 但除了 uFTB 以外，其他预测器都需要 2-3 个周期才可以产生预测结果，如何利用起他们的预测结果？又如何生成预测结果重定向信号呢？&#xA;如图中所示，一个两周期产生预测结果的 Predirector 2 ，可以在 s2 周期，向 s2 预测结果通道内输出它的预测结果。BPU 顶层拿到预测结果后，分析出预测块的跳转目标地址 target 并连向 npc_Gen。&#xA;此时连向 npc_Gen 的信号中，既有 s2 产生的旧 PC 的预测结果，又有 s1 产生的新 PC 的预测结果，该如何抉择新 PC 用哪一个呢？</description>
+      <description>&lt;h2 id=&#34;一周期无空泡预测&#34;&gt;一周期无空泡预测&lt;/h2&gt;&#xA;&#xA;&lt;figure&gt;&#xA;    &lt;img src=&#34;1.png&#34; width=&#34;500px&#34;/&gt; &#xA;&lt;/figure&gt;&#xA;&#xA;&lt;p&gt;&lt;code&gt;uFTB&lt;/code&gt; 是香山 BPU 中唯一一个可以在一周期便可以产生预测结果的预测器，上图中展示了 &lt;code&gt;uFTB&lt;/code&gt; 的预测过程。&lt;code&gt;s0_pc&lt;/code&gt; 由 BPU 顶层送入，s1 周期生效时，&lt;code&gt;s1_pc&lt;/code&gt; 保存了上一周期 &lt;code&gt;s0_pc&lt;/code&gt; 的值，依次类推。也就是说传入的 &lt;code&gt;s0_pc&lt;/code&gt; 的值会随流水线向下移动。&lt;/p&gt;&#xA;&lt;p&gt;在 s1 周期生效时，&lt;code&gt;uFTB&lt;/code&gt; 会接收到本周期传来的 &lt;code&gt;s1_fire&lt;/code&gt; 信号，并根据 &lt;code&gt;s1_pc&lt;/code&gt; 指示的地址，在本周期生成预测结果，在预测结果中可以获取新的 PC 值。&lt;/p&gt;&#xA;&#xA;&lt;figure&gt;&#xA;    &lt;img src=&#34;2.png&#34; width=&#34;500px&#34;/&gt; &#xA;&lt;/figure&gt;&#xA;&#xA;&lt;p&gt;如图所示，BPU 顶层根据 s1 预测结果通道，分析出下一个 PC 值的位置（即图中的 target），并将其送往 &lt;code&gt;npc_Gen&lt;/code&gt; （即新PC生成器）中，用于产生下一个周期的 s0_pc。&lt;/p&gt;&#xA;&lt;p&gt;于是下一周期，&lt;code&gt;uFTB&lt;/code&gt; 获取到了新的 PC 值，并开始了新 PC 值预测块的产生。由此可见，仅凭借 s1 周期，便可以以一周期一个预测块的速度来产生预测结果。&lt;/p&gt;&#xA;&lt;h2 id=&#34;预测结果重定向&#34;&gt;预测结果重定向&lt;/h2&gt;&#xA;&lt;p&gt;但除了 &lt;code&gt;uFTB&lt;/code&gt; 以外，其他预测器都需要 2-3 个周期才可以产生预测结果，如何利用起他们的预测结果？又如何生成预测结果重定向信号呢？&lt;/p&gt;&#xA;&#xA;&lt;figure&gt;&#xA;    &lt;img src=&#34;3.png&#34; width=&#34;500px&#34;/&gt; &#xA;&lt;/figure&gt;&#xA;&#xA;&lt;p&gt;如图中所示，一个两周期产生预测结果的 &lt;code&gt;Predirector 2&lt;/code&gt; ，可以在 s2 周期，向 s2 预测结果通道内输出它的预测结果。BPU 顶层拿到预测结果后，分析出预测块的跳转目标地址 &lt;code&gt;target&lt;/code&gt; 并连向 &lt;code&gt;npc_Gen&lt;/code&gt;。&lt;/p&gt;&#xA;&lt;p&gt;此时连向 &lt;code&gt;npc_Gen&lt;/code&gt; 的信号中，既有 s2 产生的旧 PC 的预测结果，又有 s1 产生的新 PC 的预测结果，该如何抉择新 PC 用哪一个呢？&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

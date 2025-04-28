@@ -19,18 +19,25 @@
 
 <title>PyTest | 开放验证平台学习资源</title>
 <meta name="description" content="可用来管理测试，生成测试报告">
-<meta property="og:title" content="PyTest" />
-<meta property="og:description" content="可用来管理测试，生成测试报告" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/docs/env_usage/frameworks/pytest/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/mlvp/docs/env_usage/frameworks/pytest/">
+  <meta property="og:site_name" content="开放验证平台学习资源">
+  <meta property="og:title" content="PyTest">
+  <meta property="og:description" content="可用来管理测试，生成测试报告">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:44:02+08:00">
+    <meta property="article:tag" content="Examples">
+    <meta property="article:tag" content="Docs">
 
-<meta property="article:modified_time" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="name" content="PyTest">
-<meta itemprop="description" content="可用来管理测试，生成测试报告">
-<meta itemprop="dateModified" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="wordCount" content="387">
-<meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PyTest"/>
-<meta name="twitter:description" content="可用来管理测试，生成测试报告"/>
+  <meta itemprop="name" content="PyTest">
+  <meta itemprop="description" content="可用来管理测试，生成测试报告">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="387">
+  <meta itemprop="keywords" content="Examples,Docs">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PyTest">
+  <meta name="twitter:description" content="可用来管理测试，生成测试报告">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -130,7 +137,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +161,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -359,8 +366,7 @@
 <li>集成测试：称组装测试，通常在单元测试的基础上，将所有程序模块进行有序的、递增测试，重点测试不同模块的接口部分</li>
 <li>系统测试：将整个软件系统看成一个整体进行测试，包括对功能、性能以及软件所运行的软硬件环境进行测试</li>
 <li>验收测试：指按照项目任务书或合同、供需双方约定的验收依据文档进行的对整个系统的测试与评审，决定是否接收或拒收系统</li>
-</ul>
-</blockquote>
+</ul></blockquote>
 <p>pytest最初是作为一个单元测试框架而设计的，但它也提供了许多功能，使其能够进行更广泛的测试，包括集成测试，系统测试，他是一个非常成熟的全功能的python 测试框架。
 它通过收集测试函数和模块，并提供丰富的断言库来简化测试的编写和运行，是一个非常成熟且功能强大的 Python 测试框架，具有以下几个特点：</p>
 <ul>
@@ -458,8 +464,7 @@
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 以上选择测试用例的方法均是在**命令行**，如果您想直接在测试程序里执行可以直接在main函数中**调用pytest.main()**,其格式为：</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">pytest</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">main</span><span style="color:#000;font-weight:bold">([</span><span style="color:#000">模块</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">py</span><span style="color:#000;font-weight:bold">::</span><span style="color:#000">类</span><span style="color:#000;font-weight:bold">::</span><span style="color:#000">方法</span><span style="color:#000;font-weight:bold">])</span>
 </span></span></code></pre></div><blockquote>
-<p>此外，Pytest 还支持控制测试用例执行的多种方式，例如过滤执行、多进程运行、重试运行等。</p>
-</blockquote>
+<p>此外，Pytest 还支持控制测试用例执行的多种方式，例如过滤执行、多进程运行、重试运行等。</p></blockquote>
 <h2 id="使用pytest编写验证">使用Pytest编写验证</h2>
 <ul>
 <li>在测试过程中，我们使用之前验证过的加法器，进入Adder文件夹，在picker_out_adder目录下新建一个test_adder.py文件，内容如下：</li>
@@ -526,11 +531,10 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Results <span style="color:#ce5c00;font-weight:bold">(</span>4.33s<span style="color:#ce5c00;font-weight:bold">)</span>:
 </span></span></code></pre></div><blockquote>
-<p>测试成功表明，在经过114514次循环之后，我们的设备暂时没有发现bug。然而，使用多次循环的随机数生成测试用例会消耗大量资源，并且这些随机生成的测试用例可能无法有效覆盖所有边界条件。在下一部分，我们将介绍一种更有效的测试用例生成方法。</p>
-</blockquote>
+<p>测试成功表明，在经过114514次循环之后，我们的设备暂时没有发现bug。然而，使用多次循环的随机数生成测试用例会消耗大量资源，并且这些随机生成的测试用例可能无法有效覆盖所有边界条件。在下一部分，我们将介绍一种更有效的测试用例生成方法。</p></blockquote>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 March 25, 2025: <a href="https://github.com/XS-MLVP/course/commit/1a44bfa239ee57ae2f3162e4a24390caa05f9553">update Toffee document address (1a44bfa)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/d04c617785d261fcdfbe044e537c68a450369c09">Upgrade hugo version to 0.146.7 (d04c617)</a>
 </div>
 
 </div>
@@ -574,7 +578,7 @@
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

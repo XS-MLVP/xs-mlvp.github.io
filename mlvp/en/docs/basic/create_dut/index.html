@@ -19,18 +19,25 @@
 
 <title>Creating DUT | UnityChip Verification</title>
 <meta name="description" content="Using Guoke Cache as an example, this document introduces how to create a DUT based on Chisel.">
-<meta property="og:title" content="Creating DUT" />
-<meta property="og:description" content="Using Guoke Cache as an example, this document introduces how to create a DUT based on Chisel." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/basic/create_dut/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/basic/create_dut/">
+  <meta property="og:site_name" content="UnityChip Verification">
+  <meta property="og:title" content="Creating DUT">
+  <meta property="og:description" content="Using Guoke Cache as an example, this document introduces how to create a DUT based on Chisel.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:44:02+08:00">
+    <meta property="article:tag" content="Examples">
+    <meta property="article:tag" content="Docs">
 
-<meta property="article:modified_time" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="name" content="Creating DUT">
-<meta itemprop="description" content="Using Guoke Cache as an example, this document introduces how to create a DUT based on Chisel.">
-<meta itemprop="dateModified" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="wordCount" content="782">
-<meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Creating DUT"/>
-<meta name="twitter:description" content="Using Guoke Cache as an example, this document introduces how to create a DUT based on Chisel."/>
+  <meta itemprop="name" content="Creating DUT">
+  <meta itemprop="description" content="Using Guoke Cache as an example, this document introduces how to create a DUT based on Chisel.">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="782">
+  <meta itemprop="keywords" content="Examples,Docs">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Creating DUT">
+  <meta name="twitter:description" content="Using Guoke Cache as an example, this document introduces how to create a DUT based on Chisel.">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -130,7 +137,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +161,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -352,7 +359,7 @@
 <p>Guoke is a sequential single-issue processor implementation based on the RISC-V RV64 open instruction set, modularly designed using the Chisel language. For a more detailed introduction to Guoke, please refer to the link: <a href="https://oscpu.github.io/NutShell-doc/">https://oscpu.github.io/NutShell-doc/</a>.</p>
 <h2 id="guoke-cache">Guoke cache</h2>
 <p>The Guoke Cache (Nutshell Cache) is the cache module used in the Guoke processor. It features a three-stage pipeline design. When the third stage pipeline detects that the current request is MMIO or a refill occurs, it will block the pipeline. The Guoke Cache also uses a customizable modular design that can generate different-sized L1 Caches or L2 Caches by changing parameters. Additionally, the Guoke Cache has a coherence interface to handle coherence-related requests.</p>
-<p><img alt="nt_cache" src="nt_cache.png"></p>
+<p><img src="nt_cache.png" alt="nt_cache"></p>
 <h2 id="chisel-to-verilog">Chisel to Verilog</h2>
 <p>The stage library in Chisel helps generate traditional HDL code such as Verilog and System Verilog from Chisel code. Below is a brief introduction on how to convert a cache implementation based on Chisel into the corresponding Verilog circuit description.</p>
 <h3 id="initializing-the-guoke-environment">Initializing the Guoke Environment</h3>
@@ -414,7 +421,7 @@
 <p>Generally, if you need the DUT to generate waveforms, coverage, etc., it will slow down the DUT&rsquo;s execution speed. Therefore, when generating a Python module through the picker tool, it will be generated according to various configurations: (1) Turn off all debug information; (2) Enable waveforms; (3) Enable code line coverage. The first configuration aims to quickly build the environment for regression testing, etc.; the second is used to analyze specific errors, timing, etc.; the third is used to improve coverage.</p>
 
 	<div class="td-page-meta__lastmod">
-  Last modified March 25, 2025: <a href="https://github.com/XS-MLVP/course/commit/1a44bfa239ee57ae2f3162e4a24390caa05f9553">update Toffee document address (1a44bfa)</a>
+  Last modified April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/d04c617785d261fcdfbe044e537c68a450369c09">Upgrade hugo version to 0.146.7 (d04c617)</a>
 </div>
 
 </div>
@@ -458,7 +465,7 @@
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

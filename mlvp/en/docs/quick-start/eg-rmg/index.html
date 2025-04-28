@@ -19,18 +19,25 @@
 
 <title>Case 2: Random Number Generator | UnityChip Verification</title>
 <meta name="description" content="Demonstrating the tool usage with a 16-bit LFSR random number generator, which includes a clock signal, sequential logic, and registers.">
-<meta property="og:title" content="Case 2: Random Number Generator" />
-<meta property="og:description" content="Demonstrating the tool usage with a 16-bit LFSR random number generator, which includes a clock signal, sequential logic, and registers." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/quick-start/eg-rmg/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://open-verify.cc/mlvp/en/docs/quick-start/eg-rmg/">
+  <meta property="og:site_name" content="UnityChip Verification">
+  <meta property="og:title" content="Case 2: Random Number Generator">
+  <meta property="og:description" content="Demonstrating the tool usage with a 16-bit LFSR random number generator, which includes a clock signal, sequential logic, and registers.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T17:44:02+08:00">
+    <meta property="article:tag" content="Examples">
+    <meta property="article:tag" content="Docs">
 
-<meta property="article:modified_time" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="name" content="Case 2: Random Number Generator">
-<meta itemprop="description" content="Demonstrating the tool usage with a 16-bit LFSR random number generator, which includes a clock signal, sequential logic, and registers.">
-<meta itemprop="dateModified" content="2025-03-25T15:21:52+08:00" />
-<meta itemprop="wordCount" content="759">
-<meta itemprop="keywords" content="examples,docs," /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Case 2: Random Number Generator"/>
-<meta name="twitter:description" content="Demonstrating the tool usage with a 16-bit LFSR random number generator, which includes a clock signal, sequential logic, and registers."/>
+  <meta itemprop="name" content="Case 2: Random Number Generator">
+  <meta itemprop="description" content="Demonstrating the tool usage with a 16-bit LFSR random number generator, which includes a clock signal, sequential logic, and registers.">
+  <meta itemprop="dateModified" content="2025-04-28T17:44:02+08:00">
+  <meta itemprop="wordCount" content="759">
+  <meta itemprop="keywords" content="Examples,Docs">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Case 2: Random Number Generator">
+  <meta name="twitter:description" content="Demonstrating the tool usage with a 16-bit LFSR random number generator, which includes a clock signal, sequential logic, and registers.">
 <link rel="preload" href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <link href="/mlvp/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
 <script
@@ -130,7 +137,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -154,7 +161,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b85c790db89e99e9ca1734daac71f3a7.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.d74cc70435127963b050fbd7e61ca2c3.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -394,8 +401,7 @@ The output directory structure is similar to <a href="https://chatgpt.com/docs/q
 <p>Navigate to the <code>picker_out_rmg</code> directory and execute the <code>make</code> command to generate the final files.</p>
 <blockquote>
 <p>Note: The compilation process is similar to <a href="https://chatgpt.com/docs/quick-start/eg-adder/#building-intermediate-files">Adder Verification - Compilation Process</a> , so it will not be elaborated here.
-The final directory structure will be:</p>
-</blockquote>
+The final directory structure will be:</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>picker_out_rmg
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- RandomGenerator.fst <span style="color:#8f5902;font-style:italic"># Waveform file from the test</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">|</span>-- UT_RandomGenerator
@@ -409,8 +415,7 @@ The final directory structure will be:</p>
 </span></span><span style="display:flex;"><span><span style="color:#4e9a06">`</span>-- example.py <span style="color:#8f5902;font-style:italic"># Example code</span>
 </span></span></code></pre></div><h3 id="configuring-the-test-code">Configuring the Test Code</h3>
 <blockquote>
-<p>Replace the content of <code>example.py</code> with the following code.</p>
-</blockquote>
+<p>Replace the content of <code>example.py</code> with the following code.</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">RandomGenerator</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">random</span>
 </span></span><span style="display:flex;"><span>
@@ -448,8 +453,7 @@ The final directory structure will be:</p>
 <p>Execute <code>python example.py</code> in the <code>picker_out_rmg</code> directory to run the test program. After the execution, if <code>Test Passed</code> is output, the test is considered passed. After the run is complete, a waveform file <code>RandomGenerator.fst</code> will be generated, which can be viewed in the terminal using the following command:</p>
 <blockquote>
 <p>gtkwave RandomGenerator.fst
-Example output:</p>
-</blockquote>
+Example output:</p></blockquote>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>···
 </span></span><span style="display:flex;"><span>Cycle 65529, DUT: d9ea, REF: d9ea
 </span></span><span style="display:flex;"><span>Cycle 65530, DUT: b3d4, REF: b3d4
@@ -461,7 +465,7 @@ Example output:</p>
 </span></span><span style="display:flex;"><span>Test Passed, destroy UT_RandomGenerator
 </span></span></code></pre></div>
 	<div class="td-page-meta__lastmod">
-  Last modified March 25, 2025: <a href="https://github.com/XS-MLVP/course/commit/1a44bfa239ee57ae2f3162e4a24390caa05f9553">update Toffee document address (1a44bfa)</a>
+  Last modified April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/d04c617785d261fcdfbe044e537c68a450369c09">Upgrade hugo version to 0.146.7 (d04c617)</a>
 </div>
 
 </div>
@@ -505,7 +509,7 @@ Example output:</p>
 </footer>
 
     </div>
-    <script src="/mlvp/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/mlvp/js/prism.js'></script>
 <script src='/mlvp/js/tabpane-persist.js'></script>
 

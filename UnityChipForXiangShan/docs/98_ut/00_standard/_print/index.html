@@ -34,13 +34,59 @@
 st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
 考虑以下伪代码示例：
 ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
-<meta property="og:title" content="验证文档规范" />
-<meta property="og:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/" />
-<meta itemprop="name" content="验证文档规范">
-<meta itemprop="description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="验证文档规范"/>
-<meta name="twitter:description" content="Powerful, extensible, and feature-packed frontend toolkit. Build and customize with Sass, utilize prebuilt grid system and components, and bring projects to life with powerful JavaScript plugins."/>
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/00_standard/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="验证文档规范">
+  <meta property="og:description" content="本规范规定了“万众一芯”验证文档的必要形式和结构（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+万众一芯验证文档格式规范 验证文档标题请用一号标题格式（一个#），以加法器验证文档为例，其标题可以为：进位加法器设计与验证。
+文档概述 文档概述标题请用二号标题格式（两个#）。
+【必填项】 在该部分对整个文档进行简约描述，例如内容概述，待验证模块的基本功能、特殊需求、特定规格、目标读者、知识前置等。目的是通过对该部分，读者便了解是否具有其感兴趣的内容。例如本文档是对验证文档的编写要求进行描述，便于多文档协作，规范验证的数据输入，特定数据标签等。
+术语说明 术语说明标题请用二号标题格式（两个#）。
+【必填项】 该部分需要列出术语和关键概念解释，方便读者参考。
+优先解释模块专有缩写（如TLB， FIFO等），且用缩写（全名）的格式填写在“名称”一栏中。 对容易混淆的概念请务必明确（如虚拟地址和物理地址等） 示例格式如下： 名称 定义 TLB（Translation Lookaside Buffer） 地址转换的缓存单元，用于加速虚拟地址到物理的转换 FIFO（First In First Out） 先进先出队列 写回 发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置 如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。
+前置知识 前置知识标题请用二号标题格式（两个#）。
+【可选项】 在阅读文档或进行验证之前，建议掌握一些关键前置知识，以便更深入理解相关内容。例如，在撰写LoadStoreQueue（LSQ）文档时，讲述RAW（Read After Write）违例有助于理解操作之间的依赖关系。在撰写Icache或L2Cache文档时，介绍缓存层级、替换策略和一致性模型等基本概念也有助于读者理解。如果涉及复杂算法，也应对其进行简要描述。
+基本要求：
+该部分内容应简洁，易于理解。如篇幅较长，可将内容移至附录。 针对较为复杂的内容，可以通过图像、伪代码和案例进行解释，以降低理解难度。 下面是一个举例：
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="验证文档规范">
+  <meta itemprop="description" content="本规范规定了“万众一芯”验证文档的必要形式和结构（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+万众一芯验证文档格式规范 验证文档标题请用一号标题格式（一个#），以加法器验证文档为例，其标题可以为：进位加法器设计与验证。
+文档概述 文档概述标题请用二号标题格式（两个#）。
+【必填项】 在该部分对整个文档进行简约描述，例如内容概述，待验证模块的基本功能、特殊需求、特定规格、目标读者、知识前置等。目的是通过对该部分，读者便了解是否具有其感兴趣的内容。例如本文档是对验证文档的编写要求进行描述，便于多文档协作，规范验证的数据输入，特定数据标签等。
+术语说明 术语说明标题请用二号标题格式（两个#）。
+【必填项】 该部分需要列出术语和关键概念解释，方便读者参考。
+优先解释模块专有缩写（如TLB， FIFO等），且用缩写（全名）的格式填写在“名称”一栏中。 对容易混淆的概念请务必明确（如虚拟地址和物理地址等） 示例格式如下： 名称 定义 TLB（Translation Lookaside Buffer） 地址转换的缓存单元，用于加速虚拟地址到物理的转换 FIFO（First In First Out） 先进先出队列 写回 发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置 如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。
+前置知识 前置知识标题请用二号标题格式（两个#）。
+【可选项】 在阅读文档或进行验证之前，建议掌握一些关键前置知识，以便更深入理解相关内容。例如，在撰写LoadStoreQueue（LSQ）文档时，讲述RAW（Read After Write）违例有助于理解操作之间的依赖关系。在撰写Icache或L2Cache文档时，介绍缓存层级、替换策略和一致性模型等基本概念也有助于读者理解。如果涉及复杂算法，也应对其进行简要描述。
+基本要求：
+该部分内容应简洁，易于理解。如篇幅较长，可将内容移至附录。 针对较为复杂的内容，可以通过图像、伪代码和案例进行解释，以降低理解难度。 下面是一个举例：
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="420">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="验证文档规范">
+  <meta name="twitter:description" content="本规范规定了“万众一芯”验证文档的必要形式和结构（不是验证报告的模板），已发布和将来将要发布的文档都需要遵循这一规范。
+万众一芯验证文档格式规范 验证文档标题请用一号标题格式（一个#），以加法器验证文档为例，其标题可以为：进位加法器设计与验证。
+文档概述 文档概述标题请用二号标题格式（两个#）。
+【必填项】 在该部分对整个文档进行简约描述，例如内容概述，待验证模块的基本功能、特殊需求、特定规格、目标读者、知识前置等。目的是通过对该部分，读者便了解是否具有其感兴趣的内容。例如本文档是对验证文档的编写要求进行描述，便于多文档协作，规范验证的数据输入，特定数据标签等。
+术语说明 术语说明标题请用二号标题格式（两个#）。
+【必填项】 该部分需要列出术语和关键概念解释，方便读者参考。
+优先解释模块专有缩写（如TLB， FIFO等），且用缩写（全名）的格式填写在“名称”一栏中。 对容易混淆的概念请务必明确（如虚拟地址和物理地址等） 示例格式如下： 名称 定义 TLB（Translation Lookaside Buffer） 地址转换的缓存单元，用于加速虚拟地址到物理的转换 FIFO（First In First Out） 先进先出队列 写回 发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置 如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。
+前置知识 前置知识标题请用二号标题格式（两个#）。
+【可选项】 在阅读文档或进行验证之前，建议掌握一些关键前置知识，以便更深入理解相关内容。例如，在撰写LoadStoreQueue（LSQ）文档时，讲述RAW（Read After Write）违例有助于理解操作之间的依赖关系。在撰写Icache或L2Cache文档时，介绍缓存层级、替换策略和一致性模型等基本概念也有助于读者理解。如果涉及复杂算法，也应对其进行简要描述。
+基本要求：
+该部分内容应简洁，易于理解。如篇幅较长，可将内容移至附录。 针对较为复杂的内容，可以通过图像、伪代码和案例进行解释，以降低理解难度。 下面是一个举例：
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -142,7 +188,7 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -236,26 +282,26 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
 <li>示例格式如下：</li>
 </ol>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>TLB（Translation Lookaside Buffer）</td>
-<td>地址转换的缓存单元，用于加速虚拟地址到物理的转换</td>
-</tr>
-<tr>
-<td>FIFO（First In First Out）</td>
-<td>先进先出队列</td>
-</tr>
-<tr>
-<td>写回</td>
-<td>发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>TLB（Translation Lookaside Buffer）</td>
+          <td>地址转换的缓存单元，用于加速虚拟地址到物理的转换</td>
+      </tr>
+      <tr>
+          <td>FIFO（First In First Out）</td>
+          <td>先进先出队列</td>
+      </tr>
+      <tr>
+          <td>写回</td>
+          <td>发生在Cache替换时，如果被替换块为脏块，需要将缓存行写回对应内存位置</td>
+      </tr>
+  </tbody>
 </table>
 <p>如果有其他补充情况请在此说明，例如：上述命名描述仅针对香山处理器，不代表RISC-V标准或者其他处理器。</p>
 <h2 id="前置知识">前置知识</h2>
@@ -312,34 +358,34 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p><strong>【可选项】</strong> 如果一个模块由多个子模块组成，则需要在此处列出所有相关的子模块，并进行简要说明。这有助于清晰地展示模块的结构和功能，便于读者理解各个子模块之间的关系及其在整体系统中的作用。</p>
 <p>以下是IFU top文档中的一个示例：</p>
 <table>
-<thead>
-<tr>
-<th>子模块</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="01_predecode.md">PreDecoder</a></td>
-<td>预译码模块，用于生成有效指令标识和类型信息</td>
-</tr>
-<tr>
-<td><a href="02_f3predecoder.md">F3Predecoder</a></td>
-<td>F3阶段预译码模块，从PreDecoder中时序优化出来的模块，负责判定CFI指令的类型</td>
-</tr>
-<tr>
-<td><a href="03_ifu_rvc_exp.md">RVCExpander</a></td>
-<td>RVC指令扩展模块，负责对传入的指令进行指令扩展，并解码计算非法信息</td>
-</tr>
-<tr>
-<td><a href="04_pred_checker.md">PredChecker</a></td>
-<td>预检查模块，校验并修正预测信息</td>
-</tr>
-<tr>
-<td><a href="05_frontend_trigger.md">FrontendTrigger</a></td>
-<td>前端断点模块，用于在前端设置硬件断点和检查</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>子模块</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="01_predecode.md">PreDecoder</a></td>
+          <td>预译码模块，用于生成有效指令标识和类型信息</td>
+      </tr>
+      <tr>
+          <td><a href="02_f3predecoder.md">F3Predecoder</a></td>
+          <td>F3阶段预译码模块，从PreDecoder中时序优化出来的模块，负责判定CFI指令的类型</td>
+      </tr>
+      <tr>
+          <td><a href="03_ifu_rvc_exp.md">RVCExpander</a></td>
+          <td>RVC指令扩展模块，负责对传入的指令进行指令扩展，并解码计算非法信息</td>
+      </tr>
+      <tr>
+          <td><a href="04_pred_checker.md">PredChecker</a></td>
+          <td>预检查模块，校验并修正预测信息</td>
+      </tr>
+      <tr>
+          <td><a href="05_frontend_trigger.md">FrontendTrigger</a></td>
+          <td>前端断点模块，用于在前端设置硬件断点和检查</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="模块功能说明">模块功能说明</h2>
 <p>模块功能说明标题请用二号标题格式（两个#）。</p>
@@ -378,22 +424,22 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>IFU应当能向FTQ报告自己已ready。</p>
 <p>所以，对于这一测试点我们只需要在发送请求后检查和ftq相关的的ready情况即可。</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>IFU_RCV_REQ</td>
-<td>READY</td>
-<td>IFU接收FTQ请求后，设置ready</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>IFU_RCV_REQ</td>
+          <td>READY</td>
+          <td>IFU接收FTQ请求后，设置ready</td>
+      </tr>
+  </tbody>
 </table>
 </mrs-functions>
 <h2 id="常量说明">常量说明</h2>
@@ -401,25 +447,25 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p><strong>【可选项】</strong> 需要列出模块中所有可配置参数及其物理意义，以便于用户理解各参数的作用和影响。</p>
 <p><strong>示例：</strong></p>
 <table>
-<thead>
-<tr>
-<th>常量名</th>
-<th>常量值</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ADDR_WIDTH</td>
-<td>64</td>
-<td>地址总线位宽</td>
-</tr>
-<tr>
-<td>FIFO_DEPTH</td>
-<td>8</td>
-<td>深度配置</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>常量名</th>
+          <th>常量值</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ADDR_WIDTH</td>
+          <td>64</td>
+          <td>地址总线位宽</td>
+      </tr>
+      <tr>
+          <td>FIFO_DEPTH</td>
+          <td>8</td>
+          <td>深度配置</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="接口说明">接口说明</h2>
 <p>接口说明标题请用二号标题格式（两个#）。</p>
@@ -464,40 +510,40 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>以下是节选自IFU top文档的一个例子:</p>
 <mrs-testpoints>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td>IFU_RCV_REQ</td>
-<td>READY</td>
-<td>IFU接收FTQ请求后，设置ready</td>
-</tr>
-<tr>
-<td>2.1.1</td>
-<td>IFU_F1_INFOS</td>
-<td>PC</td>
-<td>IFU接收FTQ请求后，在F1流水级生成PC</td>
-</tr>
-<tr>
-<td>2.1.2</td>
-<td>IFU_F1_INFOS</td>
-<td>CUT_PTR</td>
-<td>IFU接收FTQ请求后，在F1流水级生成后续切取缓存行的指针</td>
-</tr>
-<tr>
-<td>2.2.1</td>
-<td>IFU_F2_INFOS</td>
-<td>EXCP_VEC</td>
-<td>IFU接收ICache内容后，会根据ICache的结果生成属于每个指令的异常向量</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>IFU_RCV_REQ</td>
+          <td>READY</td>
+          <td>IFU接收FTQ请求后，设置ready</td>
+      </tr>
+      <tr>
+          <td>2.1.1</td>
+          <td>IFU_F1_INFOS</td>
+          <td>PC</td>
+          <td>IFU接收FTQ请求后，在F1流水级生成PC</td>
+      </tr>
+      <tr>
+          <td>2.1.2</td>
+          <td>IFU_F1_INFOS</td>
+          <td>CUT_PTR</td>
+          <td>IFU接收FTQ请求后，在F1流水级生成后续切取缓存行的指针</td>
+      </tr>
+      <tr>
+          <td>2.2.1</td>
+          <td>IFU_F2_INFOS</td>
+          <td>EXCP_VEC</td>
+          <td>IFU接收ICache内容后，会根据ICache的结果生成属于每个指令的异常向量</td>
+      </tr>
+  </tbody>
 </table>
 </mrs-testpoints>
 <h2 id="附录">附录</h2>
@@ -508,54 +554,54 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>为方便参考模型的书写，在这里根据20240411版本的手册内容整理了部分指令扩展的思路。</p>
 <p>对于RVC指令来说，op = instr(1, 0)；funct = instr(15, 13)</p>
 <table>
-<thead>
-<tr>
-<th>op\funct</th>
-<th>000</th>
-<th>001</th>
-<th>010</th>
-<th>011</th>
-<th>100</th>
-<th>101</th>
-<th>110</th>
-<th>111</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>00</td>
-<td>addi4spn</td>
-<td>fld</td>
-<td>lw</td>
-<td>ld</td>
-<td>lbu<br>lhu;lh<br>sb;sh</td>
-<td>fsd</td>
-<td>sw</td>
-<td>sd</td>
-</tr>
-<tr>
-<td>01</td>
-<td>addi</td>
-<td>addiw</td>
-<td>li</td>
-<td>lui<br>addi16sp<br>zcmop</td>
-<td>ARITHs<br>zcb</td>
-<td>j</td>
-<td>beqz</td>
-<td>bnez</td>
-</tr>
-<tr>
-<td>10</td>
-<td>slli</td>
-<td>fldsp</td>
-<td>lwsp</td>
-<td>ldsp</td>
-<td>jr;mv<br>ebreak<br>jalr;add</td>
-<td>fsdsp</td>
-<td>fwsp</td>
-<td>sdsp</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>op\funct</th>
+          <th>000</th>
+          <th>001</th>
+          <th>010</th>
+          <th>011</th>
+          <th>100</th>
+          <th>101</th>
+          <th>110</th>
+          <th>111</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>00</td>
+          <td>addi4spn</td>
+          <td>fld</td>
+          <td>lw</td>
+          <td>ld</td>
+          <td>lbu<br>lhu;lh<br>sb;sh</td>
+          <td>fsd</td>
+          <td>sw</td>
+          <td>sd</td>
+      </tr>
+      <tr>
+          <td>01</td>
+          <td>addi</td>
+          <td>addiw</td>
+          <td>li</td>
+          <td>lui<br>addi16sp<br>zcmop</td>
+          <td>ARITHs<br>zcb</td>
+          <td>j</td>
+          <td>beqz</td>
+          <td>bnez</td>
+      </tr>
+      <tr>
+          <td>10</td>
+          <td>slli</td>
+          <td>fldsp</td>
+          <td>lwsp</td>
+          <td>ldsp</td>
+          <td>jr;mv<br>ebreak<br>jalr;add</td>
+          <td>fsdsp</td>
+          <td>fwsp</td>
+          <td>sdsp</td>
+      </tr>
+  </tbody>
 </table>
 <p>在开始阅读各指令的扩展规则时，需要了解一些RVC扩展的前置知识，比如：</p>
 <p>rd&rsquo;, rs1&rsquo;和rs2&rsquo;寄存器：受限于16位指令的位宽限制，这几个寄存器只有3位来表示，他们对应到x8~x15寄存器。</p>
@@ -601,7 +647,7 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">## 术语说明 【必填项】 列出术语和关键概念解释，方便读者参考
 </span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
-</span></span><span style="display:flex;"><span>优先解释模块专有缩写（如TLB， FIFO等），如果有缩写，请用`缩写（全称）的方式填在表格的“名称”栏目中`
+</span></span><span style="display:flex;"><span>优先解释模块专有缩写（如TLB， FIFO等），如果有缩写，请用<span style="color:#4e9a06">`缩写（全称）的方式填在表格的“名称”栏目中`</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>对容易混淆的概念请务必明确（如虚拟地址和物理地址等）
 </span></span><span style="display:flex;"><span>
@@ -810,20 +856,20 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>本文档描述FIFO的功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>缩写</th>
-<th>全称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>FIFO</td>
-<td>First In First Out</td>
-<td>先进先出的数据缓冲队列</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>缩写</th>
+          <th>全称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>FIFO</td>
+          <td>First In First Out</td>
+          <td>先进先出的数据缓冲队列</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="功能说明">功能说明</h2>
 <p>本次需要验证的是FIFO，一种常见的硬件缓冲模块，在硬件电路中临时存储数据，并按照数据到达的顺序进行处理。</p>
@@ -881,164 +927,164 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 </ul>
 <h2 id="常量说明">常量说明</h2>
 <table>
-<thead>
-<tr>
-<th>常量名</th>
-<th>常量值</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>FIFO_DEPTH</td>
-<td>8</td>
-<td>FIFO存储单元数量</td>
-</tr>
-<tr>
-<td>DATA_WIDTH</td>
-<td>8</td>
-<td>数据总线位宽</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>常量名</th>
+          <th>常量值</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>FIFO_DEPTH</td>
+          <td>8</td>
+          <td>FIFO存储单元数量</td>
+      </tr>
+      <tr>
+          <td>DATA_WIDTH</td>
+          <td>8</td>
+          <td>数据总线位宽</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="接口说明">接口说明</h2>
 <h3 id="输入接口">输入接口</h3>
 <table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>clk</td>
-<td>Input</td>
-<td>1</td>
-<td>主时钟</td>
-<td></td>
-</tr>
-<tr>
-<td>rst_n</td>
-<td>Input</td>
-<td>1</td>
-<td>异步复位</td>
-<td></td>
-</tr>
-<tr>
-<td>wr_en</td>
-<td>Input</td>
-<td>1</td>
-<td>写使能</td>
-<td></td>
-</tr>
-<tr>
-<td>wdata</td>
-<td>Input</td>
-<td>8</td>
-<td>写入数据</td>
-<td></td>
-</tr>
-<tr>
-<td>rd_en</td>
-<td>Input</td>
-<td>1</td>
-<td>读使能</td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>信号名</th>
+          <th>方向</th>
+          <th>位宽</th>
+          <th>描述</th>
+          <th></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>clk</td>
+          <td>Input</td>
+          <td>1</td>
+          <td>主时钟</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>rst_n</td>
+          <td>Input</td>
+          <td>1</td>
+          <td>异步复位</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>wr_en</td>
+          <td>Input</td>
+          <td>1</td>
+          <td>写使能</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>wdata</td>
+          <td>Input</td>
+          <td>8</td>
+          <td>写入数据</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>rd_en</td>
+          <td>Input</td>
+          <td>1</td>
+          <td>读使能</td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="输出接口">输出接口</h3>
 <table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>rdata</td>
-<td>Output</td>
-<td>8</td>
-<td>读出数据</td>
-</tr>
-<tr>
-<td>empty</td>
-<td>Output</td>
-<td>1</td>
-<td>FIFO空标志（高有效）</td>
-</tr>
-<tr>
-<td>full</td>
-<td>Output</td>
-<td>1</td>
-<td>FIFO满标志（高有效）</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>信号名</th>
+          <th>方向</th>
+          <th>位宽</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>rdata</td>
+          <td>Output</td>
+          <td>8</td>
+          <td>读出数据</td>
+      </tr>
+      <tr>
+          <td>empty</td>
+          <td>Output</td>
+          <td>1</td>
+          <td>FIFO空标志（高有效）</td>
+      </tr>
+      <tr>
+          <td>full</td>
+          <td>Output</td>
+          <td>1</td>
+          <td>FIFO满标志（高有效）</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <p>建议各个测试点的覆盖组使用下表描述的功能和测试点名称进行命名。</p>
 <p>比如FIFO_READ的测试点NORMAL，其覆盖点建议命名为FIFO_READ_NORMAL</p>
 <mrs-testpoints>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1.1</td>
-<td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#1-读fifo操作">FIFO_READ</a></td>
-<td>NORMAL</td>
-<td>fifo有数据时，设置读使能，可以读出数据</td>
-</tr>
-<tr>
-<td>1.2</td>
-<td>FIFO_READ</td>
-<td>EMPTY</td>
-<td>fifo为空时，设置读使能，无法读出数据</td>
-</tr>
-<tr>
-<td>1.3</td>
-<td>FIFO_READ</td>
-<td>NO_EN</td>
-<td>fifo有数据时，不设置读使能，无法读出数据</td>
-</tr>
-<tr>
-<td>2.1</td>
-<td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#2-写fifo操作">FIFO_WRITE</a></td>
-<td>NORMAL</td>
-<td>fifo未满时，设置写使能，可以写入数据</td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>FIFO_WRITE</td>
-<td>FULL</td>
-<td>fifo已满时，设置写使能，可以写入数据</td>
-</tr>
-<tr>
-<td>2.3</td>
-<td>FIFO_WRITE</td>
-<td>NO_EN</td>
-<td>fifo未满时，不设置写使能，无法写入数据</td>
-</tr>
-<tr>
-<td>3.1</td>
-<td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#3-复位操作">FIFO_RESET</a></td>
-<td>RESET</td>
-<td>重置后，栈为空</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#1-%e8%af%bbfifo%e6%93%8d%e4%bd%9c">FIFO_READ</a></td>
+          <td>NORMAL</td>
+          <td>fifo有数据时，设置读使能，可以读出数据</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>FIFO_READ</td>
+          <td>EMPTY</td>
+          <td>fifo为空时，设置读使能，无法读出数据</td>
+      </tr>
+      <tr>
+          <td>1.3</td>
+          <td>FIFO_READ</td>
+          <td>NO_EN</td>
+          <td>fifo有数据时，不设置读使能，无法读出数据</td>
+      </tr>
+      <tr>
+          <td>2.1</td>
+          <td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#2-%e5%86%99fifo%e6%93%8d%e4%bd%9c">FIFO_WRITE</a></td>
+          <td>NORMAL</td>
+          <td>fifo未满时，设置写使能，可以写入数据</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>FIFO_WRITE</td>
+          <td>FULL</td>
+          <td>fifo已满时，设置写使能，可以写入数据</td>
+      </tr>
+      <tr>
+          <td>2.3</td>
+          <td>FIFO_WRITE</td>
+          <td>NO_EN</td>
+          <td>fifo未满时，不设置写使能，无法写入数据</td>
+      </tr>
+      <tr>
+          <td>3.1</td>
+          <td><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/#3-%e5%a4%8d%e4%bd%8d%e6%93%8d%e4%bd%9c">FIFO_RESET</a></td>
+          <td>RESET</td>
+          <td>重置后，栈为空</td>
+      </tr>
+  </tbody>
 </table>
 </mrs-testpoints>
 
@@ -1066,32 +1112,32 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>本次验证的目标是L1 Cache，即一级缓存。</p>
 <h2 id="术语说明">术语说明</h2>
 <table>
-<thead>
-<tr>
-<th>名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>MMIO（Memory-Mapped Input/Output）</td>
-<td>内存映射IO</td>
-</tr>
-<tr>
-<td>写回</td>
-<td>Cache需要进行替换时，会将脏替换块写回内存</td>
-</tr>
-<tr>
-<td>关键字优先方案</td>
-<td>缺失发生时，系统会优先获取CPU所需要的当前指令或数据所对应的字</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>MMIO（Memory-Mapped Input/Output）</td>
+          <td>内存映射IO</td>
+      </tr>
+      <tr>
+          <td>写回</td>
+          <td>Cache需要进行替换时，会将脏替换块写回内存</td>
+      </tr>
+      <tr>
+          <td>关键字优先方案</td>
+          <td>缺失发生时，系统会优先获取CPU所需要的当前指令或数据所对应的字</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="前置知识">前置知识</h2>
 <h3 id="cache的层次结构">Cache的层次结构</h3>
 <p>Cache有三种主要的组织方式：直接映射（Direct-Mapped）Cache、组相连（Set-Associative）Cache和全相连（Fully-Associative）Cache。对于物理内存中的一个数据，如果在Cache中只有一个位置可以存放它，这就是直接映射Cache；如果有多个位置可以存放这个数据，这就是组相连Cache；如果Cache中的任何位置都可以存放这个数据，这就是全相连Cache。</p>
 <p>直接映射Cache和全相连Cache实际上是组相连Cache的两种特殊情况。现代处理器中的Cache通常属于这三种方式中的一种。例如，翻译后备缓冲区（TLB）和Victim Cache多采用全相连结构，而普通的指令缓存（I-Cache）和数据缓存（D-Cache）则采用组相连结构。当处理器需要执行一个指令时，它会首先查找该指令是否在I-Cache中。如果在，则直接从I-Cache中读取指令并执行；如果不在，则需要从内存中读取指令到I-Cache中，再执行。与I-Cache类似，当处理器需要读取或写入数据时，会首先查找D-Cache。如果数据在D-Cache中，则直接读取或写入；如果不在，则需要从内存中加载数据到D-Cache中。与I-Cache不同的是，D-Cache需要考虑数据的一致性和写回策略。为了保证数据的一致性，当数据在D-Cache中被修改后，需要同步更新到内存中。</p>
-<p><img alt="composition" src="composition.png"></p>
+<p><img src="composition.png" alt="composition"></p>
 <h3 id="cache的写入">Cache的写入</h3>
 <p>在执行写数据时，如果只是向D-Cache中写入数据而不改变其下级存储器中的数据，就会导致D-Cache和下级存储器对于同一地址的数据不一致（non-consistent）。为了保持一致性，一般Cache在写命中状态下采用两种写入方式：
 （1）写通（Write Through）：数据写入D-Cache的同时也写入其下级存储器。然而，由于下级存储器的访问时间较长，而存储指令的频率较高，频繁地向这种较慢的存储器中写入数据会降低处理器的执行效率。
@@ -1115,42 +1161,42 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p><strong>随机替换算法</strong>硬件实现简单，这种方法发生缺失的频率会更高一些，但是随着Cache容量的增大，这个差距是越来越小的。在实际的设计中，很难实现严格的随机，一般采用一种称为时钟算法（clock algorithm）的方法实现近似的随机，它的工作原理本质上是一个时钟计数器，计数器的宽度由Cache的路的个数决定，当要替换时，就根据这个计数器选择相应的行进行替换。这种方法硬件复杂度较低，也不会损失较多的性能，因此是一种折中的方法。</p>
 <h2 id="整体框图和流水级">整体框图和流水级</h2>
 <p>以下是L1Cache的整体框图和流水级示意：</p>
-<p><img alt="Cache" src="Cache.png"></p>
+<p><img src="Cache.png" alt="Cache"></p>
 <h2 id="子模块列表">子模块列表</h2>
 <p>以下是NutShell L1Cache的一些子模块：</p>
 <table>
-<thead>
-<tr>
-<th>子模块</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>s1</td>
-<td>缓存阶段1</td>
-</tr>
-<tr>
-<td>s2</td>
-<td>缓存阶段2</td>
-</tr>
-<tr>
-<td>s3</td>
-<td>缓存阶段3</td>
-</tr>
-<tr>
-<td>metaArray</td>
-<td>以数组形式存储元数据</td>
-</tr>
-<tr>
-<td>dataArray</td>
-<td>以数组形式存储缓存数据</td>
-</tr>
-<tr>
-<td>arb</td>
-<td>总线仲裁器</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>子模块</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>s1</td>
+          <td>缓存阶段1</td>
+      </tr>
+      <tr>
+          <td>s2</td>
+          <td>缓存阶段2</td>
+      </tr>
+      <tr>
+          <td>s3</td>
+          <td>缓存阶段3</td>
+      </tr>
+      <tr>
+          <td>metaArray</td>
+          <td>以数组形式存储元数据</td>
+      </tr>
+      <tr>
+          <td>dataArray</td>
+          <td>以数组形式存储缓存数据</td>
+      </tr>
+      <tr>
+          <td>arb</td>
+          <td>总线仲裁器</td>
+      </tr>
+  </tbody>
 </table>
 <p>上下游通信总线采用SimpleBus总线，包含了req和resp两个通路，其中req通路的cmd信号表明请求的操作类型，可以通过检查该信号获得访问类型。SimpleBus总线共有七种操作类型，由于NutShell文档未涉及probe和prefetch操作，在验证中只出现五种操作：read、write、readBurst、writeBurst、writeLast，前两种为字读写，后三种为Burst读写，即一次可以操作多个字。</p>
 <mrs-functions>
@@ -1167,28 +1213,28 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>如果发生MMIO请求则会将请求转发到MMIO的端口上，而不会发生Cache行的读写。此外，MMIO请求不是Burst请求，每次只会写入或读出一个地址的数据，而不是一个Cache行的数据。因此，在MMIO端口上不应当观测到Burst的请求类型。</p>
 <p>据此，我们可以设计下述两个测试点：</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2.1.1</td>
-<td>CACHE_MMIO_RW</td>
-<td>FORWARD</td>
-<td>Cache接收到MMIO空间的请求时，不应发生读写，而是直接转发给MMIO端口</td>
-</tr>
-<tr>
-<td>2.1.2</td>
-<td>CACHE_MMIO_RW</td>
-<td>NO_BURST</td>
-<td>Cache接收到MMIO空间的请求时，MMIO端口接收到的Cache请求不应为BURST类型</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2.1.1</td>
+          <td>CACHE_MMIO_RW</td>
+          <td>FORWARD</td>
+          <td>Cache接收到MMIO空间的请求时，不应发生读写，而是直接转发给MMIO端口</td>
+      </tr>
+      <tr>
+          <td>2.1.2</td>
+          <td>CACHE_MMIO_RW</td>
+          <td>NO_BURST</td>
+          <td>Cache接收到MMIO空间的请求时，MMIO端口接收到的Cache请求不应为BURST类型</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="22-mmio阻塞">2.2. MMIO阻塞</h3>
 <p>NutShell手册指出，在检测出MMIO请求后会阻塞流水线。</p>
@@ -1202,28 +1248,28 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>命中发生时，即使是写命中，也无需写回或者重填，因此，回复的时间会更短一些。</p>
 <p>以下是本功能点的所有测试点：</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3.2.1</td>
-<td>CACHE_HIT</td>
-<td>WRITE</td>
-<td>Cache写命中时，应设置脏位</td>
-</tr>
-<tr>
-<td>3.2.2</td>
-<td>CACHE_HIT</td>
-<td>SHORTER</td>
-<td>Cache写命中时，回复的周期应该更少</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>3.2.1</td>
+          <td>CACHE_HIT</td>
+          <td>WRITE</td>
+          <td>Cache写命中时，应设置脏位</td>
+      </tr>
+      <tr>
+          <td>3.2.2</td>
+          <td>CACHE_HIT</td>
+          <td>SHORTER</td>
+          <td>Cache写命中时，回复的周期应该更少</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="4-cache缺失">4. Cache缺失</h3>
 <p>为了创造Cache Miss的测试环境，首先需要通过一系列的Load操作先将Cache填满。后续需要触发Cache Miss时，只需要访问上述Load覆盖范围之外的地址即可。</p>
@@ -1231,34 +1277,34 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 <p>发生Cache Miss时，会阻塞流水线，同时，NutShell Cache重填时采用<strong>关键字优先方案</strong>，即缺失发生时，系统会优先获取CPU所需要的当前指令或数据所对应的字。因此，Cache向内存请求数据时，发出的首个地址应当是向Cache发出请求时的地址。例如，假设向Cache发出0x1000地址的读请求，此时发生Cache Miss，Cache会向内存发出读请求，这个请求的首地址应当是0x1000。显然Cache缺失时，回复的时间会更长。</p>
 <p>从而，我们可以划分如下的测试点：</p>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>4.1.1</td>
-<td>CACHE_MISS_COMMON</td>
-<td>BLOCK</td>
-<td>发生缺失时，也会阻塞流水线</td>
-</tr>
-<tr>
-<td>4.1.2</td>
-<td>CACHE_MISS_COMMON</td>
-<td>CRITICAL_WORD</td>
-<td>Cache缺失时，Cache发出请求的首个地址应当是向Cache请求的地址</td>
-</tr>
-<tr>
-<td>4.1.3</td>
-<td>CACHE_MISS_COMMON</td>
-<td>LONGER</td>
-<td>Cache缺失时，回复的时间会更长</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>4.1.1</td>
+          <td>CACHE_MISS_COMMON</td>
+          <td>BLOCK</td>
+          <td>发生缺失时，也会阻塞流水线</td>
+      </tr>
+      <tr>
+          <td>4.1.2</td>
+          <td>CACHE_MISS_COMMON</td>
+          <td>CRITICAL_WORD</td>
+          <td>Cache缺失时，Cache发出请求的首个地址应当是向Cache请求的地址</td>
+      </tr>
+      <tr>
+          <td>4.1.3</td>
+          <td>CACHE_MISS_COMMON</td>
+          <td>LONGER</td>
+          <td>Cache缺失时，回复的时间会更长</td>
+      </tr>
+  </tbody>
 </table>
 <h4 id="42-脏块写回">4.2. 脏块写回</h4>
 <p>当需要替换的Cache块是脏块时，首先会进行写回的操作。</p>
@@ -1268,129 +1314,129 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 </mrs-functions>
 <h2 id="常量说明">常量说明</h2>
 <table>
-<thead>
-<tr>
-<th>常量名</th>
-<th>常量值</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>缓存行大小</td>
-<td>64</td>
-<td>以字节为单位的缓存行大小</td>
-</tr>
-<tr>
-<td>L1Cache大小</td>
-<td>32</td>
-<td>L1Cache的总容量，单位为千字节</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>常量名</th>
+          <th>常量值</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>缓存行大小</td>
+          <td>64</td>
+          <td>以字节为单位的缓存行大小</td>
+      </tr>
+      <tr>
+          <td>L1Cache大小</td>
+          <td>32</td>
+          <td>L1Cache的总容量，单位为千字节</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="接口说明">接口说明</h2>
 <table>
-<thead>
-<tr>
-<th>信号</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>clock<br>reset</td>
-<td>时钟<br>复位信号</td>
-</tr>
-<tr>
-<td>io_flush<br>io_empty <br> io_in_*</td>
-<td><br><br> 请求总线信号(req &amp; resp)</td>
-</tr>
-<tr>
-<td>io_out_mem_* <br> io_mmio_* <br> io_out_coh_* <br>victim_way_mask</td>
-<td>cache向内存请求的总线信号<br>cache向MMIO请求的总线信号 <br> 一致性相关的信号 <br> 受害者相关信号，即被替换的cache块相关信息</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>信号</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>clock<br>reset</td>
+          <td>时钟<br>复位信号</td>
+      </tr>
+      <tr>
+          <td>io_flush<br>io_empty <br> io_in_*</td>
+          <td><br><br> 请求总线信号(req &amp; resp)</td>
+      </tr>
+      <tr>
+          <td>io_out_mem_* <br> io_mmio_* <br> io_out_coh_* <br>victim_way_mask</td>
+          <td>cache向内存请求的总线信号<br>cache向MMIO请求的总线信号 <br> 一致性相关的信号 <br> 受害者相关信号，即被替换的cache块相关信息</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="测试点总表">测试点总表</h2>
 <p>实际使用下面的表格时，请用有意义的英文大写的功能名称和测试点名称替换下面表格中的名称</p>
 <mrs-testpoints>
 <table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>测试点名称</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>CACHE_BACKUP</td>
-<td>BACKUP</td>
-<td>对Cache的存取应该同对内存的存取一致</td>
-</tr>
-<tr>
-<td>2.1.1</td>
-<td>CACHE_MMIO_RW</td>
-<td>FORWARD</td>
-<td>Cache接收到MMIO空间的请求时，不应发生读写，而是直接转发给MMIO端口</td>
-</tr>
-<tr>
-<td>2.1.2</td>
-<td>CACHE_MMIO_RW</td>
-<td>NO_BURST</td>
-<td></td>
-</tr>
-<tr>
-<td>2.2</td>
-<td>CACHE_MMIO</td>
-<td>BLOCK</td>
-<td>MMIO请求发生时，应当阻塞流水线</td>
-</tr>
-<tr>
-<td>3.1</td>
-<td>CACHE_HIT</td>
-<td>WRITE</td>
-<td>Cache写命中时，应设置脏位</td>
-</tr>
-<tr>
-<td>3.2</td>
-<td>CACHE_HIT</td>
-<td>SHORTER</td>
-<td>Cache写命中时，回复的周期应该更少</td>
-</tr>
-<tr>
-<td>4.1.1</td>
-<td>CACHE_MISS_COMMON</td>
-<td>BLOCK</td>
-<td>发生缺失时，也会阻塞流水线</td>
-</tr>
-<tr>
-<td>4.1.2</td>
-<td>CACHE_MISS_COMMON</td>
-<td>CRITICAL_WORD</td>
-<td>Cache缺失时，Cache发出请求的首个地址应当是向Cache请求的地址</td>
-</tr>
-<tr>
-<td>4.1.3</td>
-<td>CACHE_MISS_COMMON</td>
-<td>LONGER</td>
-<td>Cache缺失时，回复的时间会更长</td>
-</tr>
-<tr>
-<td>4.2</td>
-<td>CACHE_MISS</td>
-<td>DIRTY</td>
-<td>Cache缺失时，Cache发出请求的首个地址应当是向Cache请求的地址</td>
-</tr>
-<tr>
-<td>4.3</td>
-<td>CACHE_MISS</td>
-<td>CLEAN</td>
-<td>Cache缺失时，回复的时间会更长</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>CACHE_BACKUP</td>
+          <td>BACKUP</td>
+          <td>对Cache的存取应该同对内存的存取一致</td>
+      </tr>
+      <tr>
+          <td>2.1.1</td>
+          <td>CACHE_MMIO_RW</td>
+          <td>FORWARD</td>
+          <td>Cache接收到MMIO空间的请求时，不应发生读写，而是直接转发给MMIO端口</td>
+      </tr>
+      <tr>
+          <td>2.1.2</td>
+          <td>CACHE_MMIO_RW</td>
+          <td>NO_BURST</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>CACHE_MMIO</td>
+          <td>BLOCK</td>
+          <td>MMIO请求发生时，应当阻塞流水线</td>
+      </tr>
+      <tr>
+          <td>3.1</td>
+          <td>CACHE_HIT</td>
+          <td>WRITE</td>
+          <td>Cache写命中时，应设置脏位</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>CACHE_HIT</td>
+          <td>SHORTER</td>
+          <td>Cache写命中时，回复的周期应该更少</td>
+      </tr>
+      <tr>
+          <td>4.1.1</td>
+          <td>CACHE_MISS_COMMON</td>
+          <td>BLOCK</td>
+          <td>发生缺失时，也会阻塞流水线</td>
+      </tr>
+      <tr>
+          <td>4.1.2</td>
+          <td>CACHE_MISS_COMMON</td>
+          <td>CRITICAL_WORD</td>
+          <td>Cache缺失时，Cache发出请求的首个地址应当是向Cache请求的地址</td>
+      </tr>
+      <tr>
+          <td>4.1.3</td>
+          <td>CACHE_MISS_COMMON</td>
+          <td>LONGER</td>
+          <td>Cache缺失时，回复的时间会更长</td>
+      </tr>
+      <tr>
+          <td>4.2</td>
+          <td>CACHE_MISS</td>
+          <td>DIRTY</td>
+          <td>Cache缺失时，Cache发出请求的首个地址应当是向Cache请求的地址</td>
+      </tr>
+      <tr>
+          <td>4.3</td>
+          <td>CACHE_MISS</td>
+          <td>CLEAN</td>
+          <td>Cache缺失时，回复的时间会更长</td>
+      </tr>
+  </tbody>
 </table>
 </mrs-testpoints>
 
@@ -1442,7 +1488,7 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

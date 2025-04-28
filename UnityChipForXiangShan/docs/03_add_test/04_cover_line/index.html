@@ -24,37 +24,41 @@
 本项目中相关涉及位置 开启覆盖率需要在编译时（使用 picker 命令时）加上“-c”参数（参考 picker 的参数解释），同时在文件中设置启用行覆盖率，这样在使用 toffee 测试时，才能够生成覆盖率统计文件。
 结合上面的描述，在本项目中也就是编译，编写和启用行覆盖率函数和测试的时候会涉及到代码覆盖率：
 添加编译脚本部分 编写编译脚本
-# 省略前面 if not os.path.exists(get_root_dir(&#34;dut/RVCExpander&#34;)): info(&#34;Exporting RVCExpander.sv&#34;) s, out, err = exe_cmd(f&#39;picker export --cp_lib false {get_rtl_dir(&#34;rtl/RVCExpander.">
-<meta property="og:title" content="代码覆盖率" />
-<meta property="og:description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
+# 省略前面 if not os.path.exists(get_root_dir(&#34;dut/RVCExpander&#34;)): info(&#34;Exporting RVCExpander.sv&#34;) s, out, err = exe_cmd(f&#39;picker export --cp_lib false {get_rtl_dir(&#34;rtl/RVCExpander.sv&#34;, cfg=cfg) } --lang python --tdir {get_root_dir(&#34;dut&#34;)}/ -w rvc.fst -c&#39;) assert s, &#34;Failed to export RVCExpander.sv: %s\n%s&#34; % (out, err) # 省略后面 在s, out, err=...这一行，我们使用 picker 命令，并且开启代码了覆盖率(命令最后的&#34;-c&#34;参数)。">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/04_cover_line/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="代码覆盖率">
+  <meta property="og:description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
 代码覆盖率包括：
-行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if &hellip; else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 *我们主要使用的模拟器是 Verilator,优先考虑行覆盖率。Verilator 支持覆盖率统计，因此我们在构建 DUT 时，如果要开启覆盖率统计，需要在编译选项中添加-c参数。
+行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if … else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 *我们主要使用的模拟器是 Verilator,优先考虑行覆盖率。Verilator 支持覆盖率统计，因此我们在构建 DUT 时，如果要开启覆盖率统计，需要在编译选项中添加-c参数。
 本项目中相关涉及位置 开启覆盖率需要在编译时（使用 picker 命令时）加上“-c”参数（参考 picker 的参数解释），同时在文件中设置启用行覆盖率，这样在使用 toffee 测试时，才能够生成覆盖率统计文件。
 结合上面的描述，在本项目中也就是编译，编写和启用行覆盖率函数和测试的时候会涉及到代码覆盖率：
 添加编译脚本部分 编写编译脚本
-# 省略前面 if not os.path.exists(get_root_dir(&#34;dut/RVCExpander&#34;)): info(&#34;Exporting RVCExpander.sv&#34;) s, out, err = exe_cmd(f&#39;picker export --cp_lib false {get_rtl_dir(&#34;rtl/RVCExpander." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/03_add_test/04_cover_line/" /><meta property="article:section" content="docs" />
+# 省略前面 if not os.path.exists(get_root_dir(&#34;dut/RVCExpander&#34;)): info(&#34;Exporting RVCExpander.sv&#34;) s, out, err = exe_cmd(f&#39;picker export --cp_lib false {get_rtl_dir(&#34;rtl/RVCExpander.sv&#34;, cfg=cfg) } --lang python --tdir {get_root_dir(&#34;dut&#34;)}/ -w rvc.fst -c&#39;) assert s, &#34;Failed to export RVCExpander.sv: %s\n%s&#34; % (out, err) # 省略后面 在s, out, err=...这一行，我们使用 picker 命令，并且开启代码了覆盖率(命令最后的&#34;-c&#34;参数)。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
 
-<meta property="article:modified_time" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="name" content="代码覆盖率">
-<meta itemprop="description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
+  <meta itemprop="name" content="代码覆盖率">
+  <meta itemprop="description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
 代码覆盖率包括：
-行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if &hellip; else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 *我们主要使用的模拟器是 Verilator,优先考虑行覆盖率。Verilator 支持覆盖率统计，因此我们在构建 DUT 时，如果要开启覆盖率统计，需要在编译选项中添加-c参数。
+行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if … else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 *我们主要使用的模拟器是 Verilator,优先考虑行覆盖率。Verilator 支持覆盖率统计，因此我们在构建 DUT 时，如果要开启覆盖率统计，需要在编译选项中添加-c参数。
 本项目中相关涉及位置 开启覆盖率需要在编译时（使用 picker 命令时）加上“-c”参数（参考 picker 的参数解释），同时在文件中设置启用行覆盖率，这样在使用 toffee 测试时，才能够生成覆盖率统计文件。
 结合上面的描述，在本项目中也就是编译，编写和启用行覆盖率函数和测试的时候会涉及到代码覆盖率：
 添加编译脚本部分 编写编译脚本
-# 省略前面 if not os.path.exists(get_root_dir(&#34;dut/RVCExpander&#34;)): info(&#34;Exporting RVCExpander.sv&#34;) s, out, err = exe_cmd(f&#39;picker export --cp_lib false {get_rtl_dir(&#34;rtl/RVCExpander.">
-<meta itemprop="dateModified" content="2025-04-03T10:10:56+08:00" />
-<meta itemprop="wordCount" content="221">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="代码覆盖率"/>
-<meta name="twitter:description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
+# 省略前面 if not os.path.exists(get_root_dir(&#34;dut/RVCExpander&#34;)): info(&#34;Exporting RVCExpander.sv&#34;) s, out, err = exe_cmd(f&#39;picker export --cp_lib false {get_rtl_dir(&#34;rtl/RVCExpander.sv&#34;, cfg=cfg) } --lang python --tdir {get_root_dir(&#34;dut&#34;)}/ -w rvc.fst -c&#39;) assert s, &#34;Failed to export RVCExpander.sv: %s\n%s&#34; % (out, err) # 省略后面 在s, out, err=...这一行，我们使用 picker 命令，并且开启代码了覆盖率(命令最后的&#34;-c&#34;参数)。">
+  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="wordCount" content="221">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="代码覆盖率">
+  <meta name="twitter:description" content="代码覆盖率是一项评价指标，它衡量了被测代码中哪些部分被执行了，哪些部分没有被执行。通过统计代码覆盖率，可以评估测试的有效性和覆盖程度。
 代码覆盖率包括：
-行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if &hellip; else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 *我们主要使用的模拟器是 Verilator,优先考虑行覆盖率。Verilator 支持覆盖率统计，因此我们在构建 DUT 时，如果要开启覆盖率统计，需要在编译选项中添加-c参数。
+行覆盖率(line coverage): 被测代码中被执行的行数，最简单的指标，一般期望达到 100%。 条件覆盖率(branch coverage): 每一个控制结构的每个分支是否均被执行。例如，给定一个 if 语句，其 true 和 false 分支是否均被执行？ 有限状态机覆盖率(fsm coverage): 状态机所有状态是否都达到过。 翻转覆盖率(toggle coverage): 统计被测代码中被执行的翻转语句，检查电路的每个节点是否都有 0 -&gt; 1 和 1 -&gt; 0 的跳变。 路径覆盖率(path coverage): 检查路径的覆盖情况。在 always 语句块和 initial 语句块中，有时会使用 if … else 和 case 语句，在电路结构上便会产生一系列的数据路径。。 *我们主要使用的模拟器是 Verilator,优先考虑行覆盖率。Verilator 支持覆盖率统计，因此我们在构建 DUT 时，如果要开启覆盖率统计，需要在编译选项中添加-c参数。
 本项目中相关涉及位置 开启覆盖率需要在编译时（使用 picker 命令时）加上“-c”参数（参考 picker 的参数解释），同时在文件中设置启用行覆盖率，这样在使用 toffee 测试时，才能够生成覆盖率统计文件。
 结合上面的描述，在本项目中也就是编译，编写和启用行覆盖率函数和测试的时候会涉及到代码覆盖率：
 添加编译脚本部分 编写编译脚本
-# 省略前面 if not os.path.exists(get_root_dir(&#34;dut/RVCExpander&#34;)): info(&#34;Exporting RVCExpander.sv&#34;) s, out, err = exe_cmd(f&#39;picker export --cp_lib false {get_rtl_dir(&#34;rtl/RVCExpander."/>
+# 省略前面 if not os.path.exists(get_root_dir(&#34;dut/RVCExpander&#34;)): info(&#34;Exporting RVCExpander.sv&#34;) s, out, err = exe_cmd(f&#39;picker export --cp_lib false {get_rtl_dir(&#34;rtl/RVCExpander.sv&#34;, cfg=cfg) } --lang python --tdir {get_root_dir(&#34;dut&#34;)}/ -w rvc.fst -c&#39;) assert s, &#34;Failed to export RVCExpander.sv: %s\n%s&#34; % (out, err) # 省略后面 在s, out, err=...这一行，我们使用 picker 命令，并且开启代码了覆盖率(命令最后的&#34;-c&#34;参数)。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <script
@@ -156,7 +160,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -180,7 +184,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.be31d802664be017a06bb2996465821d.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -526,7 +530,7 @@
 <p>开启覆盖率需要在编译时（使用 picker 命令时）加上“-c”参数（参考 picker 的<a href="https://github.com/XS-MLVP/picker/blob/master/README.zh.md#%E5%8F%82%E6%95%B0%E8%A7%A3%E9%87%8A">参数解释</a>），同时在文件中设置启用行覆盖率，这样在使用 toffee 测试时，才能够生成覆盖率统计文件。</p>
 <p>结合上面的描述，在本项目中也就是编译，编写和启用行覆盖率函数和测试的时候会涉及到代码覆盖率：</p>
 <h3 id="添加编译脚本部分">添加编译脚本部分</h3>
-<p><a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/#编写-buildcfg---bool-函数">编写编译脚本</a></p>
+<p><a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/#%e7%bc%96%e5%86%99-buildcfg---bool-%e5%87%bd%e6%95%b0">编写编译脚本</a></p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 省略前面</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#204a87;font-weight:bold">not</span> <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">path</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exists</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">get_root_dir</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;dut/RVCExpander&#34;</span><span style="color:#000;font-weight:bold">)):</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#000">info</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Exporting RVCExpander.sv&#34;</span><span style="color:#000;font-weight:bold">)</span>
@@ -535,10 +539,10 @@
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">assert</span> <span style="color:#000">s</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Failed to export RVCExpander.sv: </span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">%s</span><span style="color:#4e9a06">&#34;</span> <span style="color:#ce5c00;font-weight:bold">%</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">out</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 省略后面</span>
 </span></span></code></pre></div><p>在<code>s, out, err=...</code>这一行，我们使用 picker 命令，并且开启代码了覆盖率(命令最后的&quot;-c&quot;参数)。</p>
-<p><a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/#编写-line_coverage_filescfg---liststr-函数">设置目标覆盖文件(line_coverage_files 函数)</a></p>
+<p><a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/#%e7%bc%96%e5%86%99-line_coverage_filescfg---liststr-%e5%87%bd%e6%95%b0">设置目标覆盖文件(line_coverage_files 函数)</a></p>
 <p>按照需求编写<code>line_coverage_files(cfg) -&gt; list[str]</code>函数，并且开启测试结果处理(<code>doc_result.disable = False</code>)让其被调用。</p>
 <h3 id="构建测试环境部分">构建测试环境部分</h3>
-<p><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/#3-定义必要fixture">定义必要 fixture</a></p>
+<p><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/#3-%e5%ae%9a%e4%b9%89%e5%bf%85%e8%a6%81fixture">定义必要 fixture</a></p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">set_line_coverage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">request</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">coverage_file</span><span style="color:#000;font-weight:bold">)</span>                          <span style="color:#8f5902;font-style:italic"># 把生成的代码覆盖率文件告诉 toffee-report</span>
 </span></span></code></pre></div><p>通过函数<code>toffee-test.set_line_coverage</code>把覆盖率文件传递给 toffe-test，这样其才能够收集数据，以便于后面生成的报告带有行覆盖率。</p>
 <h2 id="忽略指定统计">忽略指定统计</h2>
@@ -585,13 +589,13 @@
 */RVCExpander_top*%
 </code></pre><p>上述文件表示，在统计覆盖率时，会忽略掉包含&quot;RVCExpander_top&quot;关键字的文件（实际上是收集了对应的数据，但是最后统计的时候忽略了）。</p>
 <h2 id="查看统计结果">查看统计结果</h2>
-<p>在经过前面所有步骤之后，包括准备测试环境中的<a href="/UnityChipForXiangShan/docs/01_verfiy_env/#下载rtl代码">下载 RTL 代码</a>、<a href="/UnityChipForXiangShan/docs/01_verfiy_env/#编译DUT">编译 DUT</a>、<a href="/UnityChipForXiangShan/docs/01_verfiy_env/#编辑配置">编辑配置</a>
+<p>在经过前面所有步骤之后，包括准备测试环境中的<a href="/UnityChipForXiangShan/docs/01_verfiy_env/#%e4%b8%8b%e8%bd%bdrtl%e4%bb%a3%e7%a0%81">下载 RTL 代码</a>、<a href="/UnityChipForXiangShan/docs/01_verfiy_env/#%e7%bc%96%e8%af%91DUT">编译 DUT</a>、<a href="/UnityChipForXiangShan/docs/01_verfiy_env/#%e7%bc%96%e8%be%91%e9%85%8d%e7%bd%ae">编辑配置</a>
 ；添加测试中的<a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/">添加编译脚本</a>,<a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/">构建测试环境</a>、<a href="/UnityChipForXiangShan/docs/03_add_test/03_add_test/">添加测试用例</a>。</p>
 <p>现在<a href="/UnityChipForXiangShan/docs/02_run_test/">运行测试</a>,之后就默认在<code>out/report</code>目录会生成 html 版本的测试报告。</p>
 <p>也可以在<a href="https://open-verify.cc/UnityChipForXiangShan/docs/">进度概述</a>图形下方的“当前版本”选择对应的测试报告(按照测试时间命名)，然后点击右侧链接即可查看统计结果。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 3, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/904f80bc9a97ffdee7f2ad38539bdae7c8c1699b">ICache verify enviroment and docs added. (#111) (904f80b)</a>
+  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
 </div>
 
 </div>
@@ -635,7 +639,7 @@
 </footer>
 
     </div>
-    <script src="/UnityChipForXiangShan/js/main.min.37d14e870feb76f0f7a2a2422bae231efb0186c477999a4ab9ca7e9924ced592.js" integrity="sha256-N9FOhw/rdvD3oqJCK64jHvsBhsR3mZpKucp&#43;mSTO1ZI=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 
