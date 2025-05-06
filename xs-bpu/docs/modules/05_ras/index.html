@@ -50,7 +50,7 @@ POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-04-28T17:43:36+08:00">
+    <meta property="article:modified_time" content="2025-05-06T12:03:58+08:00">
     <meta property="article:tag" content="子预测器">
     <meta property="article:tag" content="RAS">
 
@@ -68,7 +68,7 @@ POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时
 提交操作 提交（Commit）操作即后端告诉前端，之前预测的结果正确。理想情况下，RAS预测器此时不需要进行任何操作。
 昆明湖中RAS的实现 由于处理器在执行过程中可能会进行错误的猜测，导致数据污染，RAS需要通过恢复机制来确保数据的准确性。特别是在昆明湖的实际电路设计中，不可能有无限大的栈，也无法随时备份数据。因此，昆明湖的RAS实现中，使用了基于持久化栈的返回地址预测器。具体来说，将RAS分为提交栈（commit stack）和推测栈（spec queue）两个部分，推测栈利用了香山BPU的预测结果来进行预测，然后根据后端返回的信息将数据压入提交栈中。下面详细介绍昆明湖的RAS设计：
 每次预测时，RAS栈的快照如何获得？ 为了实现对RAS栈进行快照的功能，昆明湖的RAS推测栈采用了基于循环数组的 “链式表示“ 。设计具体如下：">
-  <meta itemprop="dateModified" content="2025-04-28T17:43:36+08:00">
+  <meta itemprop="dateModified" content="2025-05-06T12:03:58+08:00">
   <meta itemprop="wordCount" content="311">
   <meta itemprop="keywords" content="子预测器,RAS">
   <meta name="twitter:card" content="summary">
@@ -144,7 +144,7 @@ POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.cae33942e63f62947f4246798e40a87d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -168,7 +168,7 @@ POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.cae33942e63f62947f4246798e40a87d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -752,7 +752,7 @@ POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时
 <p>3、执行重定向（重定向信息由前一拍获得）操作</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/5c24d32b13e6e84ae1f86af59a596e9d23ae77df">Upgrade hugo version to 0.146.7 (5c24d32)</a>
+  最后修改 May 6, 2025: <a href="https://github.com/XS-MLVP/course/commit/b8f13473fae2aceb4a5cf1e90132706ddc329aa9">Change version of hugo to 0.145.0 (b8f1347)</a>
 </div>
 
 </div>

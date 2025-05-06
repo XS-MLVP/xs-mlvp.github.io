@@ -28,7 +28,7 @@ openxiangshan-kmh-97e37a2237-24092701.tar.gz └── rtl # 目录 |-- *.sv # �
 如果想要自行打包某个dut，需要创建编写scripts目录中的build_ut_&lt;name&gt;.py脚本。这一脚本必须实现一个build方法，在打包时会被自动调用。此外还有一个line_coverage_files方法，用于指定行覆盖率参考的文件。
 picker的打包支持内部信号的加入，详见picker的--internal参数，传递给其一个自定义的yaml即可。
 # 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
-$$dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander$$完成转换后，在测试用例代码中可以import对应的DUT，例如：
+dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
 from dut.PreDecode import DUTPreDecode dut = DUTPreDecode() 编辑配置 运行rtl、dut、test等命令时，默认使用configs/_default.yaml中的配置项。">
 <meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/01_verfiy_env/">
   <meta property="og:site_name" content="万众一芯之香山处理器">
@@ -43,12 +43,12 @@ openxiangshan-kmh-97e37a2237-24092701.tar.gz └── rtl # 目录 |-- *.sv # �
 如果想要自行打包某个dut，需要创建编写scripts目录中的build_ut_&lt;name&gt;.py脚本。这一脚本必须实现一个build方法，在打包时会被自动调用。此外还有一个line_coverage_files方法，用于指定行覆盖率参考的文件。
 picker的打包支持内部信号的加入，详见picker的--internal参数，传递给其一个自定义的yaml即可。
 # 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
-$$dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander$$完成转换后，在测试用例代码中可以import对应的DUT，例如：
+dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
 from dut.PreDecode import DUTPreDecode dut = DUTPreDecode() 编辑配置 运行rtl、dut、test等命令时，默认使用configs/_default.yaml中的配置项。">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
+    <meta property="article:modified_time" content="2025-05-06T12:04:43+08:00">
 
   <meta itemprop="name" content="准备验证环境">
   <meta itemprop="description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和toffee，环境需求如下：
@@ -61,10 +61,10 @@ openxiangshan-kmh-97e37a2237-24092701.tar.gz └── rtl # 目录 |-- *.sv # �
 如果想要自行打包某个dut，需要创建编写scripts目录中的build_ut_&lt;name&gt;.py脚本。这一脚本必须实现一个build方法，在打包时会被自动调用。此外还有一个line_coverage_files方法，用于指定行覆盖率参考的文件。
 picker的打包支持内部信号的加入，详见picker的--internal参数，传递给其一个自定义的yaml即可。
 # 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
-$$dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander$$完成转换后，在测试用例代码中可以import对应的DUT，例如：
+dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
 from dut.PreDecode import DUTPreDecode dut = DUTPreDecode() 编辑配置 运行rtl、dut、test等命令时，默认使用configs/_default.yaml中的配置项。">
-  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
-  <meta itemprop="wordCount" content="99">
+  <meta itemprop="dateModified" content="2025-05-06T12:04:43+08:00">
+  <meta itemprop="wordCount" content="100">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="准备验证环境">
   <meta name="twitter:description" content="基础环境需求 本项目基于Python编程语言进行UT验证，采用的工具和测试框架为picker和toffee，环境需求如下：
@@ -77,7 +77,7 @@ openxiangshan-kmh-97e37a2237-24092701.tar.gz └── rtl # 目录 |-- *.sv # �
 如果想要自行打包某个dut，需要创建编写scripts目录中的build_ut_&lt;name&gt;.py脚本。这一脚本必须实现一个build方法，在打包时会被自动调用。此外还有一个line_coverage_files方法，用于指定行覆盖率参考的文件。
 picker的打包支持内部信号的加入，详见picker的--internal参数，传递给其一个自定义的yaml即可。
 # 调用scripts目录中的build_ut_&lt;name&gt;.py中的build方法，创建待验证的Python版DUT make dut DUTS=&lt;name&gt; # DUTS的值如果有多个，需要用逗号隔开，支持通配符。DUTS默认值为 &#34;*&#34;，编译所有DUT # 例如： make dut DUTS=backend_ctrl_block_decode 以make dut DUTS=backend_ctrl_block_decode为例，命令执行完成后，会在dut目录下生成对应的Python包：
-$$dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander$$完成转换后，在测试用例代码中可以import对应的DUT，例如：
+dut/ ├── __init__.py ├── DecodeStage ├── Predecode └── RVCExpander 完成转换后，在测试用例代码中可以import对应的DUT，例如：
 from dut.PreDecode import DUTPreDecode dut = DUTPreDecode() 编辑配置 运行rtl、dut、test等命令时，默认使用configs/_default.yaml中的配置项。">
 <link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
 <link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
@@ -180,7 +180,7 @@ from dut.PreDecode import DUTPreDecode dut = DUTPreDecode() 编辑配置 运行r
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.9674bd9adea634eec5ba6b6a695e8d53.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -204,7 +204,7 @@ from dut.PreDecode import DUTPreDecode dut = DUTPreDecode() 编辑配置 运行r
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.9674bd9adea634eec5ba6b6a695e8d53.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -558,12 +558,12 @@ from dut.PreDecode import DUTPreDecode dut = DUTPreDecode() 编辑配置 运行r
 </span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 例如：</span>
 </span></span><span style="display:flex;"><span>make dut <span style="color:#000">DUTS</span><span style="color:#ce5c00;font-weight:bold">=</span>backend_ctrl_block_decode
 </span></span></code></pre></div><p>以<code>make dut DUTS=backend_ctrl_block_decode</code>为例，命令执行完成后，会在dut目录下生成对应的Python包：</p>
-
-<div class="chem">$$dut/
+<pre tabindex="0"><code>dut/
 ├── __init__.py
 ├── DecodeStage
 ├── Predecode
-└── RVCExpander$$</div><p>完成转换后，在测试用例代码中可以import对应的DUT，例如：</p>
+└── RVCExpander
+</code></pre><p>完成转换后，在测试用例代码中可以import对应的DUT，例如：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">dut.PreDecode</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">DUTPreDecode</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTPreDecode</span><span style="color:#000;font-weight:bold">()</span>
 </span></span></code></pre></div><h4 id="编辑配置">编辑配置</h4>
@@ -576,7 +576,7 @@ from dut.PreDecode import DUTPreDecode dut = DUTPreDecode() 编辑配置 运行r
 </span></span><span style="display:flex;"><span>make <span style="color:#204a87">test</span> <span style="color:#000">KV</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;log.term-level=\&#39;debug\&#39; test.skip-tags=[\&#39;RARELY_USED\&#39;]&#34;</span>
 </span></span></code></pre></div>
 	<div class="td-page-meta__lastmod">
-  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
+  最后修改 May 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/873b483d54586c0f9a4d259b3aea64600c17c7b8">Change version of hugo to 0.145.0 (873b483)</a>
 </div>
 
 </div>
@@ -620,21 +620,7 @@ from dut.PreDecode import DUTPreDecode dut = DUTPreDecode() 编辑配置 运行r
 </footer>
 
     </div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css"
-      integrity="sha512-r2+FkHzf1u0+SQbZOoIz2RxWOIWfdEzRuYybGjzKq18jG9zaSfEy9s3+jMqG/zPtRor/q4qaUCYQpmSjTw8M+g==" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"
-        integrity="sha512-INps9zQ2GUEMCQD7xiZQbGUVnqnzEvlynVy6eqcTcHN4+aQiLo9/uaQqckDpdJ8Zm3M0QBs+Pktg4pz0kEklUg=="
-        crossorigin="anonymous">
-</script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/mhchem.min.js"
-        integrity="sha512-mxjNw/u1lIsFC09k/unscDRY3ofIYPVFbWkP8slrePcS36ht4d/OZ8rRu5yddB2uiqajhTcLD8+jupOWuYPebg=="
-        crossorigin="anonymous">
-</script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"
-       integrity="sha512-YJVxTjqttjsU3cSvaTRqsSl0wbRgZUNF+NGGCgto/MUbIvaLdXQzGTCQu4CvyJZbZctgflVB0PXw9LLmTWm5/w==" crossorigin="anonymous"
-       onload='renderMathInElement(document.body, null);'>
-</script>
-<script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
 <script src='/UnityChipForXiangShan/js/prism.js'></script>
 <script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
 

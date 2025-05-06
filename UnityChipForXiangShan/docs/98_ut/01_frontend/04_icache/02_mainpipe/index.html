@@ -28,12 +28,12 @@ MainPipe结构示意图	从 WayLookup 获取信息，访问 DataArray 单路（S
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-04-28T18:00:16+08:00">
+    <meta property="article:modified_time" content="2025-05-06T12:04:43+08:00">
 
   <meta itemprop="name" content="MainPipe">
   <meta itemprop="description" content="MainPipe MainPipe 为 ICache 的主流水，为三级流水设计，负责从 DataArray 中读取数据，pmp 检查，缺失处理，并且将结果返回给 IFU。
 MainPipe结构示意图	从 WayLookup 获取信息，访问 DataArray 单路（S0 阶段） 在 S0 流水级，从 WayLookup 获取元数据，包括路命中信息和 ITLB 查询结果，访问 DataArray 的单路，如果 DataArray 正在被写或 WayLookup 中没有有效表项，流水线就会阻塞。每次重定向后，FTQ 中同一个请求被同时发送到 MainPipe 和 IPrefetchPipe 中，MainPipe 始终需要等待 IPrefetchPipe 将请求的查询信息写入 WayLookup 后才能向下走，导致了 1 拍重定向延迟，当预取超过取指时，该延迟就会被覆盖。 接收并解析来自 FTQ 的取指请求，提取必要的请求信息，如虚拟地址、缓存组索引、块内偏移、是否为双行读、后端的异常信息。 从 WayLookup 模块获取缓存命中信息和 TLB 信息，包括 waymask、物理标签、虚拟机物理地址、是否为叶节点、 ITLB 异常、ITLB 的 PBMT 信息、缓存元数据的校验码。 访问 DataArray 的单路，如果 DataArray 正在被写或 WayLookup 中没有有效表项，流水线就会阻塞。 每次重定向后，FTQ 中同一个请求被同时发送到 MainPipe 和 IPrefetchPipe 中，MainPipe 始终需要等待 IPrefetchPipe 将请求的查询信息写入 WayLookup 后才能向下走，导致了 1 拍重定向延迟，当预取超过取指时，该延迟就会被覆盖。 接收上一个阶段的信息并进行数据暂存、PMP 检查、从 DataArray 获取读响应异常合并、替换策略更新以及监控 MissUnit（S1 阶段） 寄存并延迟 S0 阶段信息 从 S0 获取的地址、tag、命中方式（waymask）、TLB 异常标志、下一拍要用的数据等，都会在 S1 寄存一拍，保证在流水线停顿时也能维持正确值。 Meta ECC 检查 对 S0 读出的 meta 和其校验码（ECC/Parity）进行比对，判断是否发生错误。如果关闭 parity 功能，则跳过该检查。 更新 replacer 对确定命中的访问请求，进行“touch”更新，标记最近使用过的 way，以便后续替换算法正确运行。 PMP 检查 根据 S0 得到的物理地址（paddr），在 S1 对其进行 PMP 检查，判断是否拥有执行权限、是否为 MMIO 等。在当拍收到响应，将结果寄存到下一流水级进行处理。 需要指出，IPrefetchPipe s1 流水级也会进行 PMP 检查，和此处的检查实际上是完全一样的，分别检查只是为了优化时序（避免 ITLB(reg) -&gt; ITLB.resp -&gt; PMP.req -&gt; PMP.resp -&gt; WayLookup.write -&gt; bypass -&gt; WayLookup.read -&gt; MainPipe s1(reg) 的超长组合逻辑路径）。 异常合并 将 ITLB 与 PMP 异常进行优先级合并，产生最终的异常标记。 选择数据来源：MSHR 或 SRAM 接收 DataArray 返回的 data 和 code 并寄存，同时监听 MSHR 的响应，当 DataArray 和 MSHR 的响应同时有效时，后者的优先级更高。当 MSHR 已在填充一些数据，如果当前请求与 MSHR 命中，可以在 S1 阶段直接选用 MSHR 的数据，而不必依赖 SRAM 读出的结果。 监控 MissUnit，在 ECC 校验、异常处理和缺失处理之后，将最终的数据、异常信息传递给 IFU，完成取指流程（S2 阶段） ECC 校验 DataArray ECC 校验，对 S1 流水级寄存的 code 进行校验，生成 data 是否损坏信号 s2_data_corrupt。如果校验出错，就将错误报告给 BEU。 MetaArray ECC 校验，IPrefetchPipe 读出 MetaArray 的数据后会直接进行校验，并将校验结果随命中信息一起入队 WayLookup 并随 MainPipe 流水到达 S2 级（meta_corrupt 信号），在此处随 DataArray 的 ECC 校验结果一起报告给 BEU。 监控 MissUnit 响应端口 检查当前 S2 阶段的请求是否与 MSHR 中的条目匹配，命中时寄存 MSHR 响应的数据，为了时序在下一拍才将数据发送到 IFU。 更新 Data 和其是否来自 MSHR 的信息。 更新 s2_hits 和处理异常。 处理 L2 Cache 的 Corrupt 标志。 缺失处理，发送 Miss 请求到 MSHR 计算是否需要重新获取（Refetch）。 通过是否命中、ECC 错误、正确跨行、是否异常和是否属于 MMIO 区域来发送 Miss 请求。 设置 Arbiter 合并多个端口的 Miss 请求，确保一次只处理一个请求，同时有避免重复请求的设置。 判断 Fetch 是否完成。 生成 L2 Cache 的异常标记，再将当前 S2 阶段的异常（包括 ITLB、PMP）与 L2 Cache 的异常进行合并。 响应 IFU 将最终的数据、异常信息传递给 IFU，完成取指流程。 根据请求是否为跨行，决定如何处理双行数据。 报告 TileLink 的 Corrupt 错误 对于每个端口，如果在当前周期 s2_fire 时检测到来自 L2 Cache 的数据 corrupt 错误，就将错误报告给 BEU。 MainPipe 的功能点和测试点 访问 DataArray 的单路 根据从 WayLookup 获取信息，包括路命中信息和 ITLB 查询结果还有 DataArray 当前的情况，决定是否需要从 DataArray 中读取数据。">
-  <meta itemprop="dateModified" content="2025-04-28T18:00:16+08:00">
+  <meta itemprop="dateModified" content="2025-05-06T12:04:43+08:00">
   <meta itemprop="wordCount" content="1254">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="MainPipe">
@@ -140,7 +140,7 @@ MainPipe结构示意图	从 WayLookup 获取信息，访问 DataArray 单路（S
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.9674bd9adea634eec5ba6b6a695e8d53.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -164,7 +164,7 @@ MainPipe结构示意图	从 WayLookup 获取信息，访问 DataArray 单路（S
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6097a94fa38393988c5b7c83237f7166.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.9674bd9adea634eec5ba6b6a695e8d53.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -1017,7 +1017,7 @@ MainPipe结构示意图	从 WayLookup 获取信息，访问 DataArray 单路（S
 </ul>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 April 28, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/502b2c0f51fcb2e3b46cab022b65cb691a3ae108">Upgrade hugo version to 0.146.7 (502b2c0)</a>
+  最后修改 May 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/873b483d54586c0f9a4d259b3aea64600c17c7b8">Change version of hugo to 0.145.0 (873b483)</a>
 </div>
 
 </div>

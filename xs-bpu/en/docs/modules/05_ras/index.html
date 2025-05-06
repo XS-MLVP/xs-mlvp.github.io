@@ -28,14 +28,14 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
   <meta property="og:locale" content="en">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-04-28T17:43:36+08:00">
+    <meta property="article:modified_time" content="2025-05-06T12:03:58+08:00">
     <meta property="article:tag" content="Sub-Predictor">
     <meta property="article:tag" content="RAS">
 
   <meta itemprop="name" content="RAS Branch Predictor">
   <meta itemprop="description" content="RAS介绍 RAS stands for “Return Address Stack.” It helps determine branch behavior in programs by tracking return addresses. As previously mentioned, there are many branches in a program: if/else, switch/case, while/for loop, iteration, call/return, etc. The RAS branch predictor specifically targets call/return types.
 function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } function add(a, b){ return a &#43; b; } function sub(a, b){ return a - b; } function main(){ a = 1; b = 2; c = add(a, b); d = sub(a, b); } As shown above, the main function calls add and sub, and add calls the function _add. In this process, each call’s jump address and return address are fixed, and the return address can be obtained at the time of the call. The function call process is a “stack push and pop” process, so branch prediction can be performed using a “stack” structure: each time a call instruction is encountered, the current PC&#43;4 (compressed instructions and regular instructions have different offsets) is pushed onto the stack; when a return instruction is encountered, a pop operation is performed, and the address obtained is the target jump address. In the block-based BPU, RAS cannot know whether the current block is a call or ret, so it relies on other predictors, using the results of previous predictors for RAS operations.">
-  <meta itemprop="dateModified" content="2025-04-28T17:43:36+08:00">
+  <meta itemprop="dateModified" content="2025-05-06T12:03:58+08:00">
   <meta itemprop="wordCount" content="1905">
   <meta itemprop="keywords" content="Sub-Predictor,RAS">
   <meta name="twitter:card" content="summary">
@@ -100,7 +100,7 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.cae33942e63f62947f4246798e40a87d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -124,7 +124,7 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/xs-bpu/offline-search-index.3766e33dedd17a260861f316ef8f217c.json"
+    data-offline-search-index-json-src="/xs-bpu/offline-search-index.cae33942e63f62947f4246798e40a87d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -727,7 +727,7 @@ function _add(a, b){ return (a &gt; 0 ? a : 0) &#43; (b &gt; 0? b : 0); } functi
 <p>Since the RASStack appears to complete its tasks within a cycle, data bypassing is needed inside the stack to cache data for processing.</p>
 
 	<div class="td-page-meta__lastmod">
-  Last modified April 28, 2025: <a href="https://github.com/XS-MLVP/course/commit/5c24d32b13e6e84ae1f86af59a596e9d23ae77df">Upgrade hugo version to 0.146.7 (5c24d32)</a>
+  Last modified May 6, 2025: <a href="https://github.com/XS-MLVP/course/commit/b8f13473fae2aceb4a5cf1e90132706ddc329aa9">Change version of hugo to 0.145.0 (b8f1347)</a>
 </div>
 
 </div>
