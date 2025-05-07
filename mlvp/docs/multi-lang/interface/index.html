@@ -26,13 +26,13 @@
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-05-06T12:03:31+08:00">
+    <meta property="article:modified_time" content="2025-05-07T17:55:17+08:00">
     <meta property="article:tag" content="Docs">
 
   <meta itemprop="name" content="验证接口">
   <meta itemprop="description" content="DUT文件与编程语言都支持的验证接口">
-  <meta itemprop="dateModified" content="2025-05-06T12:03:31+08:00">
-  <meta itemprop="wordCount" content="132">
+  <meta itemprop="dateModified" content="2025-05-07T17:55:17+08:00">
+  <meta itemprop="wordCount" content="142">
   <meta itemprop="keywords" content="Docs">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="验证接口">
@@ -121,7 +121,7 @@
         <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
+    <li><a class="dropdown-item" href="/mlvp/en/docs/multi-lang/interface/">English</a></li>
     </ul>
 </div></li>
       </ul>
@@ -136,7 +136,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.168b40cf965df9bbfd9d346d179deb86.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.3e2316784c2b77234524a825f1263ddb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -160,7 +160,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.168b40cf965df9bbfd9d346d179deb86.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.3e2316784c2b77234524a825f1263ddb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -173,7 +173,7 @@
       <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
+    <li><a class="dropdown-item" href="/mlvp/en/docs/multi-lang/interface/">English</a></li>
     </ul>
 </div>
     </div>
@@ -353,16 +353,17 @@
 
   </header>
 	<h2 id="生成库文件">生成库文件</h2>
-<p>picker可以通过参数<code>--lang</code>指定转换的对应语言（参数已支持cpp、python、java、scala、golang），由于不同编程语言对应的“库”不同，因此生成的库文件有所区别，例如java生成的是jar包，python生成的为文件夹。picker导出对应编程语言的库，需要xcomm的支持，可以通过<code>picker --check</code>查看支持情况：</p>
+<p>picker可以通过参数<code>--lang</code>指定转换的对应语言（参数已支持cpp、python、java、lua、scala、golang），由于不同编程语言对应的“库”不同，因此生成的库文件有所区别，例如java生成的是jar包，python生成的为文件夹。picker导出对应编程语言的库，需要xcomm的支持，可以通过<code>picker --check</code>查看支持情况：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000">$picker</span> --check
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Version: 0.9.0---dirty
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Exec path: /home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/bin/picker
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Template path: /home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/share/picker/template
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support    Cpp <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/share/picker/include&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>Err<span style="color:#ce5c00;font-weight:bold">]</span> Support   Java <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;java/xspcomm-java.jar&#39;</span> fail<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>Err<span style="color:#ce5c00;font-weight:bold">]</span> Support  Scala <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;scala/xspcomm-scala.jar&#39;</span> fail<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Python <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/home/yaozhicheng/mambaforge/lib/python3.11/site-packages/picker/share/picker/python&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>Err<span style="color:#ce5c00;font-weight:bold">]</span> Support Golang <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;golang&#39;</span> fail<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Version: 0.9.0-feat_performance_improve-b7001a6-2025-04-11-dirty
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Exec path: /usr/local/share/lib/python3.11/site-packages/picker/bin/picker
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Template path: /usr/local/share/lib/python3.11/site-packages/picker/share/picker/template
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support    Cpp <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/lib&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Golang <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/golang&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support   Java <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/java/xspcomm-java.jar&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support    Lua <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/lua/luaxspcomm.so&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Python <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/python&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support  Scala <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/scala/xspcomm-scala.jar&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
 </span></span></code></pre></div><p>输出显示success表示支持，fail表示不支持。</p>
 <h3 id="c">C++</h3>
 <p>对于C++语言，picker生成的为so动态链接库，和对应的头文件。例如：</p>
@@ -404,7 +405,7 @@
 <p>xspcomm库接口请参考连接：<a href="https://github.com/XS-MLVP/xcomm/blob/master/docs/APIs.cn.md">https://github.com/XS-MLVP/xcomm/blob/master/docs/APIs.cn.md</a></p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 May 6, 2025: <a href="https://github.com/XS-MLVP/course/commit/fae57330c6fe5849b3c3d2e35a1a12595a984215">Change version of hugo to 0.145.0 (fae5733)</a>
+  最后修改 May 7, 2025: <a href="https://github.com/XS-MLVP/course/commit/963533f1c174891060f64103bcc1aeb17a776e3b">fix(multilang): sync en with cn (963533f)</a>
 </div>
 
 </div>

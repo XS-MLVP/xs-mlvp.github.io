@@ -30,7 +30,7 @@
 
   <meta itemprop="name" content="Environment Usage">
   <meta itemprop="description" content="Detailed usage instructions for the Open Verification Platform environment.">
-  <meta itemprop="dateModified" content="2025-05-06T12:03:31+08:00">
+  <meta itemprop="dateModified" content="2025-05-07T17:55:17+08:00">
   <meta itemprop="wordCount" content="24">
   <meta itemprop="keywords" content="Examples,Docs">
   <meta name="twitter:card" content="summary">
@@ -135,7 +135,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.168b40cf965df9bbfd9d346d179deb86.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.3e2316784c2b77234524a825f1263ddb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -244,6 +244,14 @@ This is the multi-page printable view of this section.
   
 
     </ul>
+    
+  
+    
+    
+	
+<li>6: <a href="#pg-5d14fb48f09c8e7b39f81cc2a6999931">Internal Signals</a></li>
+
+
     
   
 
@@ -1119,6 +1127,200 @@ We can define a test function test_addition using the @given decorator and add p
     
 	
   
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-5d14fb48f09c8e7b39f81cc2a6999931">6 - Internal Signals</h1>
+    <div class="lead">Internal Signal Example</div>
+	<p>Internal signals refer to those not exposed at the module’s IO ports, but which play roles in control, data transfer, or state tracking within the module. Typically, when picker converts RTL to DUT, only IO ports are automatically exposed, and internal signals are not exported by default.</p>
+<p>However, when more detailed verification of internal module logic is needed, or when debugging known issues, verification engineers often need access to these internal signals. In addition to traditional tools like Verilator and VCS, picker also provides an internal signal extraction mechanism as an auxiliary tool.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Take the up-counter as an example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">UpperCounter</span> <span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span>           
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">reset</span><span style="color:#000;font-weight:bold">,</span>         
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">count</span>   
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">upper</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">upper</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;b1111</span><span style="color:#000;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">reset</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;b0000</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">end</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">upper</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">endmodule</span>
+</span></span></code></pre></div><p>The IO signals of the module are those defined directly in the module declaration, such as:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">UpperCounter</span> <span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span>           
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">reset</span><span style="color:#000;font-weight:bold">,</span>         
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">count</span>   
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">);</span>
+</span></span></code></pre></div><p>Here, <code>clk</code>, <code>reset</code>, and <code>count</code> are IO signals and can be directly accessed. The following <code>wire upper;</code> is an internal signal, whose value is determined by both module inputs and internal logic. While the counter logic in this example is simple, larger hardware modules often present the following challenges:</p>
+<ul>
+<li>When the module output does not match expectations, the problematic code range is large, making it hard to quickly narrow down the issue.</li>
+<li>Complex internal logic makes understanding and analysis difficult; internal signals can serve as key markers to clarify the module’s operation.</li>
+</ul>
+<p>For these issues, accessing and analyzing internal signals is very effective. Traditionally, tools like Verilator and VCS are used to observe internal signals. <strong>To further lower the verification barrier, picker provides three internal signal access methods: DPI direct export, VPI dynamic access, and direct memory read/write.</strong></p>
+<h2 id="dpi-direct-export">DPI Direct Export</h2>
+<p>DPI (Direct Programming Interface) is an interface for interaction between Verilog and other languages. In picker’s default implementation, DPI is provided for the IO ports of the DUT. When running picker, if the <code>--internal</code> option is added, DPI can also be provided for internal signals. Picker will use a predefined internal signal file to extract both internal signals and IO ports from the RTL when converting to DUT.</p>
+<h3 id="writing-the-signal-file">Writing the Signal File</h3>
+<p>The signal file specifies to picker which internal signals to extract, listing the module and the internal signals to extract.</p>
+<p>Example <code>internal.yaml</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">UpperCounter</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span>- <span style="color:#4e9a06">&#34;wire upper&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><p>The first line is the module name (e.g., UpperCounter). From the second line, list the internal signals to extract in the format “type signal_name”. For example, if <code>upper</code> is a wire, write <code>&quot;wire upper&quot;</code>. (In theory, as long as the signal name matches the variable name in the Verilog code, it can be matched. The type can be arbitrary, but it’s recommended to use Verilog-supported types like wire, reg, logic, etc.)</p>
+<p>The ability to extract internal signals depends on the simulator. For example, Verilator cannot extract signals starting with an underscore <code>_</code>.</p>
+<p>Note: For multi-bit internal signals, you need to explicitly specify the width, so the actual format is “type [width] signal_name”.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">UpperCounter</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span>- <span style="color:#4e9a06">&#34;wire upper&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span>- <span style="color:#4e9a06">&#34;reg [3:0] another_multiples&#34;</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># This signal does not exist in this example, just to illustrate the yaml format</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h3 id="export-parameter">Export Parameter</h3>
+<p>After writing the signal file, you need to specify it explicitly when running picker using the <code>--internal</code> option:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>--internal<span style="color:#ce5c00;font-weight:bold">=[</span>internal_signal_file<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span></code></pre></div><p>Full command example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">true</span> upper_counter.sv -w upper_counter.fst --sname UpperCounter <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>--tdir picker_out_upper_counter/ --lang python -e --sim verilator --internal<span style="color:#ce5c00;font-weight:bold">=</span>internal.yaml
+</span></span></code></pre></div><p>You can find the <code>signals.json</code> file generated by picker for the DUT:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;UpperCounter_upper&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;High&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">-1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Low&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Pin&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;wire&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;_&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;clk&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;High&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">-1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Low&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Pin&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;input&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;_&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;count&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;High&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Low&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Pin&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;output&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;_&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;reset&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;High&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">-1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Low&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Pin&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;input&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;_&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>This file shows the signal interfaces generated by picker. The first signal, <code>UpperCounter_upper</code>, is the internal signal we wanted to extract. The part before the first underscore is the module name defined in <code>internal.yaml</code>, and the rest is the internal signal name.</p>
+<h3 id="signal-access">Signal Access</h3>
+<p>After extraction, accessing internal signals is no different from accessing IO signals—they are all XData objects on the DUT and can be accessed as <code>dut.signal_name</code>.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UpperCounter</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTUpperCounter</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">UpperCounter_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h2 id="vpi-dynamic-access">VPI Dynamic Access</h2>
+<p>VPI (Verilog Procedural Interface) is a standard interface in Verilog that allows external programs (like C) to interact with the Verilog simulator during simulation. With VPI, users can access, read, and modify signals, variables, and module instances in the Verilog simulation, as well as register callbacks to control and extend the simulation process. VPI is often used for custom system tasks, advanced verification, dynamic signal access, and waveform processing. VPI is part of the IEEE 1364 standard.</p>
+<h3 id="export-parameter-1">Export Parameter</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --help
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>--vpi Enable VPI, <span style="color:#204a87;font-weight:bold">for</span> flexible internal signal access default is OFF
+</span></span></code></pre></div><p>Enable VPI support with the <code>--vpi</code> parameter, for example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> upper_counter.sv --sname UpperCounter --tdir picker_out_upper_counter/ --lang python --vpi
+</span></span></code></pre></div><h3 id="signal-access-1">Signal Access</h3>
+<p>After enabling <code>--vpi</code>, you can use the DUT interface <code>dut.GetInternalSignalList(use_vpi=True)</code> to list all accessible internal signals, and <code>dut.GetInternalSignal(name, use_vpi=True)</code> to dynamically construct XData for data access.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UpperCounter</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTUpperCounter</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># List all internal signals</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Or use dut.VPIInternalSignalList()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">GetInternalSignalList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">use_vpi</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Dynamically construct XData</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">internal_upper</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">GetInternalSignal</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;UpperCounter.upper&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">use_vpi</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Read access</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">internal_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Write access (writing is possible, but the value will be overwritten after dut.step; not recommended for non-reg types)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">internal_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0x1</span>
+</span></span></code></pre></div><h2 id="direct-memory-readwrite">Direct Memory Read/Write</h2>
+<p>Both DPI and VPI-based internal signal access have some performance overhead. For maximum performance, picker implements direct internal signal access for Verilator/GSIM simulators.</p>
+<h3 id="export-parameter-2">Export Parameter</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --help
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>--rw,--access-mode ENUM:value in <span style="color:#ce5c00;font-weight:bold">{</span>dpi-&gt;0,mem_direct-&gt;1<span style="color:#ce5c00;font-weight:bold">}</span> OR <span style="color:#ce5c00;font-weight:bold">{</span>0,1<span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span></code></pre></div><p>Enable direct memory read/write for Verilator by using <code>--rw 1</code>, for example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> upper_counter.sv --sname UpperCounter --tdir picker_out_upper_counter/ --lang python --rw <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span></code></pre></div><h3 id="signal-access-2">Signal Access</h3>
+<p>After enabling direct memory read/write, you can use <code>dut.GetInternalSignalList(use_vpi=False)</code> to list all internal signals, and <code>dut.GetInternalSignal(name, use_vpi=False)</code> to dynamically construct XData for signal read/write.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UpperCounter</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTUpperCounter</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># List all internal signals</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">GetInternalSignalList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">use_vpi</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Dynamically construct XData</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">internal_upper</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">GetInternalSignal</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;UpperCounter_top.UpperCounter.upper&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">use_vpi</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Read access</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">internal_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Write access (writing is possible, but the value will be overwritten after dut.step; not recommended for non-reg types)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">internal_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0x1</span>
+</span></span></code></pre></div><h2 id="comparison-of-internal-signal-access-methods">Comparison of Internal Signal Access Methods</h2>
+<p>Each internal signal access method provided by picker has its own advantages and disadvantages. Choose according to your needs.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Method Name</th>
+          <th>Enable Option</th>
+          <th>Advantages</th>
+          <th>Disadvantages</th>
+          <th>Access Interface</th>
+          <th>Supported Simulators</th>
+          <th>Suitable Scenarios</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DPI Direct Export</td>
+          <td>&ndash;internal=cfg.yaml</td>
+          <td>Fast</td>
+          <td>Must specify signals in advance<br>Read-only<br>Recompile after changes</td>
+          <td>Same as normal pins</td>
+          <td>verilator, VCS</td>
+          <td>Few signals, no write needed</td>
+      </tr>
+      <tr>
+          <td>VPI Dynamic Access</td>
+          <td>&ndash;vpi</td>
+          <td>Flexible, all signals<br>No need to specify in advance</td>
+          <td>Slow</td>
+          <td>GetInternalSignalList<br>GetInternalSignal</td>
+          <td>verilator, VCS</td>
+          <td>Small designs or not speed-critical</td>
+      </tr>
+      <tr>
+          <td>Direct Mem R/W</td>
+          <td>&ndash;rw 1</td>
+          <td>Fast<br>Flexible<br>No need to specify in advance</td>
+          <td>Some signals may be optimized away</td>
+          <td>GetInternalSignalList<br>GetInternalSignal</td>
+          <td>verilator, GSIM</td>
+          <td>Large designs, e.g., Xiangshan CPU</td>
+      </tr>
+  </tbody>
+</table>
+<p>*Note: These methods are independent and can be used together.</p>
+<pre tabindex="0"><code></code></pre>
+</div>
+
+
 
     
 	

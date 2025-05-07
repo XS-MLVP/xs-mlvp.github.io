@@ -39,7 +39,7 @@ Relevant learning materials:
 Before studying this material, it is assumed that you already have basic knowledge of Linux, Python, etc.
 Relevant learning materials:
 《Linux 101》Online Lecture Notes Python Official Python Tutorial Official Python Tutorial If you plan to participate in the “Open Source Verification Projects” published on this platform, it is recommended to complete the study of this material in advance.">
-  <meta itemprop="dateModified" content="2025-05-06T12:03:31+08:00">
+  <meta itemprop="dateModified" content="2025-05-07T17:55:17+08:00">
   <meta itemprop="wordCount" content="86">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Learning Resources">
@@ -146,7 +146,7 @@ Relevant learning materials:
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.168b40cf965df9bbfd9d346d179deb86.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.3e2316784c2b77234524a825f1263ddb.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -331,6 +331,14 @@ This is the multi-page printable view of this section.
     </ul>
     
   
+    
+    
+	
+<li>2.6: <a href="#pg-5d14fb48f09c8e7b39f81cc2a6999931">Internal Signals</a></li>
+
+
+    
+  
 
     </ul>
     
@@ -466,15 +474,7 @@ This is the multi-page printable view of this section.
     
     
 	
-<li>6.1: <a href="#pg-cd5f02d8062ce0e1861c417988fc8c9e">Using C&#43;&#43;</a></li>
-
-
-    
-  
-    
-    
-	
-<li>6.2: <a href="#pg-28fd3cc543c8fa74cf9e1aa32666d139">Using Java ...</a></li>
+<li>6.1: <a href="#pg-53c158edebe1befb67901d2b20c2f954">Verification Interfaces</a></li>
 
 
     
@@ -2490,6 +2490,200 @@ We can define a test function test_addition using the @given decorator and add p
     
 	
   
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-5d14fb48f09c8e7b39f81cc2a6999931">2.6 - Internal Signals</h1>
+    <div class="lead">Internal Signal Example</div>
+	<p>Internal signals refer to those not exposed at the module’s IO ports, but which play roles in control, data transfer, or state tracking within the module. Typically, when picker converts RTL to DUT, only IO ports are automatically exposed, and internal signals are not exported by default.</p>
+<p>However, when more detailed verification of internal module logic is needed, or when debugging known issues, verification engineers often need access to these internal signals. In addition to traditional tools like Verilator and VCS, picker also provides an internal signal extraction mechanism as an auxiliary tool.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Take the up-counter as an example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">UpperCounter</span> <span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span>           
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">reset</span><span style="color:#000;font-weight:bold">,</span>         
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">count</span>   
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">upper</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">assign</span> <span style="color:#000">upper</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;b1111</span><span style="color:#000;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">always</span> <span style="color:#000;font-weight:bold">@(</span><span style="color:#204a87;font-weight:bold">posedge</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">reset</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#0000cf;font-weight:bold">&#39;b0000</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">end</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">!</span><span style="color:#000">upper</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">begin</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">endmodule</span>
+</span></span></code></pre></div><p>The IO signals of the module are those defined directly in the module declaration, such as:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">module</span> <span style="color:#000">UpperCounter</span> <span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span>           
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">input</span> <span style="color:#204a87;font-weight:bold">wire</span> <span style="color:#000">reset</span><span style="color:#000;font-weight:bold">,</span>         
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">output</span> <span style="color:#204a87;font-weight:bold">reg</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#ce5c00;font-weight:bold">:</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000">count</span>   
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">);</span>
+</span></span></code></pre></div><p>Here, <code>clk</code>, <code>reset</code>, and <code>count</code> are IO signals and can be directly accessed. The following <code>wire upper;</code> is an internal signal, whose value is determined by both module inputs and internal logic. While the counter logic in this example is simple, larger hardware modules often present the following challenges:</p>
+<ul>
+<li>When the module output does not match expectations, the problematic code range is large, making it hard to quickly narrow down the issue.</li>
+<li>Complex internal logic makes understanding and analysis difficult; internal signals can serve as key markers to clarify the module’s operation.</li>
+</ul>
+<p>For these issues, accessing and analyzing internal signals is very effective. Traditionally, tools like Verilator and VCS are used to observe internal signals. <strong>To further lower the verification barrier, picker provides three internal signal access methods: DPI direct export, VPI dynamic access, and direct memory read/write.</strong></p>
+<h2 id="dpi-direct-export">DPI Direct Export</h2>
+<p>DPI (Direct Programming Interface) is an interface for interaction between Verilog and other languages. In picker’s default implementation, DPI is provided for the IO ports of the DUT. When running picker, if the <code>--internal</code> option is added, DPI can also be provided for internal signals. Picker will use a predefined internal signal file to extract both internal signals and IO ports from the RTL when converting to DUT.</p>
+<h3 id="writing-the-signal-file">Writing the Signal File</h3>
+<p>The signal file specifies to picker which internal signals to extract, listing the module and the internal signals to extract.</p>
+<p>Example <code>internal.yaml</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">UpperCounter</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span>- <span style="color:#4e9a06">&#34;wire upper&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><p>The first line is the module name (e.g., UpperCounter). From the second line, list the internal signals to extract in the format “type signal_name”. For example, if <code>upper</code> is a wire, write <code>&quot;wire upper&quot;</code>. (In theory, as long as the signal name matches the variable name in the Verilog code, it can be matched. The type can be arbitrary, but it’s recommended to use Verilog-supported types like wire, reg, logic, etc.)</p>
+<p>The ability to extract internal signals depends on the simulator. For example, Verilator cannot extract signals starting with an underscore <code>_</code>.</p>
+<p>Note: For multi-bit internal signals, you need to explicitly specify the width, so the actual format is “type [width] signal_name”.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">UpperCounter</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span>- <span style="color:#4e9a06">&#34;wire upper&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span>- <span style="color:#4e9a06">&#34;reg [3:0] another_multiples&#34;</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># This signal does not exist in this example, just to illustrate the yaml format</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h3 id="export-parameter">Export Parameter</h3>
+<p>After writing the signal file, you need to specify it explicitly when running picker using the <code>--internal</code> option:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>--internal<span style="color:#ce5c00;font-weight:bold">=[</span>internal_signal_file<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span></code></pre></div><p>Full command example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --autobuild<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">true</span> upper_counter.sv -w upper_counter.fst --sname UpperCounter <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>--tdir picker_out_upper_counter/ --lang python -e --sim verilator --internal<span style="color:#ce5c00;font-weight:bold">=</span>internal.yaml
+</span></span></code></pre></div><p>You can find the <code>signals.json</code> file generated by picker for the DUT:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;UpperCounter_upper&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;High&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">-1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Low&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Pin&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;wire&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;_&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;clk&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;High&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">-1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Low&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Pin&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;input&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;_&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;count&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;High&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Low&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Pin&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;output&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;_&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;reset&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;High&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">-1</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Low&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;Pin&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;input&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">&#34;_&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>This file shows the signal interfaces generated by picker. The first signal, <code>UpperCounter_upper</code>, is the internal signal we wanted to extract. The part before the first underscore is the module name defined in <code>internal.yaml</code>, and the rest is the internal signal name.</p>
+<h3 id="signal-access">Signal Access</h3>
+<p>After extraction, accessing internal signals is no different from accessing IO signals—they are all XData objects on the DUT and can be accessed as <code>dut.signal_name</code>.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UpperCounter</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTUpperCounter</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">UpperCounter_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h2 id="vpi-dynamic-access">VPI Dynamic Access</h2>
+<p>VPI (Verilog Procedural Interface) is a standard interface in Verilog that allows external programs (like C) to interact with the Verilog simulator during simulation. With VPI, users can access, read, and modify signals, variables, and module instances in the Verilog simulation, as well as register callbacks to control and extend the simulation process. VPI is often used for custom system tasks, advanced verification, dynamic signal access, and waveform processing. VPI is part of the IEEE 1364 standard.</p>
+<h3 id="export-parameter-1">Export Parameter</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --help
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>--vpi Enable VPI, <span style="color:#204a87;font-weight:bold">for</span> flexible internal signal access default is OFF
+</span></span></code></pre></div><p>Enable VPI support with the <code>--vpi</code> parameter, for example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> upper_counter.sv --sname UpperCounter --tdir picker_out_upper_counter/ --lang python --vpi
+</span></span></code></pre></div><h3 id="signal-access-1">Signal Access</h3>
+<p>After enabling <code>--vpi</code>, you can use the DUT interface <code>dut.GetInternalSignalList(use_vpi=True)</code> to list all accessible internal signals, and <code>dut.GetInternalSignal(name, use_vpi=True)</code> to dynamically construct XData for data access.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UpperCounter</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTUpperCounter</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># List all internal signals</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Or use dut.VPIInternalSignalList()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">GetInternalSignalList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">use_vpi</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Dynamically construct XData</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">internal_upper</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">GetInternalSignal</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;UpperCounter.upper&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">use_vpi</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Read access</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">internal_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Write access (writing is possible, but the value will be overwritten after dut.step; not recommended for non-reg types)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">internal_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0x1</span>
+</span></span></code></pre></div><h2 id="direct-memory-readwrite">Direct Memory Read/Write</h2>
+<p>Both DPI and VPI-based internal signal access have some performance overhead. For maximum performance, picker implements direct internal signal access for Verilator/GSIM simulators.</p>
+<h3 id="export-parameter-2">Export Parameter</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> --help
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>--rw,--access-mode ENUM:value in <span style="color:#ce5c00;font-weight:bold">{</span>dpi-&gt;0,mem_direct-&gt;1<span style="color:#ce5c00;font-weight:bold">}</span> OR <span style="color:#ce5c00;font-weight:bold">{</span>0,1<span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span></code></pre></div><p>Enable direct memory read/write for Verilator by using <code>--rw 1</code>, for example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>picker <span style="color:#204a87">export</span> upper_counter.sv --sname UpperCounter --tdir picker_out_upper_counter/ --lang python --rw <span style="color:#0000cf;font-weight:bold">1</span>
+</span></span></code></pre></div><h3 id="signal-access-2">Signal Access</h3>
+<p>After enabling direct memory read/write, you can use <code>dut.GetInternalSignalList(use_vpi=False)</code> to list all internal signals, and <code>dut.GetInternalSignal(name, use_vpi=False)</code> to dynamically construct XData for signal read/write.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">UpperCounter</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#ce5c00;font-weight:bold">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">test</span><span style="color:#000;font-weight:bold">():</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">DUTUpperCounter</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># List all internal signals</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">GetInternalSignalList</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">use_vpi</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Dynamically construct XData</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">internal_upper</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">GetInternalSignal</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;UpperCounter_top.UpperCounter.upper&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">use_vpi</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Read access</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87">print</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">internal_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># Write access (writing is possible, but the value will be overwritten after dut.step; not recommended for non-reg types)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">internal_upper</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0x1</span>
+</span></span></code></pre></div><h2 id="comparison-of-internal-signal-access-methods">Comparison of Internal Signal Access Methods</h2>
+<p>Each internal signal access method provided by picker has its own advantages and disadvantages. Choose according to your needs.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Method Name</th>
+          <th>Enable Option</th>
+          <th>Advantages</th>
+          <th>Disadvantages</th>
+          <th>Access Interface</th>
+          <th>Supported Simulators</th>
+          <th>Suitable Scenarios</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DPI Direct Export</td>
+          <td>&ndash;internal=cfg.yaml</td>
+          <td>Fast</td>
+          <td>Must specify signals in advance<br>Read-only<br>Recompile after changes</td>
+          <td>Same as normal pins</td>
+          <td>verilator, VCS</td>
+          <td>Few signals, no write needed</td>
+      </tr>
+      <tr>
+          <td>VPI Dynamic Access</td>
+          <td>&ndash;vpi</td>
+          <td>Flexible, all signals<br>No need to specify in advance</td>
+          <td>Slow</td>
+          <td>GetInternalSignalList<br>GetInternalSignal</td>
+          <td>verilator, VCS</td>
+          <td>Small designs or not speed-critical</td>
+      </tr>
+      <tr>
+          <td>Direct Mem R/W</td>
+          <td>&ndash;rw 1</td>
+          <td>Fast<br>Flexible<br>No need to specify in advance</td>
+          <td>Some signals may be optimized away</td>
+          <td>GetInternalSignalList<br>GetInternalSignal</td>
+          <td>verilator, GSIM</td>
+          <td>Large designs, e.g., Xiangshan CPU</td>
+      </tr>
+  </tbody>
+</table>
+<p>*Note: These methods are independent and can be used together.</p>
+<pre tabindex="0"><code></code></pre>
+</div>
+
+
+
+    
+	
+  
 
     
 	
@@ -3186,188 +3380,60 @@ TBD</p>
 
 <div class="td-content" style="">
     
-	<h1 id="pg-cd5f02d8062ce0e1861c417988fc8c9e">6.1 - Using C&#43;&#43;</h1>
-    <div class="lead">Encapsulate the DUT hardware runtime environment with C++ and compile it into a dynamic library.</div>
-	<h2 id="principle-introduction">Principle Introduction</h2>
-<h3 id="basic-library">Basic Library</h3>
-<p>In this chapter, we will introduce how to use Picker to compile RTL code into a C++ class and compile it into a dynamic library.</p>
-<ol>
-<li>
-<p>First, the Picker tool parses the RTL code, creates a new module based on the specified Top Module, encapsulates the module&rsquo;s <strong>input and output ports</strong>, and exports <code>DPI/API</code> to operate the input ports and read the output ports.</p>
-<blockquote>
-<p><em>The tool determines the module to be encapsulated by specifying the file and Module Name of the Top Module. At this point, you can understand Top as the main function in software programming.</em></p></blockquote>
-</li>
-<li>
-<p>Next, the Picker tool uses the specified <strong>simulator</strong> to compile the RTL code and generate a <strong>DPI library file</strong>. This library file contains the logic required to simulate running the RTL code (i.e., the <strong>hardware simulator</strong>).</p>
-<blockquote>
-<p><em>For VCS, this library file is a .so (dynamic library) file, and for Verilator, it is a .a (static library) file.</em>
-<em>DPI stands for <a href="https://www.chipverify.com/systemverilog/systemverilog-dpi">Direct Programming Interface</a>，which can be understood as an API specification.</em></p></blockquote>
-</li>
-<li>
-<p>Then, the Picker tool renders the base class defined in the source code according to the configuration parameters, generates a base class (wrapper) for interfacing with the simulator and <strong>hides simulator details</strong>, and links the base class with the DPI library file to generate a <strong>UT dynamic library file</strong>.</p>
-<blockquote>
-<ul>
-<li><em>At this point, the <strong>UT library file</strong> uses the unified API provided by the Picker tool template. Compared with the simulator-specific API in the <strong>DPI library file</strong>, the UT library file provides a <strong>unified API interface</strong> for the hardware simulator generated by the simulator.</em></li>
-<li><em>The generated <strong>UT library file</strong> is <strong>common</strong> across different languages! Unless otherwise specified, other high-level languages will operate the hardware simulator by <strong>calling the UT dynamic library</strong>.</em></li>
-</ul></blockquote>
-</li>
-<li>
-<p>Finally, based on the configuration parameters and parsed RTL code, the Picker tool generates a <strong>C++ class</strong> source code. This source code is the <strong>definition (.hpp)</strong> and <strong>implementation (.cpp)</strong> of the RTL hardware module in the software. Instantiating this class is equivalent to creating a hardware module.</p>
-<blockquote>
-<p><em>This class inherits from the <strong>base class</strong> and implements the pure virtual functions in the base class to instantiate the hardware in software.</em>
-<em>There are two reasons for not encapsulating this <strong>class implementation</strong> into the dynamic library:</em></p>
-<ol>
-<li><em>Since the <strong>UT library file</strong> needs to be <strong>common</strong> across different languages, and different languages have different ways to implement classes, for universality, the <code>class implementation</code> is not encapsulated into the dynamic library.</em></li>
-<li><em>To <strong>facilitate debugging</strong>, enhance code readability, and make it easier for users to repackage and modify.</em></li>
-</ol></blockquote>
-</li>
-</ol>
-<h3 id="generating-executable-files">Generating Executable Files</h3>
-<p>In this chapter, we will introduce how to write test cases and generate executable files based on the basic library generated in the previous chapter (including dynamic libraries, class declarations, and definitions).</p>
-<ol>
-<li>
-<p>First, users need to write test cases, which means instantiating the class generated in the previous chapter and calling the methods in the class to operate the hardware module.
-Details can be found in [Random Number Generator Verification - Configure Test Code](docs/quick-start/examples/rmg/#Configure Test Code) for instantiation and initialization process.</p>
-</li>
-<li>
-<p>Second, users need to apply different linking parameters to generate executable files based on the <strong>different simulators</strong> applied in the basic library. The corresponding parameters are defined in <code>template/cpp/cmake/*.cmake</code>.</p>
-</li>
-<li>
-<p>Finally, according to the configured linking parameters, the compiler will link the basic library and generate an executable file.</p>
-<blockquote>
-<p>Taking <a href="docs/quick-start/examples/adder/#%E5%B0%86rtl%E6%9E%84%E5%BB%BA%E4%B8%BAc-class">Adder Verification</a> as an example, <code>picker_out_adder/cpp/cmake/*.cmake</code> is a copy of the template described in item 2 above.
-<code>vcs.cmake</code> defines the linking parameters of the basic library generated using the VCS simulator, and <code>verilator.cmake</code> defines the linking parameters of the basic library generated using the Verilator simulator.</p></blockquote>
-</li>
-</ol>
-<h2 id="usage">Usage</h2>
-<ul>
-<li>The parameter <code>--language cpp</code> or <code>-l cpp</code> is used to specify the generation of the C++ basic library.</li>
-<li>The parameter <code>-e</code> is used to generate an executable file containing an example project.</li>
-<li>The parameter <code>-v</code> is used to retain intermediate files when generating the project.</li>
-</ul>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#include</span> <span style="color:#8f5902;font-style:italic">&#34;UT_Adder.hpp&#34;</span><span style="color:#8f5902;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int64_t</span> <span style="color:#000">random_int64</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#000">std</span><span style="color:#ce5c00;font-weight:bold">::</span><span style="color:#000">random_device</span> <span style="color:#000">rd</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#000">std</span><span style="color:#ce5c00;font-weight:bold">::</span><span style="color:#000">mt19937_64</span> <span style="color:#000">generator</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">rd</span><span style="color:#000;font-weight:bold">());</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#000">std</span><span style="color:#ce5c00;font-weight:bold">::</span><span style="color:#000">uniform_int_distribution</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int64_t</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">distribution</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">INT64_MIN</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>                                                            <span style="color:#000">INT64_MAX</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">distribution</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">generator</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#if defined(USE_VCS)
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">UTAdder</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">UTAdder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;libDPIAdder.so&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#elif defined(USE_VERILATOR)
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">UTAdder</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">UTAdder</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#endif
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#8f5902;font-style:italic">// dut-&gt;initClock(dut-&gt;clock);
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Initialized UTAdder</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000">input_t</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000">output_t</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">sum</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">cout</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#0000cf;font-weight:bold">114514</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">c</span><span style="color:#ce5c00;font-weight:bold">++</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">input_t</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">output_t</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">random_int64</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">random_int64</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">random_int64</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">auto</span> <span style="color:#000">dut_cal</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000;font-weight:bold">]()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">a</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">b</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">cin</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span>  <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">uint64_t</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">uint64_t</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">auto</span> <span style="color:#000">ref_cal</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000;font-weight:bold">]()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">uint64_t</span> <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">bool</span> <span style="color:#000">carry</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">+=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">carry</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">carry</span> <span style="color:#ce5c00;font-weight:bold">||</span> <span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span>  <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">sum</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">carry</span> <span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">dut_cal</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">ref_cal</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;[cycle %llu] a=0x%lx, b=0x%lx, cin=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;DUT: sum=0x%lx, cout=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;REF: sum=0x%lx, cout=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">Assert</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">o_ref</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;sum mismatch&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">delete</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Test Passed, destory UTAdder</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><h3 id="generating-waveforms">Generating Waveforms</h3>
-<p>In C++, the destructor of the DUT automatically calls <code>dut.Finish()</code>, so you only need to <code>delete dut</code> after the test ends to perform post-processing (write waveform, coverage files, etc.).</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">#include</span> <span style="color:#8f5902;font-style:italic">&#34;UT_Adder.hpp&#34;</span><span style="color:#8f5902;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">UTAdder</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">dut</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">UTAdder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;libDPIAdder.so&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Initialized UTAdder</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">&lt;</span> <span style="color:#0000cf;font-weight:bold">114514</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">c</span><span style="color:#ce5c00;font-weight:bold">++</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">auto</span> <span style="color:#000">dut_cal</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000;font-weight:bold">]()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">a</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">*</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">b</span>   <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">/</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">cin</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Step</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span>  <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">uint64_t</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">uint64_t</span><span style="color:#000;font-weight:bold">)</span><span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">};</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">dut_cal</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;[cycle %llu] a=0x%lx, b=0x%lx, cin=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">dut</span><span style="color:#ce5c00;font-weight:bold">-&gt;</span><span style="color:#000">xclk</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">clk</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cin</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;DUT: sum=0x%lx, cout=0x%lx</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sum</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">o_dut</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">cout</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">delete</span> <span style="color:#000">dut</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#8f5902;font-style:italic">// automatically call dut.Finish() in ~UTAdder()
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Simulation finished</span><span style="color:#4e9a06">\n</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div>
-</div>
-
-
-
-    
-	
-  
-    
-    
-	
-    
-
-<div class="td-content" style="page-break-before: always">
-    
-	<h1 id="pg-28fd3cc543c8fa74cf9e1aa32666d139">6.2 - Using Java ...</h1>
-    <div class="lead">Encapsulate the DUT hardware runtime environment with Java and package it as a jar file.</div>
-	<p>Currently, Picker supports C++/Python. Other languages such as Java, Golang, Javascript, Scala, etc., will be supported after the Python interface is stabilized.</p>
-
+	<h1 id="pg-53c158edebe1befb67901d2b20c2f954">6.1 - Verification Interfaces</h1>
+    <div class="lead">Verification interfaces supported by DUT files and all programming languages</div>
+	<h2 id="generated-library-files">Generated Library Files</h2>
+<p>Picker can specify the target language for conversion using the <code>--lang</code> parameter (supported values: cpp, python, java, lua, scala, golang). Since different programming languages use different types of “libraries,” the generated files will vary. For example, Java produces a JAR package, while Python generates a directory. Exporting a library for a specific language with picker requires xcomm support. You can check support status with <code>picker --check</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ picker --check
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Version: 0.9.0-feat_performance_improve-b7001a6-2025-04-11-dirty
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Exec path: /usr/local/share/lib/python3.11/site-packages/picker/bin/picker
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Template path: /usr/local/share/lib/python3.11/site-packages/picker/share/picker/template
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support    Cpp <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/lib&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Golang <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/golang&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support   Java <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/java/xspcomm-java.jar&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support    Lua <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/lua/luaxspcomm.so&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support Python <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/python&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support  Scala <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/scala/xspcomm-scala.jar&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span></code></pre></div><p>A status of &ldquo;success&rdquo; means supported, while &ldquo;fail&rdquo; means not supported.</p>
+<h3 id="c">C++</h3>
+<p>For C++, picker generates a shared object (<code>.so</code>) dynamic library and the corresponding header files. For example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
+</span></span><span style="display:flex;"><span>├── UT_Adder.cpp       <span style="color:#8f5902;font-style:italic"># DUT source file</span>
+</span></span><span style="display:flex;"><span>├── UT_Adder.hpp       <span style="color:#8f5902;font-style:italic"># DUT header file</span>
+</span></span><span style="display:flex;"><span>├── UT_Adder_dpi.hpp   <span style="color:#8f5902;font-style:italic"># DPI header file</span>
+</span></span><span style="display:flex;"><span>├── dut_base.hpp       <span style="color:#8f5902;font-style:italic"># DUT base header file</span>
+</span></span><span style="display:flex;"><span>├── libDPIAdder.a      <span style="color:#8f5902;font-style:italic"># DPI static library</span>
+</span></span><span style="display:flex;"><span>└── libUTAdder.so      <span style="color:#8f5902;font-style:italic"># DUT dynamic library</span>
+</span></span></code></pre></div><p>When using, set the LD path, then <code>#include UT_Adder.hpp</code> in your test code.</p>
+<h3 id="python">Python</h3>
+<p>For Python, picker generates a directory (Python modules are represented as directories):</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
+</span></span><span style="display:flex;"><span>├── _UT_Adder.so
+</span></span><span style="display:flex;"><span>├── __init__.py
+</span></span><span style="display:flex;"><span>├── libUTAdder.so
+</span></span><span style="display:flex;"><span>└── libUT_Adder.py
+</span></span></code></pre></div><p>After setting the PYTHONPATH, you can <code>import UT_Adder</code> in your test code.</p>
+<h3 id="javascala">Java/Scala</h3>
+<p>For Java and Scala (JVM-based languages), picker generates the corresponding JAR packages.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
+</span></span><span style="display:flex;"><span>├── UT_Adder-scala.jar
+</span></span><span style="display:flex;"><span>└── UT_Adder-java.jar
+</span></span></code></pre></div><h3 id="go">Go</h3>
+<p>For Go, picker generates a directory (similar to Python):</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
+</span></span><span style="display:flex;"><span>└── golang
+</span></span><span style="display:flex;"><span>    └── src
+</span></span><span style="display:flex;"><span>        └── UT_Adder
+</span></span><span style="display:flex;"><span>            ├── UT_Adder.go
+</span></span><span style="display:flex;"><span>            ├── UT_Adder.so
+</span></span><span style="display:flex;"><span>            ├── UT_Adder_Wrapper.go
+</span></span><span style="display:flex;"><span>            ├── go.mod
+</span></span><span style="display:flex;"><span>            └── libUTAdder.so
+</span></span></code></pre></div><p>After setting the GOPATH, you can directly import the package.</p>
+<h2 id="verification-interfaces">Verification Interfaces</h2>
+<p>For DUT verification interfaces, refer to: <a href="https://github.com/XS-MLVP/picker/blob/master/doc/API.zh.md">https://github.com/XS-MLVP/picker/blob/master/doc/API.zh.md</a></p>
+<p>For xspcomm library interfaces, refer to: <a href="https://github.com/XS-MLVP/xcomm/blob/master/docs/APIs.cn.md">https://github.com/XS-MLVP/xcomm/blob/master/docs/APIs.cn.md</a></p>
+<pre tabindex="0"><code></code></pre>
 </div>
 
 
