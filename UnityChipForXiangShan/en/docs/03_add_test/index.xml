@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Add Test on UnityChip Verification for XiangShan</title>
+    <link>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/</link>
+    <description>Recent content in Add Test on UnityChip Verification for XiangShan</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <atom:link href="https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Add Compilation Script</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/01_build_script/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/01_build_script/</guid>
+      <description>&lt;h2 id=&#34;script-target&#34;&gt;Script Target&lt;/h2&gt;&#xA;&lt;p&gt;Write a compilation file for the corresponding RTL in the &lt;code&gt;scripts&lt;/code&gt; directory using Python (e.g., &lt;code&gt;build_ut_frontend_ifu_rvc_expander.py&lt;/code&gt;).&lt;br&gt;&#xA;The goal of this script is to provide RTL-to-Python DUT compilation, target coverage files, and custom functionality.&lt;/p&gt;&#xA;&lt;h2 id=&#34;creation-process&#34;&gt;Creation Process&lt;/h2&gt;&#xA;&lt;h3 id=&#34;determine-file-name&#34;&gt;Determine File Name&lt;/h3&gt;&#xA;&lt;p&gt;Select the UT to be verified in &lt;a href=&#34;&#34;&gt;XiangShan Kunming Lake DUT Verification Progress&lt;/a&gt;. If it is not available or needs further refinement, you can manually add it by editing &lt;code&gt;configs/dutree/xiangshan-kmh.yaml&lt;/code&gt;.&lt;br&gt;&#xA;For example, if we want to verify the &lt;code&gt;rvc_expander&lt;/code&gt; module under the &lt;code&gt;ifu&lt;/code&gt; module in the frontend, we need to add the corresponding part to &lt;code&gt;configs/dutree/xiangshan-kmh.yaml&lt;/code&gt; (this module already exists in the YAML file; this is just an example):&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Build Test Environment</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/02_build_env/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/02_build_env/</guid>
+      <description>&lt;h2 id=&#34;determine-directory-structure&#34;&gt;Determine Directory Structure&lt;/h2&gt;&#xA;&lt;p&gt;The directory structure of the Unit Test (UT) should match its naming convention. For example, &lt;code&gt;frontend.ifu.rvc_expander&lt;/code&gt; should be located in the &lt;code&gt;ut_frontend/ifu/rvc_expander&lt;/code&gt; directory, and each directory level must include an &lt;code&gt;__init__.py&lt;/code&gt; file to enable Python imports.&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;The file for this chapter is &lt;code&gt;your_module_wrapper.py&lt;/code&gt;&lt;/strong&gt; (if your module is &lt;code&gt;rvc_expander&lt;/code&gt;, the file would be &lt;code&gt;rvc_expander_wrapper.py&lt;/code&gt;).&lt;/p&gt;&#xA;&lt;p&gt;A wrapper is essentially a layer of abstraction that encapsulates the methods needed for testing into APIs decoupled from the DUT. These APIs are then used in test cases.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Add Test Cases</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/03_add_test/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/03_add_test/</guid>
+      <description>&lt;h2 id=&#34;naming-requirements&#34;&gt;Naming Requirements&lt;/h2&gt;&#xA;&lt;p&gt;All test case files should be named in the format &lt;code&gt;test_*.py&lt;/code&gt;, where &lt;code&gt;*&lt;/code&gt; is replaced with the test target (e.g., &lt;code&gt;test_rvc_expander.py&lt;/code&gt;). All test cases should also start with the &lt;code&gt;test_&lt;/code&gt; prefix. The test case names must have clear and meaningful descriptions.&lt;/p&gt;&#xA;&lt;p&gt;Examples of naming:&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;test_a&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;():&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Not acceptable, as &amp;#34;a&amp;#34; does not indicate the test target&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;pass&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;test_rvc_expand_16bit_full&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;():&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Acceptable, as the name indicates the test content&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;pass&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;using-assert&#34;&gt;Using Assert&lt;/h2&gt;&#xA;&lt;p&gt;Each test case must use &lt;code&gt;assert&lt;/code&gt; to determine whether the test passes.&lt;br&gt;&#xA;&lt;code&gt;pytest&lt;/code&gt; relies on the results of &lt;code&gt;assert&lt;/code&gt; statements, so these statements must ensure correctness.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Code Coverage</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/04_cover_line/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/04_cover_line/</guid>
+      <description>&lt;p&gt;Code coverage is a metric that measures which parts of the tested code have been executed and which parts have not. By analyzing code coverage, the effectiveness and thoroughness of testing can be evaluated.&lt;/p&gt;&#xA;&lt;p&gt;Code coverage includes:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Line Coverage&lt;/strong&gt;: The number of lines executed in the tested code. This is the simplest metric, and the goal is usually 100%.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Branch Coverage&lt;/strong&gt;: Whether each branch of every control structure has been executed. For example, in an &lt;code&gt;if&lt;/code&gt; statement, have both the &lt;code&gt;true&lt;/code&gt; and &lt;code&gt;false&lt;/code&gt; branches been executed?&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;FSM Coverage&lt;/strong&gt;: Whether all states of a finite state machine have been reached.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Toggle Coverage&lt;/strong&gt;: Tracks the toggling of signals in the tested code, ensuring that every circuit node has both &lt;code&gt;0 -&amp;gt; 1&lt;/code&gt; and &lt;code&gt;1 -&amp;gt; 0&lt;/code&gt; transitions.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Path Coverage&lt;/strong&gt;: Examines the coverage of paths. In &lt;code&gt;always&lt;/code&gt; or &lt;code&gt;initial&lt;/code&gt; blocks, &lt;code&gt;if ... else&lt;/code&gt; and &lt;code&gt;case&lt;/code&gt; statements can create various data paths in the circuit structure.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;* The primary simulator used in this project is Verilator, with a focus on &lt;strong&gt;line coverage&lt;/strong&gt;. Verilator supports coverage statistics, so when building the DUT, the &lt;code&gt;-c&lt;/code&gt; option must be added to the compilation options to enable coverage statistics.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Functional Coverage</title>
+      <link>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/05_cover_func/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://open-verify.cc/UnityChipForXiangShan/en/docs/03_add_test/05_cover_func/</guid>
+      <description>&lt;p&gt;Functional Coverage is a &lt;strong&gt;user-defined&lt;/strong&gt; metric used to measure the proportion of design specifications executed during verification. Functional coverage focuses on whether the features and functionalities of the design have been covered by the test cases.&lt;/p&gt;&#xA;&lt;p&gt;Mapping refers to associating functional points with test cases. This allows you to see which test cases correspond to each functional point during statistics, making it easier to identify which functional points have more test cases and which have fewer. This helps optimize test cases in the later stages.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

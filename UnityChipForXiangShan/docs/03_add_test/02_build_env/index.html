@@ -40,7 +40,7 @@ ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │�
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-05-06T12:04:43+08:00">
+    <meta property="article:modified_time" content="2025-05-12T12:54:55+08:00">
 
   <meta itemprop="name" content="构建测试环境">
   <meta itemprop="description" content="确定目录结构 UT(Unit Test, 单元测试)所在的目录位置的层级结构应该与名称一致，例如frontend.ifu.rvc_expander应当位于ut_frontend/ifu/rvc_expander目录，且每层目录都需要有__init__.py，便于通过 python 进行import。
@@ -51,7 +51,7 @@ wrapper 是包装的意思，也就是我们测试中需要用到的方法封装
 ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │ │ ├── __init__.py │ │ └── rvc_expander_wrapper.py │ ├── __init__.py │ └── test_rvc_expander.py ├── __init__.py ├── README.md └── toffee_version ├── agent │ └── __init__.py ├── bundle │ └── __init__.py ├── env │ ├── __init__.py │ └── ref_rvc_expand.py ├── __init__.py └── test ├── __init__.py ├── rvc_expander_fixture.py └── test_rvc.py 这里rvc_expander目录下有classical_version传统版本和toffee_version使用toffee的版本。 传统版本就是使用pytest框架来进行测试，toffee只使用了其Bundle;而在toffee版本中，我们会使用更多toffee的特性。 一般来说，使用传统版本就已经可以覆盖绝大多数情况了，只有在传统版本不能满足需求时，才需要使用toffee版本。
 编写测试环境的时候，两个版本选择一个就行。
 模块（例如rvc_expander）中的代码目录结构由贡献者自行决定（我们写的时候并不需要再建一级classical_version或toffee_version目录），但需要满足 python 规范，且逻辑和命名合理。">
-  <meta itemprop="dateModified" content="2025-05-06T12:04:43+08:00">
+  <meta itemprop="dateModified" content="2025-05-12T12:54:55+08:00">
   <meta itemprop="wordCount" content="770">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="构建测试环境">
@@ -149,7 +149,7 @@ ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │�
         <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/docs/03_add_test/02_build_env/">English</a></li>
     </ul>
 </div></li>
       </ul>
@@ -164,7 +164,7 @@ ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.9674bd9adea634eec5ba6b6a695e8d53.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2916ce32195c1313219d358e1fdd83a6.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -188,7 +188,7 @@ ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.9674bd9adea634eec5ba6b6a695e8d53.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2916ce32195c1313219d358e1fdd83a6.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -201,7 +201,7 @@ ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │�
       <div class="dropdown">
   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/docs/03_add_test/02_build_env/">English</a></li>
     </ul>
 </div>
     </div>
@@ -621,8 +621,8 @@ ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │�
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">#    - bin ERROR. The instruction is not illegal</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">#    - bin SUCCE. The instruction is not expanded</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">g</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">add_watch_point</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">expander</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;ERROR&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">stat</span><span style="color:#000;font-weight:bold">()[</span><span style="color:#4e9a06">&#34;ilegal&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;SUCCE&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">stat</span><span style="color:#000;font-weight:bold">()[</span><span style="color:#4e9a06">&#34;ilegal&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;ERROR&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">stat</span><span style="color:#000;font-weight:bold">()[</span><span style="color:#4e9a06">&#34;illegal&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#4e9a06">&#34;SUCCE&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">lambda</span> <span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">x</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">stat</span><span style="color:#000;font-weight:bold">()[</span><span style="color:#4e9a06">&#34;illegal&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">,</span>
 </span></span><span style="display:flex;"><span>                          <span style="color:#000;font-weight:bold">},</span> <span style="color:#000">name</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;RVC_EXPAND_RET&#34;</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic"># 5. Reverse mark function coverage to the check point</span>
@@ -635,7 +635,7 @@ ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │�
 </span></span><span style="display:flex;"><span>                                              <span style="color:#4e9a06">&#34;test_rvc_expand_32bit_full&#34;</span><span style="color:#000;font-weight:bold">,</span>
 </span></span><span style="display:flex;"><span>                                              <span style="color:#4e9a06">&#34;test_rvc_expand_32bit_randomN&#34;</span><span style="color:#000;font-weight:bold">]),</span> <span style="color:#000">bin_name</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;ERROR&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;SUCCE&#34;</span><span style="color:#000;font-weight:bold">])</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">...</span>
-</span></span></code></pre></div><p>在上述代码中添加了名为<code>RVC_EXPAND_RET</code>的功能检查点来检查<code>RVCExpander</code>模块是否具有返回非法指令的能力。需要满足<code>ERROR</code>和<code>SUCCE</code>两个条件，即<code>stat()</code>中的<code>ileage</code>需要有<code>True</code>也需要有<code>False</code>值。在定义完检查点后，通过<code>mark_function</code>方法，对会覆盖到该检查的测试用例进行了标记。</p>
+</span></span></code></pre></div><p>在上述代码中添加了名为<code>RVC_EXPAND_RET</code>的功能检查点来检查<code>RVCExpander</code>模块是否具有返回非法指令的能力。需要满足<code>ERROR</code>和<code>SUCCE</code>两个条件，即<code>stat()</code>中的<code>illegal</code>需要有<code>True</code>也需要有<code>False</code>值。在定义完检查点后，通过<code>mark_function</code>方法，对会覆盖到该检查的测试用例进行了标记。</p>
 <h3 id="3-定义必要fixture">3. 定义必要fixture</h3>
 <p>以下内容位于<code>ut_frontend/ifu/rvc_expander/classical_version/env/rvc_expander_wrapper.py</code>。</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#000">version_check</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">get_version_checker</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;openxiangshan-kmh-*&#34;</span><span style="color:#000;font-weight:bold">)</span>             <span style="color:#8f5902;font-style:italic"># 指定满足要的RTL版本</span>
@@ -699,7 +699,7 @@ ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │�
 <p>使用python语言进行的测试可以通过引入我们的开源测试框架<a href="https://github.com/XS-MLVP/toffee">toffee</a>来得到更好的支持。</p>
 <p>toffee的官方教程可以参考<a href="https://open-verify.cc/mlvp/docs/mlvp/">这里</a>。</p>
 <h3 id="bundle快捷dut封装">bundle：快捷DUT封装</h3>
-<p>toffee通过Bundle实现了对DUT的绑定。toffee提供了多种建立Bundle与DUT绑定的方法。相关代码</p>
+<p>toffee通过Bundle实现了对DUT的绑定。toffee提供了多种建立Bundle与DUT绑定的方法。相关代码参照<code>ut_frontend/ifu/rvc_expander/toffee_version/bundle</code>。</p>
 <h4 id="手动绑定">手动绑定</h4>
 <p>toffee框架下，用于支持绑定引脚的最底层类是Signal，其通过命名匹配的方式和DUT中的各个引脚进行绑定。相关代码参照<code>ut_frontend/ifu/rvc_expander/toffee_version</code>。</p>
 <p>以最简单的RVCExpander为例，其io引脚形如：</p>
@@ -785,7 +785,7 @@ ut_frontend/ifu/rvc_expander ├── classical_version │ ├── env │�
 </span></span></code></pre></div><p>由于toffee提供了更强大的测试覆盖率管理功能，因此不需要手动设置行覆盖率。同时，由于toffee的时钟机制，建议在套件代码最后额外检查任务是否全部结束。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 May 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/873b483d54586c0f9a4d259b3aea64600c17c7b8">Change version of hugo to 0.145.0 (873b483)</a>
+  最后修改 May 12, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/78582e48f046f4008fcdda6fbc51eaa315aef30d">Add English version for &#34;03_add_test&#34; and Typo fix and add missing contents. (#127) (78582e4)</a>
 </div>
 
 </div>
