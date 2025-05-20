@@ -28,12 +28,12 @@ IPrefetchPipe 接收来自 FTQ 的预取请求，然后向 MetaArray 和 ITLB �
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-05-12T12:54:55+08:00">
+    <meta property="article:modified_time" content="2025-05-20T14:27:12+08:00">
 
   <meta itemprop="name" content="ICache">
   <meta itemprop="description" content="ICache 各种组合数据的宽度以 system verilog/verilog 中的为准。
 IPrefetchPipe 接收来自 FTQ 的预取请求，然后向 MetaArray 和 ITLB 发送请求，再从 ITLB 的响应得到 paddr，之后与 MetaArray 返回的 tag 进行比较得到命中信息，把命中信息、MetaArray ECC 校验信息和 ITLB 信息一并写入 WayLookup，同时进行 PMP 检查。未命中就将信息发送给 MissUnit 处理，MissUnit 通过 TileLink 总线向 L2Cache 发起请求，获取数据后返回给 MetaArray 和 IPrefetchPipe。之后会判断是否 Miss，如果 Miss 则把预取请求发送到 MissUnit，它会通过 TileLink 向 L2 做预取指。 MainPipe 接收来自 FTQ 的取指请求，然后从 WayLookup 获取路命中信息和 ITLB 查询结果，再访问 DataArray。命中后向 replacer 发送 touch 请求，replacer 采用 PLRU 替换策略,接收到 MainPipe 的命中更新，向 MissUnit 提供写入的 waymask。同时进行 PMP 检查，接收 DataArry 返回的数据。对 DataArray 做 ECC 校验，根据 DataArry 和 MetaArry 的校验结果（MetaArray 的校验结果来自 Waylookup）判断是否将错误报告给总线（beu）。之后，如果 DataArry 没有命中，将信息发往 MissUnit 处理。MissUnit 通过 TileLink 总线向 L2Cache 发起请求，获取数据后返回给 DataArray 和 MainPipe。之后就可以将数据返回给 IFU。 MetaArray 存储缓存行的标签（Tag）和 ECC 校验码 使用双 Bank SRAM 结构，支持双线访问（Double-Line），每个 Bank 存储部分元数据。 标签包含物理地址的高位，用于地址匹配。 支持标签 ECC 校验，检测和纠正存储错误。 valid_array 记录每个 Way 的有效状态，Flush 操作会清零 DataArray 存储实际的指令数据块。 数据按 Bank 划分为八个，每个 Bank 宽度为 64 位，支持多 Bank 并行访问。 数据 ECC 校验，分段生成校验码，增强错误检测能力。 支持双线访问，根据地址偏移选择 Bank，单周期可读取 32 字节数据。 冲刷信号有三种：ftqPrefetch.flushFromBpu，itlbFlushPipe，模块外部的 fencei 和 flush 信号。 ftqPrefetch.flushFromBpu：通过 FTQ 来自的 BPU 刷新信号，用于控制预取请求的冲刷。 itlbFlushPipe：ITLB 的冲刷信号，itlb 在收到该信号时会冲刷 gpf 缓存。 fencei:刷新 MetaArray，清除所有路的 valid_array 清零；missUnit 中所有 MSHR 置无效。 flush:mainPipe 和 prefetchPipe 所有流水级直接置无效，wayLookup 读写指针复位，gpf_entry 直接置无效,missUnit 中所有 MSHR 置无效。 Replacer 采用 PLRU 更新算法，考虑到每次取指可能访问连续的 doubleline，对于奇地址和偶地址设置两个 replacer，在进行 touch 和 victim 时根据地址的奇偶分别更新 replacer。">
-  <meta itemprop="dateModified" content="2025-05-12T12:54:55+08:00">
+  <meta itemprop="dateModified" content="2025-05-20T14:27:12+08:00">
   <meta itemprop="wordCount" content="711">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="ICache">
@@ -140,7 +140,7 @@ IPrefetchPipe 接收来自 FTQ 的预取请求，然后向 MetaArray 和 ITLB �
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2916ce32195c1313219d358e1fdd83a6.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.de547910e38baa895f25afcb6029a1b5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -164,7 +164,7 @@ IPrefetchPipe 接收来自 FTQ 的预取请求，然后向 MetaArray 和 ITLB �
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2916ce32195c1313219d358e1fdd83a6.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.de547910e38baa895f25afcb6029a1b5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -697,7 +697,7 @@ DataArray 主要存储了每个 Cache 行的标签和 ECC 校验码。</p>
 </ul>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 May 12, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/78582e48f046f4008fcdda6fbc51eaa315aef30d">Add English version for &#34;03_add_test&#34; and Typo fix and add missing contents. (#127) (78582e4)</a>
+  最后修改 May 20, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/04e95823c3d9c68f487f081109d6695377b89d52">Add English Support (#128) (04e9582)</a>
 </div>
 
 </div>
