@@ -48,7 +48,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-05-20T14:27:12+08:00">
+    <meta property="article:modified_time" content="2025-05-29T17:12:08+08:00">
 
   <meta itemprop="name" content="功能覆盖率">
   <meta itemprop="description" content="功能覆盖率（Functional Coverage）是一种用户定义的度量标准，用于度量验证中已执行的设计规范的比例。功能覆盖率关注的是设计的功能和特性是否被测试用例覆盖到了。
@@ -63,7 +63,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 添加观察点和反标 在每个测试用例内部，可以使用add_watch_point（add_cover_point是其别名，二者完全一致）来添加观察点和mark_function来添加反标。 观察点是，当对应的信号触发了我们在观察点内部定义的要求后，这个观察点的名字（也就是功能点）就会被统计到功能覆盖率中。 反标是，将功能点和测试用例进行关联，这样在统计时，就能看到每个功能点对应了哪些测试用例。
 对于观察点的位置，需要根据实际情况来定，一般来说，在测试用例外直接添加观察点是没有问题的。 不过有时候我们可以更加的灵活。
 在测试用例之外（decode_wrapper.py中） def init_rvc_expander_funcov(expander, g: fc.CovGroup): &#34;&#34;&#34;Add watch points to the RVCExpander module to collect function coverage information&#34;&#34;&#34; # 1. Add point RVC_EXPAND_RET to check expander return value: # - bin ERROR. The instruction is not illegal # - bin SUCCE. The instruction is not expanded g.add_watch_point(expander, { &#34;ERROR&#34;: lambda x: x.stat()[&#34;ilegal&#34;] == False, &#34;SUCCE&#34;: lambda x: x.stat()[&#34;ilegal&#34;] != False, }, name = &#34;RVC_EXPAND_RET&#34;) # 5. Reverse mark function coverage to the check point def _M(name): # get the module name return module_name_with(name, &#34;../../test_rv_decode&#34;) # - mark RVC_EXPAND_RET g.mark_function(&#34;RVC_EXPAND_RET&#34;,_M([&#34;test_rvc_expand_16bit_full&#34;, &#34;test_rvc_expand_32bit_full&#34;, &#34;test_rvc_expand_32bit_randomN&#34;]), bin_name=[&#34;ERROR&#34;, &#34;SUCCE&#34;]) # The End return None 这个例子的第一个g.add_watch_point是放在测试用例之外的，因为它和现有的测试用例没有直接关系，放在测试用例之外反而更加方便。添加观察点之后，只要add_watch_point方法中的bins条件触发了，我们的toffee-test框架就能够收集到对应的功能点。">
-  <meta itemprop="dateModified" content="2025-05-20T14:27:12+08:00">
+  <meta itemprop="dateModified" content="2025-05-29T17:12:08+08:00">
   <meta itemprop="wordCount" content="356">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="功能覆盖率">
@@ -180,7 +180,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.de547910e38baa895f25afcb6029a1b5.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.0bf3b65927635840aa36fa4b3f10552d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -204,7 +204,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.de547910e38baa895f25afcb6029a1b5.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.0bf3b65927635840aa36fa4b3f10552d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -459,10 +459,44 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut02_backend-check"/>
   <label for="m-unitychipforxiangshandocs98_ut02_backend-check"><a href="/UnityChipForXiangShan/docs/98_ut/02_backend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut02_backend"><span class="">Backend</span></a></label>
   
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock-li">
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock-check"/>
   <label for="m-unitychipforxiangshandocs98_ut03_memblock-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock"><span class="">Mem Block</span></a></label>
   
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq"><span class="">LSQ</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/01_loadqueuerar/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar"><span class="">LoadQueueRAR</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/02_loadqueueraw/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw"><span class="">LoadQueueRAW</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/03_loadqueuereplay/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay"><span class="">LoadQueueReplay</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/04_loadqueueuncache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache"><span class="">LoadQueueUncache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/06_storequeue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue"><span class="">StoreQueue</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/05_virtualloadqueue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue"><span class="">VirtualLoadQueue</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut04_misc-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut04_misc-check"/>
   <label for="m-unitychipforxiangshandocs98_ut04_misc-check"><a href="/UnityChipForXiangShan/docs/98_ut/04_misc/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut04_misc"><span class="">Misc</span></a></label>
@@ -651,7 +685,7 @@ import toffee.funcov as fc # 使用上面指定的GROUP名字 g = fc.CovGroup(na
 <p><code>StepRis</code>函数的作用是在每个时钟周期的上升沿执行传入的函数，详情可参照<a href="https://open-verify.cc/mlvp/docs/env_usage/picker_usage/">picker使用介绍</a></p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 May 20, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/04e95823c3d9c68f487f081109d6695377b89d52">Add English Support (#128) (04e9582)</a>
+  最后修改 May 29, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/649faaed1371265395e7f4e4a8b2424a8ea52eff">Doc (#130) (649faae)</a>
 </div>
 
 </div>

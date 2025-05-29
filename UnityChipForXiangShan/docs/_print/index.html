@@ -33,7 +33,7 @@
   <meta itemprop="name" content="进度概述">
   <meta itemprop="description" content="本项目旨在通过开源众包的方式对香山处理器的昆明湖架构进行单元（Unit Test, UT）验证。下图是香山昆明湖架构各个模块验证情况。
 当前版本： 20250512060007-main-78582e48f046f4008fcdda6fbc51eaa315aef30d 20250424112121-main-d354b0077ca82c234196bc1eeffdf7dfad0921cb 20250418102714-main-cd4e5c5e9e94a6619792638f6845bcc33106674c 20250403030244-main-904f80bc9a97ffdee7f2ad38539bdae7c8c1699b 20250327093124-main-039e7f65fc85f621bf5fa57a3a9364dc46d2e079 20250325053246-main-de62e755499e1756c993e560d2ae5f282df30361 20250318070200-main-2eb4fd1378bb957db14afbae18a0f9ca0eb36523 20250317023055-main-ec9b2b3fda9ed0706f5c70c4413765c042062eb3 20250306075137-main-0ca85ce5acfa0894762be5d008a2bf85bed08101 20250306021736-main-8fcdd79da758da0a651aa1a763732a98d640589e 20250303064534-main-3baa11d910f8949c77dadf50b0f8d95fd78cfc08 20250221085945-main-1bcaa98e96a9bc8404c5e71c8490aca66f56722b 20250210003155-main-2b529583954cafe6f145a5d8d49740ebd4d0fa4c 20250206064001-main-8e09f7c86acf67eb7649bd67df3ec51dccc77aaa 20250201121154-main-9595c680af64cc08a12f22a1d595ce111249f153 20250123032900-main-88fa1057ab93bd8286fc2705a1fd203397995702 20250121015322-main-2f2073ab1f56cc01fed1da01d6ddc6ed52880693 20241223133801-main-2a8c1ab351e4ea786c55435dd18f60c0c523cc8a 20241220061304-main-187577e01df03a8ff7ffc828b79070bd5e582436 20241218062220-main-a866912fc3a6df3d17b857a1a898f6f9e5c5957c 20241217100236-main-53f30b46ed6e6eeb261894c4a71a60f69777ef8c 20241216044913-main-7d081626cef0910d9490d169053ee32a8e0c51db 20241213025923-main-d09f78a58caeeb64347ca2587f1f3f2b2a59e6a0 20241212091919-main-c54c0c2e590cf334b986f8ef3eacc53329f4ed1e 20241204085334-main-335e7e0d4ffc2c7a17f8d95e7c75cbd428b14a61 20241204062337-main-f8903a8c4021ba3e310bf097b07147892729341c 20241201142531-main-365f53f574ba5c6875b3389824a3c898c642ed2b 20241129112435-main-79ccae9d5df92c4e167547564b97bd8846b7ecb6 20241129111104-main-8e0cb45a86ec3ffd779723e17ede379081431c42 查看测试报告 总统计数据如下：">
-  <meta itemprop="dateModified" content="2025-05-20T14:27:12+08:00">
+  <meta itemprop="dateModified" content="2025-05-29T17:12:08+08:00">
   <meta itemprop="wordCount" content="83">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="进度概述">
@@ -140,7 +140,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.de547910e38baa895f25afcb6029a1b5.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.0bf3b65927635840aa36fa4b3f10552d.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -717,6 +717,73 @@
   
   
 
+  
+    
+    
+	
+<li>12.4.1: <a href="#pg-8e01ee1a953553bff1b3873e6247576f">LSQ</a></li>
+
+
+    
+    <ul>
+        
+  
+  
+  
+  
+
+  
+    
+    
+	
+<li>12.4.1.1: <a href="#pg-c714e6fc3c1c9ea3ab166d48ea03e3f6">LoadQueueRAR</a></li>
+
+
+    
+  
+    
+    
+	
+<li>12.4.1.2: <a href="#pg-9a032f0cfdc8a7fe72dfec1c535356c4">LoadQueueRAW</a></li>
+
+
+    
+  
+    
+    
+	
+<li>12.4.1.3: <a href="#pg-35dc1dc6afba5e734160023fd9acf073">LoadQueueReplay</a></li>
+
+
+    
+  
+    
+    
+	
+<li>12.4.1.4: <a href="#pg-17df67412d57fff58f56428e76c07bdb">LoadQueueUncache</a></li>
+
+
+    
+  
+    
+    
+	
+<li>12.4.1.5: <a href="#pg-f3cd9f0b7554ba3e703118e43b113fbb">StoreQueue</a></li>
+
+
+    
+  
+    
+    
+	
+<li>12.4.1.6: <a href="#pg-366929e8b710d65054748c1a2afe5b56">VirtualLoadQueue</a></li>
+
+
+    
+  
+
+    </ul>
+    
   
 
     </ul>
@@ -21886,6 +21953,1996 @@ initialize 的情况。</p>
   
   
 
+  
+    
+    
+	
+    
+
+<div class="td-content" style="">
+    
+	<h1 id="pg-8e01ee1a953553bff1b3873e6247576f">12.4.1 - LSQ</h1>
+    
+	<p><strong>本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/tree/master/docs/memblock/LSU/LSQ">香山LSQ设计文档</a>写成</strong></p>
+<p>本文档撰写的内容截至[ca892e73]</p>
+<p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
+
+</div>
+
+
+
+    
+      
+  
+  
+  
+  
+
+  
+  
+
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-c714e6fc3c1c9ea3ab166d48ea03e3f6">12.4.1.1 - LoadQueueRAR</h1>
+    
+	<p><strong>本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/tree/master/docs/memblock/LSU/LSQ">香山LSQ设计文档</a>写成</strong></p>
+<p>本文档撰写的内容截至[ca892e73]</p>
+<p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
+<h1 id="loadqueuerar-简介">LoadQueueRAR 简介</h1>
+<p>LoadQueueRAR用于保存已经完成的load指令的用于load to load违例检测的信息。</p>
+<p>多核环境下会出现load to load违例。单核环境下相同地址的load乱序执行本来是不关心的，但是如果两个load之间有另外一个核做了相同地址的store，并且本身这个核的两个load做了乱序调度，就有可能导致新的load没有看到store更新的结果，但是旧的load看到了，出现了顺序错误。</p>
+<p>多核环境下的load-load违例有一个特征，当前DCache一定会收到L2 cache发来的Probe请求，使得DCache主动释放掉这个数据副本，这时DCache会通知load queue，将相同地址的load queue中已经完成访存的项做一个release标记。后续发往流水线的load指令会查询load queue中在它之后相同地址的load指令，如果存在release标记，就发生了load-load违例。</p>
+<h2 id="术语说明">术语说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>L2Cache</td>
+          <td>二级高速缓存</td>
+      </tr>
+      <tr>
+          <td>DCache</td>
+          <td>数据缓存</td>
+      </tr>
+      <tr>
+          <td>ROB</td>
+          <td>重排序缓冲区</td>
+      </tr>
+      <tr>
+          <td>CAM</td>
+          <td>内容可寻址存储器</td>
+      </tr>
+      <tr>
+          <td>FTQ</td>
+          <td>取指目标队列</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="ld-ld违例">ld-ld违例</h2>
+<p>多核环境下，可能会出现load to load违例：在单核环境中，相同地址的load乱序执行通常不被关注，因为它们在同一核内执行，不会影响其他核的状态，也不会被其他核的操作影响。但是，当两个load操作之间有另一个核对相同地址进行了store操作，情况就变得复杂。</p>
+<p>考虑以下指令序列：</p>
+<pre tabindex="0"><code>load1（core1）
+store（core2） 
+load2（core1）
+</code></pre><p>指令的实际执行顺序为：</p>
+<pre tabindex="0"><code>load2（core1）
+store（core2） 
+load1（core1）
+</code></pre><p>由于指令的乱序执行，可能导致以下情况：旧的 load1 指令在执行时读取到了 store 修改后的新数据，而新的 load2 指令却读取到了未被修改的旧数据。这种执行顺序的变化会导致数据的不一致性，进而引发访存错误。</p>
+<p>因此，在多核环境中，正确处理指令的执行顺序和内存一致性是至关重要的，以确保所有核都能看到一致的内存状态。</p>
+<h2 id="整体框图">整体框图</h2>
+<div>			
+    <center>	
+    <img src="../LoadQueueRAR_structure.svg"
+         alt="LoadQueueRAR结构示意图"
+         style="zoom:100%"/>
+    <br>
+    图1：LoadQueueRAR结构示意图<br><br>
+    </center>
+</div>
+<p>LoadQueueRAR最多能够存储72条指令（为了同VirtualLoadQueue的大小保持一致），每条指令占用一个条目。每个条目包含指令的物理地址（paddr）、与指令相关的信息（uop）、以及标记为已释放（released）和已分配（allocated）的状态寄存器。</p>
+<p>该模块通过 FreeList 子模块管理 entry 资源，FreeList 中存储的是 entry 的编号。当一条指令满足入队条件时，FreeList 会为其分配一个 entry 编号，并将该指令存放在相应的 entry 中。指令出队时，需要释放所占用的 entry 资源，并将条目编号重新放回 FreeList 中，以供后续指令使用。</p>
+<p>PaddrModule 的实现基于内容可寻址存储器（CAM），其深度为 72，数据宽度为 48。CAM 为每条流水线提供一个写端口，其中物理地址（paddr）作为写数据（wdata），条目编号作为写地址（waddr）。此外，CAM 还为每条流水线提供了一个地址查询端口（releaseViolationMdata），并为数据缓存（DCache）提供另一个地址查询端口（releaseMdata）。</p>
+<mrs-functions>
+<h2 id="模块功能说明">模块功能说明</h2>
+<h3 id="功能1发生ld-ld违例的指令请求入队">功能1：发生ld-ld违例的指令请求入队</h3>
+<p>当query到达load流水线的s2时，判断是否满足入队条件，如果在当前load指令之前有未完成的load指令,且当前指令没有被flush时，当前load可以入队。</p>
+<p>具体入队条件如下：</p>
+<ol>
+<li>
+<p>指令的入队请求必须有效，具体通过检查 <code>query.req.valid</code> 是否等于 1。如果该条件满足，系统将继续处理指令的入队。</p>
+</li>
+<li>
+<p>指令必须确认尚未写回到重排序缓冲区（ROB）。这一条件通过比较指令在 VirtualLoadQueue 中的写回指针与该指令分配的 <code>lqIdx</code> 来验证。指令只有在到达 VirtualLoadQueue 的队头，并且其地址和数据均已准备好后，才能被写回到 ROB。这一机制确保了指令执行的顺序性和数据的有效性。</p>
+</li>
+<li>
+<p>指令不能处于冲刷状态。为此，系统需要比较重定向指针所指向的指令与该指令的 <code>robIdx</code>、<code>ftqidx</code>及 FTQ 内的偏移（<code>ftqoffset</code>）。如果两者不相同，则说明该指令可以安全入队，从而避免潜在的冲突和数据不一致性。</p>
+</li>
+</ol>
+<p>在 LoadQueueRAR 指令成功入队后，系统会执行一系列响应操作，以确保指令被正确管理和处理。具体的入队响应操作如下：</p>
+<ol>
+<li>
+<p>拉高 allocated 寄存器。系统将指令的 <code>allocated</code> 寄存器设置为高电平。这一操作的目的是明确标识该指令已成功分配到 LoadQueueRAR 中。通过将 <code>allocated</code> 寄存器拉高，后续的处理逻辑能够迅速识别出该指令的状态，从而避免对未分配指令的误操作。</p>
+</li>
+<li>
+<p>写入指令相关信息到 uop。指令的相关信息将被写入到微操作（<code>uop</code>）中。这些信息包括指令的类型、目标寄存器、操作数等关键信息。将这些信息存储在 <code>uop</code> 中，确保后续的执行阶段能够准确获取和使用这些数据，从而执行相应的操作。这一过程对于指令的正确执行至关重要。</p>
+</li>
+<li>
+<p>物理地址写入 PaddrModule。指令的物理地址将被写入到 PaddrModule 中。这一操作的主要目的是为后续的地址查询和管理提供支持。</p>
+</li>
+<li>
+<p>检测 Release 的 Valid 信号。系统将检测 <code>release</code> 的有效信号是否被拉高。如果该信号有效，将进一步比较物理地址是否相同。如果物理地址一致，则对应条目的 <code>released</code> 信号将被设置为高电平，可以用于后续操作。</p>
+</li>
+</ol>
+<h3 id="功能2检测ld-ld违例条件">功能2：检测ld-ld违例条件</h3>
+<p>在 Load 指令的处理过程中，为了确保数据的一致性和正确性，系统需要检测潜在的 Load-Load 违例。当 load 到达流水线的 s2 时，会检查RAR队列中是否存在与当前load指令物理地址相同且比当前指令年轻的load指令，如果这些 load 已经拿到了数据，并且被标记了release，说明发生 load - load 违例，被标记release的指令需要从取指重发。 该检测过程主要涉及将查询指令的物理地址和相关信息与队列中存储的指令进行对比。具体流程如下：</p>
+<ol>
+<li>对比 ROB 索引。通过对比两条指令的robidx识别队列中是否存在比查询指令更年轻的指令。</li>
+<li>物理地址匹配。检查这两条指令的物理地址是否相同。这一对比通过 <code>releaseViolationMmask(w)(i)</code> 来进行，以确定两条指令是否访问了相同的内存位置。</li>
+<li>检查 Released 标记。如果该条指令的 <code>released</code> 寄存器被拉高，表明该指令已被标记为释放，说明它可以被重新使用。</li>
+</ol>
+<p>一旦检测到 Load-Load 违例，系统将在下一个时钟周期内将 <code>resp.rep_rm_fetch</code> 信号拉高，以通知其他组件发生了违例。触发 Load-Load 违例的 Load 指令将被标记为需要重新从取指阶段执行。重定向请求将在这些指令到达 ROB 队列的尾部时发出，确保指令能够在合适的时机得到正确的处理。</p>
+<p>该过程分为两个时钟周期进行：</p>
+<ul>
+<li>第一拍进行条件匹配，对比物理地址和指令状态，得到mask。</li>
+<li>第二拍生成是否发生违例的响应信号（<code>resp.rep_rm_fetch</code> ）。</li>
+</ul>
+<p>由于 Load-Load 违例出现的频率相对较低，因此系统会选择在指令到达 ROB 的头部时才进行处理。这种处理方式类似于异常处理，确保系统能够在合适的时机对潜在的违例情况进行响应。</p>
+<h3 id="功能3released寄存器更新">功能3：released寄存器更新</h3>
+<p>released寄存器需要更新的三种情况：</p>
+<ol>
+<li>missQueue模块的replace_req在mainpipe流水线的s3栈发起release释放dcache块，release信号在下一拍进入loadqueue。</li>
+<li>probeQueue模块的probe_req在mainpipe流水线的s3栈发起release释放dcache块，release信号在下一拍进入loadqueue。</li>
+<li>atomicsUnit模块的请求在mainpipe流水线的s3栈发生miss时需要释放dcache块，release信号在下一拍进入loadQueue。</li>
+</ol>
+<p>release信号的到达时机可以分为以下两种情况：</p>
+<ol>
+<li>指令入队时到达。如果查询指令传来的paddr的高42位信号与paddr的高位信号相同，并且该指令能够成功入队将对应entry的released寄存器信号拉高</li>
+<li>指令入队后到达。如果paddrmodule中存放的paddr的高42位信号与paddr的高位信号相同,将对应的released寄存器信号拉高</li>
+</ol>
+<p>值得注意的是，dcache release 信号在更新 load queue 中 <code>released</code> 状态位时, 会与正常 load 流水线中的 load-load 违例检查争用 load paddr cam 端口. release 信号更新 load queue 有更高的优先级. 如果争用不到资源, 流水线中的 load 指令将立刻被从保留站重发.</p>
+<h3 id="功能4指令的出队">功能4：指令的出队</h3>
+<p>Load指令的出队需要满足以下条件其中之一：</p>
+<ol>
+<li>当比队列entry中存放的指令更老的指令已经全部写回到ROB时，该指令可以出队。</li>
+<li>当这条指令需要被冲刷时，通常是出现数据依赖性问题、预测错误、异常或错误的情况下，迫使系统强制性地移除该指令，以保证处理器能够恢复到一个稳定的状态。</li>
+</ol>
+<p>出队执行的操作：</p>
+<ol>
+<li>将指令对应的 <code>allocated</code> 寄存器设置为低电平。这一操作的目的是标识该指令不再占用 LoadQueueRAR 的资源，从而为后续指令的入队和处理腾出空间。</li>
+<li>将entry对应的<code>free</code>掩码拉高，表示该条目已被释放并可供后续使用。</li>
+</ol>
+<p>在load流水线的s3阶段可以向队列发送revoke信号撤销上一拍的请求。如果指令当前周期的revoke信号拉高（revoke ==1），并且在上一个周期已经入队，需要执行撤销操作：</p>
+<ol>
+<li>该entry对应的allocated寄存器清零</li>
+<li>该entry对应的free掩码拉高</li>
+</ol>
+</mrs-functions>
+<h2 id="接口说明">接口说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>name</th>
+          <th>I/O</th>
+          <th>width</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>redirect</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>io.redirect.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向的有效位</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.robIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向的flag，用于在循环列表中判断先后</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.robIdx.value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>后端重定向的位置value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.level</td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向的level：</td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>1’b0：冲刷之后的指令；</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>1‘b1：冲刷这条指令本身</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>vecFeedback</td>
+          <td>io.vecFeedback_0/1.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>来自两条流水线的向量反馈信息有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.vecFeedback_0/1.bits</td>
+          <td>input</td>
+          <td>17</td>
+          <td>来自两条流水线的向量反馈信息</td>
+      </tr>
+      <tr>
+          <td>query</td>
+          <td>io.query_0/1/2.req.ready</td>
+          <td>output</td>
+          <td>1</td>
+          <td>能否接收3条数据通路中load违例检查请求</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.robIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查uop在rob中的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.robIdx.value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>3条数据通路中load违例检查uop在rob中的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.lqIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查uop在LoadQueue中的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.lqIdx.value</td>
+          <td>input</td>
+          <td>7</td>
+          <td>3条数据通路中load违例检查uop在LoadQueue中的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.paddr</td>
+          <td>input</td>
+          <td>48</td>
+          <td>3条数据通路中load违例检查的物理地址</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.data.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查data的有效</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.resp.valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查响应的有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.resp.bits.rep.frm.fetch</td>
+          <td>output</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查的响应</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.revoke</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查的撤销</td>
+      </tr>
+      <tr>
+          <td>release</td>
+          <td>io.release.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Dcache释放块有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.release.bits.paddr</td>
+          <td>input</td>
+          <td>48</td>
+          <td>Dcache释放块的物理地址</td>
+      </tr>
+      <tr>
+          <td>ldwbptr</td>
+          <td>io.ldWbPtr.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>VirtualLoadQueue中writeback的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldWbPtr.value</td>
+          <td>input</td>
+          <td>7</td>
+          <td>VirtualLoadQueue中writeback的位置value</td>
+      </tr>
+      <tr>
+          <td>Lqfull</td>
+          <td>io.lqFull</td>
+          <td>output</td>
+          <td>1</td>
+          <td>表示loadqueue RAR满了</td>
+      </tr>
+      <tr>
+          <td>performance</td>
+          <td>io.perf_0/1_value</td>
+          <td>output</td>
+          <td>6</td>
+          <td>性能计数器</td>
+      </tr>
+  </tbody>
+</table>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-9a032f0cfdc8a7fe72dfec1c535356c4">12.4.1.2 - LoadQueueRAW</h1>
+    
+	<p><strong>本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/tree/master/docs/memblock/LSU/LSQ">香山LSQ设计文档</a>写成</strong></p>
+<p>本文档撰写的内容截至[ca892e73]</p>
+<p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
+<h1 id="loadqueueraw-简介">LoadQueueRAW 简介</h1>
+<p>LoadQueueRAW是用于处理store-load违例的。由于load和store在流水线中都是乱序执行，会经常出现load越过了更老的相同地址的store，即这条load本应该前递store的数据，但是由于store地址或者数据没有准备好，导致这条load没有前递到store的数据就已经提交，后续使用这条load结果的指令也都发生了错误，于是产生store to load forwarding违例。</p>
+<p>当store address通过STA保留站发射出来进入store流水线时，会去查询LQRAW中在这条store后面的所有已经完成访存的相同地址的load，以及load流水线中正在进行的在该条store之后的相同地址的load，一旦发现有，就发生了store to load forwarding违例，可能有多个load发生了违例，需要找到离store最近的load，也就是最老的违例的load，然后给RedirectGenerator部件发送重定向请求，冲刷最老的违例的load及之后的所有指令。</p>
+<p>当store流水线执行cbo zero指令时，也需要进行store-load违例检查。</p>
+<h2 id="st-ld违例">st-ld违例</h2>
+<p>在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。</p>
+<p>考虑以下伪代码示例：</p>
+<pre tabindex="0"><code>ST R1, 0(R2)  ; 将 R1 的值存储到 R2 指向的内存地址
+LD R3, 0(R2)  ; 从 R2 指向的内存地址加载值到 R3
+ADD R4, R3, R5 ; 使用 R3 的值进行计算
+</code></pre><p>假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 <code>0</code>）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。</p>
+<p>通过上述例子，可以清楚地看到 Store-to-Load 违例如何在乱序执行的环境中导致数据一致性问题。这种问题强调了在指令调度和执行过程中，确保正确的数据流动的重要性。现代处理器通过多种机制来检测和解决这种违例，以维护程序的正确性和稳定性。</p>
+<h2 id="整体框图">整体框图</h2>
+<div>			
+    <center>	
+    <img src="../LoadQueueRAW_structure.svg"
+         alt="LoadQueueRAW结构示意图"
+         style="zoom:100%"/>
+    <br>
+    图1：LoadQueueRAW结构示意图<br><br>
+    </center>
+</div>
+<p>LoadQueueRAW最多能够存储64条指令，通过FreeList子模块管理空闲资源。FreeList 中存储的是 entry 的编号。当一条指令满足入队条件时，FreeList 会为其分配一个 entry 编号，并将该指令存放在相应的 entry 中。指令出队时，需要释放所占用的 entry 资源，并将条目编号重新放回 FreeList 中，以供后续指令使用。Load指令在s2阶段在 LoadQueueRAR 中查询 store-to-load 违例，在s3阶段返回响应。</p>
+<mrs-functions>
+<h2 id="模块功能说明">模块功能说明</h2>
+<h3 id="功能1发生st-ld违例的指令请求入队">功能1：发生st-ld违例的指令请求入队</h3>
+<p>当query到达load流水线的s2时，判断是否满足入队条件，如果在当前load指令之前有地址未准备好的store指令，且当前指令没有被flush时，当前load可以入队。具体流程如下：</p>
+<ol>
+<li>判断入队条件：检查在当前 Load 指令之前是否存在未准备好的 Store 指令。如果存在这样的 Store 指令，并且当前 Load 指令尚未被冲刷（flush），则当前 Load 指令可以入队。</li>
+<li>分配 Entry 和 Index：在 Freelist 中，系统将获得一个可分配的 Entry 及其对应的 Index，以便为 Load 指令分配资源。</li>
+<li>保存物理地址：在 PaddrModule 中将入队的 Load 指令的物理地址保存到对应的 Entry。这一操作确保在后续访问中能够正确引用该地址。</li>
+<li>保存掩码信息：在 MaskModule 中，系统将入队的 Load 指令的掩码信息保存到对应的 Entry。掩码信息用于后续的地址匹配和数据访问。</li>
+<li>写入uop：将 Load 指令的uop信息写入到相应的结构中，以完成入队过程。</li>
+</ol>
+<h3 id="功能2检测st-ld违例条件">功能2：检测st-ld违例条件</h3>
+<p>在 Store 指令到达 Store 流水线的 s1 阶段时，系统会进行 Store-to-Load 违例检查。此时，Store 指令需要与 Load Queue 中已经完成访存的 Load 指令，以及在 Load 流水线 s1 和 s2 阶段正在访存的 Load 指令进行比较。这些 Load 指令可能尚未通过前递（forwarding）机制获取 Store 指令执行的结果。</p>
+<p>具体的违例检查流程如下：</p>
+<ol>
+<li>物理地址匹配：在第一拍中，系统将进行物理地址匹配，并检查条件。此时，将匹配在当前 Store 指令之后的所有新的 Load 指令。如果这些 Load 指令已经成功获取了数据（<code>datavalid</code>），或者由于缓存未命中正在等待数据回填（<code>dcache miss</code>），则可以确定这些 Load 指令不会将数据前递给当前的 Store 指令。</li>
+<li>匹配 Load 指令：在第二拍中，Store 流水线中的 Store 指令根据匹配结果中的掩码（mask），在 Load Queue 的 RAW（Read After Write）结构中查找所有匹配的 Load 指令。Load Queue 中共有 32 项，这些项将被平分为4组。每组从 8 项中选出一个最老的 Load 指令，最多可得到 4 个候选最老的 Load 指令。</li>
+<li>选择最老的 Load：在第三拍中，从上述 4 个候选最老的 Load 指令中，系统将选出一个最老的 Load 指令，作为最终的目标。</li>
+<li>处理违例情况：在第四拍中，如果在两条 Store 流水线中均发生了 Store-to-Load 违例，系统将从各自的 Queue 中匹配到的最老 Load 指令中选出一个更老的 Load 指令，以产生回滚请求并发送给重定向模块（Redirect）。此时，违例的条件包括：
+<ul>
+<li>Load 和 Store 的地址相同。</li>
+<li>Load 指令比 Store 指令年轻。</li>
+<li>Load 指令已经成功获取了数据。</li>
+</ul>
+</li>
+</ol>
+<h3 id="功能3指令的出队">功能3：指令的出队</h3>
+<p>Load指令的出队需要满足以下条件其中之一：</p>
+<ol>
+<li>当比队列entry中存放的指令更老的指令已经全部写回到ROB时，该指令可以出队。</li>
+<li>当这条指令需要被冲刷时，通常是出现数据依赖性问题、预测错误、异常或错误的情况下，迫使系统强制性地移除该指令，以保证处理器能够恢复到一个稳定的状态。</li>
+</ol>
+<p>出队执行的操作：</p>
+<ol>
+<li>将指令对应的 <code>allocated</code> 寄存器设置为低电平。这一操作的目的是标识该指令不再占用 LoadQueueRAR 的资源，从而为后续指令的入队和处理腾出空间。</li>
+<li>将entry对应的<code>free</code>掩码拉高，表示该条目已被释放并可供后续使用。</li>
+</ol>
+<p>在load流水线的s3阶段可以向队列发送revoke信号撤销上一拍的请求。如果指令当前周期的revoke信号拉高（revoke ==1），并且在上一个周期已经入队，需要执行撤销操作：</p>
+<ol>
+<li>该entry对应的allocated寄存器清零</li>
+<li>该entry对应的free掩码拉高</li>
+</ol>
+</mrs-functions>
+<h2 id="接口说明">接口说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>name</th>
+          <th>I/O</th>
+          <th>width</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>redirect</td>
+          <td>io.redirect.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向的有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.robIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向的flag，用于在循环列表中判断先后</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.robIdx.value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>后端重定向的位置value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.level</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向的level：1’b0：冲刷之后的指令；1‘b1：冲刷这条指令本身</td>
+      </tr>
+      <tr>
+          <td>vecFeedback</td>
+          <td>io.vecFeedback_0/1.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>来自两条流水线的向量反馈信息有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.vecFeedback_0/1.bits</td>
+          <td>input</td>
+          <td>17</td>
+          <td>来自两条流水线的向量反馈信息</td>
+      </tr>
+      <tr>
+          <td>query</td>
+          <td>io.query_0/1/2.req.ready</td>
+          <td>output</td>
+          <td>1</td>
+          <td>能否接收3条数据通路中load违例检查请求</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.robIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查uop在rob中的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.robIdx.value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>3条数据通路中load违例检查uop在rob中的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.lqIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查uop在LoadQueue中的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.lqIdx.value</td>
+          <td>input</td>
+          <td>7</td>
+          <td>3条数据通路中load违例检查uop在LoadQueue中的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.paddr</td>
+          <td>input</td>
+          <td>48</td>
+          <td>3条数据通路中load违例检查的物理地址</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.data.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查data的有效</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.revoke</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查的撤销</td>
+      </tr>
+      <tr>
+          <td>storeIn</td>
+          <td>storeIn_0/1.bits</td>
+          <td>input</td>
+          <td>84</td>
+          <td>两条store流水线store指令相关信息</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>storeIn_0/1.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>两条store流水线store指令相关信息有效位</td>
+      </tr>
+      <tr>
+          <td>rollback</td>
+          <td>rollback_0/1.valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>两条store流水线回滚信息的有效性</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>rollback_0/1.bits</td>
+          <td>output</td>
+          <td>31</td>
+          <td>两条store流水线回滚信息</td>
+      </tr>
+      <tr>
+          <td>stAddrReadySqPtr</td>
+          <td>stAddrReadySqPtr</td>
+          <td>input</td>
+          <td>7</td>
+          <td>指向 store 队列中已准备好的地址条目</td>
+      </tr>
+      <tr>
+          <td>stIssuePtr</td>
+          <td>stIssuePtr</td>
+          <td>input</td>
+          <td>7</td>
+          <td>指向 store 队列中准备发射执行的指令条目</td>
+      </tr>
+      <tr>
+          <td>lqFull</td>
+          <td>lqFull</td>
+          <td>output</td>
+          <td>1</td>
+          <td>判断队列是否满</td>
+      </tr>
+  </tbody>
+</table>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-35dc1dc6afba5e734160023fd9acf073">12.4.1.3 - LoadQueueReplay</h1>
+    
+	<p><strong>本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/tree/master/docs/memblock/LSU/LSQ">香山LSQ设计文档</a>写成</strong></p>
+<p>本文档撰写的内容截至[ca892e73]</p>
+<p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
+<h1 id="loadqueuereplay-简介">LoadQueueReplay 简介</h1>
+<p>LoadQueueReplay 模块是现代处理器架构中用于处理 Load 指令重发的重要组成部分。它负责管理因各种原因而需要重发的 Load 指令，确保指令执行的正确性和高效性。</p>
+<h2 id="整体框图">整体框图</h2>
+<div>			
+    <center>	
+    <img src="../LoadQueueReplay_structure.png"
+         alt="LoadQueueReplay结构示意图"
+         style="zoom:100%"/>
+    <br>
+    图1：LoadQueueReplay结构示意图<br><br>
+    </center>
+</div>
+<p>LoadQueueReplay 最多存放72条指令，涉及多个状态和存储的信息。其关键组成部分如下：</p>
+<ul>
+<li><strong>Allocated</strong>：
+<ul>
+<li>表示某个 Load 重发队列项是否已经被分配，反映该项的有效性。</li>
+</ul>
+</li>
+<li><strong>Scheduled</strong>：
+<ul>
+<li>指示某个 Load 重发队列项是否已被调度，意味着该项已经被选出，并将被发送至 Load Unit 进行重发。</li>
+</ul>
+</li>
+<li><strong>Uop</strong>：
+<ul>
+<li>该队列项对应的 Load 指令执行信息，包括微操作（uop）。</li>
+</ul>
+</li>
+<li><strong>Cause</strong>：指示该 Load 指令重发的原因，主要包括以下几种情况：
+<ul>
+<li><strong>C_MA</strong>：存储-加载（st-ld）违反重新执行。</li>
+<li><strong>C_TM</strong>：TLB（翻译后备页表）缺失。</li>
+<li><strong>C_FF</strong>：存储-加载转发。</li>
+<li><strong>C_DR</strong>：数据缓存（dcache）需要重发。</li>
+<li><strong>C_DM</strong>：数据缓存缺失。</li>
+<li><strong>C_WF</strong>：路径预测失败。</li>
+<li><strong>C_BC</strong>：数据缓存路径冲突。</li>
+<li><strong>C_RAR</strong>：读取-读取（RAR）队列无法接收。</li>
+<li><strong>C_RAW</strong>：读取-写入（RAW）队列无法接收。</li>
+<li><strong>C_NK</strong>：存储-加载违反。</li>
+</ul>
+</li>
+<li><strong>Blocking</strong>：指示该 Load 指令因等待条件而被阻塞，不能被调度重发。阻塞的原因和解除阻塞的条件包括：
+<ul>
+<li><strong>C_MA</strong>：存储指令的地址就绪。</li>
+<li><strong>C_TM</strong>：TLB 回填完毕，并发送 Hint 信号。</li>
+<li><strong>C_FF</strong>：存储指令的数据就绪。</li>
+<li><strong>C_DM</strong>：数据缓存回填完毕。</li>
+<li><strong>C_RAR</strong>：RAR 队列未满，且 Load 指令比 Load Queue 的写回项更老。</li>
+<li><strong>C_RAW</strong>：RAW 队列未满，且 Load 指令比 Store Queue 中所有地址准备好的项都更老。</li>
+</ul>
+</li>
+</ul>
+<p>LoadReplayQueue 通过 FreeList 管理队列的空闲状态。FreeList 的大小等于 LoadReplayQueue 的项数，分配宽度为3（Load Unit 的数量），释放宽度为 4。同时，Free List 可以反馈 Load Replay Queue 的空余项数量以及是否已满的信息。除了FreeList，LoadQueueReplay还包含两个子模块：AgeDetector 和 LqVAddrModule，其中 AgeDetector 用于寻找一系列load replay queue项中最早入队的一项。</p>
+<p>例如昆明湖V1的Load宽度为2，则会将load replay queue分为两半，从偶数项和奇数项中分别挑选一项最老的进行重发。LqVAddrModule 用于保存load replay queue项数个虚拟地址，读口和写口的数量均为Load的宽度（LoadUnit的数量）。</p>
+<h2 id="loadqueuereplay-存储信息">LoadQueueReplay 存储信息</h2>
+<table>
+  <thead>
+      <tr>
+          <th>Field</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>allocated</td>
+          <td>是否已经被分配，也代表是否该项是否有效。</td>
+      </tr>
+      <tr>
+          <td>scheduled</td>
+          <td>是否已经被调度，代表该项已经被选出，已经或即将被发送至LoadUnit进行重发。</td>
+      </tr>
+      <tr>
+          <td>uop</td>
+          <td>load指令执行包括的uop信息。</td>
+      </tr>
+      <tr>
+          <td>vecReplay</td>
+          <td>向量load指令相关信息。</td>
+      </tr>
+      <tr>
+          <td>vaddrModule</td>
+          <td>Load指令的虚拟地址。</td>
+      </tr>
+      <tr>
+          <td>cause</td>
+          <td>某load replay queue项对应load指令重发的原因，包括：<br>- C_MA(位0): store-load预测违例<br>- C_TM(位1): tlb miss<br>- C_FF(位2): store-to-load-forwarding store数据为准备好，导致失败<br>- C_DR(位3): 出现DCache miss，但是无法分配MSHR<br>- C_DM(位4): 出现DCache miss<br>- C_WF(位5): 路预测器预测错误<br>- C_BC(位6): Bank冲突<br>- C_RAR(位7): LoadQueueRAR没有空间接受指令<br>- C_RAR(位8): LoadQueueRAW没有空间接受指令<br>- C_NK(位9): LoadUnit监测到store-to-load-forwarding违例<br>- C_MF(位10): LoadMisalignBuffer没用空间接受指令</td>
+      </tr>
+      <tr>
+          <td>blocking</td>
+          <td>Load指令正在被阻塞。</td>
+      </tr>
+      <tr>
+          <td>strict</td>
+          <td>访存依赖预测器判断指令是否需要等待它之前的所有store指令执行完毕进入调度阶段。</td>
+      </tr>
+      <tr>
+          <td>blockSqIdx</td>
+          <td>与load指令有相关性的store指令的StoreQueue Index。</td>
+      </tr>
+      <tr>
+          <td>missMSHRId</td>
+          <td>load指令的dcache miss请求接受ID。</td>
+      </tr>
+      <tr>
+          <td>tlbHintId</td>
+          <td>load指令的tlb miss请求接受ID。</td>
+      </tr>
+      <tr>
+          <td>replacementUpdated</td>
+          <td>DCache的替换算法是否已经更新。</td>
+      </tr>
+      <tr>
+          <td>replayCarry</td>
+          <td>DCache的路预测器预测信息。</td>
+      </tr>
+      <tr>
+          <td>missDbUpdated</td>
+          <td>ChiselDB中Miss相关情况更新。</td>
+      </tr>
+      <tr>
+          <td>dataInLastBeatReg</td>
+          <td>Load指令需要的数据在两笔回填请求的最后一笔。</td>
+      </tr>
+  </tbody>
+</table>
+<h1 id="功能简介">功能简介</h1>
+<mrs-functions>
+<h2 id="模块功能说明">模块功能说明</h2>
+<h3 id="功能1需要重发的指令请求入队">功能1：需要重发的指令请求入队</h3>
+<p>根据是否满足以下条件以及freelist是否可以分配的空闲槽位决定能否直接入队：</p>
+<ol>
+<li><code>enq_X.valid</code> 信号有效。</li>
+<li>即将入队的项不需要重定向。</li>
+<li>该项被标记为需要重发(<code>enq.bits.rep_info.need_rep</code>)。</li>
+<li>没有异常。在入队时，必须确保没有异常发生。如果当前指令处于异常状态，入队操作应被禁止，以防止无效指令的执行。</li>
+</ol>
+<h3 id="功能2指令重发解锁">功能2：指令重发解锁</h3>
+<p>LoadQueueReplay 中的指令出队分三拍：</p>
+<p>在重发过程中，根据重发的原因和当前条件解锁相应项。在不满足解锁条件时，将会被阻塞，无法参与重发仲裁。其中C_BC（Dcache 块冲突）、C_NK（oad_unit 在 S1、S2 阶段发生 store-load 违例）、C_DR（Dcache miss 且 MSHR 满）、C_WF（路径预测失败）<strong>无需条件即可立即重发</strong>。</p>
+<p>其他重发原因和对应的解锁条件如下：</p>
+<ol>
+<li>C_MA（store_load 预测违例）：已经被分配入队并且store准备好了相应的地址，具体如下：
+<ol>
+<li>store unit 的地址信号有效，且 <code>sqIdx</code> 与被阻塞的 <code>Idx</code> 相同，store 地址未发生 TLB miss。</li>
+<li>被阻塞的 <code>SeqIdx</code> 在 store_queue 发送的 <code>stAddrReadySqPtr</code> 之前。</li>
+<li>非严格阻塞，且阻塞的 <code>SeqIdx</code> 在 <code>stAddrReadyVec</code> 的向量组内。</li>
+<li>store queue 为空，无未处理项。</li>
+</ol>
+</li>
+<li>C_TM（TLB Miss）：resp信号有效，并且输入的id号等于Tlb Hint的id号，或者replay_all信号有效。</li>
+<li>C_FF（store_load 数据前递失败）：因为数据前递失败导致指令重发的释放条件有下面四条：
+<ol>
+<li>store unit 的数据信号有效，且 <code>sqIdx</code> 与被阻塞的 <code>Idx</code> 相同。</li>
+<li>被阻塞的 <code>SqIdx</code> 在 store_queue 发送的 <code>stDataReadySqPtr</code> 之前。</li>
+<li>阻塞的 <code>SeqIdx</code> 在 <code>stDataReadyVec</code> 的向量组内。</li>
+<li>store queue 为空，无未处理项。</li>
+</ol>
+</li>
+<li>C_DM（Dcache Miss）：Dcache 的信号有效，且 <code>tl_d_channel.mshrid</code> 与阻塞的 <code>missMSHRId</code> 相同。</li>
+<li>C_RAR（RAR queue 没有回应）：RAR 未满，或 <code>lqIdx</code> 在 <code>ldWbPtr</code> 之前。</li>
+<li>C_RAW（RAW 没有回应）：RAW 未满，或 <code>lqIdx</code> 在 <code>stAddrReadySqPtr</code> 之前。</li>
+</ol>
+<h3 id="功能3指令重发优先级">功能3：指令重发优先级</h3>
+<p>LoadQueueReplay有3种选择调度方式：</p>
+<ol>
+<li>
+<p>根据入队年龄</p>
+<p>LoadQueueReplay使用3个年龄矩阵(每一个Bank对应一个年龄矩阵)，来记录入队的时间。年龄矩阵会从已经准备好可以重发的指令中，选择一个入队时间最长的指令调度重发。</p>
+</li>
+<li>
+<p>根据Load指令的年龄</p>
+<p>LoadQueuReplay可以根据LqPtr判断靠近最老的load指令重发，判断宽度为OldestSelectStride=4。</p>
+</li>
+<li>
+<p>DCache数据相关的load指令优先调度</p>
+<ul>
+<li>
+<p>LoadQueueReply首先调度因L2 Hint调度的重发（当dcache miss后，需要继续查询下级缓存L2 Cache。在L2 Cache回填前的2或3拍，L2 Cache会提前给LoadQueueReplay唤醒信号，称为L2 Hint）当收到L2 Hint后，LoadQueueReplay可以更早地唤醒这条因dcache miss而阻塞的Load指令进行重发。</p>
+</li>
+<li>
+<p>如果不存在L2 Hint情况，会将其余Load Replay的原因分为高优先级和低优先级。高优先级包括因dcache缺失或st-ld forward导致的重发，而将其他原因归纳为低优先级。如果能够从LoadQueueReplay中找出一条满足重发条件的Load指令（有效、未被调度、且不被阻塞等待唤醒），则选择该Load指令重发，否则按照入队顺序，通过AgeDetector模块寻找一系列load replay queue项中最早入队的一项进行重发。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="功能4指令重发逻辑">功能4：指令重发逻辑</h3>
+<ol>
+<li>
+<p>Load_unit s3过来的请求根据enq.bits.isLoadReplay判断是否是已经从replay_queue出队的序列，如果是已经出队的序列，根据是否needReplay和有异常做下一步的判断，如果有异常或者不需要重发则释放这个槽位，并从agedetector里面把该项出队，如果需要重发则将这个项对应的scheduled位置为false来参与后续的出队仲裁竞争。</p>
+</li>
+<li>
+<p>从freelist中选出发给load unit的有效项，项数为load unit的宽度（即有几条load unit的流水线），根据优先级来进行出队。</p>
+</li>
+<li>
+<p>第0拍将数据传递给第1拍由s0_can_go控制，当s0_can_go为1时才能将0拍得到的数据发给第一拍，s0_can_go有效的条件是s0被重定向或者s1_can_go为1。</p>
+</li>
+<li>
+<p>第一拍从vaddr内部取出需要的虚拟地址，发给下一拍流水线。 ColdCouter的值在0到12之间，上一拍没有被阻塞并且整个过程没有发生重定向的时候，向load unit发送请求。</p>
+</li>
+<li>
+<p>发送给下一拍流水线的数据受s1_can_go控制，s1_can_go为1的条件是:</p>
+</li>
+</ol>
+<ul>
+<li>
+<p>ColdCouter的值在0到12之间 且 上一拍完成操作(未被阻塞)或者不需要发送数据两者之一。</p>
+</li>
+<li>
+<p>发生数据的重定向。</p>
+</li>
+</ul>
+<ol start="6">
+<li>第二拍将收到第一拍的数据发送给对应的load unit,获取仲裁权限，完成重发指令的任务。</li>
+</ol>
+</mrs-functions>
+<h2 id="接口说明">接口说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th>name</th>
+          <th>I/O</th>
+          <th>description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>redirect</td>
+          <td>input</td>
+          <td>后端重定向相关信息</td>
+      </tr>
+      <tr>
+          <td>vecFeedback</td>
+          <td>input</td>
+          <td>来自两条流水线的向量反馈信息</td>
+      </tr>
+      <tr>
+          <td>enq</td>
+          <td>input</td>
+          <td>表示外部模块希望将 load 指令传递给当前模块，来自 load 指令流水线的 s3 级</td>
+      </tr>
+      <tr>
+          <td>storeAddrIn</td>
+          <td>input</td>
+          <td>在一个时钟周期内接收多条 store 指令的地址信息，用于判断指令存储的地址是否已经准备好</td>
+      </tr>
+      <tr>
+          <td>storeDataIn</td>
+          <td>input</td>
+          <td>在一个时钟周期内接收多条 store 指令的数据信息，用于判断指令存储的数据是否已准备好</td>
+      </tr>
+      <tr>
+          <td>replay</td>
+          <td>output</td>
+          <td>用于处理 load 指令的重发请求，每个元素对应一个重发接口</td>
+      </tr>
+      <tr>
+          <td>tl_d_channel</td>
+          <td>input</td>
+          <td>用于接收来自数据缓存（Dcache）的信息，在处理 load 指令时会使用该端口进行数据转发</td>
+      </tr>
+      <tr>
+          <td>stAddrReadySqPtr</td>
+          <td>input</td>
+          <td>指向当前准备好地址的 store 指令</td>
+      </tr>
+      <tr>
+          <td>stAddrReadyVec</td>
+          <td>input</td>
+          <td>向量中对应 store 指令的地址是否已经准备好</td>
+      </tr>
+      <tr>
+          <td>stDataReadySqPtr</td>
+          <td>input</td>
+          <td>指向当前准备好数据的 store 指令</td>
+      </tr>
+      <tr>
+          <td>stDataReadyVec</td>
+          <td>input</td>
+          <td>向量中对应 store 指令的数据是否已经准备好</td>
+      </tr>
+      <tr>
+          <td>sqEmpty</td>
+          <td>input</td>
+          <td>当前 store 队列是否为空</td>
+      </tr>
+      <tr>
+          <td>lqFull</td>
+          <td>output</td>
+          <td>当前 load 队列是否已满</td>
+      </tr>
+      <tr>
+          <td>ldWbPtr</td>
+          <td>input</td>
+          <td>指向当前写回的load指令</td>
+      </tr>
+      <tr>
+          <td>rarFull</td>
+          <td>input</td>
+          <td>rar 队列是否已满</td>
+      </tr>
+      <tr>
+          <td>rawFull</td>
+          <td>input</td>
+          <td>raw 队列是否已满</td>
+      </tr>
+      <tr>
+          <td>l2_hint</td>
+          <td>input</td>
+          <td>当 dcache miss 后，需要继续查询下级缓存 L2 Cache。在 L2 Cache 回填前的 2 或 3 拍，L2 Cache 会提前给 LoadQueueReplay 唤醒信号，称为 L2 Hint</td>
+      </tr>
+      <tr>
+          <td>tlb_hint</td>
+          <td>input</td>
+          <td>作用类似于 l2_hint，接收当前的 TLB 提示信息</td>
+      </tr>
+      <tr>
+          <td>tlbReplayDelayCycleCtrl</td>
+          <td>input</td>
+          <td>控制 TLB 重发的延迟周期</td>
+      </tr>
+  </tbody>
+</table>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-17df67412d57fff58f56428e76c07bdb">12.4.1.4 - LoadQueueUncache</h1>
+    
+	<p><strong>本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/tree/master/docs/memblock/LSU/LSQ">香山LSQ设计文档</a>写成</strong></p>
+<p>本文档撰写的内容截至[66e9b546]</p>
+<p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
+<h1 id="loadqueueuncache-简介">LoadQueueUncache 简介</h1>
+<p>LoadQueueUncache 和 Uncache 模块，对于 uncache load 访问请求来说，起到一个从 LoadUnit 流水线到总线访问的中间站作用。其中 Uncache 模块，作为靠近总线的一方，主要用于处理 uncache 访问到总线的请求和响应。LoadQueueUncache 作为靠近流水线的一方，需要承担以下责任：</p>
+<ol>
+<li>
+<p>接收 LoadUnit 流水线传过来的 uncache load 请求。</p>
+</li>
+<li>
+<p>选择已准备好 uncache 访问的 uncache load 请求 发送到 Uncache Buffer。</p>
+</li>
+<li>
+<p>接收来自 Uncache Buffer 的处理完的 uncache load 请求。</p>
+</li>
+<li>
+<p>将处理完的 uncache load 请求 返回给 LoadUnit。</p>
+</li>
+</ol>
+<p>LoadQueueUncache 结构上，目前有 4 项（项数可配）UncacheEntry，每一项独立负责一个请求并利用一组状态寄存器控制其具体处理流程；有一个 FreeList，管理各项分配和回收的情况。而 LoadQueueUncache 主要是协同 4 项的新项分配、请求选择、响应分派、出队等统筹逻辑。</p>
+<h2 id="整体框图">整体框图</h2>
+<div>			
+    <center>	
+    <img src="../LoadQueueUncache_structure.svg"
+         alt="LoadQueueUncache结构示意图"
+         style="zoom:100%"/>
+    <br>
+    图1：LoadQueueUncache结构示意图
+    </center>
+</div>
+<p>UnCacheBuffer 最多存放4条指令，除了 FreeList 之外，另一个重要的子模块是 UncacheEntry，管理每个Uncahce请求，负责发起Uncache，写回Uncache数据。每个Entry内维护一个用于发起Uncache请求的状态机，状态机的状态转换图如下：</p>
+<div>			
+    <center>	
+    <img src="../UncacheEntry.png"
+         alt="UncacheEntry结构示意图"
+         style="zoom:100%"/>
+    <br>
+    图2：UncacheEntry状态转换图
+    </center>
+</div>
+<ul>
+<li>
+<p>s_idl:该项还未发起一个MMIO请求。</p>
+</li>
+<li>
+<p>s_req:向uncache模块发起MMIO请求，等待请求被接收。</p>
+</li>
+<li>
+<p>s_resp:等待uncache模块的MMIO响应。</p>
+</li>
+<li>
+<p>s_wait:等待将MMIO结果写回流水线。</p>
+</li>
+</ul>
+<h1 id="功能简介">功能简介</h1>
+<mrs-functions>
+<h2 id="模块功能说明">模块功能说明</h2>
+<h3 id="功能1uncache指令请求入队">功能1：Uncache指令请求入队</h3>
+<p>LoadQueueUncache 负责接收来自 LoadUnit 0、1、2 三个模块的请求，这些请求可以是 MMIO 请求，也可以是 NC 请求。</p>
+<ol>
+<li>
+<p>首先，系统会根据请求的 robIdx 按照时间顺序（从最老到最新）对请求进行排序，以确保最早的请求能优先分配到空闲项，避免特殊情况下因老项回滚（rollback）而导致死锁。</p>
+</li>
+<li>
+<p>进入入队处理的条件是：请求没有重发、没有异常，并且系统会根据 FreeList 中可分配的空闲项依次为请求分配项。</p>
+</li>
+<li>
+<p>当 LoadQueueUncache 达到容量上限，且仍有请求未分配到项时，系统会从这些未分配的请求中选择最早的请求进行 rollback。</p>
+</li>
+</ol>
+<p>UncacheBuffer 的入队分为 s1 和 s2 两个阶段：</p>
+<p>s1：</p>
+<ul>
+<li>
+<p><strong>请求收集</strong>：通过 <code>io.req.map(_.bits)</code> 收集所有请求的内容，形成 <code>s1_req</code> 向量。</p>
+</li>
+<li>
+<p><strong>有效性标记</strong>：通过 <code>io.req.map(_.valid)</code> 收集所有请求的有效性，形成 <code>s1_valid</code> 向量。</p>
+</li>
+</ul>
+<p>s2：</p>
+<p>执行入队操作，主要分为以下几步：</p>
+<ul>
+<li>
+<p>使用 <code>RegEnable</code> 将 <strong>s1</strong> 阶段的请求 <code>s1_req</code> 注册到 <code>s2_req</code>，确保在请求有效时保持其状态。</p>
+</li>
+<li>
+<p>通过以下条件生成<code>s2_valid</code>向量，判断每个请求是否有效：</p>
+<ol>
+<li>
+<p><code>RegNext(s1_valid(i))</code>：确保请求在 <strong>s1</strong> 阶段有效。</p>
+</li>
+<li>
+<p><code>!s2_req(i).uop.robIdx.needFlush(RegNext(io.redirect))</code>：确保请求的 ROB 索引不需要因重定向而被刷新。</p>
+</li>
+<li>
+<p><code>!s2_req(i).uop.robIdx.needFlush(io.redirect)</code>：确保请求的 ROB 索引不需要因当前重定向而被刷新。</p>
+</li>
+</ol>
+</li>
+<li>
+<p>检查每个请求是否需要重发，结果存储在 <code>s2_need_replay</code> 向量中。</p>
+</li>
+<li>
+<p>在 <strong>s2</strong> 阶段，使用 <code>s2_enqueue</code> 向量来决定哪些请求成功入队。入队条件包括：</p>
+<ul>
+<li>
+<p><code>s2_valid(w)</code>：请求在 <strong>s2</strong> 阶段有效。</p>
+</li>
+<li>
+<p><code>!s2_has_exception(w)</code>：请求没有异常。</p>
+</li>
+<li>
+<p><code>!s2_need_replay(w)</code>：请求不需要重发。</p>
+</li>
+<li>
+<p><code>s2_req(w).mmio</code>：请求是一个内存映射 IO（MMIO）请求。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>通过 <code>enqValidVec</code> 和 <code>enqIndexVec</code> 的有效管理，确保每个加载请求在满足有效性和可分配条件时能够正确地申请和分配FreeList槽位。</p>
+</li>
+</ul>
+<h3 id="功能2uncache指令的出队">功能2：Uncache指令的出队</h3>
+<ol>
+<li>
+<p>当一个项完成 Uncache 访问操作并返回给 LoadUnit ，或被 redirect 刷新时，则该项出队并释放 FreeList 中该项的标志。</p>
+<p>具体流程如下：</p>
+<ul>
+<li>
+<p>计算<code>freeMaskVec</code>掩码，用于标记每个槽位的释放状态，指示相应槽位是否可用。</p>
+</li>
+<li>
+<p>如果当前条目被选择 (<code>e.io.select</code>) 且其输出信号有效 (<code>e.io.ldout.fire</code>)，则对应槽位的释放状态被标记为 <code>true</code>，表示该槽位可用。</p>
+</li>
+<li>
+<p>如果接收到刷新信号 (<code>e.io.flush</code>)，同样将对应槽位的释放状态设置为 <code>true</code>。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>同一拍可能有多个项出队。返回给 LoadUnit 的请求，会在第一拍中选出，第二拍返回。</p>
+</li>
+<li>
+<p>其中，可供处理 uncache 返回请求的 LoadUnit 端口是预先设定的。当前，MMIO 只返回到 LoadUnit 2；NC 可返回到 LoadUnit 1\2。在多个端口返回的情况下，利用 uncache entry id 与端口数的余数，来指定每个项可以返回到的 LoadUnit 端口，并从该端口的候选项中选择一个项进行返回。</p>
+</li>
+</ol>
+<h3 id="功能3uncache交互逻辑">功能3：Uncache交互逻辑</h3>
+<ol>
+<li>发送 req</li>
+</ol>
+<p>第一拍先从当前已准备好 uncache 访问中选择一个，第二拍将其发送给 Uncache Buffer。发送的请求中，会标记选中项的 id，称为 mid 。其中是否被成功接收，可根据 req.ready 判断。</p>
+<ol start="2">
+<li>接收 idResp</li>
+</ol>
+<p>如果发送的请求被 Uncache Buffer 接收，那么会在接收的下一拍收到 Uncache 的 idResp。该响应中，包含 mid 和 Uncache Buffer 为该请求分配 entry id（称为 sid）。LoadQueueUncache 利用 mid 找到内部对应的项，并将 sid 存储在该项中。</p>
+<ol start="3">
+<li>接收 resp</li>
+</ol>
+<p>待 Uncache Buffer 完成该请求的总线访问后，会将访问结果返回给 LoadQueueUncache。该响应中，包含 sid。考虑到 Uncache Buffer 的合并特性（详细入队合并逻辑见 Uncache），一个 sid 可能对应 LoadQueueUncache 的多个项。LoadQueueUncache 利用 sid 找到内部所有相关项，并将访问结果传递给这些项。</p>
+<h3 id="功能4uncache回滚检测">功能4：Uncache回滚检测</h3>
+<p>freelist 没有空闲表现导致 MMIO Load 进入 UncacheBuffer 失败时需要进行 rollback，此
+时需要根据 robidx 选择不能入队的 MMIO 中最老的指令进行 rollback。整个流程分为以下几个周期：</p>
+<ul>
+<li>
+<p>Cycle 0：进行 uncache 请求入队。</p>
+</li>
+<li>
+<p>Cycle 1：选择最旧的 uncache 加载请求。</p>
+</li>
+<li>
+<p>Cycle 2：发出重定向请求。</p>
+<ul>
+<li>
+<p>从 load 流水线中选择最旧的 load 请求。</p>
+</li>
+<li>
+<p>根据检测到的拒绝情况准备重定向请求。</p>
+</li>
+<li>
+<p>如果重定向请求有效，则发出请求。</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>使用 <code>selectOldestRedirect</code> 函数来选择最旧的重定向请求，具体步骤如下：</p>
+<ul>
+<li>
+<p>比较向量生成：</p>
+<ul>
+<li>创建一个比较向量 <code>compareVec</code>，用于判断请求的顺序，比较每个请求的 ROB 索引。</li>
+</ul>
+</li>
+<li>
+<p>生成独热编码结果：</p>
+<ul>
+<li><code>resultOnehot</code> 向量根据有效性和比较结果生成，标记出最旧的可重定向请求。</li>
+</ul>
+</li>
+</ul>
+</mrs-functions>
+<h2 id="接口说明">接口说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th>name</th>
+          <th>I/O</th>
+          <th>description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>redirect</td>
+          <td>input</td>
+          <td>后端重定向相关信息</td>
+      </tr>
+      <tr>
+          <td>req</td>
+          <td>input</td>
+          <td>接收写入请求</td>
+      </tr>
+      <tr>
+          <td>ldout</td>
+          <td>output</td>
+          <td>写回 MMIO 数据接口，输出 MemExuOutput 类型的数据，处理与 MMIO 的写回操作</td>
+      </tr>
+      <tr>
+          <td>ld_raw_data</td>
+          <td>output</td>
+          <td>读取原始数据输出接口</td>
+      </tr>
+      <tr>
+          <td>rob</td>
+          <td>input</td>
+          <td>接收来自 ROB 的信号或数据</td>
+      </tr>
+      <tr>
+          <td>uncache</td>
+          <td>output</td>
+          <td>发送数据或信号给 uncache 模块</td>
+      </tr>
+      <tr>
+          <td>rollback</td>
+          <td>output</td>
+          <td>当 uncache 缓存满时，从前端进行回滚</td>
+      </tr>
+  </tbody>
+</table>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-f3cd9f0b7554ba3e703118e43b113fbb">12.4.1.5 - StoreQueue</h1>
+    
+	<p><strong>本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/tree/master/docs/memblock/LSU/LSQ">香山LSQ设计文档</a>写成</strong></p>
+<p>本文档撰写的内容截至[ca892e73]</p>
+<p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
+<h1 id="storequeue-简介">StoreQueue 简介</h1>
+<p>StoreQueue是一个队列，用来装所有的 store 指令，功能如下：</p>
+<ul>
+<li>
+<p>在跟踪 store 指令的执行状态</p>
+</li>
+<li>
+<p>存储 store 的数据，跟踪数据的状态（是否到达）</p>
+</li>
+<li>
+<p>为load提供查询接口，让load可以forward相同地址的store</p>
+</li>
+<li>
+<p>负责 MMIO store和NonCacheable store的执行</p>
+</li>
+<li>
+<p>将被 ROB 提交的 store 写到 sbuffer 中</p>
+</li>
+<li>
+<p>维护地址和数据就绪指针，用于LoadQueueRAW的释放和LoadQueueReplay的唤醒</p>
+</li>
+</ul>
+<p>store进行了地址与数据分离发射的优化，即 StoreUnit 是 store 的地址发射出来走的流水线，StdExeUnit 是 store 的数据发射出来走的流水线，是两个不同的保留站，store 的数据就绪了就可以发射到 StdExeUnit，store 的地址就绪了就可以发射到 StoreUnit。</p>
+<h2 id="整体框图">整体框图</h2>
+<div>			
+    <center>	
+    <img src="../StoreQueue_structure.svg"
+         alt="StoreQueue结构示意图"
+         style="zoom:100%"/>
+    <br>
+    图1：StoreQueue结构示意图<br><br>
+    </center>
+</div>
+<p>StoreQueue最多可以存放64条指令，<strong>store queue 中重要的状态位有：</strong></p>
+<ul>
+<li>allocated：RS在storeQueue队列有空闲时，会设置这个entry的allocated状态，开始记录这条store 的生命周期。同时发射到StoreUnit/ StdExeUnit 2条流水。当这条store指令被提交到Sbuffer时，allocated状态被清除。</li>
+<li>addrvalid：在StoreUnit的S1更新，表示是否已经经过了地址转换得到物理地址，用于 load forward 检查时的 cam 比较。</li>
+<li>datavalid：在StdExeUnit 的S1更新，表示store 的数据是否已经被发射出来，是否已经可用</li>
+<li>committed：在store 是否已经被 ROB commit 了</li>
+<li>pending：在StoreUnit的S2更新，在这条 store 是否是 MMIO 空间的 store，主要是用于控制 MMIO 的状态机</li>
+<li>mmio：在StoreUnit的S2更新，这条 store 是否是 MMIO 空间的 store，主要是用于控制对 sbuffer 的写</li>
+</ul>
+<h2 id="非对齐store指令">非对齐store指令</h2>
+<p>StoreQueue支持处理非对齐的Store指令，每一个非对齐的Store指令占用一项，并在写入dataBuffer对地址和数据对齐后写入。</p>
+<h2 id="向量store指令">向量store指令</h2>
+<p>如图2所示，StoreQueue会给向量store指令预分配一些项。</p>
+<p>StoreQueue通过vecMbCommit控制向量store的提交：</p>
+<ol>
+<li>
+<p>针对每个 store，从反馈向量 fbk 中获取相应的信息。</p>
+</li>
+<li>
+<p>判断该 store 是否符合提交条件（valid 且标记为 commit 或 flush），并且检查该 store 是否与 uop(i) 对应的指令匹配（通过 robIdx 和 uopIdx）。只有当满足所有条件时，才会将该 store 标记为提交。判断VecStorePipelineWidth内是否有指令满足条件，满足则判断该向量store提交，否则不提交。</p>
+</li>
+<li>
+<p>特殊情况处理（跨页 store 指令）:</p>
+</li>
+</ol>
+<p>在特殊情况下（当 store 跨页且 storeMisalignBuffer 中有相同的 uop），如果该 store 符合条件<code>io.maControl.toStoreQueue.withSameUop</code>，会强制将 vecMbCommit设置为 true，表示该 store 无论如何都已提交。</p>
+<div>			
+    <center>	
+    <img src="../StoreQueue_Vector.svg"
+         alt="向量store指令示意图"
+         style="zoom:100%"/>
+    <br>
+    图2：向量store指令<br><br>
+    </center>
+</div>
+<h1 id="功能简介">功能简介</h1>
+<mrs-functions>
+<h2 id="模块功能说明">模块功能说明</h2>
+<h3 id="功能1store指令请求入队">功能1：store指令请求入队</h3>
+<ol>
+<li>
+<p>StoreQueue 每次最多会有 2 个 entry 入队，通过入队指针 enqPtrExt 控制。在 dispatch 阶段最多可以分配2个 entry，指针每次右移 1 位或 2 位。</p>
+</li>
+<li>
+<p>通过比较入队指针 enqPtrExt 和出队指针 deqPtrExt 得出已经在队列中有效 entry。只有空闲的 entry 大于需要请求入队的指令时才会分配 entry 入队。</p>
+</li>
+<li>
+<p>入队时设置 entry 的状态位 allocated 为 true，其他状态位都为 false。</p>
+</li>
+</ol>
+<h3 id="功能2指令的出队">功能2：指令的出队</h3>
+<ol>
+<li>
+<p>StoreQueue 每次最多会有2个 entry 出队释放，通过输出指针 deqPtrExt 控制，每次指针右移一位或 2 位。</p>
+</li>
+<li>
+<p>STQ 出队的触发信号是isbuffer(i).fire延后一拍的信号，因为 sbuffer 的写动作要用 2 拍完成，在 sbuffer 写完成之前 entry 不释放可以继续 forward 数据。</p>
+</li>
+</ol>
+<h3 id="功能3从store的地址流水线写回结果">功能3：从store的地址流水线写回结果</h3>
+<p>store 的地址从保留站发出来后会经过 StoreUnit 流水线，通过lsq/lsq_replenish总线接口在S1/S2把地址信息更新到store queue 中：</p>
+<ol>
+<li>
+<p>在store流水线s1阶段，获得 DTLB hit/miss 的信息, 以及指令的虚拟地址vaddr和物理地址paddr</p>
+</li>
+<li>
+<p>在store流水线s2阶段，获得 mmio/pmp 信息，以及是否是mmio地址空间操作等信息</p>
+</li>
+</ol>
+<h3 id="功能4接收-store-的数据到stq的datamodule">功能4：接收 store 的数据到STQ 的Datamodule</h3>
+<p>store 的数据是从与地址不同的保留站发出来的后经过<code>StdExeUnit</code>流水线，通过<code>storeDataIn</code>接口在S0/S1把数据写到对应的entry的<code>datamodule</code>里:</p>
+<ol>
+<li>
+<p>S0：给<code>datamodule</code>发写请求</p>
+</li>
+<li>
+<p>S1：写入数据到<code>datamodule</code>同时更新 entry 的<code>datavalid</code>属性为True，接收 store 的mask到STQ 的<code>Datamodule</code></p>
+</li>
+</ol>
+<p>store 的地址从保留站发出来之后会经过<code>StoreUnit</code>流水线，<code>s0_mask_out</code>在S0把地址中的mask信息更新到对应entry的<code>datamodule</code>里。</p>
+<h3 id="功能5为-load-提供-forward-查询">功能5：为 load 提供 forward 查询</h3>
+<ol>
+<li>load 需要查询 store queue 来找到在它之前相同地址的与它最近的那个 store 的数据。
+<ul>
+<li>查询总线(<code>io.forwrd.sqIdx</code>) 和 StoreQueue 的出栈指针比较，找出所有比 load 指令老的 storeQueue 中的 entry。以 flag 相同或不同分为2种情况：</li>
+</ul>
+</li>
+</ol>
+<p>(1)same flag-&gt; older Store范围是 (tail, sqIdx)，如图3(a)所示</p>
+<p>(2)different flags-&gt; older Store范围是(tail, VirtualLoadQueueSize) +(0, sqIdx)，如图3(b)所示</p>
+<div>			
+    <center>	
+    <img src="../StoreQueue_Forward_Mask.svg"
+         alt="StoreQueue前递范围生成"
+         style="zoom:100%"/>
+    <br>
+    图3：StoreQueue前递范围生成<br><br>
+    </center>
+</div>
+<ol start="2">
+<li>
+<p>查询总线用va 和pa同时查询，如果发现物理地址匹配但是虚拟地址不匹配；或者虚拟地址匹配但是物理地址不匹配的情况就需要将那条 load 设置为 replayInst，等 load 到 ROB head 后replay。</p>
+</li>
+<li>
+<p>如果只发现一笔 entry 匹配且数据准备好，则直接 forward</p>
+</li>
+<li>
+<p>如果只发现一笔 entry 匹配且数据没有准备好，就需要让保留站负责重发</p>
+</li>
+<li>
+<p>如果发现多笔匹配，则选择最老的一笔 store forward，StoreQueue以1字节为单位，采用树形数据选择逻辑,如图4</p>
+</li>
+</ol>
+<div>			
+    <center>	
+    <img src="../StoreQueue_Forward.svg"
+         alt="StoreQueue前递数据选择"
+         style="zoom:100%"/>
+    <br>
+    图4：StoreQueue前递数据选择<br><br>
+    </center>
+</div>
+<ol start="6">
+<li>
+<p>store 指令能被 load forward的条件：</p>
+<ul>
+<li>allocated：这条 store 还在 store queue 内，还没有写到 sbuffer</li>
+<li>datavalid：这条 store 的数据已经就绪</li>
+<li>addrvalid：这条 store 已经完成了虚实地址转换，得到了物理地址</li>
+</ul>
+</li>
+<li>
+<p>SSID (Store-Set-ID) 标记了之前 load 预测执行失败历史信息，如果当前 load 命中之前历史中的SSID，会等之前所有 older 的 store 都执行完；如果没有命中就只会等pa相同的 older Store 执行完成。</p>
+</li>
+</ol>
+<h3 id="功能6mmio与noncacheable-store指令">功能6：MMIO与NonCacheable Store指令</h3>
+<ul>
+<li><strong>MMIO Store指令执行</strong>:</li>
+</ul>
+<ol>
+<li>
+<p>MMIO 空间的 store 也只能等它到达 ROB 的 head 时才能执行，但是跟 load 稍微有些不同，store 到达 ROB 的 head 时，它不一定位于 store queue 的尾部，有可能有的 store 已经提交，但是还在 store queue 中没有写入到 sbuffer，需要等待这些 store 写到 sbuffer 之后，才能让这条 MMIO 的 store 去执行。</p>
+</li>
+<li>
+<p>利用一个状态机去控制MMIO的store执行</p>
+<ul>
+<li>
+<p>s_idle：空闲状态，接收到MMIO的store请求后进入到s_req状态;</p>
+</li>
+<li>
+<p>s_req：给MMIO通道发请求，请求被MMIO通道接受后进入s_resp状态;</p>
+</li>
+<li>
+<p>s_resp：MMIO通道返回响应，接收后记录是否产生异常，并进入到 s_wb 状态</p>
+</li>
+<li>
+<p>s_wb：将结果转化为内部信号，写回给 ROB，成功后,如果有异常，则进入s_idle, 否则进入到 s_wait 状态</p>
+</li>
+<li>
+<p>s_wait：等待 ROB 将这条 store 指令提交，提交后重新回到 s_idle 状态</p>
+</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><strong>NonCacheable Store指令执行</strong>：</li>
+</ul>
+<ol>
+<li>
+<p>NonCacheable空间的store指令，需要等待上一个NonCacheable Store指令提交之后，才能从StoreQueue按序发送请求</p>
+</li>
+<li>
+<p>利用一个状态机去控制NonCacheable的store执行</p>
+<ul>
+<li>
+<p>nc_idle：空闲状态，接收到NonCacheable的store请求后进入到nc_req状态;</p>
+</li>
+<li>
+<p>nc_req：给NonCacheable通道发请求，请求被NonCachable通道接受后, 如果启用uncacheOutstanding功能，则进入nc_idle，否则进入nc_resp状态;</p>
+</li>
+<li>
+<p>nc_resp：接受NonCacheable通道返回响应，并进入到nc_idle状态</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="功能7store指令提交以及写入sbuffer">功能7：store指令提交以及写入SBuffer</h3>
+<p>StoreQueue采用提前提交的方式进行提交。</p>
+<ul>
+<li><strong>提前提交规则</strong>:</li>
+</ul>
+<ol>
+<li>
+<p>检查进入提交阶段的条件</p>
+<p>(1)指令有效。</p>
+<p>(2)指令的ROB对头指针不超过待提交指针。</p>
+<p>(3)指令不需要取消。</p>
+<p>(4)指令不等待Store操作完成，或者是向量指令</p>
+</li>
+<li>
+<p>如果是CommitGroup的第一条指令, 则</p>
+<p>(1)检查MMIO状态: 没有MMIO操作或者有MMIO操作并且MMIO store以及提交。</p>
+<p>(2)如果是向量指令，需满足vecMbCommit条件。</p>
+</li>
+<li>
+<p>如果不是CommitGroup的第一条指令，则：</p>
+<p>(1)提交状态依赖于前一条指令的提交状态。</p>
+<p>(2)如果是向量指令，需满足vecMbCommit条件。</p>
+</li>
+</ol>
+<p>提交之后可以按顺序写到 sbuffer, 先将这些 store 写到 dataBuffer 中，dataBuffer 是一个两项的缓冲区（0，1通道），用来处理从大项数 store queue 中的读出延迟。只有0通道可以编写未对齐的指令,同时为了简化设计，即使两个端口出现异常，但仍然只有一个未对齐出队。</p>
+<ul>
+<li><strong>写入sbuffer的过程</strong>：</li>
+</ul>
+<ol>
+<li>
+<p>写入有效信号生成</p>
+</li>
+<li>
+<p>0通道指令存在非对齐且跨越16字节边界时：</p>
+<p>(1) 0通道的指令已分配和提交</p>
+<p>(2) dataBuffer的0，1通道能同时接受指令，</p>
+<p>(3) 0通道的指令不是向量指令，并且地址和数据有效；或者是向量且vsMergeBuffer以及提交。</p>
+<p>(4) 没有跨越4K页表；或者跨越4K页表但是可以被出队,并且1）如果是0通道：允许有异常的数据写入; 2）如果是1通道：不允许有异常的数据写入。</p>
+<p>(5) 之前的指令没有NonCacheable指令，如果是第一条指令，自身不能是Noncacheable指令</p>
+</li>
+<li>
+<p>否则，需要满足：</p>
+<p>(1) 指令已分配和提交。</p>
+<p>(2) 不是向量且地址和数据有效，或者是向量且vsMergeBuffer以及提交。</p>
+<p>(3) 之前的指令没有NonCacheable和MMIO指令，如果是第一条指令，自身不能是Noncacheable和MMIO指令。</p>
+<p>(4) 如果未对齐store，则不能跨越16字节边界，且地址和数据有效或有异常</p>
+</li>
+</ol>
+<ul>
+<li><strong>地址和数据生成</strong>：</li>
+</ul>
+<ol>
+<li>
+<p>地址拆分为高低两部分：</p>
+<p>(1) 低位地址：8字节对齐地址</p>
+<p>(2) 高位地址：低位地址加上8偏移量</p>
+</li>
+<li>
+<p>数据拆分为高低两部分：</p>
+<p>(1) 跨16字节边界数据：原始数据左移地址低4位偏移量包含的字节数</p>
+<p>(2) 低位数据：跨16字节边界数据的低128位；</p>
+<p>(3) 高位数据：跨16字节边界数据的高128位；</p>
+</li>
+<li>
+<p>写入选择逻辑：</p>
+<p>如果dataBuffer能接受非对齐指令写入,通道0的指令是非对齐并且跨越了16字节边界，则检查：</p>
+<p>(1) 是否跨4K页表同时跨4K页表且可以出队: 通道0使用低位地址和低位数据写入dataBuffer; 通道1使用StoreMisaligBuffer的物理地址和高位数据写入dataBuffer</p>
+<p>(2) 否则: 通道0使用低位地址和低位数据写入dataBuffer; 通道1使用高位地址和高位数据写入dataBuffer</p>
+<p>(3) 如果通道指令没有跨越16字节并且非对齐，则使用16字节对齐地址和对齐数据写入dataBuffer</p>
+<p>(4) 否则，将原始数据和地址写给dataBuffer</p>
+</li>
+</ol>
+<h3 id="功能8强制刷新sbuffer">功能8：强制刷新sbuffer</h3>
+<p>StoreQueue采用双阈值的方法控制强制刷新Sbuffer：上阈值和下阈值。</p>
+<ol>
+<li>当StoreQueue的有效项数大于上阈值时， StoreQueue强制刷新Sbuffer</li>
+<li>直到StoreQueue的有效项数小于下阈值时，停止刷新Sbuffer。</li>
+</ol>
+</mrs-functions>
+<h2 id="接口说明">接口说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th>name</th>
+          <th>description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>enq</td>
+          <td>接收来自外部模块的信息，包含入队请求、控制信号等</td>
+      </tr>
+      <tr>
+          <td>brqRedirect</td>
+          <td>分支重定向信号</td>
+      </tr>
+      <tr>
+          <td>vecFeedback</td>
+          <td>向量反馈信息</td>
+      </tr>
+      <tr>
+          <td>storeAddrIn</td>
+          <td>store指令的地址</td>
+      </tr>
+      <tr>
+          <td>storeAddrInRe</td>
+          <td>store指令的地址，用于处理MMIO 和异常情况</td>
+      </tr>
+      <tr>
+          <td>storeDataIn</td>
+          <td>store指令的数据</td>
+      </tr>
+      <tr>
+          <td>storeMaskIn</td>
+          <td>传递store掩码，从保留站（RS）发送到 Store Queue（SQ）。store掩码通常用于指示哪些字节在store操作中是有效的。</td>
+      </tr>
+      <tr>
+          <td>sbuffer</td>
+          <td>存储已提交的 Store 请求到sbuffer</td>
+      </tr>
+      <tr>
+          <td>uncacheOutstanding</td>
+          <td>指示是否有未完成的uncached请求</td>
+      </tr>
+      <tr>
+          <td>cmoOpReg</td>
+          <td>发送缓存管理操作请求</td>
+      </tr>
+      <tr>
+          <td>cmoOpResp</td>
+          <td>接收缓存管理操作的响应</td>
+      </tr>
+      <tr>
+          <td>mmioStout</td>
+          <td>写回uncache的存储操作的结果</td>
+      </tr>
+      <tr>
+          <td>forward</td>
+          <td>查询forwarding信息</td>
+      </tr>
+      <tr>
+          <td>rob</td>
+          <td>接收来自 ROB 的信号或数据</td>
+      </tr>
+      <tr>
+          <td>uncache</td>
+          <td>发送数据或信号给 uncache 模块</td>
+      </tr>
+      <tr>
+          <td>flushSbuffer</td>
+          <td>冲刷sbuffer缓冲区</td>
+      </tr>
+      <tr>
+          <td>sqEmpty</td>
+          <td>标识store queue为空</td>
+      </tr>
+      <tr>
+          <td>stAddrReadySqPtr</td>
+          <td>指向当前准备好地址的 store 指令</td>
+      </tr>
+      <tr>
+          <td>stAddrReadyVec</td>
+          <td>向量中对应 store 指令的地址是否已经准备好</td>
+      </tr>
+      <tr>
+          <td>stDataReadySqPtr</td>
+          <td>指向当前准备好数据的 store 指令</td>
+      </tr>
+      <tr>
+          <td>stDataReadyVec</td>
+          <td>向量中对应 store 指令的数据是否已经准备好</td>
+      </tr>
+      <tr>
+          <td>stIssuePtr</td>
+          <td>跟踪当前发出的store请求</td>
+      </tr>
+      <tr>
+          <td>sqCancelCnt</td>
+          <td>指示在store queue中可以被取消的请求数量</td>
+      </tr>
+      <tr>
+          <td>sqDeq</td>
+          <td>当前store queue中出队的请求位置</td>
+      </tr>
+      <tr>
+          <td>force_write</td>
+          <td>是否强制写入存储操作</td>
+      </tr>
+      <tr>
+          <td>maControl</td>
+          <td>与存储管理缓冲区（MA）进行控制信号的交互</td>
+      </tr>
+  </tbody>
+</table>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-366929e8b710d65054748c1a2afe5b56">12.4.1.6 - VirtualLoadQueue</h1>
+    
+	<p><strong>本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/tree/master/docs/memblock/LSU/LSQ">香山LSQ设计文档</a>写成</strong></p>
+<p>本文档撰写的内容截至[ca892e73]</p>
+<p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
+<h1 id="virtualloadqueue-简介">VirtualLoadQueue 简介</h1>
+<p>Virtualloadqueue是一个队列，用于存储所有load指令的微操作(MicroOp)，并维护这些load指令之间的顺序，它的功能类似于重排序缓冲区（Reorder Buffer, ROB），但专注于load指令的管理。其主要功能是跟踪Load指令执行状态，以确保在并发执行的环境中，加载操作能够正确、有序地完成。</p>
+<h2 id="整体框图">整体框图</h2>
+<div>			
+    <center>	
+    <img src="../VirtualLoadQueue_structure.png"
+         alt="VirtualLoadQueue结构示意图"
+         style="zoom:100%"/>
+    <br>
+    图1：VirtualLoadQueue结构示意图
+    </center>
+</div>
+<p>Virtualloadqueue最多可以存放72条指令，dispatch阶段最多支持6条指令同时入队，最多支持8条指令出队。Virtualloadqueue对于每一个 entry 中的 load 指令都有若干状态位来标识这个 load 处于什么状态：</p>
+<p><strong>allocated</strong>：该项是否分配了load，用于确定load指令的生命周期。</p>
+<p><strong>isvec</strong>：该指令是否是向量load指令。</p>
+<p><strong>committed</strong>: 该项是否提交。</p>
+<h1 id="功能简介">功能简介</h1>
+<mrs-functions>
+<h2 id="模块功能说明">模块功能说明</h2>
+<h3 id="功能1load指令请求入队">功能1：load指令请求入队</h3>
+<p>在调度阶段，保留站通过入队（enq）总线向VirtualLoadQueue发起入队请求，最多支持六组并发请求。成功入队的条件包括以下几点：</p>
+<ol>
+<li>StoreQueue 和 LoadQueue 有预留空间：确保LoadQueue有足够的容量来接收新的加载指令，以避免队列溢出。确保StoreQueu有预留空间则是基于数据一致性和避免指令阻塞的考虑，因为store指令入队阻塞可能会导致load指令无法正确读取或forward到数据。</li>
+<li>入队请求有效：入队请求必须是合法的，确保指令在调度过程中可以被正确处理。</li>
+<li>指令未被冲刷：确保指令在入队时没有被系统标记为无效或被撤销。</li>
+</ol>
+<p>成功入队之后，系统会执行以下操作：</p>
+<ol>
+<li>将指令的lqidx作为索引，将对应的allocated寄存器置1，bits信息写入uop寄存器。</li>
+<li>计算新的lqidx值，作为enq_resp传送给保留站。</li>
+</ol>
+<h3 id="功能2接收load流水线写回的数据">功能2：接收load流水线写回的数据</h3>
+<p>在 load 流水线的s3阶段，load unit会将指令执行的信息通过总线 ldin 写回到 VirtualLoadQueue。具体写回信息包括：</p>
+<ol>
+<li>是否发生了异常以及异常类型</li>
+<li>dcache是否命中</li>
+<li>tlb是否命中</li>
+<li>是否为mmio指令</li>
+<li>是否为软件预取或者硬件预取</li>
+<li>是否需要重发以及重发的原因</li>
+<li>写uop的使能信号</li>
+</ol>
+<p>写回需要满足的条件如下：</p>
+<ol>
+<li>ldin 总线的 valid 信号需要拉高，表明当前正在进行有效的数据传输。</li>
+<li>指令不应需要重发（即 <code>need_rep</code> 信号为 0），否则将影响写回的正常进行。</li>
+</ol>
+<p>在满足写回条件后，系统将生成相应的写回响应，具体包括以下几个方面：</p>
+<ol>
+<li>如果在执行过程中发生了异常、TLB命中或软件预取操作，<code>addrvalid</code> 信号将被置为 1，表示地址信息有效。</li>
+<li>如果在执行过程中发生了异常、MMIO操作、DCACHE命中并且不需要重发，或是软件预取操作，<code>datavalid</code> 信号将被置为 1，表示数据有效。</li>
+<li>指令在流水线的 S3 阶段有效（注意：不能是硬件预取指令）。当 <code>ldin</code> 总线的写使能信号 <code>data_wen_dup</code> 拉高时，将更新队列中的uop信息，以确保指令的状态及时反映。</li>
+</ol>
+<p>系统将<code>addrvalid</code>和<code>datavalid</code>分开进行处理是考虑到在一些情况下，地址可以被重用，而数据可能需要重新请求（如dcache miss/mmio/软件预取等）。分开标识可以减少流水线停顿，允许处理器在地址有效时继续执行其他指令，而不必等待数据有效性确认，从而优化整体性能。</p>
+<h3 id="功能3load指令的出队提交">功能3：load指令的出队(提交)</h3>
+<ol>
+<li>出队时机：当被分配的entries（allocated为高）到达队头，同时allocated与committed都为1时，表示可以出队，如果是向量load，需要每个元素都committed。</li>
+</ol>
+</mrs-functions>
+<h2 id="接口说明">接口说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>name</th>
+          <th>I/O</th>
+          <th>width</th>
+          <th>description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>redirect</td>
+          <td>io.redirect.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.robIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向相关信息</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.robIdx.value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>后端重定向相关信息</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.level</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向相关信息</td>
+      </tr>
+      <tr>
+          <td>enq</td>
+          <td>io.enq.canAccept</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Lq能否接收派遣指令</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.enq.sqcanAccept</td>
+          <td>input</td>
+          <td>1</td>
+          <td>sq能否接收派遣至零</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.enq.needAlloc_0~5</td>
+          <td>input</td>
+          <td>1</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.enq.req_0~5.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>入队请求的有效信号</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.enq.req_0~5.bits.robIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>入队请求ROB指针的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.enq.req_0~5.bits.robIdx.value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>入队请求ROB指针的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.enq.req_0~5.bits.lqIdx.value</td>
+          <td>input</td>
+          <td>7</td>
+          <td>入队请求lqidx的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.enq.req_0~5.bits.numLsElem</td>
+          <td>input</td>
+          <td>5</td>
+          <td>1. 向量寄存器的总位宽为128位，每个向量元素的大小为8位，因此每个向量寄存器可以存储16个，numLsElem表示向量寄存器中元素的个数，因此位宽为5。 2. 如果是标量值零，numLsElem的值恒为5‘b1 3. 如果是向量指令，每个端口的numLsElem的最大值为[16 2 2 2 2 2]</td>
+      </tr>
+      <tr>
+          <td>ldin</td>
+          <td>io.ldin_0/1/2.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>load写回到loadqueue的信息有效</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.uop.cf.exceptionVec_3/4/5/13/21</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Load写回到流水线的指令发生异常</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.uop.robIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>load写回lq指令的rob指针的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.uop.robIdx_value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>load写回lq指令的rob指针的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.uop.lqIdx.value</td>
+          <td>input</td>
+          <td>7</td>
+          <td>load写回lq指令的lq指针的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.miss</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Load写回到Lq的指令发生cacheMiss</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1.bits.tlbMiss</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Load写回到Lq的指令发生tlbMiss</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.mmio</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Load写回到Lq的指令是MMIO指令</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.isPrefetch</td>
+          <td>input</td>
+          <td>1</td>
+          <td>指令为预取操作，预取分为软件预取和硬件预取</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.isHWPrefetch</td>
+          <td>input</td>
+          <td>1</td>
+          <td>指令为硬件预取</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.dcacheRequireReplay</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Load写回到Lq的指令需要replay</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.rep.info.cause_0~9</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Load写回到Lq的指令需要replay的原因： =0：st-ld violention predirect =1：tlb miss =2：st-ld forward =3：dcache replay =4：dcache miss =5：wpu predict fail =6：dcache bank conflict =7：RAR queue nack =8：RAW queue nack =9：st-ld violention</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldin_0/1/2.bits.data_wen_dup_1</td>
+          <td>input</td>
+          <td>1</td>
+          <td>uop信息的写入使能信号</td>
+      </tr>
+      <tr>
+          <td>ldWbPtr</td>
+          <td>io.ldWbPtr.flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>writeback指针的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.ldWbPtr.value</td>
+          <td>output</td>
+          <td>7</td>
+          <td>writeback指针的value</td>
+      </tr>
+      <tr>
+          <td>lqEmpty</td>
+          <td>io.lqEmpty</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Lq是否空</td>
+      </tr>
+      <tr>
+          <td>lqDeq</td>
+          <td>io.lqDeq</td>
+          <td>output</td>
+          <td>3</td>
+          <td>出队表项数量</td>
+      </tr>
+      <tr>
+          <td>lqCancelCnt</td>
+          <td>io.lqCancelCnt</td>
+          <td>output</td>
+          <td>7</td>
+          <td>后端发生重定向时取消的load数量</td>
+      </tr>
+  </tbody>
+</table>
+
+</div>
+
+
+
+    
+	
+  
+
+    
+	
   
 
     

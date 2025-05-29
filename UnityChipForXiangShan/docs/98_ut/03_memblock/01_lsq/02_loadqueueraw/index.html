@@ -1,0 +1,850 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-cn" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/UnityChipForXiangShan/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/UnityChipForXiangShan/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
+
+<title>LoadQueueRAW | 万众一芯之香山处理器</title>
+<meta name="description" content="本文档参考香山LSQ设计文档写成
+本文档撰写的内容截至[ca892e73]
+请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
+LoadQueueRAW 简介 LoadQueueRAW是用于处理store-load违例的。由于load和store在流水线中都是乱序执行，会经常出现load越过了更老的相同地址的store，即这条load本应该前递store的数据，但是由于store地址或者数据没有准备好，导致这条load没有前递到store的数据就已经提交，后续使用这条load结果的指令也都发生了错误，于是产生store to load forwarding违例。
+当store address通过STA保留站发射出来进入store流水线时，会去查询LQRAW中在这条store后面的所有已经完成访存的相同地址的load，以及load流水线中正在进行的在该条store之后的相同地址的load，一旦发现有，就发生了store to load forwarding违例，可能有多个load发生了违例，需要找到离store最近的load，也就是最老的违例的load，然后给RedirectGenerator部件发送重定向请求，冲刷最老的违例的load及之后的所有指令。
+当store流水线执行cbo zero指令时，也需要进行store-load违例检查。
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/02_loadqueueraw/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="LoadQueueRAW">
+  <meta property="og:description" content="本文档参考香山LSQ设计文档写成
+本文档撰写的内容截至[ca892e73]
+请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
+LoadQueueRAW 简介 LoadQueueRAW是用于处理store-load违例的。由于load和store在流水线中都是乱序执行，会经常出现load越过了更老的相同地址的store，即这条load本应该前递store的数据，但是由于store地址或者数据没有准备好，导致这条load没有前递到store的数据就已经提交，后续使用这条load结果的指令也都发生了错误，于是产生store to load forwarding违例。
+当store address通过STA保留站发射出来进入store流水线时，会去查询LQRAW中在这条store后面的所有已经完成访存的相同地址的load，以及load流水线中正在进行的在该条store之后的相同地址的load，一旦发现有，就发生了store to load forwarding违例，可能有多个load发生了违例，需要找到离store最近的load，也就是最老的违例的load，然后给RedirectGenerator部件发送重定向请求，冲刷最老的违例的load及之后的所有指令。
+当store流水线执行cbo zero指令时，也需要进行store-load违例检查。
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-05-29T17:12:08+08:00">
+
+  <meta itemprop="name" content="LoadQueueRAW">
+  <meta itemprop="description" content="本文档参考香山LSQ设计文档写成
+本文档撰写的内容截至[ca892e73]
+请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
+LoadQueueRAW 简介 LoadQueueRAW是用于处理store-load违例的。由于load和store在流水线中都是乱序执行，会经常出现load越过了更老的相同地址的store，即这条load本应该前递store的数据，但是由于store地址或者数据没有准备好，导致这条load没有前递到store的数据就已经提交，后续使用这条load结果的指令也都发生了错误，于是产生store to load forwarding违例。
+当store address通过STA保留站发射出来进入store流水线时，会去查询LQRAW中在这条store后面的所有已经完成访存的相同地址的load，以及load流水线中正在进行的在该条store之后的相同地址的load，一旦发现有，就发生了store to load forwarding违例，可能有多个load发生了违例，需要找到离store最近的load，也就是最老的违例的load，然后给RedirectGenerator部件发送重定向请求，冲刷最老的违例的load及之后的所有指令。
+当store流水线执行cbo zero指令时，也需要进行store-load违例检查。
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
+  <meta itemprop="dateModified" content="2025-05-29T17:12:08+08:00">
+  <meta itemprop="wordCount" content="356">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="LoadQueueRAW">
+  <meta name="twitter:description" content="本文档参考香山LSQ设计文档写成
+本文档撰写的内容截至[ca892e73]
+请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
+LoadQueueRAW 简介 LoadQueueRAW是用于处理store-load违例的。由于load和store在流水线中都是乱序执行，会经常出现load越过了更老的相同地址的store，即这条load本应该前递store的数据，但是由于store地址或者数据没有准备好，导致这条load没有前递到store的数据就已经提交，后续使用这条load结果的指令也都发生了错误，于是产生store to load forwarding违例。
+当store address通过STA保留站发射出来进入store流水线时，会去查询LQRAW中在这条store后面的所有已经完成访存的相同地址的load，以及load流水线中正在进行的在该条store之后的相同地址的load，一旦发现有，就发生了store to load forwarding违例，可能有多个load发生了违例，需要找到离store最近的load，也就是最老的违例的load，然后给RedirectGenerator部件发送重定向请求，冲刷最老的违例的load及之后的所有指令。
+当store流水线执行cbo zero指令时，也需要进行store-load违例检查。
+st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
+考虑以下伪代码示例：
+ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/UnityChipForXiangShan/css/prism.css"/>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/UnityChipForXiangShan/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">万众一芯之香山处理器</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.0bf3b65927635840aa36fa4b3f10552d.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.0bf3b65927635840aa36fa4b3f10552d.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
+    <div class="td-sidebar-nav__section nav-item dropdown d-block d-lg-none">
+      <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    </ul>
+</div>
+    </div>
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs-li">
+  <a href="/UnityChipForXiangShan/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-unitychipforxiangshandocs"><span class="">进度概述</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-check"/>
+  <label for="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-check"><a href="/UnityChipForXiangShan/docs/00_unitychip_for_xiangshan/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan"><span class="">目标验证单元</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs01_verfiy_env-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs01_verfiy_env-check"/>
+  <label for="m-unitychipforxiangshandocs01_verfiy_env-check"><a href="/UnityChipForXiangShan/docs/01_verfiy_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs01_verfiy_env"><span class="">准备验证环境</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs02_run_test-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs02_run_test-check"/>
+  <label for="m-unitychipforxiangshandocs02_run_test-check"><a href="/UnityChipForXiangShan/docs/02_run_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs02_run_test"><span class="">运行测试</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs03_add_test-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test-check"><a href="/UnityChipForXiangShan/docs/03_add_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs03_add_test"><span class="">添加测试</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test01_build_script-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test01_build_script-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test01_build_script-check"><a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test01_build_script"><span class="">添加编译脚本</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test02_build_env-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test02_build_env-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test02_build_env-check"><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test02_build_env"><span class="">构建测试环境</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test03_add_test-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test03_add_test-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test03_add_test-check"><a href="/UnityChipForXiangShan/docs/03_add_test/03_add_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test03_add_test"><span class="">添加测试用例</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test04_cover_line-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test04_cover_line-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test04_cover_line-check"><a href="/UnityChipForXiangShan/docs/03_add_test/04_cover_line/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test04_cover_line"><span class="">代码覆盖率</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test05_cover_func-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test05_cover_func-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test05_cover_func-check"><a href="/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test05_cover_func"><span class="">功能覆盖率</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs06_join_us-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs06_join_us-check"/>
+  <label for="m-unitychipforxiangshandocs06_join_us-check"><a href="/UnityChipForXiangShan/docs/06_join_us/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs06_join_us"><span class="">如何参与本项目</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs08_template_pr-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs08_template_pr-check"/>
+  <label for="m-unitychipforxiangshandocs08_template_pr-check"><a href="/UnityChipForXiangShan/docs/08_template_pr/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs08_template_pr"><span class="">模板-PR</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs09_template_issue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs09_template_issue-check"/>
+  <label for="m-unitychipforxiangshandocs09_template_issue-check"><a href="/UnityChipForXiangShan/docs/09_template_issue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs09_template_issue"><span class="">模板-ISSUE</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs10_template_ut_readme-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs10_template_ut_readme-check"/>
+  <label for="m-unitychipforxiangshandocs10_template_ut_readme-check"><a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-README</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs95_api-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs95_api-check"/>
+  <label for="m-unitychipforxiangshandocs95_api-check"><a href="/UnityChipForXiangShan/docs/95_api/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs95_api"><span class="">常用API</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs96_others-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs96_others-check"/>
+  <label for="m-unitychipforxiangshandocs96_others-check"><a href="/UnityChipForXiangShan/docs/96_others/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs96_others"><span class="">其他</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs97_constraint-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs97_constraint-check"/>
+  <label for="m-unitychipforxiangshandocs97_constraint-check"><a href="/UnityChipForXiangShan/docs/97_constraint/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs97_constraint"><span class="">必要规范</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut-check"><a href="/UnityChipForXiangShan/docs/98_ut/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut"><span class="">验证文档</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut00_standard-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="">验证文档规范</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard00_template"><span class="">文档模板</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo"><span class="">FIFO文档案例</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/02_nutshell/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell"><span class="">果壳Cache文档案例</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/" title="FTQ概述" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq"><span class="">FTQ</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/01_topio/" title="FTQ顶层" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio"><span class="">01_FTQ顶层</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/02_subqueue/" title="FTQ子队列" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue"><span class="">02_FTQ子队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/03_enqfrombpu/" title="FTQ接收BPU分支预测结果" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu"><span class="">03_FTQ接收BPU分支预测结果</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/04_toifu/" title="FTQ向IFU发送取指目标" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu"><span class="">04_FTQ向IFU发送取指目标</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/05_wbfromifu/" title="IFU向FTQ写回预译码信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu"><span class="">05_IFU向FTQ写回预译码信息</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/06_-redirectfrombackend/" title="FTQ接收后端重定向" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend"><span class="">06_FTQ接收后端重定向</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/07_redirectfromifu/" title="FTQ接收IFU重定向" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu"><span class="">07_FTQ接收IFU重定向</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/08_tobackend/" title="FTQ向后端发送取指目标" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend"><span class="">08_FTQ向后端发送取指目标</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/09_wbfromexu/" title="执行单元修改FTQ状态队列" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu"><span class="">09_执行单元修改FTQ状态队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/10_flushptrandstatequeue/" title="冲刷指针和状态队列" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue"><span class="">10_冲刷指针和状态队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" title="FTQ向BPU发送更新与重定向信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu"><span class="">11_FTQ向BPU发送更新与重定向信息</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache"><span class="">ICache</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/05_ctrlunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit"><span class="">CtrlUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/06_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache"><span class="">ICache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/01_iprefetchpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe"><span class="">IPrefetchPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/02_mainpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe"><span class="">MainPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/04_missunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit"><span class="">MissUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/03_waylookup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup"><span class="">WayLookup</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu"><span class="">IFU</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder"><span class="">F3PreDecoder</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/05_frontend_trigger/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger"><span class="">FrontendTrigger</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker"><span class="">PredChecker</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode"><span class="">PreDecode</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp"><span class="">RVCExpander</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb"><span class="">ITLB</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/04_io/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io"><span class="">IO接口说明</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/02_func/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func"><span class="">功能详述</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/03_keysignal/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal"><span class="">关键信号说明</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env"><span class="">环境配置</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut02_backend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut02_backend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut02_backend-check"><a href="/UnityChipForXiangShan/docs/98_ut/02_backend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut02_backend"><span class="">Backend</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock"><span class="">Mem Block</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq"><span class="">LSQ</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/01_loadqueuerar/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar"><span class="">LoadQueueRAR</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/02_loadqueueraw/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw"><span class="td-sidebar-nav-active-item">LoadQueueRAW</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/03_loadqueuereplay/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay"><span class="">LoadQueueReplay</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/04_loadqueueuncache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache"><span class="">LoadQueueUncache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/06_storequeue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue"><span class="">StoreQueue</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/05_virtualloadqueue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue"><span class="">VirtualLoadQueue</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut04_misc-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut04_misc-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut04_misc-check"><a href="/UnityChipForXiangShan/docs/98_ut/04_misc/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut04_misc"><span class="">Misc</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs99_maintain-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs99_maintain-check"/>
+  <label for="m-unitychipforxiangshandocs99_maintain-check"><a href="/UnityChipForXiangShan/docs/99_maintain/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_maintain"><span class="">维护者</span></a></label>
+  
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_ut/03_memblock/01_lsq/02_LoadQueueRAW.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_ut/03_memblock/01_lsq/02_LoadQueueRAW.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs/98_ut/03_memblock/01_lsq?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=LoadQueueRAW" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan//issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
+  <a id="print" href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#st-ld违例">st-ld违例</a></li>
+    <li><a href="#整体框图">整体框图</a></li>
+    <li><a href="#模块功能说明">模块功能说明</a>
+      <ul>
+        <li><a href="#功能1发生st-ld违例的指令请求入队">功能1：发生st-ld违例的指令请求入队</a></li>
+        <li><a href="#功能2检测st-ld违例条件">功能2：检测st-ld违例条件</a></li>
+        <li><a href="#功能3指令的出队">功能3：指令的出队</a></li>
+      </ul>
+    </li>
+    <li><a href="#接口说明">接口说明</a></li>
+  </ul>
+</nav>
+      </div>
+    
+            
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/">进度概述</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/">验证文档</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/">Mem Block</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/">LSQ</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    LoadQueueRAW</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>LoadQueueRAW</h1>
+	
+	<header class="article-meta">
+		
+  </header>
+	<p><strong>本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/tree/master/docs/memblock/LSU/LSQ">香山LSQ设计文档</a>写成</strong></p>
+<p>本文档撰写的内容截至[ca892e73]</p>
+<p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
+<h1 id="loadqueueraw-简介">LoadQueueRAW 简介</h1>
+<p>LoadQueueRAW是用于处理store-load违例的。由于load和store在流水线中都是乱序执行，会经常出现load越过了更老的相同地址的store，即这条load本应该前递store的数据，但是由于store地址或者数据没有准备好，导致这条load没有前递到store的数据就已经提交，后续使用这条load结果的指令也都发生了错误，于是产生store to load forwarding违例。</p>
+<p>当store address通过STA保留站发射出来进入store流水线时，会去查询LQRAW中在这条store后面的所有已经完成访存的相同地址的load，以及load流水线中正在进行的在该条store之后的相同地址的load，一旦发现有，就发生了store to load forwarding违例，可能有多个load发生了违例，需要找到离store最近的load，也就是最老的违例的load，然后给RedirectGenerator部件发送重定向请求，冲刷最老的违例的load及之后的所有指令。</p>
+<p>当store流水线执行cbo zero指令时，也需要进行store-load违例检查。</p>
+<h2 id="st-ld违例">st-ld违例</h2>
+<p>在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。</p>
+<p>考虑以下伪代码示例：</p>
+<pre tabindex="0"><code>ST R1, 0(R2)  ; 将 R1 的值存储到 R2 指向的内存地址
+LD R3, 0(R2)  ; 从 R2 指向的内存地址加载值到 R3
+ADD R4, R3, R5 ; 使用 R3 的值进行计算
+</code></pre><p>假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 <code>0</code>）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。</p>
+<p>通过上述例子，可以清楚地看到 Store-to-Load 违例如何在乱序执行的环境中导致数据一致性问题。这种问题强调了在指令调度和执行过程中，确保正确的数据流动的重要性。现代处理器通过多种机制来检测和解决这种违例，以维护程序的正确性和稳定性。</p>
+<h2 id="整体框图">整体框图</h2>
+<div>			
+    <center>	
+    <img src="../LoadQueueRAW_structure.svg"
+         alt="LoadQueueRAW结构示意图"
+         style="zoom:100%"/>
+    <br>
+    图1：LoadQueueRAW结构示意图<br><br>
+    </center>
+</div>
+<p>LoadQueueRAW最多能够存储64条指令，通过FreeList子模块管理空闲资源。FreeList 中存储的是 entry 的编号。当一条指令满足入队条件时，FreeList 会为其分配一个 entry 编号，并将该指令存放在相应的 entry 中。指令出队时，需要释放所占用的 entry 资源，并将条目编号重新放回 FreeList 中，以供后续指令使用。Load指令在s2阶段在 LoadQueueRAR 中查询 store-to-load 违例，在s3阶段返回响应。</p>
+<mrs-functions>
+<h2 id="模块功能说明">模块功能说明</h2>
+<h3 id="功能1发生st-ld违例的指令请求入队">功能1：发生st-ld违例的指令请求入队</h3>
+<p>当query到达load流水线的s2时，判断是否满足入队条件，如果在当前load指令之前有地址未准备好的store指令，且当前指令没有被flush时，当前load可以入队。具体流程如下：</p>
+<ol>
+<li>判断入队条件：检查在当前 Load 指令之前是否存在未准备好的 Store 指令。如果存在这样的 Store 指令，并且当前 Load 指令尚未被冲刷（flush），则当前 Load 指令可以入队。</li>
+<li>分配 Entry 和 Index：在 Freelist 中，系统将获得一个可分配的 Entry 及其对应的 Index，以便为 Load 指令分配资源。</li>
+<li>保存物理地址：在 PaddrModule 中将入队的 Load 指令的物理地址保存到对应的 Entry。这一操作确保在后续访问中能够正确引用该地址。</li>
+<li>保存掩码信息：在 MaskModule 中，系统将入队的 Load 指令的掩码信息保存到对应的 Entry。掩码信息用于后续的地址匹配和数据访问。</li>
+<li>写入uop：将 Load 指令的uop信息写入到相应的结构中，以完成入队过程。</li>
+</ol>
+<h3 id="功能2检测st-ld违例条件">功能2：检测st-ld违例条件</h3>
+<p>在 Store 指令到达 Store 流水线的 s1 阶段时，系统会进行 Store-to-Load 违例检查。此时，Store 指令需要与 Load Queue 中已经完成访存的 Load 指令，以及在 Load 流水线 s1 和 s2 阶段正在访存的 Load 指令进行比较。这些 Load 指令可能尚未通过前递（forwarding）机制获取 Store 指令执行的结果。</p>
+<p>具体的违例检查流程如下：</p>
+<ol>
+<li>物理地址匹配：在第一拍中，系统将进行物理地址匹配，并检查条件。此时，将匹配在当前 Store 指令之后的所有新的 Load 指令。如果这些 Load 指令已经成功获取了数据（<code>datavalid</code>），或者由于缓存未命中正在等待数据回填（<code>dcache miss</code>），则可以确定这些 Load 指令不会将数据前递给当前的 Store 指令。</li>
+<li>匹配 Load 指令：在第二拍中，Store 流水线中的 Store 指令根据匹配结果中的掩码（mask），在 Load Queue 的 RAW（Read After Write）结构中查找所有匹配的 Load 指令。Load Queue 中共有 32 项，这些项将被平分为4组。每组从 8 项中选出一个最老的 Load 指令，最多可得到 4 个候选最老的 Load 指令。</li>
+<li>选择最老的 Load：在第三拍中，从上述 4 个候选最老的 Load 指令中，系统将选出一个最老的 Load 指令，作为最终的目标。</li>
+<li>处理违例情况：在第四拍中，如果在两条 Store 流水线中均发生了 Store-to-Load 违例，系统将从各自的 Queue 中匹配到的最老 Load 指令中选出一个更老的 Load 指令，以产生回滚请求并发送给重定向模块（Redirect）。此时，违例的条件包括：
+<ul>
+<li>Load 和 Store 的地址相同。</li>
+<li>Load 指令比 Store 指令年轻。</li>
+<li>Load 指令已经成功获取了数据。</li>
+</ul>
+</li>
+</ol>
+<h3 id="功能3指令的出队">功能3：指令的出队</h3>
+<p>Load指令的出队需要满足以下条件其中之一：</p>
+<ol>
+<li>当比队列entry中存放的指令更老的指令已经全部写回到ROB时，该指令可以出队。</li>
+<li>当这条指令需要被冲刷时，通常是出现数据依赖性问题、预测错误、异常或错误的情况下，迫使系统强制性地移除该指令，以保证处理器能够恢复到一个稳定的状态。</li>
+</ol>
+<p>出队执行的操作：</p>
+<ol>
+<li>将指令对应的 <code>allocated</code> 寄存器设置为低电平。这一操作的目的是标识该指令不再占用 LoadQueueRAR 的资源，从而为后续指令的入队和处理腾出空间。</li>
+<li>将entry对应的<code>free</code>掩码拉高，表示该条目已被释放并可供后续使用。</li>
+</ol>
+<p>在load流水线的s3阶段可以向队列发送revoke信号撤销上一拍的请求。如果指令当前周期的revoke信号拉高（revoke ==1），并且在上一个周期已经入队，需要执行撤销操作：</p>
+<ol>
+<li>该entry对应的allocated寄存器清零</li>
+<li>该entry对应的free掩码拉高</li>
+</ol>
+</mrs-functions>
+<h2 id="接口说明">接口说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>name</th>
+          <th>I/O</th>
+          <th>width</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>redirect</td>
+          <td>io.redirect.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向的有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.robIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向的flag，用于在循环列表中判断先后</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.robIdx.value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>后端重定向的位置value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.redirect.bits.level</td>
+          <td>input</td>
+          <td>1</td>
+          <td>后端重定向的level：1’b0：冲刷之后的指令；1‘b1：冲刷这条指令本身</td>
+      </tr>
+      <tr>
+          <td>vecFeedback</td>
+          <td>io.vecFeedback_0/1.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>来自两条流水线的向量反馈信息有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.vecFeedback_0/1.bits</td>
+          <td>input</td>
+          <td>17</td>
+          <td>来自两条流水线的向量反馈信息</td>
+      </tr>
+      <tr>
+          <td>query</td>
+          <td>io.query_0/1/2.req.ready</td>
+          <td>output</td>
+          <td>1</td>
+          <td>能否接收3条数据通路中load违例检查请求</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查有效位</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.robIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查uop在rob中的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.robIdx.value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>3条数据通路中load违例检查uop在rob中的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.lqIdx.flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查uop在LoadQueue中的flag</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.uop.lqIdx.value</td>
+          <td>input</td>
+          <td>7</td>
+          <td>3条数据通路中load违例检查uop在LoadQueue中的value</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.paddr</td>
+          <td>input</td>
+          <td>48</td>
+          <td>3条数据通路中load违例检查的物理地址</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.req.bits.data.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查data的有效</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>io.query_0/1/2.revoke</td>
+          <td>input</td>
+          <td>1</td>
+          <td>3条数据通路中load违例检查的撤销</td>
+      </tr>
+      <tr>
+          <td>storeIn</td>
+          <td>storeIn_0/1.bits</td>
+          <td>input</td>
+          <td>84</td>
+          <td>两条store流水线store指令相关信息</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>storeIn_0/1.valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>两条store流水线store指令相关信息有效位</td>
+      </tr>
+      <tr>
+          <td>rollback</td>
+          <td>rollback_0/1.valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>两条store流水线回滚信息的有效性</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>rollback_0/1.bits</td>
+          <td>output</td>
+          <td>31</td>
+          <td>两条store流水线回滚信息</td>
+      </tr>
+      <tr>
+          <td>stAddrReadySqPtr</td>
+          <td>stAddrReadySqPtr</td>
+          <td>input</td>
+          <td>7</td>
+          <td>指向 store 队列中已准备好的地址条目</td>
+      </tr>
+      <tr>
+          <td>stIssuePtr</td>
+          <td>stIssuePtr</td>
+          <td>input</td>
+          <td>7</td>
+          <td>指向 store 队列中准备发射执行的指令条目</td>
+      </tr>
+      <tr>
+          <td>lqFull</td>
+          <td>lqFull</td>
+          <td>output</td>
+          <td>1</td>
+          <td>判断队列是否满</td>
+      </tr>
+  </tbody>
+</table>
+
+	<div class="td-page-meta__lastmod">
+  最后修改 May 29, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/649faaed1371265395e7f4e4a8b2424a8ea52eff">Doc (#130) (649faae)</a>
+</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2025
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">保留所有权利</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
+<script src='/UnityChipForXiangShan/js/prism.js'></script>
+<script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
