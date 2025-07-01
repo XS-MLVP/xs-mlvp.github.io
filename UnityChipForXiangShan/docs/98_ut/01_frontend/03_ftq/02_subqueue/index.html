@@ -46,7 +46,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-06-16T13:20:11+08:00">
+    <meta property="article:modified_time" content="2025-07-01T19:19:47+08:00">
 
   <meta itemprop="name" content="FTQ子队列">
   <meta itemprop="description" content="文档概述 请注意：从本篇开始，就涉及待验证的功能点和测试点了
@@ -60,7 +60,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 1.1 ftq_redirect_mem读操作 读操作： 输入： 需要使能ren，这是一个向量，可指定任意读端口可读 对应接口：ren 从任意读端口中输入要读取的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：raddr 输出： 从发起输入的读端口对应的读出端口中读出Ftq_Redirect_SRAMEntry。 对应接口：rdata 1.2 ftq_redirect_mem写操作 写操作 输入： 需要使能wen，可指定写端口可写 对应接口：wen 向写端口中输入要写入的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：waddr 向wdata中写入Ftq_Redirect_SRAMEntry 对应接口：wdata 多端口读：可以从多个读端口读取结果 每个子队列的读写基本都是类似的，后面不再赘述
 Ftq_Redirect_SRAMEntry ftq_redirect_mem存储的表项。继承自SpeculativeInfo，存储RAS预测器相关重定向信息，根据这些信息回溯到之前的状态
 sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize.W TOSW：重定向请求指令对应的 RAS 推测栈（队列）写指针 接口类型：RASPtr TOSR：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr NOS：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr topAddr： 接口类型：UInt(VAddrBits.W) 序号 功能名称 测试点名称 描述 1.1 FTQ_REDIRECT_MEM WRITE 向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata 1.2 FTQ_REDIRECT_MEM READ 向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取 2. ftq_pd_mem存储预译码信息 由64（FtqSize）个表项（Ftq_pd_Entry）构成。支持同步读写操作。有2个读端口和1个写端口。具有读写使能信号。">
-  <meta itemprop="dateModified" content="2025-06-16T13:20:11+08:00">
+  <meta itemprop="dateModified" content="2025-07-01T19:19:47+08:00">
   <meta itemprop="wordCount" content="399">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="FTQ子队列">
@@ -176,7 +176,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.816605f3e1eb924a3758b30f6807180c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.21553c6abf42e85872f1209a9d7c891f.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -200,7 +200,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.816605f3e1eb924a3758b30f6807180c.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.21553c6abf42e85872f1209a9d7c891f.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -1240,7 +1240,7 @@ Ftq_1R_SRAMEntry接口列表</p>
 <p>newest_entry_ptr，newest_entry_target这几个内部信号，它们不是队列，但是它们很重要，表明我们当前应该关注的最新的FTQ项及对应的跳转目标。BPU新的写入，重定向等等都会对最新FTQ项进行新的安排，在涉及到修改该信号的相应的文档中，对其生成方式做具体的描述。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 June 16, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0c723d86f7e13f986f9f4fdaf33fe82035ead79c">update itlb env (#138) (0c723d8)</a>
+  最后修改 July 1, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/f6057a282c18e687e5f57346ff11c0a0e57a6487">Add reset for all fixture (#141) (f6057a2)</a>
 </div>
 
 </div>
