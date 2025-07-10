@@ -54,7 +54,7 @@ PaddrModule 的实现基于内容可寻址存储器（CAM），其深度为 72�
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-07-01T19:19:47+08:00">
+    <meta property="article:modified_time" content="2025-07-10T22:57:41+08:00">
 
   <meta itemprop="name" content="LoadQueueRAR">
   <meta itemprop="description" content="本文档参考香山LSQ设计文档写成
@@ -72,7 +72,7 @@ load2（core1） store（core2） load1（core1） 由于指令的乱序执行�
 LoadQueueRAR最多能够存储72条指令（为了同VirtualLoadQueue的大小保持一致），每条指令占用一个条目。每个条目包含指令的物理地址（paddr）、与指令相关的信息（uop）、以及标记为已释放（released）和已分配（allocated）的状态寄存器。
 该模块通过 FreeList 子模块管理 entry 资源，FreeList 中存储的是 entry 的编号。当一条指令满足入队条件时，FreeList 会为其分配一个 entry 编号，并将该指令存放在相应的 entry 中。指令出队时，需要释放所占用的 entry 资源，并将条目编号重新放回 FreeList 中，以供后续指令使用。
 PaddrModule 的实现基于内容可寻址存储器（CAM），其深度为 72，数据宽度为 48。CAM 为每条流水线提供一个写端口，其中物理地址（paddr）作为写数据（wdata），条目编号作为写地址（waddr）。此外，CAM 还为每条流水线提供了一个地址查询端口（releaseViolationMdata），并为数据缓存（DCache）提供另一个地址查询端口（releaseMdata）。">
-  <meta itemprop="dateModified" content="2025-07-01T19:19:47+08:00">
+  <meta itemprop="dateModified" content="2025-07-10T22:57:41+08:00">
   <meta itemprop="wordCount" content="328">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="LoadQueueRAR">
@@ -192,7 +192,7 @@ PaddrModule 的实现基于内容可寻址存储器（CAM），其深度为 72�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.21553c6abf42e85872f1209a9d7c891f.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c57f59ee832739a3603696bb55df85e4.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -216,7 +216,7 @@ PaddrModule 的实现基于内容可寻址存储器（CAM），其深度为 72�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.21553c6abf42e85872f1209a9d7c891f.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.c57f59ee832739a3603696bb55df85e4.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -928,7 +928,7 @@ load1（core1）
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 July 1, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/f6057a282c18e687e5f57346ff11c0a0e57a6487">Add reset for all fixture (#141) (f6057a2)</a>
+  最后修改 July 10, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/0536646a2a4831ba18e599b13c01ba6004ce5b9a">add lsq env (#143) (0536646)</a>
 </div>
 
 </div>
