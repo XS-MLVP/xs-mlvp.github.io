@@ -36,7 +36,7 @@ cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ft
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-07-18T12:05:16+08:00">
+    <meta property="article:modified_time" content="2025-07-30T15:48:03+08:00">
 
   <meta itemprop="name" content="FTQ接收IFU重定向">
   <meta itemprop="description" content="文档概述 除了后端，IFU也会发送重定向相关消息，和后端不同，IFU的重定向信息来自于预译码写回信息。相同的是，它们都是通过BranchPredictionRedirect的接口传递重定向信息。
@@ -45,7 +45,7 @@ cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ft
 cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ftq_redirect_mem读出ftq_Redirect_SRAMEntry，把其中的所有信号直接传递给cfiUpdate的同名信号中。 target：已在第一周期写入cfiUpdate的pd有效，且isRet字段拉高，指明发生预测错误的指令本是一条Ret指令，此时，将target设置为cfiUpdate的topAddr，帮助回到发生错误之前的状态。 2. 重定向结果生效 两个周期生成完整的重定向信息后，IFU重定向信息才有效，有可能被FTQ采取，完整的IFU重定向结果记为ifuRedirectToBpu
 3. IFU 冲刷信号 (ifuFlush) 指令流控制信号： ifuFlush：来自IFU的冲刷信号，主要是由IFU重定向造成的，生成IFU重定向信息的两个周期内，该信号都拉高
 标志：IFU重定向信息产生接口BranchPredictionRedirect中valid有效，表示开始生成重定向信息，该周期以及下一个周期，ifuFlush拉高 接口说明 顶层IO 作用 fromIFU 接收来自IFU的预译码信息 接口时序 测试点总表 序号 功能名称 测试点名称 描述 1.1 IFU_REDIRECT IFU_REDIRECT_GRN_VALID 当预译码写回pdWb有效，且pdWb的missOffset字段有效表明存在预测错误的指令，同时后端冲刷信号backendFlush无效时，valid信号有效 1.2 IFU_REDIRECT IFU_REDIRECT_GEN 允许生成IFU重定向时，在两周期内生成具体信号 2 IFU_REDIRECT_TO_BPU IFU_REDIRECT_TO_BPU IFU重定向生成后，IFU重定向结果生效 3 IFU_FLUSH IFU_FLUSH 生成IFU重定向信息的两个周期内，ifuFlush信号都拉高">
-  <meta itemprop="dateModified" content="2025-07-18T12:05:16+08:00">
+  <meta itemprop="dateModified" content="2025-07-30T15:48:03+08:00">
   <meta itemprop="wordCount" content="78">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="FTQ接收IFU重定向">
@@ -156,7 +156,7 @@ cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ft
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2c2c8874aa5fee803f2fa43e566d0bf0.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eecc35e33c45b74098eca28726528490.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -180,7 +180,7 @@ cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ft
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2c2c8874aa5fee803f2fa43e566d0bf0.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eecc35e33c45b74098eca28726528490.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -671,7 +671,7 @@ ifuFlush：来自IFU的冲刷信号，主要是由IFU重定向造成的，生成
 </mrs-testpoints>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 July 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/5c2f4df80179b8ff80f3721efd03e371319b4b4d">add dtlb env (#144) (5c2f4df)</a>
+  最后修改 July 30, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/59460cfdc08629bdd91d8ccb58156dfd2ae8fc2e">Pr smy ifu predecode new (#140) (59460cf)</a>
 </div>
 
 </div>

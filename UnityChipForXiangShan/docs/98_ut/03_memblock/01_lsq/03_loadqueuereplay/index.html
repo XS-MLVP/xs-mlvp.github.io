@@ -38,7 +38,7 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-07-18T12:05:16+08:00">
+    <meta property="article:modified_time" content="2025-07-30T15:48:03+08:00">
 
   <meta itemprop="name" content="LoadQueueReplay">
   <meta itemprop="description" content="本文档参考香山LSQ设计文档写成
@@ -48,7 +48,7 @@ LoadQueueReplay 简介 LoadQueueReplay 模块是现代处理器架构中用于�
 整体框图 图1：LoadQueueReplay结构示意图
 LoadQueueReplay 最多存放72条指令，涉及多个状态和存储的信息。其关键组成部分如下：
 Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该项的有效性。 Scheduled： 指示某个 Load 重发队列项是否已被调度，意味着该项已经被选出，并将被发送至 Load Unit 进行重发。 Uop： 该队列项对应的 Load 指令执行信息，包括微操作（uop）。 Cause：指示该 Load 指令重发的原因，主要包括以下几种情况： C_MA：存储-加载（st-ld）违反重新执行。 C_TM：TLB（翻译后备页表）缺失。 C_FF：存储-加载转发。 C_DR：数据缓存（dcache）需要重发。 C_DM：数据缓存缺失。 C_WF：路径预测失败。 C_BC：数据缓存路径冲突。 C_RAR：读取-读取（RAR）队列无法接收。 C_RAW：读取-写入（RAW）队列无法接收。 C_NK：存储-加载违反。 Blocking：指示该 Load 指令因等待条件而被阻塞，不能被调度重发。阻塞的原因和解除阻塞的条件包括： C_MA：存储指令的地址就绪。 C_TM：TLB 回填完毕，并发送 Hint 信号。 C_FF：存储指令的数据就绪。 C_DM：数据缓存回填完毕。 C_RAR：RAR 队列未满，且 Load 指令比 Load Queue 的写回项更老。 C_RAW：RAW 队列未满，且 Load 指令比 Store Queue 中所有地址准备好的项都更老。 LoadReplayQueue 通过 FreeList 管理队列的空闲状态。FreeList 的大小等于 LoadReplayQueue 的项数，分配宽度为3（Load Unit 的数量），释放宽度为 4。同时，Free List 可以反馈 Load Replay Queue 的空余项数量以及是否已满的信息。除了FreeList，LoadQueueReplay还包含两个子模块：AgeDetector 和 LqVAddrModule，其中 AgeDetector 用于寻找一系列load replay queue项中最早入队的一项。">
-  <meta itemprop="dateModified" content="2025-07-18T12:05:16+08:00">
+  <meta itemprop="dateModified" content="2025-07-30T15:48:03+08:00">
   <meta itemprop="wordCount" content="423">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="LoadQueueReplay">
@@ -160,7 +160,7 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2c2c8874aa5fee803f2fa43e566d0bf0.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eecc35e33c45b74098eca28726528490.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -184,7 +184,7 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2c2c8874aa5fee803f2fa43e566d0bf0.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eecc35e33c45b74098eca28726528490.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -884,7 +884,7 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 July 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/5c2f4df80179b8ff80f3721efd03e371319b4b4d">add dtlb env (#144) (5c2f4df)</a>
+  最后修改 July 30, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/59460cfdc08629bdd91d8ccb58156dfd2ae8fc2e">Pr smy ifu predecode new (#140) (59460cf)</a>
 </div>
 
 </div>

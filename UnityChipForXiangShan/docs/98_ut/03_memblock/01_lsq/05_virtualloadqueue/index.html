@@ -52,7 +52,7 @@ ldin 总线的 valid 信号需要拉高，表明当前正在进行有效的数�
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-07-18T12:05:16+08:00">
+    <meta property="article:modified_time" content="2025-07-30T15:48:03+08:00">
 
   <meta itemprop="name" content="VirtualLoadQueue">
   <meta itemprop="description" content="本文档参考香山LSQ设计文档写成
@@ -69,7 +69,7 @@ StoreQueue 和 LoadQueue 有预留空间：确保LoadQueue有足够的容量来�
 是否发生了异常以及异常类型 dcache是否命中 tlb是否命中 是否为mmio指令 是否为软件预取或者硬件预取 是否需要重发以及重发的原因 写uop的使能信号 写回需要满足的条件如下：
 ldin 总线的 valid 信号需要拉高，表明当前正在进行有效的数据传输。 指令不应需要重发（即 need_rep 信号为 0），否则将影响写回的正常进行。 在满足写回条件后，系统将生成相应的写回响应，具体包括以下几个方面：
 如果在执行过程中发生了异常、TLB命中或软件预取操作，addrvalid 信号将被置为 1，表示地址信息有效。 如果在执行过程中发生了异常、MMIO操作、DCACHE命中并且不需要重发，或是软件预取操作，datavalid 信号将被置为 1，表示数据有效。 指令在流水线的 S3 阶段有效（注意：不能是硬件预取指令）。当 ldin 总线的写使能信号 data_wen_dup 拉高时，将更新队列中的uop信息，以确保指令的状态及时反映。 系统将addrvalid和datavalid分开进行处理是考虑到在一些情况下，地址可以被重用，而数据可能需要重新请求（如dcache miss/mmio/软件预取等）。分开标识可以减少流水线停顿，允许处理器在地址有效时继续执行其他指令，而不必等待数据有效性确认，从而优化整体性能。">
-  <meta itemprop="dateModified" content="2025-07-18T12:05:16+08:00">
+  <meta itemprop="dateModified" content="2025-07-30T15:48:03+08:00">
   <meta itemprop="wordCount" content="242">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="VirtualLoadQueue">
@@ -188,7 +188,7 @@ ldin 总线的 valid 信号需要拉高，表明当前正在进行有效的数�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2c2c8874aa5fee803f2fa43e566d0bf0.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eecc35e33c45b74098eca28726528490.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -212,7 +212,7 @@ ldin 总线的 valid 信号需要拉高，表明当前正在进行有效的数�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.2c2c8874aa5fee803f2fa43e566d0bf0.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eecc35e33c45b74098eca28726528490.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -869,7 +869,7 @@ ldin 总线的 valid 信号需要拉高，表明当前正在进行有效的数�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 July 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/5c2f4df80179b8ff80f3721efd03e371319b4b4d">add dtlb env (#144) (5c2f4df)</a>
+  最后修改 July 30, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/59460cfdc08629bdd91d8ccb58156dfd2ae8fc2e">Pr smy ifu predecode new (#140) (59460cf)</a>
 </div>
 
 </div>
