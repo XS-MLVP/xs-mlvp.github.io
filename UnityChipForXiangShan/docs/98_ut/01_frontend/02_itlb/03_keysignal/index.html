@@ -30,13 +30,13 @@ class SatpStruct(implicit p: Parameters) extends XSBundle { val mode = UInt(4.W)
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-07-30T15:48:03+08:00">
+    <meta property="article:modified_time" content="2025-08-07T11:05:22+08:00">
 
   <meta itemprop="name" content="关键信号说明">
   <meta itemprop="description" content="相关 CSR 寄存器 val csr = Input(new TlbCsrBundle) csr：包含 satp、vsatp、hgatp 三个寄存器的信息以及一些权限信息。
 class TlbCsrBundle(implicit p: Parameters) extends XSBundle { val satp = new TlbSatpBundle() val vsatp = new TlbSatpBundle() val hgatp = new TlbHgatpBundle() val priv = new Bundle { val mxr = Bool() val sum = Bool() val vmxr = Bool() val vsum = Bool() val virt = Bool() val spvp = UInt(1.W) val imode = UInt(2.W) val dmode = UInt(2.W) } override def toPrintable: Printable = { p&#34;Satp mode:0x${Hexadecimal(satp.mode)} asid:0x${Hexadecimal(satp.asid)} ppn:0x${Hexadecimal(satp.ppn)} &#34; &#43; p&#34;Priv mxr:${priv.mxr} sum:${priv.sum} imode:${priv.imode} dmode:${priv.dmode}&#34; } } TlbCsrBundle 中包含了 satp、vsatp、hgatp 以及 priv 特权标志。其中 satp 与 vsatp 通过 TlbSatpBundle 实现，包括 mode、asid、ppn、changed 以及一个 apply 方法：
 class SatpStruct(implicit p: Parameters) extends XSBundle { val mode = UInt(4.W) val asid = UInt(16.W) val ppn = UInt(44.W) } class TlbSatpBundle(implicit p: Parameters) extends SatpStruct { val changed = Bool() // Todo: remove it def apply(satp_value: UInt): Unit = { require(satp_value.getWidth == XLEN) val sa = satp_value.asTypeOf(new SatpStruct) mode := sa.mode asid := sa.asid ppn := sa.ppn changed := DataChanged(sa.asid) // when ppn is changed, software need do the flush } } hgatp 通过 TlbHgatpBundle 实现，区别在于将 asid 替换为 vmid：">
-  <meta itemprop="dateModified" content="2025-07-30T15:48:03+08:00">
+  <meta itemprop="dateModified" content="2025-08-07T11:05:22+08:00">
   <meta itemprop="wordCount" content="847">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="关键信号说明">
@@ -144,7 +144,7 @@ class SatpStruct(implicit p: Parameters) extends XSBundle { val mode = UInt(4.W)
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eecc35e33c45b74098eca28726528490.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.7a0c4e3d987360f7eb9e17cf8e0a44bc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -168,7 +168,7 @@ class SatpStruct(implicit p: Parameters) extends XSBundle { val mode = UInt(4.W)
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.eecc35e33c45b74098eca28726528490.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.7a0c4e3d987360f7eb9e17cf8e0a44bc.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -855,7 +855,7 @@ class SatpStruct(implicit p: Parameters) extends XSBundle { val mode = UInt(4.W)
 </ul>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 July 30, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/59460cfdc08629bdd91d8ccb58156dfd2ae8fc2e">Pr smy ifu predecode new (#140) (59460cf)</a>
+  最后修改 August 7, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/167df40b5248182cb331bc567535ace7bd299834">Revert &#34;Pr smy ifu predecode new (#140)&#34; (167df40)</a>
 </div>
 
 </div>
