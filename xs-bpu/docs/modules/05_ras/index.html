@@ -86,8 +86,8 @@ POP 原因同上，对当前栈进行快照，标记为s。当遇到ret指令时
 提交操作 提交（Commit）操作即后端告诉前端，之前预测的结果正确。理想情况下，RAS预测器此时不需要进行任何操作。
 昆明湖中RAS的实现 由于处理器在执行过程中可能会进行错误的猜测，导致数据污染，RAS需要通过恢复机制来确保数据的准确性。特别是在昆明湖的实际电路设计中，不可能有无限大的栈，也无法随时备份数据。因此，昆明湖的RAS实现中，使用了基于持久化栈的返回地址预测器。具体来说，将RAS分为提交栈（commit stack）和推测栈（spec queue）两个部分，推测栈利用了香山BPU的预测结果来进行预测，然后根据后端返回的信息将数据压入提交栈中。下面详细介绍昆明湖的RAS设计：
 每次预测时，RAS栈的快照如何获得？ 为了实现对RAS栈进行快照的功能，昆明湖的RAS推测栈采用了基于循环数组的 “链式表示“ 。设计具体如下：">
-<link rel="preload" href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" as="style" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
-<link href="/xs-bpu/scss/main.min.48c25d0a5a23a1e8cae94d6c5e7622061e5345cf098171b1d6ee41d8e309e6c8.css" rel="stylesheet" integrity="sha256-SMJdClojoejK6U1sXnYiBh5TRc8JgXGx1u5B2OMJ5sg=" crossorigin="anonymous">
+<link rel="preload" href="/xs-bpu/scss/main.min.3bb6570761fbbb25e6691001febc67f331f0953db4e4e1cfb79172c2e6a5819e.css" as="style" integrity="sha256-O7ZXB2H7uyXmaRAB/rxn8zHwlT205OHPt5FywualgZ4=" crossorigin="anonymous">
+<link href="/xs-bpu/scss/main.min.3bb6570761fbbb25e6691001febc67f331f0953db4e4e1cfb79172c2e6a5819e.css" rel="stylesheet" integrity="sha256-O7ZXB2H7uyXmaRAB/rxn8zHwlT205OHPt5FywualgZ4=" crossorigin="anonymous">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
   integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="

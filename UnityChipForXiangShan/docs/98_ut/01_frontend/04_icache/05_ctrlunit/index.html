@@ -111,8 +111,8 @@ mmio-mapped CSR CtrlUnit 内实现了一组 mmio-mapped CSR，连接在 tilelink
 0: ECC 未使能 (i.e. !eccctrl.enable) 1: inject 目标 SRAM 无效 (i.e. eccctrl.itarget==rsvd) 2: inject 目标地址 (i.e. ecciaddr.paddr) 不在 ICache 中
 3: rsvd 4: rsvd 5: rsvd 6: rsvd 7: rsvd ecciaddr paddr ECC 错误注入物理地址 RERI standard RERI 手册还要求了错误计数等寄存器，用于软件获取 RAS controller 状态，参考手册，可能需要与 dcache、L2cache 统一在后端实现，icache 像现在给 BEU 送 error 一样送给后端。
 即：暂时不需要在 icache 实现，但要把错误计数等机制所需的接口准备出来 错误校验使能 CtrlUnit 的 eccctrl.enable 位直接连接到 MainPipe，控制 ECC 校验使能。当该位为 0 时，ICache 不会进行 ECC 校验。但仍会在重填时计算校验码并存储，这可能会有少量的额外功耗；如果不计算，则在未使能转换成使能时需要冲刷 ICache（否则读出的 parity code 可能是错的）。">
-<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" as="style" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
-<link href="/UnityChipForXiangShan/scss/main.min.689b22b0041c8c7c7cf217802f908a4ce2122a5f8924320dd5431c6362fe39a7.css" rel="stylesheet" integrity="sha256-aJsisAQcjHx88heAL5CKTOISKl&#43;JJDIN1UMcY2L&#43;Oac=" crossorigin="anonymous">
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.356574e8308264151b533ef504ebe576b67671f54b4f4d7f8077b25dc08441c6.css" as="style" integrity="sha256-NWV06DCCZBUbUz71BOvldrZ2cfVLT01/gHeyXcCEQcY=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.356574e8308264151b533ef504ebe576b67671f54b4f4d7f8077b25dc08441c6.css" rel="stylesheet" integrity="sha256-NWV06DCCZBUbUz71BOvldrZ2cfVLT01/gHeyXcCEQcY=" crossorigin="anonymous">
 <script
   src="https://code.jquery.com/jquery-3.7.1.min.js"
   integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
