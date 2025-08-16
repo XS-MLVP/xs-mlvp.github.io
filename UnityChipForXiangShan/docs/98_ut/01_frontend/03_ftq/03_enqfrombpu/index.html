@@ -42,7 +42,7 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-08-14T17:52:35+08:00">
+    <meta property="article:modified_time" content="2025-08-16T12:48:43+08:00">
 
   <meta itemprop="name" content="FTQ接收BPU分支预测结果">
   <meta itemprop="description" content="文档概述 BPU会将分支预测结果和meta数据发给FTQ。
@@ -54,7 +54,7 @@ BPU预测结果发生重定向的具体标志：fromBpu的resp接口的s2（s2�
 2. 写入FTQ项 之前已经说明过了，FTQ项只是一个抽象的概念，FTQ有很多个子队列组成，它们的项共同构成一个FTQ项，所以，向FTQ中写入FTQ项，实际上就是就是把BPU的预测信息写到对应的FTQ子队列中。
 FTQ主要获取以下信息作为bpu_in_resp
 bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个阶段的指令预测信息，bpu_in_resp将获取其中某一阶段预测信息selectedResp作为其值。未发生重定向时，使用s1作为预测结果，s2或者s3发生重定向信息时，优先s3的预测信息作为selectedResp。某阶段发生重定向的标志与上文讲述的一样一样。 从selectedResp（bpu_in_resp）中，我们还可以获取以下目标信息帮助我们写入子队列：ftq_idx，帮助我们索引写入子队列的地址 2.1 写入FTQ子队列： 2.1.1 写入ftq_pc_mem ftq_pc_mem: 来自BPU的selectedResp预测信息被写入ftq_pc_mem, 该存储结构有ftqsize个表项，对应队列中的所有ftq表项，每个存储元素可以推出对应的ftq表项中每条指令的pc地址 接收信号列表： wen：接收bpu_in_fire作为写使能信号 waddr：接收selectedResp的ftq_idx wdata：selectedResp的相应信号 2.1.2 写入ftq_redirect_mem ftq_redirect_mem: 在BPU的s3（也就是最终阶段）接收信息，因为重定向信息只有在s3阶段才能得到。里面存储了RAS重定向相关的信息帮助BPU进行重定向。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx.value wdata：从BPU回应的last_stage_spec_info 2.1.3 写入ftq_meta_1r_sram ftq_meta_1r_sram：在 BPU的s3阶段接收信息，同样是因为对于一个指令预测块，只有在其s3阶段才能获取完整的mata信息，同样被接收的还有最后阶段ftqentry信息 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value wdata： meta：从BPU回应的last_stage_meta ftb_entry：从BPU回应的last_stage_ftb_entry 2.1.4 写入ftb_entry_mem ftb_entry_mem：虽然ftq_meta_1r_sram中存储有最后阶段ftbentry，但此处出于更高效率读取专门把它存在ftb_entry_mem中。 接收信号列表： wen：从BPU（fromBpu）回应（resp）的lastStage有效信号 waddr：从BPU回应的lastStage的ftq_idx的value字段 wdata：从BPU回应的last_stage_ftb_entry 从中可以看到，FTQ虽然名字上听起来是一个队列，实际上内部却是由数个队列组成，他们共同构成了FTQ这个大队列 2.2 写入状态队列 上述存储结构是FTQ中比较核心的存储结构，实际上，还有一些子队列用来存储一些状态信息，也同样都是存储ftqsize个（64）元素，需要被写入，写入时机是在发生bpu_in_fire的下一个周期，或者再下一个周期 。主要有以下：">
-  <meta itemprop="dateModified" content="2025-08-14T17:52:35+08:00">
+  <meta itemprop="dateModified" content="2025-08-16T12:48:43+08:00">
   <meta itemprop="wordCount" content="294">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="FTQ接收BPU分支预测结果">
@@ -168,7 +168,7 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.8aeb4c29523aa16ecab9b47eaed29e33.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.668e1ed941299b3642e0a532c8b00b5f.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -192,7 +192,7 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.8aeb4c29523aa16ecab9b47eaed29e33.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.668e1ed941299b3642e0a532c8b00b5f.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -441,6 +441,97 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
   
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmap-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmap-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmap-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/" title="Shield-XS:基于Bitmap的安全隔离机制" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmap"><span class="">香山bitmap 隔离模块</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/basic/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic"><span class="">Shield-XS Bitmap 基础知识</span></a></label>
+  
+  <ul class="ul-5 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic00_bm_background-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic00_bm_background-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic00_bm_background-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/basic/00_bm_background/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic00_bm_background"><span class="">背景描述</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic01_bm_principle-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic01_bm_principle-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic01_bm_principle-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/basic/01_bm_principle/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic01_bm_principle"><span class="">香山 bitmap 防御原理</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic02_bm_workflow-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic02_bm_workflow-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic02_bm_workflow-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/basic/02_bm_workflow/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic02_bm_workflow"><span class="">bitmap的工作流程</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic03_bm_scenario-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic03_bm_scenario-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic03_bm_scenario-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/basic/03_bm_scenario/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapbasic03_bm_scenario"><span class="">香山bitmap 应用场景</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/feature/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature"><span class="">Shield-XS Bitmap总体设计</span></a></label>
+  
+  <ul class="ul-5 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature00_bm_csr-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature00_bm_csr-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature00_bm_csr-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/feature/00_bm_csr/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature00_bm_csr"><span class="">机器模式Bitmap控制状态寄存器</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature01_bm_acceleration-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature01_bm_acceleration-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature01_bm_acceleration-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/feature/01_bm_acceleration/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature01_bm_acceleration"><span class="">Shield-Bitmap Cache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature02_bm_mmu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature02_bm_mmu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature02_bm_mmu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/feature/02_bm_mmu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature02_bm_mmu"><span class="">Shield-Bitmap 地址翻译</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature03_bm_mmu_with_bm-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature03_bm_mmu_with_bm-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature03_bm_mmu_with_bm-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/feature/03_bm_mmu_with_bm/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapfeature03_bm_mmu_with_bm"><span class="">Shield-Bitmap 地址翻译2</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/modules/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules"><span class="">Shield-XS Bitmap 硬件设计</span></a></label>
+  
+  <ul class="ul-5 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules00_bm_checker-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules00_bm_checker-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules00_bm_checker-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/modules/00_bm_checker/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules00_bm_checker"><span class="">Bitmap Checker</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules01_bm_cache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules01_bm_cache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules01_bm_cache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/modules/01_bm_cache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules01_bm_cache"><span class="">Bitmap Cache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules02_bm_l2tlb-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules02_bm_l2tlb-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules02_bm_l2tlb-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/modules/02_bm_l2tlb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules02_bm_l2tlb"><span class="">Bitmap 与L2TLB交互</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules03_bm_timing-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules03_bm_timing-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules03_bm_timing-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/modules/03_bm_timing/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules03_bm_timing"><span class="">Bitmap接口时序图</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules04_bm_cost-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules04_bm_cost-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules04_bm_cost-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/modules/04_bm_cost/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapmodules04_bm_cost"><span class="">开销评估</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapverification-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapverification-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapverification-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/verification/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapverification"><span class="">Shield-XS_Bitmap 单元验证</span></a></label>
+  
+  <ul class="ul-5 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapverification00_bm_verification-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapverification00_bm_verification-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapverification00_bm_verification-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/05_bitmap/verification/00_bm_verification/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend05_bitmapverification00_bm_verification"><span class="">单元验证</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut02_backend-li">
@@ -533,7 +624,28 @@ bpu_in_resp：BPU交给FTQ的resp详见BPU文档，resp中含有s1,s2,s3三个�
 </nav>
       </div>
     
-            
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tag Cloud</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/bitmap/" data-taxonomy-term="bitmap"><span class="taxonomy-label">Bitmap</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E5%9F%BA%E7%A1%80/" data-taxonomy-term="%E5%9F%BA%E7%A1%80"><span class="taxonomy-label">基础</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E5%AE%89%E5%85%A8%E9%9A%94%E7%A6%BB/" data-taxonomy-term="%E5%AE%89%E5%85%A8%E9%9A%94%E7%A6%BB"><span class="taxonomy-label">安全隔离</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82/" data-taxonomy-term="%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82"><span class="taxonomy-label">技术细节</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E7%A1%AC%E4%BB%B6/" data-taxonomy-term="%E7%A1%AC%E4%BB%B6"><span class="taxonomy-label">硬件</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E9%A6%99%E5%B1%B1/" data-taxonomy-term="%E9%A6%99%E5%B1%B1"><span class="taxonomy-label">香山</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E9%AA%8C%E8%AF%81/" data-taxonomy-term="%E9%AA%8C%E8%AF%81"><span class="taxonomy-label">验证</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  <div class="taxonomy taxonomy-terms-cloud taxo-categories">
+      <h5 class="taxonomy-title">Categories</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/categories/bitmap-%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82/" data-taxonomy-term="bitmap-%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82"><span class="taxonomy-label">Bitmap 技术细节</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/categories/bitmap-%E7%A1%AC%E4%BB%B6%E5%AE%9E%E7%8E%B0/" data-taxonomy-term="bitmap-%E7%A1%AC%E4%BB%B6%E5%AE%9E%E7%8E%B0"><span class="taxonomy-label">Bitmap 硬件实现</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/categories/%E9%A6%99%E5%B1%B1-bitmap-%E5%9F%BA%E7%A1%80%E8%AE%BE%E8%AE%A1/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bitmap-%E5%9F%BA%E7%A1%80%E8%AE%BE%E8%AE%A1"><span class="taxonomy-label">香山 Bitmap 基础设计</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/categories/%E9%A6%99%E5%B1%B1bitmap%E9%AA%8C%E8%AF%81/" data-taxonomy-term="%E9%A6%99%E5%B1%B1bitmap%E9%AA%8C%E8%AF%81"><span class="taxonomy-label">香山bitmap验证</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  
 	
           </aside>
           <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
@@ -954,7 +1066,7 @@ s3阶段向IFU以及Prefetch的重定向传递与s2阶段的重定向信号传�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 August 14, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/07336278308f8f7b83f09fd04c7647ceb428d4f2">fix: Fix typo (0733627)</a>
+  最后修改 August 16, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/27bbc9ed04a2c8fd37948f5010f1eacd714a63e6">Fix: Fix formatting error (27bbc9e)</a>
 </div>
 
 </div>
