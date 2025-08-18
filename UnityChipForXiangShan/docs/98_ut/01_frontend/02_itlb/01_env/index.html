@@ -40,7 +40,7 @@
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-08-16T12:48:43+08:00">
+    <meta property="article:modified_time" content="2025-08-18T20:24:30+08:00">
 
   <meta itemprop="name" content="环境配置">
   <meta itemprop="description" content="WSL2&#43;Ubuntu22.04&#43;GTKWave（Windows用户推荐使用） 我们推荐 Windows10/11 用户通过 WSL2 进行开发，在此给出通过此方法进行环境配置的教程集锦，仅供参考。如环境安装过程中出现任何问题，欢迎在QQ群（群号：976081653）中提出，我们将尽力帮助解决。此页面将收集大家提出的所有环境配置相关问题并提供解决方案，欢迎随时向我们提问！
@@ -51,7 +51,7 @@
 3、配置验证环境 请参照开放验证平台学习资源-快速开始-搭建验证环境配置环境。
 以下是示例方法：
 # 基本工具包 cd ~ &amp;&amp; sudo apt-get update sudo apt-get install -y build-essential cmake git wget curl lcov autoconf flex bison libgoogle-perftools-dev gcc python3.11 python3.11-dev python3.11-distutils python3-pip python-is-python3 rm -rf /var/lib/apt/lists/* sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11 # verilator git clone https://github.com/verilator/verilator.git cd verilator git checkout v4.218 # 4.218为最低需求版本，可自行查看并选择新版本 autoconf &amp;&amp; ./configure &amp;&amp; make -j$(nproc) &amp;&amp; make install cd .. &amp;&amp; rm -rf verilator # verible curl -sS https://github.com/chipsalliance/verible/releases/download/v0.0-3946-g851d3ff4/verible-v0.0-3946-g851d3ff4-linux-static-x86_64.tar.gz -o /tmp/ tar -zxvf /tmp/verible-v0.0-3946-g851d3ff4-linux-static-x86_64.tar.gz -C /tmp/ copy /tmp/verible-v0.0-3946-g851d3ff4/bin/verible-* /usr/local/bin/ sudo chmod &#43;x /usr/local/bin/verible-* rm /tmp/verible-* # pcre2 curl -sS https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.45/pcre2-10.45.tar.gz -o /tmp/ tar -zxvf /tmp/pcre2-10.45.tar.gz -C /tmp/ cd /tmp/pcre2-10.45 ./configure --prefix=/usr/local &amp;&amp; make -j$(nproc) &amp;&amp; make install rm -rf /tmp/pcre2* &amp;&amp; cd ~ # swig # 注意不要使用 apt install swig，将会下载不符合最低要求的版本 4.0.2 curl -sS http://prdownloads.sourceforge.net/swig/swig-4.3.0.tar.gz -o /tmp/ tar -zxvf /tmp/swig-4.3.0.tar.gz -C /tmp/ cd /tmp/swig-4.3.0 ./configure --prefix=/usr/local &amp;&amp; make -j$(nproc) &amp;&amp; make install rm -rf /tmp/swig* &amp;&amp; cd ~ # 更新本地包 apt-get update &amp;&amp; apt-get -y upgrade # picker git clone https://github.com/XS-MLVP/picker.git --depth=1 cd picker make init &amp;&amp; make &amp;&amp; make install cd .. &amp;&amp; rm -rf picker # UnityChipForXiangShan git clone https://github.com/XS-MLVP/UnityChipForXiangShan.git cd UnityChipForXiangShan pip3 install --no-cache-dir -r requirements.txt 4、使用 GTKWave 查看波形文件 使用重庆大学硬件综合设计实验文档-Windows原生GTKWave给出的方法，可以通过在WSL中输入 gtkwave.exe wave.fst 打开在 Windows 下安装的 GTKWave。请注意，gtkwave在使用中需要进入 fst 文件所在文件夹，否则会出现无法 initialize 的情况。">
-  <meta itemprop="dateModified" content="2025-08-16T12:48:43+08:00">
+  <meta itemprop="dateModified" content="2025-08-18T20:24:30+08:00">
   <meta itemprop="wordCount" content="286">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="环境配置">
@@ -164,7 +164,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.668e1ed941299b3642e0a532c8b00b5f.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.82d76d6ca4c9a3031a6f87fb003d0a10.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -188,7 +188,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.668e1ed941299b3642e0a532c8b00b5f.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.82d76d6ca4c9a3031a6f87fb003d0a10.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -735,7 +735,7 @@ initialize 的情况。</p>
 <p><a href="https://blog.csdn.net/sj349781478/article/details/105267887/">Docker：docker 拉取镜像及查看pull下来的image在哪里</a></p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 August 16, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/27bbc9ed04a2c8fd37948f5010f1eacd714a63e6">Fix: Fix formatting error (27bbc9e)</a>
+  最后修改 August 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/71b4962d6897962e2233a1ace32efa8037cb5fa1">Update _index.md (#162) (71b4962)</a>
 </div>
 
 </div>

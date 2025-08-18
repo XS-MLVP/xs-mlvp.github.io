@@ -54,7 +54,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-08-16T12:48:43+08:00">
+    <meta property="article:modified_time" content="2025-08-18T20:24:30+08:00">
 
   <meta itemprop="name" content="IFU向FTQ写回预译码信息">
   <meta itemprop="description" content="文档概述 IFU获取来自BPU的预测信息之后，会执行预译码，并将FTQ项写回FTQ中去。我们会比对FTQ中原BPU预测项和预译码的结果，判断是否有预测错误
@@ -72,7 +72,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
 5. 综合错误 综合比对预测结果与预译码结果得到的错误信息，与预译码错误直接获得的预测错误，任意一种发生时has_false_hit拉高表示有预测错误，此时，命中状态队列entry_hit_status中写回项的状态置为h_false_hit
 6. 更新写回指针 ifu_wb_valid拉高，表示写回有效，将ifuWbPtr更新为原值加1。
 接口说明 顶层IO 子接口 fromIfu pdWb 测试点总表 序号 功能名称 测试点名称 描述 1 WB_PD WB_PD 向ftq_pd_mem中写回预译码信息 2 UPDATE_COMMITSTATE UPDATE_COMMITSTATE 当预译码信息pdWb有效时，根据预译码信息中每条指令的有效情况和该指令是否在有效范围内，判断指令的提交状态是否可以修改，若可以修改，则将提交状态队列，写回项中的指令状态修改 3.1.1 BR_FALSE_HIT COND1 brSlots的任意一项有效，同时在预译码信息中不满足这一项对应的pd有效且isBr字段拉高 3.1.2 BR_FALSE_HIT COND2 taiSlot有效且sharing字段拉高表明该slot为分支slot，同时在预译码信息中不满足这一项对应的pd有效且isBr字段拉高 3.2 JAL_FALSE_HIT JAL_FALSE_HIT 指令预测有效，且其中isJal拉高或者指明是isjalr指令 4 PD_MISS PD_MISS 如果回写项ftb命中且missoffset字段有效表明有错误预测的指令，hit_pd_mispred信号拉高 5 FALSE_HIT FALSE_HIT 综合比对预测结果与预译码结果得到的错误信息，与预译码错误直接获得的预测错误，任意一种发生时has_false_hit拉高表示有预测错误，此时，命中状态队列entry_hit_status中写回项的状态置为h_false_hit 6 UPDATE_IFU_WB_PTR UPDATE_IFU_WB_PTR ifu_wb_valid拉高，将ifuWbPtr更新为原值加1">
-  <meta itemprop="dateModified" content="2025-08-16T12:48:43+08:00">
+  <meta itemprop="dateModified" content="2025-08-18T20:24:30+08:00">
   <meta itemprop="wordCount" content="103">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="IFU向FTQ写回预译码信息">
@@ -192,7 +192,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.668e1ed941299b3642e0a532c8b00b5f.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.82d76d6ca4c9a3031a6f87fb003d0a10.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -216,7 +216,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.668e1ed941299b3642e0a532c8b00b5f.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.82d76d6ca4c9a3031a6f87fb003d0a10.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -868,7 +868,7 @@ pdWb有效的时候，读有效，读取地址为预译码信息中指示的ftqI
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 August 16, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/27bbc9ed04a2c8fd37948f5010f1eacd714a63e6">Fix: Fix formatting error (27bbc9e)</a>
+  最后修改 August 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/71b4962d6897962e2233a1ace32efa8037cb5fa1">Update _index.md (#162) (71b4962)</a>
 </div>
 
 </div>

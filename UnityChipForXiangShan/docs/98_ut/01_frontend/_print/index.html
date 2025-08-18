@@ -30,7 +30,7 @@
 
   <meta itemprop="name" content="Frontend">
   <meta itemprop="description" content="前端模块验证文档">
-  <meta itemprop="dateModified" content="2025-08-16T12:48:43+08:00">
+  <meta itemprop="dateModified" content="2025-08-18T20:24:30+08:00">
   <meta itemprop="wordCount" content="1">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Frontend">
@@ -136,7 +136,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.668e1ed941299b3642e0a532c8b00b5f.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.82d76d6ca4c9a3031a6f87fb003d0a10.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -6965,18 +6965,17 @@ pmp 包含 req 和 resp 两个子结构。</p>
           <td>vSetIdx</td>
           <td>虚拟地址的缓存组索引。</td>
       </tr>
+  </tbody>
+</table>
+<p>resp 的结构如下：</p>
+<table>
+  <thead>
       <tr>
-          <td>resp 的结构如下：</td>
-          <td></td>
+          <th>接口名</th>
+          <th>解释</th>
       </tr>
-      <tr>
-          <td>接口名</td>
-          <td>解释</td>
-      </tr>
-      <tr>
-          <td>&mdash;&mdash;&mdash;-</td>
-          <td>&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</td>
-      </tr>
+  </thead>
+  <tbody>
       <tr>
           <td>blkPaddr</td>
           <td>已从 tilelink 获取的缓存行的物理地址。</td>
@@ -7035,18 +7034,48 @@ pmp 包含 req 和 resp 两个子结构。</p>
       </tr>
   </thead>
   <tbody>
+      <tr>
+          <td>doubleLine</td>
+          <td>指示预测块是否跨缓存行。</td>
+      </tr>
+      <tr>
+          <td>vaddr</td>
+          <td>指令块起始虚拟地址、下一个缓存行的虚拟地址。</td>
+      </tr>
+      <tr>
+          <td>data</td>
+          <td>要传送的缓存行。</td>
+      </tr>
+      <tr>
+          <td>paddr</td>
+          <td>指令块的起始物理地址</td>
+      </tr>
+      <tr>
+          <td>exception</td>
+          <td>向 IFU 报告每个缓存行上的异常情况，方便 ICache 生成每个指令的异常向量。</td>
+      </tr>
+      <tr>
+          <td>pmp_mmio</td>
+          <td>指示当前指令块是否在 MMIO 空间。</td>
+      </tr>
+      <tr>
+          <td>itlb_pbmt</td>
+          <td>ITLB 基于客户页的内存类型，对 MMIO 状态有用。</td>
+      </tr>
+      <tr>
+          <td>backendException</td>
+          <td>后端是否存在异常。</td>
+      </tr>
+      <tr>
+          <td>gpaddr</td>
+          <td>客户页地址。</td>
+      </tr>
+      <tr>
+          <td>isForVSnonLeafPTE</td>
+          <td>是否为非叶的 PTE，来自 itlb。</td>
+      </tr>
   </tbody>
 </table>
-<p>|doubleLine| 指示预测块是否跨缓存行。|
-|vaddr |指令块起始虚拟地址、下一个缓存行的虚拟地址。|
-|data |要传送的缓存行。|
-|paddr |指令块的起始物理地址|
-|exception| 向 IFU 报告每个缓存行上的异常情况，方便 ICache 生成每个指令的异常向量。|
-|pmp_mmio| 指示当前指令块是否在 MMIO 空间。|
-|itlb_pbmt |ITLB 基于客户页的内存类型，对 MMIO 状态有用。|
-|backendException| 后端是否存在异常。|
-|gpaddr| 客户页地址。|
-|isForVSnonLeafPTE| 是否为非叶的 PTE，来自 itlb。|</p>
 <h4 id="flush全局刷新信号">flush：全局刷新信号</h4>
 <p>来自 FTQ。</p>
 <h4 id="pmp-物理内存保护相关的信息-1">pmp: 物理内存保护相关的信息</h4>
