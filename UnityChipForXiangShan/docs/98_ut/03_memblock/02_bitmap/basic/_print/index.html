@@ -1,0 +1,677 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-cn" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="canonical" type="text/html" href="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/">
+<link rel="alternate" type="application/rss&#43;xml" href="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/index.xml">
+<meta name="robots" content="noindex, nofollow">
+
+
+<link rel="shortcut icon" href="/UnityChipForXiangShan/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/UnityChipForXiangShan/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
+
+<title>Shield-XS Bitmap 基础知识 | 万众一芯之香山处理器</title>
+<meta name="description" content="本文档介绍了bitmap 安全隔离的基础设计思想，通过阅读本文档，你可以知道为什么需要bitmap， 以及其应用场景">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="Shield-XS Bitmap 基础知识">
+  <meta property="og:description" content="本文档介绍了bitmap 安全隔离的基础设计思想，通过阅读本文档，你可以知道为什么需要bitmap， 以及其应用场景">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="Shield-XS Bitmap 基础知识">
+  <meta itemprop="description" content="本文档介绍了bitmap 安全隔离的基础设计思想，通过阅读本文档，你可以知道为什么需要bitmap， 以及其应用场景">
+  <meta itemprop="dateModified" content="2025-08-21T11:42:44+08:00">
+  <meta itemprop="wordCount" content="106">
+  <meta itemprop="keywords" content="香山,Bitmap,基础">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Shield-XS Bitmap 基础知识">
+  <meta name="twitter:description" content="本文档介绍了bitmap 安全隔离的基础设计思想，通过阅读本文档，你可以知道为什么需要bitmap， 以及其应用场景">
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.356574e8308264151b533ef504ebe576b67671f54b4f4d7f8077b25dc08441c6.css" as="style" integrity="sha256-NWV06DCCZBUbUz71BOvldrZ2cfVLT01/gHeyXcCEQcY=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.356574e8308264151b533ef504ebe576b67671f54b4f4d7f8077b25dc08441c6.css" rel="stylesheet" integrity="sha256-NWV06DCCZBUbUz71BOvldrZ2cfVLT01/gHeyXcCEQcY=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/UnityChipForXiangShan/css/prism.css"/>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
+  </head>
+  <body class="td-section">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/UnityChipForXiangShan/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">万众一芯之香山处理器</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.faaae6645c4a0ecb102c7a11debc82be.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+
+
+
+
+<div class="td-content">
+<div class="pageinfo pageinfo-primary d-print-none">
+<p>
+这是本节的多页打印视图。
+<a href="#" onclick="print();return false;">点击此处打印</a>.
+</p><p>
+<a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/">返回本页常规视图</a>.
+</p>
+</div>
+
+
+
+<h1 class="title">Shield-XS Bitmap 基础知识</h1>
+<div class="lead">本文档介绍了bitmap 安全隔离的基础设计思想，通过阅读本文档，你可以知道为什么需要bitmap， 以及其应用场景</div>
+
+
+
+
+    <ul>
+    
+  
+  
+  
+  
+
+  
+    
+    
+	
+<li>1: <a href="#pg-dd1286eb042d33c71170880919743180">背景描述</a></li>
+
+
+    
+  
+    
+    
+	
+<li>2: <a href="#pg-750b311a404f64437ad197e254e70ed8">香山 bitmap 防御原理</a></li>
+
+
+    
+  
+    
+    
+	
+<li>3: <a href="#pg-b732fa4bed6f7770e375f277d3134d11">bitmap的工作流程</a></li>
+
+
+    
+  
+    
+    
+	
+<li>4: <a href="#pg-769d220f5cb16bbfee3403c98ead0181">香山bitmap 应用场景</a></li>
+
+
+    
+  
+
+    </ul>
+
+
+<div class="content">
+      <p>本节将介绍 bitmap 的一些基础知识，有助于理解为什么我们需要 bitmap，本节包含：</p>
+<ul>
+<li><strong>背景描述</strong></li>
+<li><strong>威胁模型</strong></li>
+<li><strong>防御原理</strong></li>
+<li><strong>工作流程</strong></li>
+<li><strong>应用场景</strong></li>
+</ul>
+<h4 id="术语描述">术语描述</h4>
+<table>
+  <thead>
+      <tr>
+          <th>缩写</th>
+          <th>全名</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>TCB</td>
+          <td>Trusted Computing Base</td>
+          <td>可信计算基，负责底层硬件的安全可信操作</td>
+      </tr>
+      <tr>
+          <td>TEE</td>
+          <td>Trusted Execution Environment</td>
+          <td>可信执行环境</td>
+      </tr>
+      <tr>
+          <td>MMU</td>
+          <td>Memory Management Unit</td>
+          <td>内存管理单元</td>
+      </tr>
+      <tr>
+          <td>RDSM</td>
+          <td>Root Domain Security Mananger</td>
+          <td>根域权限管理器</td>
+      </tr>
+      <tr>
+          <td>C-SDSM</td>
+          <td>Confidencial Supervisor Domain Security Manager</td>
+          <td>可信监督域 权限管理器</td>
+      </tr>
+      <tr>
+          <td>APLIC</td>
+          <td>advanced platform level interrupt controller</td>
+          <td>平台级中断控制器</td>
+      </tr>
+      <tr>
+          <td>LLC</td>
+          <td>Last Lavel Cache</td>
+          <td>末级缓存</td>
+      </tr>
+      <tr>
+          <td>DMA</td>
+          <td>Direct Memory Access</td>
+          <td>直接内存访问</td>
+      </tr>
+      <tr>
+          <td>CVM</td>
+          <td>Confidencial Virtual Machine</td>
+          <td>可信虚拟机</td>
+      </tr>
+      <tr>
+          <td>TLB</td>
+          <td>Translation Lookaside Buffer</td>
+          <td>页表缓存</td>
+      </tr>
+      <tr>
+          <td>MBMC</td>
+          <td>machine level bitmap check</td>
+          <td>bitmap CSR 特殊状态寄存器</td>
+      </tr>
+      <tr>
+          <td>BMA</td>
+          <td>Bitmap Adress</td>
+          <td>Shield Bitmap 专属内存区域基地址</td>
+      </tr>
+      <tr>
+          <td>CMODE</td>
+          <td>Confidencial Mode</td>
+          <td>开启bitmap后当前模式是否是可信</td>
+      </tr>
+      <tr>
+          <td>BME</td>
+          <td>Bitmap Enable</td>
+          <td>是否开启 Bitmap</td>
+      </tr>
+      <tr>
+          <td>PTW</td>
+          <td>Page Table Walker</td>
+          <td>页表遍历器</td>
+      </tr>
+      <tr>
+          <td>HPTW</td>
+          <td>Hypervisor PTW</td>
+          <td>监督域页表遍历器</td>
+      </tr>
+      <tr>
+          <td>LLPTW</td>
+          <td>Last Level PTW</td>
+          <td>末级页表遍历器</td>
+      </tr>
+  </tbody>
+</table>
+
+</div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+  
+
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-dd1286eb042d33c71170880919743180">1 - 背景描述</h1>
+    <div class="lead">解释下为什么需要bitmap 进行隔离</div>
+	<h2 id="背景描述">背景描述</h2>
+<p>自计算机问世以来，数据安全始终是至关重要的议题。在个人计算机时代，数据安全主要集中在单机硬盘等存储设备的安全性上。随着互联网时代的到来，数据安全的范畴扩展到了计算机之间数据传输的安全性，促使了安全传输协议的设计与发展。如今，在云计算时代，用户的大量数据被存储和处理在云端。在云环境中存储、共享和计算的数据面临着多重安全威胁。在云计算环境下，不同类型的负载面临各自的威胁模型包括但不限于：</p>
+<p>计算型负载：恶意软件可能侵入操作系统或固件，攻击 CPU 和内存资源，导致数据泄露或系统性能下降。</p>
+<p>内存型负载：恶意软件或进程可能试图访问内存型负载使用的内存区域，导致数据泄露或篡改。</p>
+<p>存储型负载：存储设备及其 DMA 功能可能被攻击者利用，直接访问或篡改存储设备内存，绕过传统安全检查。</p>
+<p>网络型负载：网络攻击可能利用网络接口控制器（NIC）等网络设备漏洞入侵系统，通过 DMA 功能访问或篡改内存中的敏感数据。</p>
+<h4 id="不同工作负载面临的安全威胁">不同工作负载面临的安全威胁</h4>
+<p><img src="../../basic00_1.png" alt="不同工作负载面临的安全威胁"></p>
+<h2 id="威胁模型">威胁模型</h2>
+<hr>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left"><strong>类别</strong></th>
+          <th style="text-align: left"><strong>安全准则</strong></th>
+          <th style="text-align: left"><strong>描述</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>内存分配</strong></td>
+          <td style="text-align: left">动态分配安全/非安全内存的能力</td>
+          <td style="text-align: left">安全内存应根据需求动态分配或释放。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>内存机密性</strong></td>
+          <td style="text-align: left">内存隔离</td>
+          <td style="text-align: left">防止非可信计算基（non-TCB）组件读取可信执行环境（TEE）的内存。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">抵御软件攻击的内存完整性</td>
+          <td style="text-align: left">防止软件攻击（如内存重映射、别名攻击、重放攻击、数据破坏等）。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>共享内存</strong></td>
+          <td style="text-align: left">TEE控制与非TCB组件的数据共享</td>
+          <td style="text-align: left">防止非TCB代码在未经TEE同意的情况下泄露信息。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">TEE控制与其他TEE的数据共DUT 享</td>
+          <td style="text-align: left">支持TEE之间安全共享内存的能力。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>I/O保护</strong></td>
+          <td style="text-align: left">防止非TCB设备通过DMA访问TEE内存</td>
+          <td style="text-align: left">禁止未被TCB接纳的外设设备访问TEE内存。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"></td>
+          <td style="text-align: left">来自TCB内设备的可信I/O</td>
+          <td style="text-align: left">通过准入控制将设备绑定到TEE。</td>
+      </tr>
+  </tbody>
+</table>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-750b311a404f64437ad197e254e70ed8">2 - 香山 bitmap 防御原理</h1>
+    <div class="lead">本节介绍了bitmap 的基础思想和工作原理</div>
+	<h2 id="防御原理">防御原理</h2>
+<p>针对日益复杂的负载的安全威胁，香山轻量动态隔离模型为经典负载机密虚拟机和容器设计了一种动态隔离机制，用来保护正在使用中的数据的机密性和完整性。依据不同的应用场景，将负载从安全的维度进行划分，分为安全敏感型负载和非安全敏感型负载。</p>
+<p>安全敏感型负载需要运行在可信执行环境下，用来保护正在使用中数据和代码的机密性和完整性。非安全敏感型负载对数据没有安全性保护需求，执行在开放的执行环境下，保证执行的效率。</p>
+<p>基于bitmap的安全隔离的防御机制，其核心原理是通过可信根在软件层面的标记（Shield-bit）来隔离和保护敏感工作负载（Sensitive Workloads）与普通工作负载（Normal Workloads），从而增强系统的安全性。以下是其防御原理的详细描述：</p>
+<h3 id="1-分类与标记">1. 分类与标记</h3>
+<p><strong>工作负载分类</strong>：系统将工作负载分为两类：</p>
+<ul>
+<li>
+<p><strong>敏感工作负载（Sensitive Workloads）</strong>：需要高安全级别的任务，如机密虚拟机、安全容器的任务（隐私数据的访问、处理）等。</p>
+</li>
+<li>
+<p><strong>普通工作负载（Normal Workloads）</strong>：常规任务，代表系统中普通的应用程序或进程，安全要求较低。</p>
+</li>
+</ul>
+<p><strong>Shield-bit 标记</strong>：通过 “Shield-bit”（<strong>每比特代表 4KB</strong>）对敏感工作负载使用的资源进行标记，依据需此标记动态调整资源访问权限：</p>
+<ul>
+<li>
+<p><code>Shield-bit = 1</code> 表示<strong>安全敏感资源</strong></p>
+</li>
+<li>
+<p><code>Shield-bit = 0</code> 表示<strong>非安全敏感资源</strong></p>
+</li>
+</ul>
+<h3 id="2-资源隔离">2. 资源隔离</h3>
+<p><strong>资源池划分</strong>：<a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/01_bm_principle/#light_model_img">图中</a>显示资源池中包含混合的敏感和普通工作负载，但通过 Shield-bit 实现逻辑隔离。</p>
+<p><strong>资源类型保护</strong>：敏感工作负载访问特定资源（如内存、IO设备、中断等）时，Shield-bit 会触发保护机制，防止普通工作负载或恶意程序越权访问。例如：</p>
+<ol>
+<li>
+<p><strong>内存隔离</strong>：敏感数据的内存区域仅对标记为敏感的工作负载可访问。</p>
+</li>
+<li>
+<p><strong>设备与中断保护</strong>：关键外设或中断仅允许敏感工作负载调用。</p>
+</li>
+</ol>
+<h3 id="3-bypass-机制">3. Bypass 机制</h3>
+<p><strong>Bypass Shield-bit</strong>：在单向隔离的情况下（仅对普通负载的资源访问作限制），安全敏感负载可绕过 Shield-bit 的机制直接访问资源提升性能。</p>
+<h3 id="4-防御目标">4. 防御目标</h3>
+<p><strong>防止横向渗透</strong>：攻击者通过普通工作负载漏洞无法访问敏感资源。</p>
+<p><strong>最小权限原则</strong>：每个工作负载仅能访问其必需的资源，降低攻击面。</p>
+<p><strong>动态安全调整</strong>：根据工作负载的敏感程度动态切换保护状态。</p>
+<h3 id="5-技术实现">5. 技术实现</h3>
+<p><strong>硬件支持</strong>：依赖内存管理单元（MMU）的扩展功能。</p>
+<p><strong>软件协同</strong>：由可信计算基负责标记管理和资源调度。</p>
+<span id="light_model_img"/>
+<h4 id="香山shield-xs-轻量隔离模型">香山Shield-XS 轻量隔离模型</h4>
+<p><img src="../../basic01_1.png" alt="香山Shield-XS 轻量隔离模型"></p>
+<h3 id="6-核心工作流程">6. 核心工作流程</h3>
+<h4 id="shield-xs-隔离模型工作流程">Shield-XS 隔离模型工作流程</h4>
+<p><img src="../../basic01_2.png" alt="Shield-XS 隔离模型工作流程"></p>
+<p><strong>A. 启动</strong></p>
+<p>系统初始化，加载固件（Firmware TCB）和可信执行环境（TEE TCB）。</p>
+<p>开启Bitmap安全检测功能。</p>
+<p><strong>B. 配置</strong></p>
+<p>设定安全策略，例如定义受保护资源（内存、IO、中断等）访问权限。</p>
+<p>TEE-TCB 依据应用需求配置不同资源的安全/非安全属性。</p>
+<p><strong>C. 检测</strong></p>
+<p>硬件监控访问行为，识别异常或非法访问请求。</p>
+<p>通过 <strong>Bitmap</strong> 或其他机制标记不信任的访问行为。</p>
+<p><strong>D. 故障处理</strong></p>
+<p>当检测到违规操作（如未授权的内存访问）时，触发安全机制。</p>
+<h3 id="7-关键安全机制">7. 关键安全机制</h3>
+<p>支持对所有地址映射类资源（内存、I/O、中断）的动态隔离。</p>
+<p>资源隔离支持按需分配的，而非静态划分（区别于PMP）。</p>
+<p>使用位图（Bitmap）标记资源的信任状态，快速过滤不信任的访问请求。</p>
+<h3 id="8-技术特点">8. 技术特点</h3>
+<p><strong>灵活性</strong><br>
+动态隔离允许根据运行时需求调整安全策略，适应不同场景。</p>
+<p><strong>细粒度控制</strong><br>
+支持多种资源类型（内存、I/O、中断）的精细化权限管理。</p>
+<p><strong>轻量级检测</strong><br>
+通过Bitmap等高效数据结构实现低开销的安全监控。</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-b732fa4bed6f7770e375f277d3134d11">3 - bitmap的工作流程</h1>
+    <div class="lead">bitmap的工作流程是怎样的？</div>
+	<h2 id="bitmap的工作流程是怎样的">bitmap的工作流程是怎样的？</h2>
+<p><img src="../../basic02_1.png" alt=""></p>
+<h3 id="1-识别负载类型">1. 识别负载类型</h3>
+<p>根据应用场景和安全需求，将负载分为安全敏感型负载和非安全敏感型负载：</p>
+<ul>
+<li>
+<p><strong>安全敏感型负载</strong>：需要在可信执行环境中运行，以保护数据和代码的机密性和完整性。</p>
+</li>
+<li>
+<p><strong>非安全敏感型负载</strong>：可以在开放的执行环境中运行，主要关注执行效率。</p>
+</li>
+</ul>
+<h3 id="2-设置隔离属性">2. 设置隔离属性</h3>
+<p><strong>定义隔离属性</strong>：为不同类型负载设置隔离属性，包括单向隔离和双向隔离。</p>
+<ul>
+<li>
+<p><strong>单向隔离</strong>：允许安全敏感型负载访问非安全敏感型负载的资源，但不允许反向访问。</p>
+</li>
+<li>
+<p><strong>双向隔离</strong>：安全敏感型负载和非安全敏感型负载之间互相不能访问对方的资源。</p>
+</li>
+</ul>
+<h3 id="3-划分资源池">3. 划分资源池</h3>
+<p><strong>划分物理内存资源</strong>：将物理内存划分为不同的资源池以支持不同负载的隔离需求。</p>
+<ul>
+<li>
+<p><strong>安全资源池</strong>：分配给安全敏感型负载。</p>
+</li>
+<li>
+<p><strong>非安全资源池</strong>：分配给非安全敏感型负载。</p>
+</li>
+</ul>
+<h3 id="4-配置安全属性">4. 配置安全属性</h3>
+<p><strong>设置内存页安全状态</strong>：使用Bitmap数据结构标记每个物理内存页的安全状态。</p>
+<ul>
+<li>
+<p><strong>安全页</strong>：标记为1，表示该页属于安全资源池。</p>
+</li>
+<li>
+<p><strong>非安全页</strong>：标记为0，表示该页属于非安全资源池。</p>
+</li>
+</ul>
+<h3 id="5-动态分配资源">5. 动态分配资源</h3>
+<p><strong>按需分配内存</strong>：根据负载的启动和运行时需求，动态分配相应的内存资源。</p>
+<ul>
+<li>
+<p><strong>安全敏感型负载</strong>：从安全资源池分配内存，并确保其访问受限于安全页。</p>
+</li>
+<li>
+<p><strong>非安全敏感型负载</strong>：从非安全资源池分配内存，允许其访问非安全页。</p>
+</li>
+</ul>
+<h3 id="6-隔离检测判断">6. 隔离检测判断</h3>
+<p><strong>判断隔离类型</strong>：判断当前负载是否需要单向隔离或者双向隔离。</p>
+<ul>
+<li>
+<p><strong>单向隔离</strong>：仅对非安全敏感型负载进行安全性检测，确保其不访问安全资源。</p>
+</li>
+<li>
+<p><strong>双向隔离</strong>：对所有负载类型进行隔离检测，确保不同负载之间互不干扰。</p>
+</li>
+</ul>
+<h3 id="7-安全性检测">7. 安全性检测</h3>
+<p><strong>执行访问控制检查</strong>：</p>
+<ul>
+<li>
+<p>对于单向隔离情况，检查非安全敏感型负载是否试图访问安全资源。</p>
+</li>
+<li>
+<p>对于双向隔离情况，检查所有负载类型是否试图越界访问其他类型的资源。</p>
+</li>
+</ul>
+<h3 id="8-动态回收资源">8. 动态回收资源</h3>
+<p><strong>释放不再使用的资源</strong>：负载执行完毕后，其占用的内存资源被回收并返回到相应的资源池中，以便后续其他负载的使用。</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-769d220f5cb16bbfee3403c98ead0181">4 - 香山bitmap 应用场景</h1>
+    <div class="lead">香山bitmap 应用场景</div>
+	<h2 id="应用场景">应用场景</h2>
+<h3 id="1-机密虚拟机">1. 机密虚拟机</h3>
+<p><img src="../../basic03_1.png" alt="应用场景-机密虚拟机"></p>
+<p>Shield-XS用于普通虚拟机和机密虚拟机的隔离。在机密虚拟机（Confidential VM， CVM）环境中，bitmap 用于标记和隔离安全内存区域。</p>
+<p>普通虚拟机在访问内存时，硬件通过 bitmap 检查机制确保其只能访问被授权的内存区域，从而实现虚拟机之间的内存隔离。</p>
+<p>注：机密虚拟机之间的隔离通过MMU 完成，不需要经过Bitmap 的检查机制。</p>
+<p>CVM Bitmap 的资源的标记和分配由C-SDSM (Confidential Supervisor Domain Security Manager) 完成，Hypervisor 和 CVM 通过TEECall 和 TEEResume 进行安全世界的交互。</p>
+<p><img src="../../basic03_2.png" alt="安全世界接口"></p>
+<p><strong>TEECall</strong></p>
+<ul>
+<li>从普通世界（Normal World）切换到安全世界（TEE），进入敏感工作负载执行流程。</li>
+</ul>
+<p><strong>TEEResume</strong></p>
+<ul>
+<li>从 TEE 返回普通世界，恢复 Normal Workloads 的执行。</li>
+</ul>
+<h3 id="2-安全增强容器">2. 安全增强容器</h3>
+<p><img src="../../basic03_3.png" alt="应用场景-容器"></p>
+<p>上图显示了bitmap在容器中的应用场景。安全容器和普通容器都位于可信计算基的保护范围内。在安全容器中运行的应用程序可能包含敏感数据或关键业务逻辑。为了防止这些数据被普通容器或恶意软件访问，采用通过 <strong>bitmap 机制</strong>进行隔离。</p>
+<p>Bitmap 数据结构用于标记哪些物理页属于安全容器的存储空间，通过将对应该容器内存区域的位图数据写为1，确保普通容器无法访问这些存储空间。只有安全容器内的应用程可以访问这些被标记为安全的内存页。</p>
+<p>普通容器中的应用程序可能来自不可信的来源。通过 bitmap 机制，普通容器的内存访问被限制在非安全内存区域。任何试图访问安全内存的请求都会被硬件拦截，并触发Access Fault。</p>
+<p>在上述场景的具体的实施细节中，<strong><font style="color:#ee0000;">软件模块负责Bitmap管理和配置 ， 硬件机制负责Bitmap检查和同步。<font></strong></p>
+
+</div>
+
+
+
+    
+	
+  
+
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2025
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">保留所有权利</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
+<script src='/UnityChipForXiangShan/js/prism.js'></script>
+<script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
