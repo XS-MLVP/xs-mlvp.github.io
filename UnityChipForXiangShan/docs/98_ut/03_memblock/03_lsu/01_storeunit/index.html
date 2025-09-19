@@ -1,0 +1,3991 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-cn" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/UnityChipForXiangShan/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/UnityChipForXiangShan/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/UnityChipForXiangShan/favicons/android-192x192.png" sizes="192x192">
+
+<title>万众一芯之香山处理器</title>
+<meta name="description" content="StoreUnit 本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
+StoreUnit说明文档 文档概述 本文档描述了StoreUnit的结构与功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。 StoreUnit 是存储指令执行单元 ，由多个协同工作的子模块组成，包括其五级流水线处理流程、支持的三种类型store指令（标量、向量、非对齐）、接口设计与信号交互逻辑。该模块用于执行Store类指令的地址生成与处理，是Load/Store流水线中的关键组成部分。
+术语说明 名称 定义 TLB（Translation Lookaside Buffer） 地址转换旁路缓冲器，用于虚拟地址到物理地址的快速转换 PMP（Physical Memory Protection） 物理内存访问权限检查机制 RAW（Read After Write）违例 写后读违例，表示一个load指令读取尚未写入的store数据 MMIO（Memory-Mapped Input/Output） 内存映射IO 存储指令执行 内存单元里包含2条Store地址流水线与2条Store数据流水线。各流水线独立接收并执行对应发射队列派发的指令。
+存储地址流水线 由4级结构组成：
+​Store地址流水线（4级结构）​​
+stage 0:
+计算VA地址
+非对齐 &gt; 向量 &gt; 标量请求的优先级仲裁
+地址非对齐检查更新到uop.exceptionVec
+对地址的16字节边界检测
+发出DTLB读请求到tlb
+更新指令的掩码信息到s0_mask_out发送到StoreQueue
+判断是否为数据宽度为128bits的store指令。
+stage 1:
+接收TLB地址转换响应，TLB若缺失则重试
+查询LoadQueueRAW以进行违规检查
+与加载单元s1和s2阶段的Load指令进行RAW冒险检测
+如果DTLB hit，将store issue信息发送到后端
+stage 2:
+mmio/PMP检查、检查原子操作权限
+更新storeQueue中标记为地址就绪状态
+更新DTLB结果通过feedback_slow更新到后端
+stage 3:
+标量store发起写回，通过stout发送给后端
+StoreQueue条目释放与状态清理
+存储数据流水线 从发射队列（issue queue）接收数据 将数据写回StoreQueue 标记发射队列接收的数据为就绪状态 向量存储指令执行 对于除 SEG指令外的向量内存访问指令，VSSplit 负责接收向量内存访问指令发射队列发送的微操作（uop），并将该微操作拆分为多个元素。随后VSSplit 将这些元素发送至StoreUnit 执行，执行流程与标量内存访问指令相同。执行完成后，元素会被写回至 VSMerge，其中 Merge 模块会将这些元素收集并组合成微操作，最终写回向量寄存器文件。 SEG 指令则由独立的 VSegmentUnit 模块处理。">
+<meta property="og:url" content="https://open-verify.cc/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/">
+  <meta property="og:site_name" content="万众一芯之香山处理器">
+  <meta property="og:title" content="万众一芯之香山处理器">
+  <meta property="og:description" content="StoreUnit 本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
+StoreUnit说明文档 文档概述 本文档描述了StoreUnit的结构与功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。 StoreUnit 是存储指令执行单元 ，由多个协同工作的子模块组成，包括其五级流水线处理流程、支持的三种类型store指令（标量、向量、非对齐）、接口设计与信号交互逻辑。该模块用于执行Store类指令的地址生成与处理，是Load/Store流水线中的关键组成部分。
+术语说明 名称 定义 TLB（Translation Lookaside Buffer） 地址转换旁路缓冲器，用于虚拟地址到物理地址的快速转换 PMP（Physical Memory Protection） 物理内存访问权限检查机制 RAW（Read After Write）违例 写后读违例，表示一个load指令读取尚未写入的store数据 MMIO（Memory-Mapped Input/Output） 内存映射IO 存储指令执行 内存单元里包含2条Store地址流水线与2条Store数据流水线。各流水线独立接收并执行对应发射队列派发的指令。
+存储地址流水线 由4级结构组成：
+​Store地址流水线（4级结构）​​
+stage 0:
+计算VA地址
+非对齐 &gt; 向量 &gt; 标量请求的优先级仲裁
+地址非对齐检查更新到uop.exceptionVec
+对地址的16字节边界检测
+发出DTLB读请求到tlb
+更新指令的掩码信息到s0_mask_out发送到StoreQueue
+判断是否为数据宽度为128bits的store指令。
+stage 1:
+接收TLB地址转换响应，TLB若缺失则重试
+查询LoadQueueRAW以进行违规检查
+与加载单元s1和s2阶段的Load指令进行RAW冒险检测
+如果DTLB hit，将store issue信息发送到后端
+stage 2:
+mmio/PMP检查、检查原子操作权限
+更新storeQueue中标记为地址就绪状态
+更新DTLB结果通过feedback_slow更新到后端
+stage 3:
+标量store发起写回，通过stout发送给后端
+StoreQueue条目释放与状态清理
+存储数据流水线 从发射队列（issue queue）接收数据 将数据写回StoreQueue 标记发射队列接收的数据为就绪状态 向量存储指令执行 对于除 SEG指令外的向量内存访问指令，VSSplit 负责接收向量内存访问指令发射队列发送的微操作（uop），并将该微操作拆分为多个元素。随后VSSplit 将这些元素发送至StoreUnit 执行，执行流程与标量内存访问指令相同。执行完成后，元素会被写回至 VSMerge，其中 Merge 模块会将这些元素收集并组合成微操作，最终写回向量寄存器文件。 SEG 指令则由独立的 VSegmentUnit 模块处理。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-09-19T13:00:53+08:00">
+
+  <meta itemprop="name" content="万众一芯之香山处理器">
+  <meta itemprop="description" content="StoreUnit 本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
+StoreUnit说明文档 文档概述 本文档描述了StoreUnit的结构与功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。 StoreUnit 是存储指令执行单元 ，由多个协同工作的子模块组成，包括其五级流水线处理流程、支持的三种类型store指令（标量、向量、非对齐）、接口设计与信号交互逻辑。该模块用于执行Store类指令的地址生成与处理，是Load/Store流水线中的关键组成部分。
+术语说明 名称 定义 TLB（Translation Lookaside Buffer） 地址转换旁路缓冲器，用于虚拟地址到物理地址的快速转换 PMP（Physical Memory Protection） 物理内存访问权限检查机制 RAW（Read After Write）违例 写后读违例，表示一个load指令读取尚未写入的store数据 MMIO（Memory-Mapped Input/Output） 内存映射IO 存储指令执行 内存单元里包含2条Store地址流水线与2条Store数据流水线。各流水线独立接收并执行对应发射队列派发的指令。
+存储地址流水线 由4级结构组成：
+​Store地址流水线（4级结构）​​
+stage 0:
+计算VA地址
+非对齐 &gt; 向量 &gt; 标量请求的优先级仲裁
+地址非对齐检查更新到uop.exceptionVec
+对地址的16字节边界检测
+发出DTLB读请求到tlb
+更新指令的掩码信息到s0_mask_out发送到StoreQueue
+判断是否为数据宽度为128bits的store指令。
+stage 1:
+接收TLB地址转换响应，TLB若缺失则重试
+查询LoadQueueRAW以进行违规检查
+与加载单元s1和s2阶段的Load指令进行RAW冒险检测
+如果DTLB hit，将store issue信息发送到后端
+stage 2:
+mmio/PMP检查、检查原子操作权限
+更新storeQueue中标记为地址就绪状态
+更新DTLB结果通过feedback_slow更新到后端
+stage 3:
+标量store发起写回，通过stout发送给后端
+StoreQueue条目释放与状态清理
+存储数据流水线 从发射队列（issue queue）接收数据 将数据写回StoreQueue 标记发射队列接收的数据为就绪状态 向量存储指令执行 对于除 SEG指令外的向量内存访问指令，VSSplit 负责接收向量内存访问指令发射队列发送的微操作（uop），并将该微操作拆分为多个元素。随后VSSplit 将这些元素发送至StoreUnit 执行，执行流程与标量内存访问指令相同。执行完成后，元素会被写回至 VSMerge，其中 Merge 模块会将这些元素收集并组合成微操作，最终写回向量寄存器文件。 SEG 指令则由独立的 VSegmentUnit 模块处理。">
+  <meta itemprop="dateModified" content="2025-09-19T13:00:53+08:00">
+  <meta itemprop="wordCount" content="2334">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="万众一芯之香山处理器">
+  <meta name="twitter:description" content="StoreUnit 本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
+StoreUnit说明文档 文档概述 本文档描述了StoreUnit的结构与功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。 StoreUnit 是存储指令执行单元 ，由多个协同工作的子模块组成，包括其五级流水线处理流程、支持的三种类型store指令（标量、向量、非对齐）、接口设计与信号交互逻辑。该模块用于执行Store类指令的地址生成与处理，是Load/Store流水线中的关键组成部分。
+术语说明 名称 定义 TLB（Translation Lookaside Buffer） 地址转换旁路缓冲器，用于虚拟地址到物理地址的快速转换 PMP（Physical Memory Protection） 物理内存访问权限检查机制 RAW（Read After Write）违例 写后读违例，表示一个load指令读取尚未写入的store数据 MMIO（Memory-Mapped Input/Output） 内存映射IO 存储指令执行 内存单元里包含2条Store地址流水线与2条Store数据流水线。各流水线独立接收并执行对应发射队列派发的指令。
+存储地址流水线 由4级结构组成：
+​Store地址流水线（4级结构）​​
+stage 0:
+计算VA地址
+非对齐 &gt; 向量 &gt; 标量请求的优先级仲裁
+地址非对齐检查更新到uop.exceptionVec
+对地址的16字节边界检测
+发出DTLB读请求到tlb
+更新指令的掩码信息到s0_mask_out发送到StoreQueue
+判断是否为数据宽度为128bits的store指令。
+stage 1:
+接收TLB地址转换响应，TLB若缺失则重试
+查询LoadQueueRAW以进行违规检查
+与加载单元s1和s2阶段的Load指令进行RAW冒险检测
+如果DTLB hit，将store issue信息发送到后端
+stage 2:
+mmio/PMP检查、检查原子操作权限
+更新storeQueue中标记为地址就绪状态
+更新DTLB结果通过feedback_slow更新到后端
+stage 3:
+标量store发起写回，通过stout发送给后端
+StoreQueue条目释放与状态清理
+存储数据流水线 从发射队列（issue queue）接收数据 将数据写回StoreQueue 标记发射队列接收的数据为就绪状态 向量存储指令执行 对于除 SEG指令外的向量内存访问指令，VSSplit 负责接收向量内存访问指令发射队列发送的微操作（uop），并将该微操作拆分为多个元素。随后VSSplit 将这些元素发送至StoreUnit 执行，执行流程与标量内存访问指令相同。执行完成后，元素会被写回至 VSMerge，其中 Merge 模块会将这些元素收集并组合成微操作，最终写回向量寄存器文件。 SEG 指令则由独立的 VSegmentUnit 模块处理。">
+<link rel="preload" href="/UnityChipForXiangShan/scss/main.min.356574e8308264151b533ef504ebe576b67671f54b4f4d7f8077b25dc08441c6.css" as="style" integrity="sha256-NWV06DCCZBUbUz71BOvldrZ2cfVLT01/gHeyXcCEQcY=" crossorigin="anonymous">
+<link href="/UnityChipForXiangShan/scss/main.min.356574e8308264151b533ef504ebe576b67671f54b4f4d7f8077b25dc08441c6.css" rel="stylesheet" integrity="sha256-NWV06DCCZBUbUz71BOvldrZ2cfVLT01/gHeyXcCEQcY=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/UnityChipForXiangShan/css/prism.css"/>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/UnityChipForXiangShan/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">万众一芯之香山处理器</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.57aa8a513e411e013755c3b01b9d0802.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.57aa8a513e411e013755c3b01b9d0802.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
+    <div class="td-sidebar-nav__section nav-item dropdown d-block d-lg-none">
+      <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/UnityChipForXiangShan/en/">English</a></li>
+    </ul>
+</div>
+    </div>
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs-li">
+  <a href="/UnityChipForXiangShan/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-unitychipforxiangshandocs"><span class="">进度概述</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-check"/>
+  <label for="m-unitychipforxiangshandocs00_unitychip_for_xiangshan-check"><a href="/UnityChipForXiangShan/docs/00_unitychip_for_xiangshan/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs00_unitychip_for_xiangshan"><span class="">目标验证单元</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs01_verfiy_env-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs01_verfiy_env-check"/>
+  <label for="m-unitychipforxiangshandocs01_verfiy_env-check"><a href="/UnityChipForXiangShan/docs/01_verfiy_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs01_verfiy_env"><span class="">准备验证环境</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs02_run_test-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs02_run_test-check"/>
+  <label for="m-unitychipforxiangshandocs02_run_test-check"><a href="/UnityChipForXiangShan/docs/02_run_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs02_run_test"><span class="">运行测试</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs03_add_test-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test-check"><a href="/UnityChipForXiangShan/docs/03_add_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs03_add_test"><span class="">添加测试</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test01_build_script-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test01_build_script-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test01_build_script-check"><a href="/UnityChipForXiangShan/docs/03_add_test/01_build_script/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test01_build_script"><span class="">添加编译脚本</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test02_build_env-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test02_build_env-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test02_build_env-check"><a href="/UnityChipForXiangShan/docs/03_add_test/02_build_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test02_build_env"><span class="">构建测试环境</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test03_add_test-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test03_add_test-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test03_add_test-check"><a href="/UnityChipForXiangShan/docs/03_add_test/03_add_test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test03_add_test"><span class="">添加测试用例</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test04_cover_line-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test04_cover_line-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test04_cover_line-check"><a href="/UnityChipForXiangShan/docs/03_add_test/04_cover_line/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test04_cover_line"><span class="">代码覆盖率</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs03_add_test05_cover_func-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs03_add_test05_cover_func-check"/>
+  <label for="m-unitychipforxiangshandocs03_add_test05_cover_func-check"><a href="/UnityChipForXiangShan/docs/03_add_test/05_cover_func/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs03_add_test05_cover_func"><span class="">功能覆盖率</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs06_join_us-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs06_join_us-check"/>
+  <label for="m-unitychipforxiangshandocs06_join_us-check"><a href="/UnityChipForXiangShan/docs/06_join_us/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs06_join_us"><span class="">如何参与本项目</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs08_template_pr-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs08_template_pr-check"/>
+  <label for="m-unitychipforxiangshandocs08_template_pr-check"><a href="/UnityChipForXiangShan/docs/08_template_pr/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs08_template_pr"><span class="">模板-PR</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs09_template_issue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs09_template_issue-check"/>
+  <label for="m-unitychipforxiangshandocs09_template_issue-check"><a href="/UnityChipForXiangShan/docs/09_template_issue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs09_template_issue"><span class="">模板-ISSUE</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs10_template_ut_readme-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs10_template_ut_readme-check"/>
+  <label for="m-unitychipforxiangshandocs10_template_ut_readme-check"><a href="/UnityChipForXiangShan/docs/10_template_ut_readme/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs10_template_ut_readme"><span class="">模板-UT-README</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs95_api-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs95_api-check"/>
+  <label for="m-unitychipforxiangshandocs95_api-check"><a href="/UnityChipForXiangShan/docs/95_api/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs95_api"><span class="">常用API</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs96_others-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs96_others-check"/>
+  <label for="m-unitychipforxiangshandocs96_others-check"><a href="/UnityChipForXiangShan/docs/96_others/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs96_others"><span class="">其他</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs97_constraint-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs97_constraint-check"/>
+  <label for="m-unitychipforxiangshandocs97_constraint-check"><a href="/UnityChipForXiangShan/docs/97_constraint/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs97_constraint"><span class="">必要规范</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut-check"><a href="/UnityChipForXiangShan/docs/98_ut/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut"><span class="">验证文档</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut00_standard-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut00_standard"><span class="">验证文档规范</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard00_template"><span class="">文档模板</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard01_fifo-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/01_fifo/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard01_fifo"><span class="">FIFO文档案例</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut00_standard02_nutshell-check"><a href="/UnityChipForXiangShan/docs/98_ut/00_standard/02_nutshell/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut00_standard02_nutshell"><span class="">果壳Cache文档案例</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend"><span class="">Frontend</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/" title="FTQ概述" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq"><span class="">FTQ</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/01_topio/" title="FTQ顶层" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq01_topio"><span class="">01_FTQ顶层</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/02_subqueue/" title="FTQ子队列" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq02_subqueue"><span class="">02_FTQ子队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/03_enqfrombpu/" title="FTQ接收BPU分支预测结果" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq03_enqfrombpu"><span class="">03_FTQ接收BPU分支预测结果</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/04_toifu/" title="FTQ向IFU发送取指目标" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq04_toifu"><span class="">04_FTQ向IFU发送取指目标</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/05_wbfromifu/" title="IFU向FTQ写回预译码信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq05_wbfromifu"><span class="">05_IFU向FTQ写回预译码信息</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/06_-redirectfrombackend/" title="FTQ接收后端重定向" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq06_-redirectfrombackend"><span class="">06_FTQ接收后端重定向</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/07_redirectfromifu/" title="FTQ接收IFU重定向" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq07_redirectfromifu"><span class="">07_FTQ接收IFU重定向</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/08_tobackend/" title="FTQ向后端发送取指目标" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq08_tobackend"><span class="">08_FTQ向后端发送取指目标</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/09_wbfromexu/" title="执行单元修改FTQ状态队列" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq09_wbfromexu"><span class="">09_执行单元修改FTQ状态队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/10_flushptrandstatequeue/" title="冲刷指针和状态队列" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq10_flushptrandstatequeue"><span class="">10_冲刷指针和状态队列</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/03_ftq/11_tobpu/" title="FTQ向BPU发送更新与重定向信息" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend03_ftq11_tobpu"><span class="">11_FTQ向BPU发送更新与重定向信息</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache"><span class="">ICache</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/05_ctrlunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache05_ctrlunit"><span class="">CtrlUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/06_icache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache06_icache"><span class="">ICache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/01_iprefetchpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache01_iprefetchpipe"><span class="">IPrefetchPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/02_mainpipe/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache02_mainpipe"><span class="">MainPipe</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/04_missunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache04_missunit"><span class="">MissUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/04_icache/03_waylookup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend04_icache03_waylookup"><span class="">WayLookup</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu"><span class="">IFU</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/02_f3predecoder/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu02_f3predecoder"><span class="">F3PreDecoder</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/05_frontend_trigger/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu05_frontend_trigger"><span class="">FrontendTrigger</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/04_pred_checker/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu04_pred_checker"><span class="">PredChecker</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/01_predecode/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu01_predecode"><span class="">PreDecode</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/01_ifu/03_ifu_rvc_exp/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend01_ifu03_ifu_rvc_exp"><span class="">RVCExpander</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb"><span class="">ITLB</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/04_io/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb04_io"><span class="">IO接口说明</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/02_func/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb02_func"><span class="">功能详述</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/03_keysignal/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb03_keysignal"><span class="">关键信号说明</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env-check"><a href="/UnityChipForXiangShan/docs/98_ut/01_frontend/02_itlb/01_env/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut01_frontend02_itlb01_env"><span class="">环境配置</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut02_backend-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut02_backend-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut02_backend-check"><a href="/UnityChipForXiangShan/docs/98_ut/02_backend/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut02_backend"><span class="">Backend</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock"><span class="">Mem Block</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq"><span class="">LSQ</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/01_loadqueuerar/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq01_loadqueuerar"><span class="">LoadQueueRAR</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/02_loadqueueraw/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq02_loadqueueraw"><span class="">LoadQueueRAW</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/03_loadqueuereplay/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq03_loadqueuereplay"><span class="">LoadQueueReplay</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/04_loadqueueuncache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq04_loadqueueuncache"><span class="">LoadQueueUncache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/06_storequeue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq06_storequeue"><span class="">StoreQueue</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/01_lsq/05_virtualloadqueue/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock01_lsq05_virtualloadqueue"><span class="">VirtualLoadQueue</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/" title="Shield-XS:基于Bitmap的安全隔离机制" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap"><span class="">香山bitmap 隔离模块</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic"><span class="">Shield-XS Bitmap 基础知识</span></a></label>
+  
+  <ul class="ul-5 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic00_bm_background-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic00_bm_background-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic00_bm_background-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/00_bm_background/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic00_bm_background"><span class="">背景描述</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic01_bm_principle-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic01_bm_principle-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic01_bm_principle-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/01_bm_principle/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic01_bm_principle"><span class="">香山 bitmap 防御原理</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic02_bm_workflow-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic02_bm_workflow-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic02_bm_workflow-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/02_bm_workflow/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic02_bm_workflow"><span class="">bitmap的工作流程</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic03_bm_scenario-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic03_bm_scenario-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic03_bm_scenario-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/basic/03_bm_scenario/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapbasic03_bm_scenario"><span class="">香山bitmap 应用场景</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/feature/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature"><span class="">Shield-XS Bitmap总体设计</span></a></label>
+  
+  <ul class="ul-5 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature00_bm_csr-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature00_bm_csr-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature00_bm_csr-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/feature/00_bm_csr/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature00_bm_csr"><span class="">机器模式Bitmap控制状态寄存器</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature01_bm_acceleration-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature01_bm_acceleration-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature01_bm_acceleration-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/feature/01_bm_acceleration/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature01_bm_acceleration"><span class="">Shield-Bitmap Cache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature02_bm_mmu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature02_bm_mmu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature02_bm_mmu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/feature/02_bm_mmu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature02_bm_mmu"><span class="">Shield-Bitmap 地址翻译</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature03_bm_mmu_with_bm-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature03_bm_mmu_with_bm-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature03_bm_mmu_with_bm-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/feature/03_bm_mmu_with_bm/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapfeature03_bm_mmu_with_bm"><span class="">Shield-Bitmap 地址翻译2</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/modules/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules"><span class="">Shield-XS Bitmap 硬件设计</span></a></label>
+  
+  <ul class="ul-5 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules00_bm_checker-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules00_bm_checker-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules00_bm_checker-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/modules/00_bm_checker/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules00_bm_checker"><span class="">Bitmap Checker</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules01_bm_cache-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules01_bm_cache-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules01_bm_cache-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/modules/01_bm_cache/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules01_bm_cache"><span class="">Bitmap Cache</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules02_bm_l2tlb-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules02_bm_l2tlb-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules02_bm_l2tlb-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/modules/02_bm_l2tlb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules02_bm_l2tlb"><span class="">Bitmap 与L2TLB交互</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules03_bm_timing-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules03_bm_timing-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules03_bm_timing-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/modules/03_bm_timing/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules03_bm_timing"><span class="">Bitmap接口时序图</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules04_bm_cost-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules04_bm_cost-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules04_bm_cost-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/modules/04_bm_cost/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapmodules04_bm_cost"><span class="">开销评估</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapverification-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapverification-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapverification-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/verification/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapverification"><span class="">Shield-XS_Bitmap 单元验证</span></a></label>
+  
+  <ul class="ul-5 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapverification00_bm_verification-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapverification00_bm_verification-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapverification00_bm_verification-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/verification/00_bm_verification/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmapverification00_bm_verification"><span class="">单元验证</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" title="LSU" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">香山LSU模块</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class=""></span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="td-sidebar-nav-active-item"></span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut04_misc-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut04_misc-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut04_misc-check"><a href="/UnityChipForXiangShan/docs/98_ut/04_misc/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut04_misc"><span class="">Misc</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs99_maintain-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs99_maintain-check"/>
+  <label for="m-unitychipforxiangshandocs99_maintain-check"><a href="/UnityChipForXiangShan/docs/99_maintain/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs99_maintain"><span class="">维护者</span></a></label>
+  
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_ut/03_memblock/03_lsu/01_storeunit.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_ut/03_memblock/03_lsu/01_storeunit.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs/98_ut/03_memblock/03_lsu?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan//issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
+  <a id="print" href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#文档概述">文档概述</a></li>
+    <li><a href="#术语说明">术语说明</a>
+      <ul>
+        <li><a href="#存储指令执行">存储指令执行</a></li>
+        <li><a href="#向量存储指令执行">向量存储指令执行</a></li>
+        <li><a href="#非对齐存储指令执行">非对齐存储指令执行</a></li>
+        <li><a href="#raw违例">RAW违例</a></li>
+      </ul>
+    </li>
+    <li><a href="#整体框图及流水级">整体框图及流水级</a></li>
+    <li><a href="#storeunit功能说明">StoreUnit功能说明</a>
+      <ul>
+        <li><a href="#1-内存指令派发">1. 内存指令派发</a></li>
+        <li><a href="#2-地址流水线">2. 地址流水线</a></li>
+        <li><a href="#3-向量内存指令执行">3. 向量内存指令执行</a></li>
+        <li><a href="#4-重执行">4. 重执行​</a></li>
+        <li><a href="#5-raw处理">5. RAW处理</a></li>
+        <li><a href="#6-sbuffer优化">6. SBuffer优化</a></li>
+        <li><a href="#7-mmio处理">7. MMIO处理</a></li>
+        <li><a href="#8-uncache指令执行">8. Uncache指令执行</a></li>
+        <li><a href="#9-非对齐内存访问">9. 非对齐内存访问</a></li>
+        <li><a href="#10-原子指令执行">10. 原子指令执行</a></li>
+      </ul>
+    </li>
+    <li><a href="#常量说明">常量说明</a></li>
+    <li><a href="#接口说明">接口说明</a>
+      <ul>
+        <li><a href="#输入接口">输入接口</a></li>
+        <li><a href="#输出接口">输出接口</a></li>
+      </ul>
+    </li>
+    <li><a href="#接口时序">接口时序</a>
+      <ul>
+        <li><a href="#接口时序实例">接口时序实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#测试点总表">测试点总表</a></li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tag Cloud</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/bitmap/" data-taxonomy-term="bitmap"><span class="taxonomy-label">Bitmap</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E5%9F%BA%E7%A1%80/" data-taxonomy-term="%E5%9F%BA%E7%A1%80"><span class="taxonomy-label">基础</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E5%AE%89%E5%85%A8%E9%9A%94%E7%A6%BB/" data-taxonomy-term="%E5%AE%89%E5%85%A8%E9%9A%94%E7%A6%BB"><span class="taxonomy-label">安全隔离</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82/" data-taxonomy-term="%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82"><span class="taxonomy-label">技术细节</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E7%A1%AC%E4%BB%B6/" data-taxonomy-term="%E7%A1%AC%E4%BB%B6"><span class="taxonomy-label">硬件</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E9%A6%99%E5%B1%B1/" data-taxonomy-term="%E9%A6%99%E5%B1%B1"><span class="taxonomy-label">香山</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/tags/%E9%AA%8C%E8%AF%81/" data-taxonomy-term="%E9%AA%8C%E8%AF%81"><span class="taxonomy-label">验证</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  <div class="taxonomy taxonomy-terms-cloud taxo-categories">
+      <h5 class="taxonomy-title">Categories</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/categories/bitmap-%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82/" data-taxonomy-term="bitmap-%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82"><span class="taxonomy-label">Bitmap 技术细节</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/categories/bitmap-%E7%A1%AC%E4%BB%B6%E5%AE%9E%E7%8E%B0/" data-taxonomy-term="bitmap-%E7%A1%AC%E4%BB%B6%E5%AE%9E%E7%8E%B0"><span class="taxonomy-label">Bitmap 硬件实现</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/categories/%E9%A6%99%E5%B1%B1-bitmap-%E5%9F%BA%E7%A1%80%E8%AE%BE%E8%AE%A1/" data-taxonomy-term="%E9%A6%99%E5%B1%B1-bitmap-%E5%9F%BA%E7%A1%80%E8%AE%BE%E8%AE%A1"><span class="taxonomy-label">香山 Bitmap 基础设计</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/UnityChipForXiangShan/categories/%E9%A6%99%E5%B1%B1bitmap%E9%AA%8C%E8%AF%81/" data-taxonomy-term="%E9%A6%99%E5%B1%B1bitmap%E9%AA%8C%E8%AF%81"><span class="taxonomy-label">香山bitmap验证</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/">进度概述</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/">验证文档</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/">Mem Block</a></li>
+  <li class="breadcrumb-item">
+    <a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/">香山LSU模块</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    </li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1></h1>
+	
+	<header class="article-meta">
+		
+  </header>
+	<h1 id="storeunit">StoreUnit</h1>
+<h4 id="本文档参考香山storeunit设计文档写成">本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/blob/master/docs/zh/memblock/LSU/index.md">香山StoreUnit设计文档</a>写成</h4>
+<p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
+<h1 id="storeunit说明文档">StoreUnit说明文档</h1>
+<h2 id="文档概述">文档概述</h2>
+<p>本文档描述了StoreUnit的结构与功能，并根据功能给出测试点参考，方便测试的参与者理解测试需求，编写相关测试用例。
+StoreUnit 是存储指令执行单元 ，由多个协同工作的子模块组成，包括其五级流水线处理流程、支持的三种类型store指令（标量、向量、非对齐）、接口设计与信号交互逻辑。该模块用于执行Store类指令的地址生成与处理，是Load/Store流水线中的关键组成部分。</p>
+<h2 id="术语说明">术语说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>TLB（Translation Lookaside Buffer）</td>
+          <td>地址转换旁路缓冲器，用于虚拟地址到物理地址的快速转换</td>
+      </tr>
+      <tr>
+          <td>PMP（Physical Memory Protection）</td>
+          <td>物理内存访问权限检查机制</td>
+      </tr>
+      <tr>
+          <td>RAW（Read After Write）违例</td>
+          <td>写后读违例，表示一个load指令读取尚未写入的store数据</td>
+      </tr>
+      <tr>
+          <td>MMIO（Memory-Mapped Input/Output）</td>
+          <td>内存映射IO</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="存储指令执行">存储指令执行</h3>
+<p>内存单元里包含2条Store地址流水线与2条Store数据流水线。各流水线独立接收并执行对应发射队列派发的指令。</p>
+<h4 id="存储地址流水线">存储地址流水线</h4>
+<p><img src="scalar.png" alt="Scalar"></p>
+<p>由4级结构组成：</p>
+<p>​Store地址流水线（4级结构）​​</p>
+<ul>
+<li>
+<p>stage 0:</p>
+<ul>
+<li>
+<p>计算VA地址</p>
+</li>
+<li>
+<p>非对齐 &gt; 向量 &gt; 标量请求的优先级仲裁</p>
+</li>
+<li>
+<p>地址非对齐检查更新到uop.exceptionVec</p>
+</li>
+<li>
+<p>对地址的16字节边界检测</p>
+</li>
+<li>
+<p>发出DTLB读请求到tlb</p>
+</li>
+<li>
+<p>更新指令的掩码信息到s0_mask_out发送到StoreQueue</p>
+</li>
+<li>
+<p>判断是否为数据宽度为128bits的store指令。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>stage 1:</p>
+<ul>
+<li>
+<p>接收TLB地址转换响应，TLB若缺失则重试</p>
+</li>
+<li>
+<p>查询LoadQueueRAW以进行违规检查</p>
+</li>
+<li>
+<p>与加载单元s1和s2阶段的Load指令进行RAW冒险检测</p>
+</li>
+<li>
+<p>如果DTLB hit，将store issue信息发送到后端</p>
+</li>
+</ul>
+</li>
+<li>
+<p>stage 2:</p>
+<ul>
+<li>
+<p>mmio/PMP检查、检查原子操作权限</p>
+</li>
+<li>
+<p>更新storeQueue中标记为地址就绪状态</p>
+</li>
+<li>
+<p>更新DTLB结果通过feedback_slow更新到后端</p>
+</li>
+</ul>
+</li>
+<li>
+<p>stage 3:</p>
+<ul>
+<li>
+<p>标量store发起写回，通过stout发送给后端</p>
+</li>
+<li>
+<p>StoreQueue条目释放与状态清理</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="存储数据流水线">存储数据流水线</h4>
+<ul>
+<li>从发射队列（issue queue）接收数据</li>
+<li>将数据写回StoreQueue</li>
+<li>标记发射队列接收的数据为就绪状态</li>
+</ul>
+<h3 id="向量存储指令执行">向量存储指令执行</h3>
+<p>对于除 SEG指令外的向量内存访问指令，VSSplit 负责接收向量内存访问指令发射队列发送的微操作（uop），并将该微操作拆分为多个元素。随后VSSplit 将这些元素发送至StoreUnit 执行，执行流程与标量内存访问指令相同。执行完成后，元素会被写回至 VSMerge，其中 Merge 模块会将这些元素收集并组合成微操作，最终写回向量寄存器文件。
+SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
+<p><img src="vector.png" alt="Vector"></p>
+<p>StoreUnit处理非对齐Store指令流程和标量类似，特别的:</p>
+<ul>
+<li>
+<p>stage 0:</p>
+<ul>
+<li>接受vsSplit的执行请求，优先级高于标量请求,并且不需要计算虚拟地址</li>
+</ul>
+</li>
+<li>
+<p>stage 1:</p>
+<ul>
+<li>计算vecVaddrOffset和vecTriggerMask</li>
+</ul>
+</li>
+<li>
+<p>stage 2:</p>
+<ul>
+<li>不需要向后端发送feedback_slow响应</li>
+</ul>
+</li>
+<li>
+<p>stage 3:</p>
+<ul>
+<li>向量store发起Writeback，通过vecstout发送给后端</li>
+</ul>
+</li>
+</ul>
+<h3 id="非对齐存储指令执行">非对齐存储指令执行</h3>
+<p>香山核支持标量与向量内存指令对存储空间进行非对齐访问。</p>
+<p>标量非对齐访问未跨越16B边界时可正常执行，无需特殊处理，而跨越16B边界的标量非对齐内存访问在MisalignBuffer中拆分为两次对齐内存操作，完成后由MisalignBuffer处理拼接与写回。</p>
+<p>向量非Segment的Unit-stride指令访问连续地址空间，合并元素后一次访问16B，因此无需特殊处理。</p>
+<p>非Unit-stride的非Segment向量指令由VSplit模块完成元素拆分与地址计算后发送至流水线。若元素非对齐则发送至MisalignBuffer，后续过程与非对齐标量相同，区别在于MisalignBuffer最终写回至VMerge而非直接后端</p>
+<p>向量Segment指令的非对齐处理由VSegmentUnit独立完成，不复用标量内存访问路径，通过独立状态机完成</p>
+<p>原子指令、MMIO与NC地址空间均不支持非对齐访问，这些情况将触发AccessFault异常。</p>
+<p><img src="misalign.png" alt="Misalign"></p>
+<p>StoreUnit处理非对齐Store指令流程和标量类似，特别的:</p>
+<ul>
+<li>
+<p>stage 0:</p>
+<ul>
+<li>接受来自StoreMisalignBuffer的请求，优先级高于向量和标量请求,并且不需要计算虚拟地址</li>
+</ul>
+</li>
+<li>
+<p>stage 2:</p>
+<ul>
+<li>
+<p>不需要向后端发送feedback响应</p>
+</li>
+<li>
+<p>如果不是来自于StoreMisalignBuffer的请求并且没有跨越16字节边界的非对齐请求，那么需要进入StoreMisalignBuffer处理</p>
+<ul>
+<li>通过io_misalign_buf接口，向StoreMisalignBuffer发送入队请求</li>
+</ul>
+</li>
+<li>
+<p>如果是来自与StoreMisalignBuffer的请求并且没有跨越16字节边界请求，则需要向StoreMisliagnBuffer发送重发或者写回响应</p>
+<ul>
+<li>
+<p>通过io_misalign_sout接口，向StoreMisalignBuffer发送响应</p>
+</li>
+<li>
+<p>如果出现TLB miss，则需要重发，否则写回</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="raw违例">RAW违例</h3>
+<p>RAW内存违例：处理器核执行的Load指令的结果应来源于当前处理器核观察到的全局内存顺序中最新的写操作。具体而言，若最新的写操作来自当前核的Store指令，则Load应获取该Store写入的数据。为优化Load指令性能，超标量乱序处理器会投机执行Loads。因此，Load指令可能早于地址相同的更早Store执行，从而获取到该Store之前的旧值，即构成RAW内存违例。</p>
+<h2 id="整体框图及流水级">整体框图及流水级</h2>
+<p>Store指令地址流水线分为S0/S1/S2/S3四级,如图所示：</p>
+<p><img src="StoreUnit.png" alt="StoreUnit整体框图"></p>
+<p>接收store地址发射队列发来的请求，处理完成之后需要给后端和向量部分响应，处理过程中需要给发射队列反馈信息，给StoreQueue反馈信息，最后写回, 如果中间出现异常则从发射队列重新发射。</p>
+<mrs-functions>
+<h2 id="storeunit功能说明">StoreUnit功能说明</h2>
+<p>StoreUnit是存储指令的逻辑，功能被解构并集成到了 ​Memory Dispatch Queue、STA、STD、Integer ALUs、StoreQueue、SBuffer、LoadQueueRAW/RAR以及 DTLB​ 等一系列子模块中。</p>
+<h3 id="1-内存指令派发">1. 内存指令派发</h3>
+<p>Store指令存在复杂的控制机制（如顺序、转发、违例等），因此需要队列来保存Store指令的先进先出顺序以进行相关控制，该队列即StoreQueue。Store指令在完成译码、重命名等操作后，需要派发至ROB与LSQ，分配对应的robIdx、lqIdx与sqIdx，随后进入各自发射队列。在所有源操作数就绪后发射至MemBlock中的流水线。在MemBlock中的执行生命周期内，Store指令会携带lqIdx与sqIdx，用于内存违例检测与数据转发时的顺序维护。</p>
+<p>对于标量内存访问指令，一条指令分配一个StoreQueue表项。</p>
+<p>对于向量内存访问指令，一条指令在译码阶段会被拆分为多个uop，每个uop包含若干元素，相当于一次内存访问操作。在派发时，一个uop会分配与其包含元素数量相等的多个LSQ表项。</p>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>SU_DISPATCH</td>
+          <td>SCALAR_DISPATCH</td>
+          <td>验证标量Store指令派发时分配一个StoreQueue条目。</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>SU_DISPATCH</td>
+          <td>VECTOR_DISPATCH</td>
+          <td>验证向量Store指令的一个uop分配多个LSQ条目（根据元素数量）。</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="2-地址流水线">2. 地址流水线</h3>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2.1</td>
+          <td>SU_STORE</td>
+          <td>S0_ADDRESS_CALC</td>
+          <td>验证s0阶段地址计算和仲裁。</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>SU_STORE</td>
+          <td>S1_RAW_CHECK</td>
+          <td>验证s1阶段RAW冒险检测。</td>
+      </tr>
+      <tr>
+          <td>2.3</td>
+          <td>SU_STORE</td>
+          <td>S2_SQ_MARK_READY</td>
+          <td>验证s2阶段StoreQueue地址就绪标记。</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="3-向量内存指令执行">3. 向量内存指令执行</h3>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>3.1</td>
+          <td>SU_VECTOR</td>
+          <td>SPLIT</td>
+          <td>验证向量指令拆分正确性。</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>SU_VECTOR</td>
+          <td>OFFSET</td>
+          <td>元素偏移计算</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="4-重执行">4. 重执行​</h3>
+<p>存储指令会被发射队列重新传输，在一个存储指令被发射队列发射后，队列不会立即清除该指令，直到StoreUnit返回信号。StoreUnit根据TLB是否命中发送相应反馈。如果TLB未命中，则由指令发射队列负责重新发送该指令。</p>
+<h3 id="5-raw处理">5. RAW处理</h3>
+<p>RAW内存访问违例检测：LoadQueue中的LoadQueueRAW模块通过FreeList结构记录所有可能地址相同但尚未执行更早Store的Load指令。当Load指令在LoadUnit执行到s2阶段（此时地址转换与PMA/PMP检查已完成）时，会分配LoadQueueRAW表项。当StoreQueue中所有Store地址就绪后，LoadQueueRAW中的所有Load可释放；或当程序顺序早于它的所有Store地址就绪后，该Load可从LoadQueueRAW释放。若Store指令在查询LoadQueueRAW时发现存在地址相同的更晚Load，则发生RAW内存访问违例，需要回滚。</p>
+<p>RAW内存访问违例恢复：检测到RAW违例时，由LoadQueueRAW发起回滚，从造成违例的Store指令的下一条指令开始清空流水线。</p>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>5.1</td>
+          <td>SU_RAW</td>
+          <td>VIOLATION</td>
+          <td>验证RAW违例检测。</td>
+      </tr>
+      <tr>
+          <td>5.2</td>
+          <td>SU_RAW</td>
+          <td>RECOVERY_MECH</td>
+          <td>验证检测到RAW违例后的恢复（流水线清空）。</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="6-sbuffer优化">6. SBuffer优化</h3>
+<p>根据RVWMO模型，在多核场景下（无FENCE等栅栏语义指令时），一个核的Store指令可以比地址不同的更晚Load指令更晚对其他核可见。该内存模型规则主要优化Store指令性能。RVWMO等弱一致性模型允许处理器核包含SBuffer，暂时保存已提交的Store写操作，合并这些写操作后再写入DCache，从而减少Store指令对DCache SRAM端口的争用，提高Load指令执行带宽。</p>
+<p>SBuffer为16×512B的全相联结构。当多个Store地址落在同一缓存块时，SBuffer会合并这些Store。</p>
+<p>SBuffer每周期最多可写入2条Store指令，每条Store指令写数据位宽为16B（例外：cbo.zero指令按缓存块操作，一次操作一个缓存块）。</p>
+<p>SBuffer换出：</p>
+<p>当SBuffer容量超过一定阈值时，执行换出操作，按PLRU替换算法选择被替换块写入DCache</p>
+<p>SBuffer支持被动清空机制；FENCE/atomic/向量Segment等指令执行时会清空SBuffer</p>
+<p>SBuffer支持超时清空机制；超过2^20周期未被换出的数据块将被驱逐</p>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>6.1</td>
+          <td>SU_SBUFFER</td>
+          <td>WRITE_MERGE</td>
+          <td>验证同一缓存块的多个Store在SBuffer中合并。</td>
+      </tr>
+      <tr>
+          <td>6.2</td>
+          <td>SU_SBUFFER</td>
+          <td>PLRU_REPLACE</td>
+          <td>验证SBuffer满时按PLRU策略替换。</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="7-mmio处理">7. MMIO处理</h3>
+<p>香山核仅允许标量内存访问指令访问MMIO地址空间。MMIO访问与任何其他内存操作强顺序。因此，MMIO指令必须等待成为ROB头（即所有前序指令均完成）时才能执行。对于MMIO Store指令，需完成虚地址到实地址转换，通过实地址检查，且写数据就绪。随后LSQ将内存请求发送至Uncache模块，通过总线访问外设。结果返回LSQ后写回至ROB。</p>
+<p>原子指令与向量指令不支持MMIO访问。若此类指令访问MMIO地址空间，将触发对应AccessFault异常。</p>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>7.1</td>
+          <td>SU_MMIO</td>
+          <td>ORDER</td>
+          <td>验证MMIO指令强顺序执行（成为ROB头）。</td>
+      </tr>
+      <tr>
+          <td>7.2</td>
+          <td>SU_MMIO</td>
+          <td>EXCEPTION</td>
+          <td>验证原子/向量指令访问MMIO触发异常。</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="8-uncache指令执行">8. Uncache指令执行</h3>
+<p>香山核除支持访问非幂等、强顺序的MMIO地址空间外，还支持访问幂等、弱一致性（RVWMO）的Non-cacheable地址空间，简称NC。软件通过页表PBMT字段配置为NC以覆盖原有PMA属性。与MMIO访问不同，NC访问允许乱序内存操作。</p>
+<p>在StoreUnit流水线中被识别为NC地址（PBMT = NC）的内存访问指令会在LSQ中标记。LSQ负责将NC访问发送至Uncache模块。Uncache支持同时处理多个NC请求，支持请求合并，并负责向正在LoadUnit执行的NC Load转发Stores。</p>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>8.1</td>
+          <td>SU_NC</td>
+          <td>EXEC</td>
+          <td>验证NC访问允许乱序执行。</td>
+      </tr>
+      <tr>
+          <td>8.2</td>
+          <td>SU_NC</td>
+          <td>FORWARD</td>
+          <td>验证Uncache模块的Store到Load转发。</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="9-非对齐内存访问">9. 非对齐内存访问</h3>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>9.1</td>
+          <td>SU_MISALIGN</td>
+          <td>SCALAR_SPLIT</td>
+          <td>验证标量非对齐访问跨越16B边界时拆分为两个对齐访问。</td>
+      </tr>
+      <tr>
+          <td>9.2</td>
+          <td>SU_MISALIGN</td>
+          <td>SEG_HANDLE</td>
+          <td>验证向量Segment指令的非对齐处理（独立路径）。</td>
+      </tr>
+      <tr>
+          <td>9.3</td>
+          <td>SU_MISALIGN</td>
+          <td>EXCEPTION</td>
+          <td>验证原子指令、MMIO、NC空间非对齐访问触发异常。</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="10-原子指令执行">10. 原子指令执行</h3>
+<p>香山核支持RVA与Zacas指令集。香山当前设计中，原子指令需先将访问的缓存块缓存至DCache，再进行原子操作。</p>
+<p>内存访问单元监控Store发射队列发射的地址与数据，若为原子指令则进入AtomicsUnit。AtomicsUnit执行一系列操作，包括TLB地址转换、清空SBuffer、访问DCache等。</p>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>10.1</td>
+          <td>SU_ATOMIC</td>
+          <td>PRELOAD</td>
+          <td>验证原子指令先将缓存块读入DCache。</td>
+      </tr>
+      <tr>
+          <td>10.2</td>
+          <td>SU_ATOMIC</td>
+          <td>OPS</td>
+          <td>验证原子操作（如AMO）执行正确性。</td>
+      </tr>
+  </tbody>
+</table>
+</mrs-functions>
+<h2 id="常量说明">常量说明</h2>
+<table>
+  <thead>
+      <tr>
+          <th>常量名</th>
+          <th>常量值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>VAddrBits</td>
+          <td>(Sv39) 39, (Sv48) 48</td>
+      </tr>
+      <tr>
+          <td>GPAddr Bits</td>
+          <td>(Sv39x4) 41, (Sv48x4) 50</td>
+      </tr>
+      <tr>
+          <td>StoreExeUnit</td>
+          <td>2</td>
+      </tr>
+      <tr>
+          <td>StoreUnit</td>
+          <td>2 x 8B/16B</td>
+      </tr>
+      <tr>
+          <td>StoreQueue</td>
+          <td>56</td>
+      </tr>
+      <tr>
+          <td>StoreBuffer</td>
+          <td>16 x 64B</td>
+      </tr>
+      <tr>
+          <td>VSMergeBuffer</td>
+          <td>16</td>
+      </tr>
+      <tr>
+          <td>Store TLB</td>
+          <td>48项全相联</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="接口说明">接口说明</h2>
+<h3 id="输入接口">输入接口</h3>
+<table>
+  <thead>
+      <tr>
+          <th>信号名</th>
+          <th>方向</th>
+          <th>位宽</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>clock</td>
+          <td>input</td>
+          <td>1</td>
+          <td>时钟信号，用于同步时序</td>
+      </tr>
+      <tr>
+          <td>reset</td>
+          <td>input</td>
+          <td>1</td>
+          <td>复位信号，用于重置模块状态</td>
+      </tr>
+      <tr>
+          <td>io_redirect_valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>重定向有效信号，指示是否有重定向操作</td>
+      </tr>
+      <tr>
+          <td>io_redirect_bits_robIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>重定向ROB索引标志，指示是否需要重定向</td>
+      </tr>
+      <tr>
+          <td>io_redirect_bits_robIdx_value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>重定向ROB索引值</td>
+      </tr>
+      <tr>
+          <td>io_redirect_bits_level</td>
+          <td>input</td>
+          <td>1</td>
+          <td>重定向级别信号，表示重定向的优先级</td>
+      </tr>
+      <tr>
+          <td>io_csrCtrl_hd_misalign_st_enable</td>
+          <td>input</td>
+          <td>1</td>
+          <td>控制Misalign Store启用信号，指示是否启用未对齐存储</td>
+      </tr>
+      <tr>
+          <td>io_stin_valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>输入有效信号，指示是否有有效的存储指令</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_ftqPtr_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>指令FTQ指针标志，标记指令在队列中的位置</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_ftqPtr_value</td>
+          <td>input</td>
+          <td>6</td>
+          <td>指令FTQ指针值，指示指令在队列中的位置</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_ftqOffset</td>
+          <td>input</td>
+          <td>4</td>
+          <td>指令FTQ偏移量，指示指令在队列中的偏移</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_fuType</td>
+          <td>input</td>
+          <td>35</td>
+          <td>功能单元类型，指示该指令使用的功能单元类型</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_fuOpType</td>
+          <td>input</td>
+          <td>9</td>
+          <td>功能单元操作类型，指示该指令执行的操作类型</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_rfWen</td>
+          <td>input</td>
+          <td>1</td>
+          <td>指令是否写入寄存器，表示是否更新寄存器值</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_imm</td>
+          <td>input</td>
+          <td>32</td>
+          <td>指令立即数，包含该指令中的常数值</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_pdest</td>
+          <td>input</td>
+          <td>8</td>
+          <td>指令目的寄存器编号，表示数据存储的目标寄存器</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_robIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>ROB索引标志，表示是否使用ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_robIdx_value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>ROB索引值，指示指令对应的ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_eliminatedMove</td>
+          <td>input</td>
+          <td>1</td>
+          <td>指令优化消除的移动，标识指令是否被优化</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_renameTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>指令重命名时间，记录指令的重命名时间</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_dispatchTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>指令调度时间，记录指令进入调度队列的时间</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_enqRsTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>指令入队时间，记录指令进入执行队列的时间</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_selectTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>指令选择时间，记录指令被选中执行的时间</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_issueTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>指令发射时间，指示指令进入执行单元的时间</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_writebackTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>指令回写时间，表示指令将结果回写到寄存器的时间</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_runahead_checkpoint_id</td>
+          <td>input</td>
+          <td>64</td>
+          <td>预执行检查点ID，用于标记预执行阶段的检查点</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_tlbFirstReqTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>TLB首次请求时间，记录指令发起首次TLB请求的时间</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_debugInfo_tlbRespTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>TLB响应时间，记录指令收到TLB响应的时间</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_lqIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Load Queue索引标志，指示是否使用Load Queue</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_lqIdx_value</td>
+          <td>input</td>
+          <td>7</td>
+          <td>Load Queue索引值，标识该指令在Load Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_sqIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Store Queue索引标志，指示是否使用Store Queue</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_uop_sqIdx_value</td>
+          <td>input</td>
+          <td>6</td>
+          <td>Store Queue索引值，标识该指令在Store Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_src_0</td>
+          <td>input</td>
+          <td>64</td>
+          <td>数据源0，提供给指令执行的数据源</td>
+      </tr>
+      <tr>
+          <td>io_stin_bits_isFirstIssue</td>
+          <td>input</td>
+          <td>1</td>
+          <td>是否是第一次发射，表示指令是否首次被发射</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入有效信号，指示Misalign Store是否接收有效数据</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_0</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量0，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_1</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量1，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_2</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量2，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_4</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量4，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_5</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量5，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_8</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量8，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_9</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量9，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_10</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量10，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_11</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量11，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_12</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量12，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_13</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量13，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_14</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量14，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_16</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量16，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_17</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量17，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_18</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量18，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_19</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量19，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_20</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量20，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_21</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量21，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_exceptionVec_22</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入异常向量22，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_ftqPtr_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入FTQ指针标志，表示指令位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_ftqPtr_value</td>
+          <td>input</td>
+          <td>6</td>
+          <td>Misalign Store输入FTQ指针值，指示指令在队列中的位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_ftqOffset</td>
+          <td>input</td>
+          <td>4</td>
+          <td>Misalign Store输入FTQ偏移量，表示指令在队列中的偏移</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_fuType</td>
+          <td>input</td>
+          <td>35</td>
+          <td>Misalign Store输入功能单元类型，表示指令所需的功能单元</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_fuOpType</td>
+          <td>input</td>
+          <td>9</td>
+          <td>Misalign Store输入功能单元操作类型，表示指令执行的操作类型</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_rfWen</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入是否写入寄存器，标识是否会更新寄存器</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_vpu_vstart</td>
+          <td>input</td>
+          <td>8</td>
+          <td>Misalign Store输入VPU向量起始位置，标识向量操作的起始位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_vpu_nf</td>
+          <td>input</td>
+          <td>3</td>
+          <td>Misalign Store输入VPU向量元素数，表示该向量操作的元素数量</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_vpu_veew</td>
+          <td>input</td>
+          <td>2</td>
+          <td>Misalign Store输入VPU向量元素宽度，表示向量的元素宽度</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_uopIdx</td>
+          <td>input</td>
+          <td>7</td>
+          <td>Misalign Store输入操作索引，表示该指令的操作索引</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_pdest</td>
+          <td>input</td>
+          <td>8</td>
+          <td>Misalign Store输入目的寄存器，表示存储的目标寄存器</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_robIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入ROB索引标志，表示是否使用ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_robIdx_value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>Misalign Store输入ROB索引值，表示该操作对应的ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_eliminatedMove</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入优化消除的移动，表示该操作是否被优化消除</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_renameTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>Misalign Store输入指令重命名时间，记录指令的重命名时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_dispatchTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>Misalign Store输入指令调度时间，表示指令进入调度队列的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_enqRsTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>Misalign Store输入指令入队时间，表示指令加入执行队列的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_selectTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>Misalign Store输入指令选择时间，表示指令被选中执行的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_issueTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>Misalign Store输入指令发射时间，表示指令发射到执行单元的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_writebackTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>Misalign Store输入指令回写时间，表示指令回写结果的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_runahead_checkpoint_id</td>
+          <td>input</td>
+          <td>64</td>
+          <td>Misalign Store输入指令预执行检查点ID，标记指令的预执行检查点</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_tlbFirstReqTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>Misalign Store输入指令TLB首次请求时间，表示该指令发起首次TLB请求的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_debugInfo_tlbRespTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>Misalign Store输入指令TLB响应时间，表示该指令收到TLB响应的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_lqIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入Load Queue索引标志，表示是否使用Load Queue</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_lqIdx_value</td>
+          <td>input</td>
+          <td>7</td>
+          <td>Misalign Store输入Load Queue索引值，标识该指令在Load Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_sqIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入Store Queue索引标志，表示是否使用Store Queue</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_uop_sqIdx_value</td>
+          <td>input</td>
+          <td>6</td>
+          <td>Misalign Store输入Store Queue索引值，标识该指令在Store Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_vaddr</td>
+          <td>input</td>
+          <td>50</td>
+          <td>Misalign Store输入虚拟地址，表示存储请求的虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_mask</td>
+          <td>input</td>
+          <td>16</td>
+          <td>Misalign Store输入掩码，标识存储操作涉及的字节</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_isvec</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入是否为向量操作，指示是否为向量Store指令</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_is128bit</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入是否为128位操作，标识该操作是否为128位数据存储</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_bits_isFinalSplit</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign Store输入是否为最终分割，指示该操作是否为最后一次存储操作</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>TLB响应有效信号，指示是否收到有效的TLB响应</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_paddr_0</td>
+          <td>input</td>
+          <td>48</td>
+          <td>TLB响应物理地址0，表示TLB响应中的物理地址</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_gpaddr_0</td>
+          <td>input</td>
+          <td>64</td>
+          <td>TLB响应通用物理地址0，提供对应的物理地址</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_fullva</td>
+          <td>input</td>
+          <td>64</td>
+          <td>TLB响应完整虚拟地址，表示该指令请求的完整虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_pbmt_0</td>
+          <td>input</td>
+          <td>2</td>
+          <td>TLB响应页面映射类型0，指示TLB响应的页面映射类型</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_miss</td>
+          <td>input</td>
+          <td>1</td>
+          <td>TLB响应是否命中，指示TLB是否命中请求的地址</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_isForVSnonLeafPTE</td>
+          <td>input</td>
+          <td>1</td>
+          <td>TLB响应是否为非叶PTE，指示是否为虚拟化的非叶页面表项</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_excp_0_vaNeedExt</td>
+          <td>input</td>
+          <td>1</td>
+          <td>TLB响应是否需要扩展虚拟地址，表示是否需要扩展地址</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_excp_0_isHyper</td>
+          <td>input</td>
+          <td>1</td>
+          <td>TLB响应是否为Hypervisor模式的异常，表示TLB异常是否是超级管理模式</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_excp_0_gpf_st</td>
+          <td>input</td>
+          <td>1</td>
+          <td>TLB响应是否为一般保护异常，指示TLB请求是否发生一般保护错误</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_excp_0_pf_st</td>
+          <td>input</td>
+          <td>1</td>
+          <td>TLB响应是否为页面错误异常，指示TLB请求是否发生页面错误</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_excp_0_af_st</td>
+          <td>input</td>
+          <td>1</td>
+          <td>TLB响应是否为地址错误异常，指示TLB请求是否发生地址错误</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_ptwBack</td>
+          <td>input</td>
+          <td>1</td>
+          <td>TLB响应是否为物理地址翻译回写，表示TLB响应是否涉及物理地址回写</td>
+      </tr>
+      <tr>
+          <td>io_tlb_resp_bits_memidx_idx</td>
+          <td>input</td>
+          <td>7</td>
+          <td>TLB响应内存索引索引，指示TLB响应所在的内存块索引</td>
+      </tr>
+      <tr>
+          <td>io_pmp_st</td>
+          <td>input</td>
+          <td>1</td>
+          <td>PMP状态信号，表示是否为物理内存保护状态</td>
+      </tr>
+      <tr>
+          <td>io_pmp_mmio</td>
+          <td>input</td>
+          <td>1</td>
+          <td>PMP内存映射IO信号，表示是否涉及内存映射IO</td>
+      </tr>
+      <tr>
+          <td>io_pmp_atomic</td>
+          <td>input</td>
+          <td>1</td>
+          <td>PMP原子操作信号，表示是否为原子操作请求</td>
+      </tr>
+      <tr>
+          <td>io_prefetch_req_bits_vaddr</td>
+          <td>input</td>
+          <td>50</td>
+          <td>预取请求的虚拟地址，表示请求的虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_valid</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入有效信号，指示是否有有效的输入数据</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_vaddr</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入虚拟地址，表示该操作的虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_basevaddr</td>
+          <td>input</td>
+          <td>50</td>
+          <td>向量Store输入基准虚拟地址，表示向量操作的基准虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_mask</td>
+          <td>input</td>
+          <td>16</td>
+          <td>向量Store输入掩码，表示该向量操作涉及的字节</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_alignedType</td>
+          <td>input</td>
+          <td>3</td>
+          <td>向量Store输入对齐类型，表示向量操作的对齐类型</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_vecActive</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入是否为激活的向量操作</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_exceptionVec_4</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入异常向量4，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_exceptionVec_5</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入异常向量5，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_exceptionVec_6</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入异常向量6，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_exceptionVec_13</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入异常向量13，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_exceptionVec_21</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入异常向量21，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_ftqPtr_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入FTQ指针标志，表示指令在队列中的位置</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_ftqPtr_value</td>
+          <td>input</td>
+          <td>6</td>
+          <td>向量Store输入FTQ指针值，指示指令在队列中的位置</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_ftqOffset</td>
+          <td>input</td>
+          <td>4</td>
+          <td>向量Store输入FTQ偏移量，表示指令在队列中的偏移</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_fuType</td>
+          <td>input</td>
+          <td>35</td>
+          <td>向量Store输入功能单元类型，表示指令所需的功能单元</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_fuOpType</td>
+          <td>input</td>
+          <td>9</td>
+          <td>向量Store输入功能单元操作类型，表示指令执行的操作类型</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_rfWen</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入是否写入寄存器，表示该指令是否会更新寄存器值</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_vpu_vstart</td>
+          <td>input</td>
+          <td>8</td>
+          <td>向量Store输入VPU向量起始位置，标识向量操作的起始位置</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_vpu_nf</td>
+          <td>input</td>
+          <td>3</td>
+          <td>向量Store输入VPU向量元素数，表示该向量操作的元素数量</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_vpu_veew</td>
+          <td>input</td>
+          <td>2</td>
+          <td>向量Store输入VPU向量元素宽度，表示向量的元素宽度</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_uopIdx</td>
+          <td>input</td>
+          <td>7</td>
+          <td>向量Store输入操作索引，表示该指令的操作索引</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_pdest</td>
+          <td>input</td>
+          <td>8</td>
+          <td>向量Store输入目的寄存器，表示存储的目标寄存器</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_robIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入ROB索引标志，表示是否使用ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_robIdx_value</td>
+          <td>input</td>
+          <td>8</td>
+          <td>向量Store输入ROB索引值，表示该操作对应的ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_eliminatedMove</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入优化消除的移动，标识该操作是否被优化消除</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_renameTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入指令重命名时间，表示该Store指令的重命名时间</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_dispatchTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入指令调度时间，表示该Store指令的调度时间</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_enqRsTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入指令入队时间，表示该Store指令的入队时间</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_selectTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入指令选择时间，表示该Store指令的选择时间</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_issueTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入指令发射时间，表示该Store指令的发射时间</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_writebackTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入指令回写时间，表示该Store指令的回写时间</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_runahead_checkpoint_id</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入指令预执行检查点ID，标记该Store指令的预执行阶段</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_tlbFirstReqTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入指令TLB首次请求时间，表示该Store指令的首次TLB请求时间</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_debugInfo_tlbRespTime</td>
+          <td>input</td>
+          <td>64</td>
+          <td>向量Store输入指令TLB响应时间，表示该Store指令的TLB响应时间</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_lqIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入Load Queue索引标志，指示是否使用Load Queue</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_lqIdx_value</td>
+          <td>input</td>
+          <td>7</td>
+          <td>向量Store输入Load Queue索引值，标识该指令在Load Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_sqIdx_flag</td>
+          <td>input</td>
+          <td>1</td>
+          <td>向量Store输入Store Queue索引标志，指示是否使用Store Queue</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_uop_sqIdx_value</td>
+          <td>input</td>
+          <td>6</td>
+          <td>向量Store输入Store Queue索引值，标识该指令在Store Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_mBIndex</td>
+          <td>input</td>
+          <td>4</td>
+          <td>向量Store输入块索引，标识该向量操作的块索引</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_bits_elemIdx</td>
+          <td>input</td>
+          <td>8</td>
+          <td>向量Store输入元素索引，标识该向量操作的元素索引</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_ready</td>
+          <td>input</td>
+          <td>1</td>
+          <td>Misalign缓冲区准备信号，指示Misalign操作是否准备好接收数据</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_0_matchType</td>
+          <td>input</td>
+          <td>2</td>
+          <td>从CSR触发器接收的数据向量0匹配类型，指示匹配类型</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_0_select</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量0选择标志，指示是否选择该向量</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_0_timing</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量0定时标志，表示触发的定时信息</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_0_action</td>
+          <td>input</td>
+          <td>4</td>
+          <td>从CSR触发器接收的数据向量0动作类型，表示触发动作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_0_chain</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量0链操作标志，指示是否为链操作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_0_store</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量0存储标志，指示是否为存储操作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_0_tdata2</td>
+          <td>input</td>
+          <td>64</td>
+          <td>从CSR触发器接收的数据向量0附加数据2</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_1_matchType</td>
+          <td>input</td>
+          <td>2</td>
+          <td>从CSR触发器接收的数据向量1匹配类型，指示匹配类型</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_1_select</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量1选择标志，指示是否选择该向量</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_1_timing</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量1定时标志，表示触发的定时信息</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_1_action</td>
+          <td>input</td>
+          <td>4</td>
+          <td>从CSR触发器接收的数据向量1动作类型，表示触发动作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_1_chain</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量1链操作标志，指示是否为链操作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_1_store</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量1存储标志，指示是否为存储操作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_1_tdata2</td>
+          <td>input</td>
+          <td>64</td>
+          <td>从CSR触发器接收的数据向量1附加数据2</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_2_matchType</td>
+          <td>input</td>
+          <td>2</td>
+          <td>从CSR触发器接收的数据向量2匹配类型，指示匹配类型</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_2_select</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量2选择标志，指示是否选择该向量</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_2_timing</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量2定时标志，表示触发的定时信息</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_2_action</td>
+          <td>input</td>
+          <td>4</td>
+          <td>从CSR触发器接收的数据向量2动作类型，表示触发动作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_2_chain</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量2链操作标志，指示是否为链操作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_2_store</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量2存储标志，指示是否为存储操作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_2_tdata2</td>
+          <td>input</td>
+          <td>64</td>
+          <td>从CSR触发器接收的数据向量2附加数据2</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_3_matchType</td>
+          <td>input</td>
+          <td>2</td>
+          <td>从CSR触发器接收的数据向量3匹配类型，指示匹配类型</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_3_select</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量3选择标志，指示是否选择该向量</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_3_timing</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量3定时标志，表示触发的定时信息</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_3_action</td>
+          <td>input</td>
+          <td>4</td>
+          <td>从CSR触发器接收的数据向量3动作类型，表示触发动作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_3_chain</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量3链操作标志，指示是否为链操作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_3_store</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的数据向量3存储标志，指示是否为存储操作</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tdataVec_3_tdata2</td>
+          <td>input</td>
+          <td>64</td>
+          <td>从CSR触发器接收的数据向量3附加数据2</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tEnableVec_0</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的启用信号0，指示是否启用该向量</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tEnableVec_1</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的启用信号1，指示是否启用该向量</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tEnableVec_2</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的启用信号2，指示是否启用该向量</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_tEnableVec_3</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的启用信号3，指示是否启用该向量</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_debugMode</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的调试模式标志，指示是否为调试模式</td>
+      </tr>
+      <tr>
+          <td>io_fromCsrTrigger_triggerCanRaiseBpExp</td>
+          <td>input</td>
+          <td>1</td>
+          <td>从CSR触发器接收的触发是否可以引发BP异常标志</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="输出接口">输出接口</h3>
+<table>
+  <thead>
+      <tr>
+          <th>信号名</th>
+          <th>方向</th>
+          <th>位宽</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>io_stin_ready</td>
+          <td>output</td>
+          <td>1</td>
+          <td>输入准备信号，指示是否准备好接收数据</td>
+      </tr>
+      <tr>
+          <td>io_issue_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>指令有效信号，指示该指令是否有效</td>
+      </tr>
+      <tr>
+          <td>io_issue_bits_uop_robIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>指令ROB索引标志，标示该指令是否使用ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_issue_bits_uop_robIdx_value</td>
+          <td>output</td>
+          <td>8</td>
+          <td>指令ROB索引值，提供该指令的ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stin_ready</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store输入准备信号，指示Misalign Store是否准备好接收数据</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store输出有效信号，指示是否有有效的输出结果</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_uop_exceptionVec_3</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store输出异常向量3，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_uop_exceptionVec_6</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store输出异常向量6，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_uop_exceptionVec_7</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store输出异常向量7，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_uop_exceptionVec_15</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store输出异常向量15，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_uop_exceptionVec_23</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store输出异常向量23，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_uop_trigger</td>
+          <td>output</td>
+          <td>4</td>
+          <td>Misalign Store输出触发器，标记触发的异常类型</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_paddr</td>
+          <td>output</td>
+          <td>48</td>
+          <td>Misalign Store输出物理地址，表示该操作的目标物理地址</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_mmio</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store输出是否为MMIO操作，标识是否为内存映射IO操作</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_vecActive</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store向量激活标志，指示是否为有效的向量存储操作</td>
+      </tr>
+      <tr>
+          <td>io_misalign_stout_bits_need_rep</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign Store输出是否需要重发标志，指示该操作是否需要重发</td>
+      </tr>
+      <tr>
+          <td>io_tlb_req_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>TLB请求有效信号，指示是否有有效的TLB请求</td>
+      </tr>
+      <tr>
+          <td>io_tlb_req_bits_vaddr</td>
+          <td>output</td>
+          <td>50</td>
+          <td>TLB请求的虚拟地址，提供请求的虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_tlb_req_bits_fullva</td>
+          <td>output</td>
+          <td>64</td>
+          <td>TLB请求的完整虚拟地址，包含更多的地址信息</td>
+      </tr>
+      <tr>
+          <td>io_tlb_req_bits_checkfullva</td>
+          <td>output</td>
+          <td>1</td>
+          <td>TLB检查完整虚拟地址信号，指示是否检查完整地址</td>
+      </tr>
+      <tr>
+          <td>io_tlb_req_bits_hyperinst</td>
+          <td>output</td>
+          <td>1</td>
+          <td>TLB请求的超指令标志，表示是否为超指令请求</td>
+      </tr>
+      <tr>
+          <td>io_tlb_req_bits_memidx_idx</td>
+          <td>output</td>
+          <td>7</td>
+          <td>TLB请求的内存索引，标识内存请求的索引</td>
+      </tr>
+      <tr>
+          <td>io_tlb_req_bits_debug_robIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>TLB请求的ROB索引调试标志，调试用</td>
+      </tr>
+      <tr>
+          <td>io_tlb_req_bits_debug_robIdx_value</td>
+          <td>output</td>
+          <td>8</td>
+          <td>TLB请求的ROB索引值，调试用</td>
+      </tr>
+      <tr>
+          <td>io_tlb_req_bits_debug_isFirstIssue</td>
+          <td>output</td>
+          <td>1</td>
+          <td>TLB请求的首次发射标志，指示是否是第一次发射</td>
+      </tr>
+      <tr>
+          <td>io_dcache_req_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>数据缓存请求有效信号，表示是否有有效的数据缓存请求</td>
+      </tr>
+      <tr>
+          <td>io_lsq_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue有效信号，表示是否有有效的Load/Store指令</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_0</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量0，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_1</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量1，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_2</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量2，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_3</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量3，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_4</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量4，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_5</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量5，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_6</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量6，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_7</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量7，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_8</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量8，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_9</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量9，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_10</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量10，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_11</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量11，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_12</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量12，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_13</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量13，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_14</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量14，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_15</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量15，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_16</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量16，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_17</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量17，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_18</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量18，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_19</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量19，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_20</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量20，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_21</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量21，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_22</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量22，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_exceptionVec_23</td>
+          <td>output</td>
+          <td>1</td>
+          <td>LSQ异常向量23，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_trigger</td>
+          <td>output</td>
+          <td>4</td>
+          <td>Load Store Queue操作触发器，表示触发的异常类型</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_ftqPtr_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue FTQ指针标志，标记指令在队列中的位置</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_ftqPtr_value</td>
+          <td>output</td>
+          <td>6</td>
+          <td>Load Store Queue FTQ指针值，指示指令在队列中的位置</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_ftqOffset</td>
+          <td>output</td>
+          <td>4</td>
+          <td>Load Store Queue FTQ偏移量，表示指令在队列中的偏移</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_fuType</td>
+          <td>output</td>
+          <td>35</td>
+          <td>Load Store Queue功能单元类型，表示指令所需的功能单元</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_fuOpType</td>
+          <td>output</td>
+          <td>9</td>
+          <td>Load Store Queue功能单元操作类型，表示指令执行的操作类型</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_rfWen</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue是否写入寄存器，表示该指令是否会更新寄存器值</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_vpu_nf</td>
+          <td>output</td>
+          <td>3</td>
+          <td>Load Store Queue VPU向量元素数，表示该向量操作的元素数量</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_vpu_veew</td>
+          <td>output</td>
+          <td>2</td>
+          <td>Load Store Queue VPU向量元素宽度，表示向量的元素宽度</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_uopIdx</td>
+          <td>output</td>
+          <td>7</td>
+          <td>Load Store Queue操作索引，表示该指令的操作索引</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_pdest</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Load Store Queue目的寄存器，表示存储的目标寄存器</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_robIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue ROB索引标志，表示是否使用ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_robIdx_value</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Load Store Queue ROB索引值，表示该Store操作对应的ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_eliminatedMove</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue优化消除的移动，标识该Store是否优化消除</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_renameTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue重命名时间，表示该指令的重命名时间</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_dispatchTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue调度时间，表示指令调度的时间</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_enqRsTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue入队时间，表示指令入队的时间</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_selectTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue选择时间，表示指令选择的时间</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_issueTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue发射时间，表示指令发射的时间</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_writebackTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue回写时间，表示指令回写的时间</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_runahead_checkpoint_id</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue预执行检查点ID，标记该指令的预执行阶段</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_tlbFirstReqTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue TLB首次请求时间，表示该指令发起TLB请求的时间</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_debugInfo_tlbRespTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue TLB响应时间，表示该指令接收到TLB响应的时间</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_sqIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue Store Queue索引标志，指示是否涉及Store Queue</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_uop_sqIdx_value</td>
+          <td>output</td>
+          <td>6</td>
+          <td>Load Store Queue Store Queue索引值，标识该指令在Store Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_vaddr</td>
+          <td>output</td>
+          <td>50</td>
+          <td>Load Store Queue虚拟地址，表示请求的虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_fullva</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue完整虚拟地址，表示请求的完整虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_vaNeedExt</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue虚拟地址是否需要扩展，指示是否需要扩展虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_paddr</td>
+          <td>output</td>
+          <td>48</td>
+          <td>Load Store Queue物理地址，表示指令执行后的物理地址</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_gpaddr</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue通用物理地址，表示指令执行后的物理地址</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_mask</td>
+          <td>output</td>
+          <td>16</td>
+          <td>Load Store Queue掩码，指示数据存储操作涉及的字节</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_wlineflag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue是否为写回标志，表示是否写回数据</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_miss</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue未命中标志，表示该存储请求是否命中</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_nc</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue非一致性标志，表示该操作是否为非一致性操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_isHyper</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue是否为超级管理模式，指示该操作是否为超级管理模式</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_isForVSnonLeafPTE</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue是否为非叶PTE，指示是否为非叶页面表项操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_isvec</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue是否为向量操作，指示是否为向量Store指令</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_isFrmMisAlignBuf</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue是否为误对齐缓存操作，指示是否为误对齐操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_isMisalign</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue是否为误对齐操作，指示是否为误对齐存储操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_misalignWith16Byte</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue是否为16字节对齐的误对齐操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_bits_updateAddrValid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue地址更新有效信号，指示是否有有效的地址更新</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_uop_exceptionVec_3</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作异常向量3，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_uop_exceptionVec_6</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作异常向量6，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_uop_exceptionVec_15</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作异常向量15，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_uop_exceptionVec_23</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作异常向量23，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_uop_uopIdx</td>
+          <td>output</td>
+          <td>7</td>
+          <td>Load Store Queue重新补充操作索引，表示该指令的操作索引</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_uop_robIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作ROB索引标志，指示是否使用ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_uop_robIdx_value</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Load Store Queue重新补充操作ROB索引值，表示该操作对应的ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_fullva</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue重新补充操作完整虚拟地址，表示该操作的完整虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_vaNeedExt</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作是否需要扩展虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_gpaddr</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Load Store Queue重新补充操作物理地址，表示该操作的目标物理地址</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_af</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作是否为地址错误标志，表示是否发生地址错误</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_mmio</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作是否为MMIO操作，标示是否为内存映射IO操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_memBackTypeMM</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作是否为内存回写标志，表示是否为内存回写操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_atomic</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作是否为原子操作，指示是否为原子操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_hasException</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作是否包含异常，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_isHyper</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作是否为超级管理模式操作，表示是否为超级管理模式操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_isForVSnonLeafPTE</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作是否为非叶PTE，指示是否为非叶页面表项操作</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_isvec</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作是否为向量操作，表示是否为向量Store指令</td>
+      </tr>
+      <tr>
+          <td>io_lsq_replenish_updateAddrValid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Load Store Queue重新补充操作地址更新有效信号，指示是否有有效的地址更新</td>
+      </tr>
+      <tr>
+          <td>io_feedback_slow_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>反馈慢操作有效信号，表示是否有有效的反馈慢操作</td>
+      </tr>
+      <tr>
+          <td>io_feedback_slow_bits_robIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>反馈慢操作ROB索引标志，指示是否涉及ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_feedback_slow_bits_robIdx_value</td>
+          <td>output</td>
+          <td>8</td>
+          <td>反馈慢操作ROB索引值，表示该操作对应的ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_feedback_slow_bits_hit</td>
+          <td>output</td>
+          <td>1</td>
+          <td>反馈慢操作命中标志，表示是否命中目标地址</td>
+      </tr>
+      <tr>
+          <td>io_feedback_slow_bits_flushState</td>
+          <td>output</td>
+          <td>1</td>
+          <td>反馈慢操作刷新状态标志，表示是否需要刷新状态</td>
+      </tr>
+      <tr>
+          <td>io_feedback_slow_bits_sqIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>反馈慢操作Store Queue索引标志，指示是否涉及Store Queue</td>
+      </tr>
+      <tr>
+          <td>io_feedback_slow_bits_sqIdx_value</td>
+          <td>output</td>
+          <td>6</td>
+          <td>反馈慢操作Store Queue索引值，标识该操作在Store Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_feedback_slow_bits_lqIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>反馈慢操作Load Queue索引标志，指示是否涉及Load Queue</td>
+      </tr>
+      <tr>
+          <td>io_feedback_slow_bits_lqIdx_value</td>
+          <td>output</td>
+          <td>7</td>
+          <td>反馈慢操作Load Queue索引值，标识该操作在Load Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_stld_nuke_query_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store Load查询有效信号，表示是否有有效的Store Load查询</td>
+      </tr>
+      <tr>
+          <td>io_stld_nuke_query_bits_robIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store Load查询ROB索引标志，指示是否涉及ROB</td>
+      </tr>
+      <tr>
+          <td>io_stld_nuke_query_bits_robIdx_value</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Store Load查询的ROB索引值</td>
+      </tr>
+      <tr>
+          <td>io_stld_nuke_query_bits_paddr</td>
+          <td>output</td>
+          <td>48</td>
+          <td>Store Load查询的物理地址</td>
+      </tr>
+      <tr>
+          <td>io_stld_nuke_query_bits_mask</td>
+          <td>output</td>
+          <td>16</td>
+          <td>Store Load查询的掩码</td>
+      </tr>
+      <tr>
+          <td>io_stld_nuke_query_bits_matchLine</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store Load查询的匹配行标志，表示是否匹配</td>
+      </tr>
+      <tr>
+          <td>io_stout_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store操作有效信号，表示是否有有效的Store操作</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_exceptionVec_3</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store输出异常向量3，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_exceptionVec_6</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store输出异常向量6，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_exceptionVec_7</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store输出异常向量7，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_exceptionVec_15</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store输出异常向量15，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_exceptionVec_23</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store输出异常向量23，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_trigger</td>
+          <td>output</td>
+          <td>4</td>
+          <td>Store操作触发器，标记触发的异常类型</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_rfWen</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store是否写入寄存器，表示该指令是否会更新寄存器</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_pdest</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Store目的寄存器，表示该操作的目标寄存器</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_robIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store ROB索引标志，指示是否使用ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_robIdx_value</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Store ROB索引值，表示该操作对应的ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_eliminatedMove</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store输出优化消除的移动，表示该Store是否优化消除</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_renameTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Store输出指令重命名时间，表示该Store指令的重命名时间</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_dispatchTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Store输出指令调度时间，表示该Store指令的调度时间</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_enqRsTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Store输出指令入队时间，表示该Store指令的入队时间</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_selectTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Store输出指令选择时间，表示该Store指令的选择时间</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_issueTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Store输出指令发射时间，表示该Store指令的发射时间</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_writebackTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Store输出指令回写时间，表示该Store指令的回写时间</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_runahead_checkpoint_id</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Store输出指令预执行检查点ID，标记该Store指令的预执行检查点</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_tlbFirstReqTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Store输出指令TLB首次请求时间，表示该Store指令的首次TLB请求时间</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_debugInfo_tlbRespTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Store输出指令TLB响应时间，表示该Store指令的TLB响应时间</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_sqIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store输出Store Queue索引标志，指示是否使用Store Queue</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_uop_sqIdx_value</td>
+          <td>output</td>
+          <td>6</td>
+          <td>Store输出Store Queue索引值，标识该Store操作在Store Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_debug_isMMIO</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store输出是否为MMIO操作，标示该Store操作是否为内存映射IO操作</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_debug_isNC</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store输出是否为非一致性操作，指示该操作是否为非一致性操作</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_debug_paddr</td>
+          <td>output</td>
+          <td>48</td>
+          <td>Store输出物理地址，表示该操作的目标物理地址</td>
+      </tr>
+      <tr>
+          <td>io_stout_bits_debug_vaddr</td>
+          <td>output</td>
+          <td>50</td>
+          <td>Store输出虚拟地址，表示该操作的目标虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store结果有效信号，表示是否有有效的向量Store结果</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_mBIndex</td>
+          <td>output</td>
+          <td>4</td>
+          <td>向量Store块索引，标识该向量Store操作的块索引</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_hit</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store命中标志，表示该向量Store操作是否命中目标地址</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_trigger</td>
+          <td>output</td>
+          <td>4</td>
+          <td>向量Store触发器，标识触发的异常类型</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_exceptionVec_3</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store异常向量3，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_exceptionVec_6</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store异常向量6，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_exceptionVec_7</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store异常向量7，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_exceptionVec_15</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store异常向量15，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_exceptionVec_23</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store异常向量23，表示该异常是否发生</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_hasException</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store是否有异常，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_vaddr</td>
+          <td>output</td>
+          <td>64</td>
+          <td>向量Store虚拟地址，表示该操作的目标虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_vaNeedExt</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store虚拟地址扩展标志，指示是否需要扩展虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_gpaddr</td>
+          <td>output</td>
+          <td>64</td>
+          <td>向量Store物理地址，表示该操作的目标物理地址</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_isForVSnonLeafPTE</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store是否为非叶PTE，表示是否为非叶页面表项操作</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_vstart</td>
+          <td>output</td>
+          <td>8</td>
+          <td>向量Store起始位置，表示该向量操作的起始位置</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_elemIdx</td>
+          <td>output</td>
+          <td>8</td>
+          <td>向量Store元素索引，标识该向量操作的元素索引</td>
+      </tr>
+      <tr>
+          <td>io_vecstout_bits_mask</td>
+          <td>output</td>
+          <td>16</td>
+          <td>向量Store掩码，标识该向量操作的有效位掩码</td>
+      </tr>
+      <tr>
+          <td>io_st_mask_out_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Store Mask操作有效信号，指示是否有有效的存储掩码操作</td>
+      </tr>
+      <tr>
+          <td>io_st_mask_out_bits_sqIdx_value</td>
+          <td>output</td>
+          <td>6</td>
+          <td>Store Mask操作Store Queue索引值，表示该掩码操作在Store Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_st_mask_out_bits_mask</td>
+          <td>output</td>
+          <td>16</td>
+          <td>Store Mask操作掩码，表示存储操作涉及的字节掩码</td>
+      </tr>
+      <tr>
+          <td>io_vecstin_ready</td>
+          <td>output</td>
+          <td>1</td>
+          <td>向量Store输入准备信号，指示向量Store是否准备好接收数据</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区有效信号，表示是否有有效的数据</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_0</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量0，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_1</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量1，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_2</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量2，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_4</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量4，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_5</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量5，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_8</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量8，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_9</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量9，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_10</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量10，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_11</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量11，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_12</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量12，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_13</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量13，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_14</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量14，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_16</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量16，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_17</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量17，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_18</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量18，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_19</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量19，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_20</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量20，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_21</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量21，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_exceptionVec_22</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区异常向量22，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_trigger</td>
+          <td>output</td>
+          <td>4</td>
+          <td>Misalign缓冲区触发器，表示触发的异常类型</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_ftqPtr_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区FTQ指针标志，表示指令位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_ftqPtr_value</td>
+          <td>output</td>
+          <td>6</td>
+          <td>Misalign缓冲区FTQ指针值，指示指令在队列中的位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_ftqOffset</td>
+          <td>output</td>
+          <td>4</td>
+          <td>Misalign缓冲区FTQ偏移量，表示指令在队列中的偏移</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_fuType</td>
+          <td>output</td>
+          <td>35</td>
+          <td>Misalign缓冲区功能单元类型，表示指令所需的功能单元</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_fuOpType</td>
+          <td>output</td>
+          <td>9</td>
+          <td>Misalign缓冲区功能单元操作类型，表示指令执行的操作类型</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_rfWen</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区是否写入寄存器，表示该指令是否会更新寄存器</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_vpu_vstart</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Misalign缓冲区VPU向量起始位置，表示向量操作的起始位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_vpu_nf</td>
+          <td>output</td>
+          <td>3</td>
+          <td>Misalign缓冲区VPU向量元素数，表示该向量操作的元素数量</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_vpu_veew</td>
+          <td>output</td>
+          <td>2</td>
+          <td>Misalign缓冲区VPU向量元素宽度，表示向量的元素宽度</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_uopIdx</td>
+          <td>output</td>
+          <td>7</td>
+          <td>Misalign缓冲区操作索引，表示该指令的操作索引</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_pdest</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Misalign缓冲区目的寄存器，表示存储的目标寄存器</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_robIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区ROB索引标志，表示是否使用ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_robIdx_value</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Misalign缓冲区ROB索引值，表示该操作对应的ROB索引</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_eliminatedMove</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区优化消除的移动，标识该操作是否被优化消除</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_renameTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区指令重命名时间，记录指令的重命名时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_dispatchTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区指令调度时间，记录指令调度的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_enqRsTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区指令入队时间，表示指令加入执行队列的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_selectTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区指令选择时间，表示指令被选中执行的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_issueTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区指令发射时间，表示指令发射到执行单元的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_writebackTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区指令回写时间，表示指令回写的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_runahead_checkpoint_id</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区预执行检查点ID，标记指令的预执行阶段</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_tlbFirstReqTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区指令TLB首次请求时间，表示该指令发起TLB请求的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_debugInfo_tlbRespTime</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区指令TLB响应时间，表示该指令收到TLB响应的时间</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_lqIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区Load Queue索引标志，指示是否使用Load Queue</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_lqIdx_value</td>
+          <td>output</td>
+          <td>7</td>
+          <td>Misalign缓冲区Load Queue索引值，标识该指令在Load Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_sqIdx_flag</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区Store Queue索引标志，指示是否使用Store Queue</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_uop_sqIdx_value</td>
+          <td>output</td>
+          <td>6</td>
+          <td>Misalign缓冲区Store Queue索引值，标识该指令在Store Queue中的位置</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_vaddr</td>
+          <td>output</td>
+          <td>50</td>
+          <td>Misalign缓冲区虚拟地址，表示存储请求的虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_vaNeedExt</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区虚拟地址是否需要扩展，指示是否需要扩展虚拟地址</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_paddr</td>
+          <td>output</td>
+          <td>48</td>
+          <td>Misalign缓冲区物理地址，表示该操作的目标物理地址</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_gpaddr</td>
+          <td>output</td>
+          <td>64</td>
+          <td>Misalign缓冲区通用物理地址，表示该操作的目标物理地址</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_mask</td>
+          <td>output</td>
+          <td>16</td>
+          <td>Misalign缓冲区掩码，表示存储操作涉及的字节</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_hasException</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区是否包含异常，表示是否发生异常</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_isForVSnonLeafPTE</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区是否为非叶PTE操作，表示是否为非叶页面表项操作</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_isvec</td>
+          <td>output</td>
+          <td>1</td>
+          <td>Misalign缓冲区是否为向量操作，表示是否为向量Store指令</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_elemIdx</td>
+          <td>output</td>
+          <td>8</td>
+          <td>Misalign缓冲区元素索引，表示该向量操作的元素索引</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_alignedType</td>
+          <td>output</td>
+          <td>3</td>
+          <td>Misalign缓冲区对齐类型，表示向量操作的对齐类型</td>
+      </tr>
+      <tr>
+          <td>io_misalign_buf_bits_mbIndex</td>
+          <td>output</td>
+          <td>4</td>
+          <td>Misalign缓冲区块索引，表示该向量操作的块索引</td>
+      </tr>
+      <tr>
+          <td>io_s0_s1_valid</td>
+          <td>output</td>
+          <td>1</td>
+          <td>S0/S1有效信号，指示S0/S1阶段是否有效</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="接口时序">接口时序</h2>
+<h3 id="接口时序实例">接口时序实例</h3>
+<p><img src="LSU-StoreUnit-Timing.svg" alt="StoreUnit接口时序"></p>
+<h2 id="测试点总表">测试点总表</h2>
+<mrs-testpoints>
+<table>
+  <thead>
+      <tr>
+          <th>序号</th>
+          <th>功能名称</th>
+          <th>测试点名称</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1.1</td>
+          <td>SU_DISPATCH</td>
+          <td>SCALAR_DISPATCH</td>
+          <td>验证标量Store指令派发时分配一个StoreQueue条目。</td>
+      </tr>
+      <tr>
+          <td>1.2</td>
+          <td>SU_DISPATCH</td>
+          <td>VECTOR_DISPATCH</td>
+          <td>验证向量Store指令的一个uop分配多个LSQ条目（根据元素数量）。</td>
+      </tr>
+      <tr>
+          <td>2.1</td>
+          <td>SU_STORE</td>
+          <td>S0_ADDRESS_CALC</td>
+          <td>验证s0阶段地址计算和仲裁是否按三类指令优先级排序。</td>
+      </tr>
+      <tr>
+          <td>2.2</td>
+          <td>SU_STORE</td>
+          <td>S1_RAW_CHECK</td>
+          <td>验证s1阶段RAW冒险检测发生。</td>
+      </tr>
+      <tr>
+          <td>2.3</td>
+          <td>SU_STORE</td>
+          <td>S2_SQ_MARK_READY</td>
+          <td>验证s2阶段StoreQueue地址就绪标记。</td>
+      </tr>
+      <tr>
+          <td>3.1</td>
+          <td>SU_VECTOR</td>
+          <td>SPLIT</td>
+          <td>验证向量指令拆分正确性。</td>
+      </tr>
+      <tr>
+          <td>3.2</td>
+          <td>SU_VECTOR</td>
+          <td>OFFSET</td>
+          <td>验证向量元素偏移地址计算。</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>SU_REPLAY</td>
+          <td>TLB_MISS</td>
+          <td>验证TLB缺失时Store指令重发。</td>
+      </tr>
+      <tr>
+          <td>5.1</td>
+          <td>SU_RAW</td>
+          <td>VIOLATION</td>
+          <td>验证RAW违例检测。</td>
+      </tr>
+      <tr>
+          <td>5.2</td>
+          <td>SU_RAW</td>
+          <td>RECOVERY_MECH</td>
+          <td>验证检测到RAW违例后的恢复（流水线清空）。</td>
+      </tr>
+      <tr>
+          <td>6.1</td>
+          <td>SU_SBUFFER</td>
+          <td>WRITE_MERGE</td>
+          <td>验证同一缓存块的多个Store在SBuffer中合并。</td>
+      </tr>
+      <tr>
+          <td>6.2</td>
+          <td>SU_SBUFFER</td>
+          <td>PLRU_REPLACE</td>
+          <td>验证SBuffer满时按PLRU策略替换。</td>
+      </tr>
+      <tr>
+          <td>7.1</td>
+          <td>SU_MMIO</td>
+          <td>ORDER</td>
+          <td>验证MMIO指令强顺序执行（成为ROB头）。</td>
+      </tr>
+      <tr>
+          <td>7.2</td>
+          <td>SU_MMIO</td>
+          <td>EXCEPTION</td>
+          <td>验证原子/向量指令访问MMIO触发异常。</td>
+      </tr>
+      <tr>
+          <td>8.1</td>
+          <td>SU_NC</td>
+          <td>EXEC</td>
+          <td>验证NC访问允许乱序执行。</td>
+      </tr>
+      <tr>
+          <td>8.2</td>
+          <td>SU_NC</td>
+          <td>FORWARD</td>
+          <td>验证Uncache模块的Store到Load转发。</td>
+      </tr>
+      <tr>
+          <td>9.1</td>
+          <td>SU_MISALIGN</td>
+          <td>SCALAR_SPLIT</td>
+          <td>验证标量非对齐访问跨越16B边界时拆分为两个对齐访问。</td>
+      </tr>
+      <tr>
+          <td>9.2</td>
+          <td>SU_MISALIGN</td>
+          <td>SEG_HANDLE</td>
+          <td>验证向量Segment指令的非对齐处理（独立路径）。</td>
+      </tr>
+      <tr>
+          <td>9.3</td>
+          <td>SU_MISALIGN</td>
+          <td>EXCEPTION</td>
+          <td>验证原子指令、MMIO、NC空间非对齐访问触发异常。</td>
+      </tr>
+      <tr>
+          <td>10.1</td>
+          <td>SU_ATOMIC</td>
+          <td>PRELOAD</td>
+          <td>验证原子指令先将缓存块读入DCache。</td>
+      </tr>
+      <tr>
+          <td>10.2</td>
+          <td>SU_ATOMIC</td>
+          <td>OPS</td>
+          <td>验证原子操作（如AMO）执行正确性。</td>
+      </tr>
+  </tbody>
+</table>
+</mrs-testpoints>
+
+	<div class="td-page-meta__lastmod">
+  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/176c7c6000659a762b416bf9016d521a3604fff0">StoreUnit &amp; template (#174) (176c7c6)</a>
+</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2025
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">保留所有权利</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/UnityChipForXiangShan/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
+<script src='/UnityChipForXiangShan/js/prism.js'></script>
+<script src='/UnityChipForXiangShan/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
