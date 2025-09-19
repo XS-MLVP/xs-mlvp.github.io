@@ -72,7 +72,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
 后端重定向与更新：后端是实际执行指令的单元，通过后端的执行结果，才能确认一条指令是否执行错误，产生重定向，同时，在发生重定向时，根据后端实际执行结果生成更新信息。 指令commit：当一个分支预测块内的所有指令都被执行，在后端提交，这标志着FTQ队列中这个分支预测块对应的FTQ项已经结束了它的生命周期，可以从队列中移除了，这时候，我们就可以把它的更新信息发给FTQ了。 FTQ指针 FTQ的全名叫取值目标队列，队列中的一个项叫做FTQ项，BPU写入预测结果时是写入队列中哪个位置，IFU又是从哪个队列取FTQ项？这时候，我们需要一个FTQ指针去索引FTQ项，而由于和不同模块的交互需要索引不同的FTQ项，因此，有以下类型的FTQ指针，下面，由指令生命周期为例，大致介绍这些指针：
 指令在 FTQ 中的生存周期 指令以预测块为单位，从 BPU 预测后便送进 FTQ，直到指令所在的预测块中的所有指令全部在后端提交完成，FTQ 才会在存储结构中完全释放该预测块所对应的项。这个过程中发生的事如下：
 预测块从 BPU 发出，进入 FTQ，bpuPtr 指针加一，初始化对应 FTQ 项的各种状态，把各种预测信息写入存储结构；如果预测块来自 BPU 覆盖预测逻辑，则恢复 bpuPtr 和 ifuPtr FTQ 向 IFU 发出取指请求，ifuPtr 指针加一，等待预译码信息写回 IFU 写回预译码信息，ifuWbPtr 指针加一，如果预译码检测出了预测错误，则给 BPU 发送相应的重定向请求，恢复 bpuPtr 和 ifuPtr 指令进入后端执行，如果后端检测出了误预测，则通知 FTQ，给 IFU 和 BPU 发送重定向请求，恢复 bpuPtr、ifuPtr 和 ifuWbPtr 指令在后端提交，通知 FTQ，等 FTQ 项中所有的有效指令都已提交，commPtr 指针加一，从存储结构中读出相应的信息，送给 BPU 进行训练 预测块 n 内指令的生存周期会涉及到 FTQ 中的 bpuPtr、ifuPtr、ifuWbPtr 和 commPtr 四个指针，当 bpuPtr 开始指向 n&#43;1 时，预测块内的指令进入生存周期，当 commPtr 指向 n&#43;1 后，预测块内的指令完成生存周期。">
-  <meta itemprop="dateModified" content="2025-09-19T14:28:31+08:00">
+  <meta itemprop="dateModified" content="2025-09-19T14:52:04+08:00">
   <meta itemprop="wordCount" content="126">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="FTQ概述">
@@ -192,7 +192,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.78b19efa46866ff16616df5b30f6d91e.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d9463241ec04d4e6728523bf641946f5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -216,7 +216,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.78b19efa46866ff16616df5b30f6d91e.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d9463241ec04d4e6728523bf641946f5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -854,7 +854,7 @@ BPU和FTQ BPUtoFTQ：BPU会将分支预测结果和meta数据发给FTQ。
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/1d18e71c0c8b63831fc0b1e2f3b4c0607781c9e6">update storeunit pics (1d18e71)</a>
+  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/e0974aa19ed1b6ad45d9e092ca63392ab130570a">storeunit pics (#179) (e0974aa)</a>
 </div>
 </div>
 
