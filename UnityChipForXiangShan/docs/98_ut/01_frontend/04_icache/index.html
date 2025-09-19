@@ -42,7 +42,7 @@ ICache 说明文档 文档概述 本文档描述 ICache 的模块列表、设计
 请注意，本文档撰写的测试点仅供参考，部分测试点需要修改，如能补充或修改测试点，最终获得的奖励可能更高！
 ICache 说明文档 文档概述 本文档描述 ICache 的模块列表、设计规格、参数列表、功能概述和详述。 功能概述部分提供 ICache 整体数据流向图和过程。
 术语说明 缩写 全称 中文名称 说明 ICache Instruction Cache L1 指令缓存 用于存储最近访问过的指令，以减少对主内存的访问次数，从而提高处理速度。 DCache Data Cache L1 数据缓存 用于存储最近访问过的数据，以减少对主内存的访问次数，从而提高处理速度。 L2 Cache Level Two Cache L2 缓存 从主内存中预取指令和数据,作为 iCache 和主内存之间的缓冲区。 ITLB Instruction TLB 指令地址转换缓冲 用于将虚拟地址转换为物理地址的缓冲。 BPU Branch Prediction Unit 分支预测单元 预测程序中的条件分支，以便提前获取和解码后续指令，这样可以减少等待分支结果的时间。 FTQ Fetch Target Queue 取指目标队列 暂存 BPU 预测的取指目标，并根据这些取指目标给 IFU 发送取指请求。 IFU Instruction Fetch Unit 取指单元 进行取指，预译码，分支预测检查，指令扩展和非法检查。 BEU Bus Error Unit 总线错误单元 总线错误可以使用总线错误单元 (BEU) 对 hart 产生中断。 PF Page Fault 缺页异常 当 CPU 访问的内存地址不在物理内存中时，会触发缺页异常。 GPF Guest Page Fault 虚拟机缺页异常 是在虚拟化环境中，客户机（guest）操作系统尝试访问的虚拟地址未能成功映射到物理地址时产生的异常。 AF Access Fault 访问错误 当 CPU 试图访问一个不允许的物理地址时，会触发访问错误。 PMP Physical Memory Protection 物理内存保护模块 RISC-V 架构中提供的一种硬件机制，用于控制不同内存区域的读、写和执行权限，主要目的是提供对物理内存的保护和隔离。 PMA Physical Memory Attribute 物理内存属性模块（PMP 的一部分） RISC-V 系统中，机器物理地址空间的每个区域的这些属性和能力称为物理内存属性。 PBMT Page-Base Memory Type 基于页面的内存类型 一种内存管理机制，它使用分页（paging）技术来管理虚拟内存。见特权手册 Svpbmt 扩展。 MMIO Memory-Mapped Input/Output 内存映射输入/输出 在 MMIO 中，外设的寄存器和内存被映射到同一个地址空间。 cacheline cacheline 缓存行 缓存中的最小存储单位。 MetaArray MetaArray 元数据数组 用于存储指令的元数据信息，包括指令的地址、访问权限、是否有效等。 DataArray DataArray 数据数组 用于存储指令数据的数组。 SRAM Static Random Access Memory 静态随机存取存储器 一种用于存储数据的存储器，具有随机访问特性。 MSHR Miss Status Holding Register 缺失状态保持寄存器 用来处理非阻塞缓存（non-blocking cache）中的缓存未命中（cache miss）情况 。 SATP Supervisor Address Translation and Protection 监管者地址转换和保护单元 管理地址转换和保护机制，它决定了虚拟地址到物理地址的转换方式以及访问权限的控制。 VS Virtual Supervisor 虚拟监管者 是 H 扩展引入的一种特权模式，用于运行虚拟机中的操作系统。包括两级地址翻译，虚拟 CSR 和异常和中断虚拟化等机制。 hartID hardware thread ID 硬件线程标识 RISC-V 硬件线程 ID。在 RISC-V 架构中，每个处理器核心都有一个唯一的 hart ID，用于区分同一处理器中运行的多个硬件线程。 SFENCE.VMA Supervisor Memory-Management Fence Instruction 监管者内存管理屏障指令 同步对内存中内存管理数据结构的更新与当前执行的指令。 fence.i fence.i 屏障指令 用于同步指令流与数据流，确保在指令之前的存储操作对后续取指可见。 FDIP Fetch-directed instruction prefetching 取指导向指令预取 通过在分支预测单元和取指单元之间引入一个取指目标队列（Fetch Target Queue，FTQ），将两者解耦。分支预测单元会预测未来的控制流，并将预测的分支目标地址存入FTQ。取指单元则根据FTQ中的地址信息，提前从更高级别的缓存或内存中获取指令块，并将其放入一个全相联的缓冲区中，以便与L1指令缓存并行访问。 ICache 和 DCache 区别 功能用途 ICache 专门用于存储指令。当 CPU 从内存中读取指令时，这些指令会先被存储在 ICache 中。这样，当 CPU 需要再次执行相同的指令时，可以直接从 ICache 中读取，而无需再次访问速度较慢的内存，从而提高指令的读取速度，加快程序的执行效率。">
-  <meta itemprop="dateModified" content="2025-09-19T15:08:23+08:00">
+  <meta itemprop="dateModified" content="2025-09-19T15:18:45+08:00">
   <meta itemprop="wordCount" content="10183">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="ICache">
@@ -152,7 +152,7 @@ ICache 说明文档 文档概述 本文档描述 ICache 的模块列表、设计
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6358c7cc9c561b5b1942184606aa3801.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d9463241ec04d4e6728523bf641946f5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -176,7 +176,7 @@ ICache 说明文档 文档概述 本文档描述 ICache 的模块列表、设计
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.6358c7cc9c561b5b1942184606aa3801.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d9463241ec04d4e6728523bf641946f5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -6356,7 +6356,7 @@ pmp 包含 req 和 resp 两个子结构。</p>
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/b2d32274a616e76435e2e0976c0230236d1f3aab">pics adjust (#180) (b2d3227)</a>
+  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/8d196d2eb24581ed28f7a29bee73fb5d09bed45a">Pics adjustment (#181) (8d196d2)</a>
 </div>
 </div>
 
