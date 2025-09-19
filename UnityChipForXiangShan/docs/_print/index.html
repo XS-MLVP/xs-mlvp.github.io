@@ -36,7 +36,7 @@
   <meta itemprop="description" content="本项目旨在通过开源众包的方式对香山处理器的昆明湖架构进行单元（Unit Test, UT）验证。下图是香山昆明湖架构各个模块验证情况。
 当前版本： 20250915034133-main-bcfbe7afca8060ad7ddee7f9fde14aed0da25f3c-dirty 查看测试报告 总统计数据如下：
 总测试用例数（Total Cases）： - 测试用例通过数（Passed Cases）： - 测试用例通过率（Passed Rate）： - 测试用例未过数（Failed Cases）： - 测试用例跳过数（Skipped Cases）： - 测试用例跳过率（Skip Rate）： - 总功能覆盖点数（Function Coverage）： - 覆盖点已覆盖数（Covered Functions）： - 覆盖点已覆盖率（Covered Rate）： - 总代码行覆盖率（Total Lines）： - 总代码行覆盖数（Covered Lines）： - 总代码行覆盖率（Covered Rate）： - *总代码行会随着DUT的增加而不断增加，因此：总代码行覆盖率不是最终覆盖率">
-  <meta itemprop="dateModified" content="2025-09-19T13:00:53+08:00">
+  <meta itemprop="dateModified" content="2025-09-19T13:47:43+08:00">
   <meta itemprop="wordCount" content="55">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="进度概述">
@@ -144,7 +144,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.57aa8a513e411e013755c3b01b9d0802.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d9463241ec04d4e6728523bf641946f5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -1014,7 +1014,7 @@
     
     
 	
-<li>12.4.3.1: <a href="#pg-ee675f9c192f352a52e83ce5a137f604"></a></li>
+<li>12.4.3.1: <a href="#pg-cae277314de45b24dc43679a076417b4">StoreUnit</a></li>
 
 
     
@@ -1022,7 +1022,7 @@
     
     
 	
-<li>12.4.3.2: <a href="#pg-cae277314de45b24dc43679a076417b4"></a></li>
+<li>12.4.3.2: <a href="#pg-ee675f9c192f352a52e83ce5a137f604">微报告模板</a></li>
 
 
     
@@ -26266,57 +26266,9 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 
 <div class="td-content" style="page-break-before: always">
     
-	<h1 id="pg-ee675f9c192f352a52e83ce5a137f604">12.4.3.1 - </h1>
+	<h1 id="pg-cae277314de45b24dc43679a076417b4">12.4.3.1 - StoreUnit</h1>
     
-	<h1 id="微报告模板">微报告模板</h1>
-<p><em><strong>SCALAR_DISPATCH 测试点</strong></em></p>
-<h3 id="功能描述">功能描述</h3>
-<p>本测试点验证标量Store指令（如sb、sh、sw、sd）从发射队列派发到StoreUnit时，是否正确分配一个StoreQueue（SQ）条目。测试确保指令派发机制正常工作，包括SQ索引分配、状态标记和信号交互。这是StoreUnit最基本的功能，涉及指令派发流水线的初始阶段。</p>
-<h3 id="输入参数">输入参数</h3>
-<ul>
-<li>虚拟地址（vaddr）​​：0x1000</li>
-<li>存储数据（data）​​：0x12345678</li>
-<li>存储大小（size）​​：1、2、4、8字节</li>
-<li>首次派发标志（is_first_issue）​​：true或false</li>
-<li>指令类型​：通过fuOpType设置</li>
-</ul>
-<h3 id="输出验证">输出验证</h3>
-<ul>
-<li>派发成功信号​：io_stin_ready和io_stin_valid同时为高，表示指令被接收。</li>
-<li>SQ条目分配​：io_lsq_valid为高，且io_lsq_bits_updateAddrValid为高，表示SQ地址更新有效。</li>
-<li>SQ索引范围​：io_lsq_bits_uop_sqIdx_value在0到SQ_SIZE-1之间（如0-63）。</li>
-<li>状态标记​：SQ条目中的valid位被设置为1，robIdx正确记录。</li>
-<li>后续准备​：io_stin_ready保持为高，表示可接收新指令。</li>
-</ul>
-<h3 id="边界条件分析">边界条件分析</h3>
-<ol>
-<li>不同存储大小​：测试了1字节（sb）、2字节（sh）、4字节（sw）和8字节（sd）指令，确保所有大小都能正确分配SQ条目。</li>
-<li>地址对齐​：测试对齐地址（如0x1000）和不对齐地址（如0x1001），验证地址计算不影响派发。</li>
-<li>首次派发与重发​：设置is_first_issue为true和false，模拟首次派发和重发场景，确保重发机制不干扰SQ分配。</li>
-<li>​SQ容量边界​：通过多次派发指令，测试SQ接近满时的行为，确保索引不溢出。</li>
-<li>信号时序​：验证在时钟上升沿信号稳定，避免时序问题导致派发失败。</li>
-</ol>
-<h3 id="结果总结">结果总结</h3>
-<p>测试通过，所有验证点均符合预期。标量Store指令派发功能正常，SQ条目分配正确，边界条件处理稳健。覆盖了标量存储的所有大小类型和常见地址场景，为后续流水线阶段提供了可靠基础。无异常或错误发生，测试完整性高。</p>
-
-</div>
-
-
-
-    
-	
-  
-    
-    
-	
-    
-
-<div class="td-content" style="page-break-before: always">
-    
-	<h1 id="pg-cae277314de45b24dc43679a076417b4">12.4.3.2 - </h1>
-    
-	<h1 id="storeunit">StoreUnit</h1>
-<h4 id="本文档参考香山storeunit设计文档写成">本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/blob/master/docs/zh/memblock/LSU/index.md">香山StoreUnit设计文档</a>写成</h4>
+	<h4 id="本文档参考香山storeunit设计文档写成">本文档参考<a href="https://github.com/OpenXiangShan/XiangShan-Design-Doc/blob/master/docs/zh/memblock/LSU/index.md">香山StoreUnit设计文档</a>写成</h4>
 <p>请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！</p>
 <h1 id="storeunit说明文档">StoreUnit说明文档</h1>
 <h2 id="文档概述">文档概述</h2>
@@ -29463,6 +29415,52 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
   </tbody>
 </table>
 </mrs-testpoints>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-ee675f9c192f352a52e83ce5a137f604">12.4.3.2 - 微报告模板</h1>
+    
+	<p><em><strong>SCALAR_DISPATCH 测试点</strong></em></p>
+<h3 id="功能描述">功能描述</h3>
+<p>本测试点验证标量Store指令（如sb、sh、sw、sd）从发射队列派发到StoreUnit时，是否正确分配一个StoreQueue（SQ）条目。测试确保指令派发机制正常工作，包括SQ索引分配、状态标记和信号交互。这是StoreUnit最基本的功能，涉及指令派发流水线的初始阶段。</p>
+<h3 id="输入参数">输入参数</h3>
+<ul>
+<li>虚拟地址（vaddr）​​：0x1000</li>
+<li>存储数据（data）​​：0x12345678</li>
+<li>存储大小（size）​​：1、2、4、8字节</li>
+<li>首次派发标志（is_first_issue）​​：true或false</li>
+<li>指令类型​：通过fuOpType设置</li>
+</ul>
+<h3 id="输出验证">输出验证</h3>
+<ul>
+<li>派发成功信号​：io_stin_ready和io_stin_valid同时为高，表示指令被接收。</li>
+<li>SQ条目分配​：io_lsq_valid为高，且io_lsq_bits_updateAddrValid为高，表示SQ地址更新有效。</li>
+<li>SQ索引范围​：io_lsq_bits_uop_sqIdx_value在0到SQ_SIZE-1之间（如0-63）。</li>
+<li>状态标记​：SQ条目中的valid位被设置为1，robIdx正确记录。</li>
+<li>后续准备​：io_stin_ready保持为高，表示可接收新指令。</li>
+</ul>
+<h3 id="边界条件分析">边界条件分析</h3>
+<ol>
+<li>不同存储大小​：测试了1字节（sb）、2字节（sh）、4字节（sw）和8字节（sd）指令，确保所有大小都能正确分配SQ条目。</li>
+<li>地址对齐​：测试对齐地址（如0x1000）和不对齐地址（如0x1001），验证地址计算不影响派发。</li>
+<li>首次派发与重发​：设置is_first_issue为true和false，模拟首次派发和重发场景，确保重发机制不干扰SQ分配。</li>
+<li>​SQ容量边界​：通过多次派发指令，测试SQ接近满时的行为，确保索引不溢出。</li>
+<li>信号时序​：验证在时钟上升沿信号稳定，避免时序问题导致派发失败。</li>
+</ol>
+<h3 id="结果总结">结果总结</h3>
+<p>测试通过，所有验证点均符合预期。标量Store指令派发功能正常，SQ条目分配正确，边界条件处理稳健。覆盖了标量存储的所有大小类型和常见地址场景，为后续流水线阶段提供了可靠基础。无异常或错误发生，测试完整性高。</p>
 
 </div>
 

@@ -36,7 +36,7 @@ cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ft
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-19T13:00:53+08:00">
+    <meta property="article:modified_time" content="2025-09-19T13:47:43+08:00">
 
   <meta itemprop="name" content="FTQ接收IFU重定向">
   <meta itemprop="description" content="文档概述 除了后端，IFU也会发送重定向相关消息，和后端不同，IFU的重定向信息来自于预译码写回信息。相同的是，它们都是通过BranchPredictionRedirect的接口传递重定向信息。
@@ -45,7 +45,7 @@ cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ft
 cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ftq_redirect_mem读出ftq_Redirect_SRAMEntry，把其中的所有信号直接传递给cfiUpdate的同名信号中。 target：已在第一周期写入cfiUpdate的pd有效，且isRet字段拉高，指明发生预测错误的指令本是一条Ret指令，此时，将target设置为cfiUpdate的topAddr，帮助回到发生错误之前的状态。 2. 重定向结果生效 两个周期生成完整的重定向信息后，IFU重定向信息才有效，有可能被FTQ采取，完整的IFU重定向结果记为ifuRedirectToBpu
 3. IFU 冲刷信号 (ifuFlush) 指令流控制信号： ifuFlush：来自IFU的冲刷信号，主要是由IFU重定向造成的，生成IFU重定向信息的两个周期内，该信号都拉高
 标志：IFU重定向信息产生接口BranchPredictionRedirect中valid有效，表示开始生成重定向信息，该周期以及下一个周期，ifuFlush拉高 接口说明 顶层IO 作用 fromIFU 接收来自IFU的预译码信息 接口时序 测试点总表 序号 功能名称 测试点名称 描述 1.1 IFU_REDIRECT IFU_REDIRECT_GRN_VALID 当预译码写回pdWb有效，且pdWb的missOffset字段有效表明存在预测错误的指令，同时后端冲刷信号backendFlush无效时，valid信号有效 1.2 IFU_REDIRECT IFU_REDIRECT_GEN 允许生成IFU重定向时，在两周期内生成具体信号 2 IFU_REDIRECT_TO_BPU IFU_REDIRECT_TO_BPU IFU重定向生成后，IFU重定向结果生效 3 IFU_FLUSH IFU_FLUSH 生成IFU重定向信息的两个周期内，ifuFlush信号都拉高">
-  <meta itemprop="dateModified" content="2025-09-19T13:00:53+08:00">
+  <meta itemprop="dateModified" content="2025-09-19T13:47:43+08:00">
   <meta itemprop="wordCount" content="78">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="FTQ接收IFU重定向">
@@ -156,7 +156,7 @@ cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ft
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.57aa8a513e411e013755c3b01b9d0802.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d9463241ec04d4e6728523bf641946f5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -180,7 +180,7 @@ cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ft
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.57aa8a513e411e013755c3b01b9d0802.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d9463241ec04d4e6728523bf641946f5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -567,13 +567,13 @@ cifUpdate： 信号列表： 重定向RAS相关信号：通过ftqIdx索引从 ft
   <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" title="LSU" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">香山LSU模块</span></a></label>
   
   <ul class="ul-4 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class=""></span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class=""></span></a></label>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
   
 </li>
   </ul>
@@ -798,7 +798,7 @@ ifuFlush：来自IFU的冲刷信号，主要是由IFU重定向造成的，生成
 </mrs-testpoints>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/176c7c6000659a762b416bf9016d521a3604fff0">StoreUnit &amp; template (#174) (176c7c6)</a>
+  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/aeb5754b48c1cc5af6ff377b9e9c0ca6ca7b9449">StoreUnit docs update (aeb5754)</a>
 </div>
 
 </div>
