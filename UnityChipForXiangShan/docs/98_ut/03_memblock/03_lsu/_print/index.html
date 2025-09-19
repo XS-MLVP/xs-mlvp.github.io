@@ -33,7 +33,7 @@
   <meta itemprop="name" content="LSU">
   <meta itemprop="description" content="本文档参考香山LSQ设计文档写成
 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！">
-  <meta itemprop="dateModified" content="2025-09-19T14:08:07+08:00">
+  <meta itemprop="dateModified" content="2025-09-19T14:28:31+08:00">
   <meta itemprop="wordCount" content="2">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="LSU">
@@ -140,7 +140,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.7cd2e896209eb07ce94ce9fbb749ff0a.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.78b19efa46866ff16616df5b30f6d91e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -268,12 +268,14 @@ StoreUnit 是存储指令执行单元 ，由多个协同工作的子模块组成
 <h4 id="存储地址流水线">存储地址流水线</h4>
 <div>			
     <center>	
-    <img src="../scalar.png"
-         alt="sw指令流水示意图"
-         style="zoom:100%"/>
-    <br>
-    图1：LoadQueueRAR结构示意图<br><br>
-    </center>
+<pre><code>&lt;img src=&quot;../../../../../../static/docs/98_ut/03_memblock/03_storeunit/scalar.png&quot;
+
+     alt=&quot;sw指令流水示意图&quot;
+     style=&quot;zoom:100%&quot;/&gt;
+&lt;br&gt;
+图1：LoadQueueRAR结构示意图&lt;br&gt;&lt;br&gt;
+&lt;/center&gt;
+</code></pre>
 </div>
 <p>由4级结构组成：</p>
 <p>​Store地址流水线（4级结构）​​</p>
@@ -358,12 +360,14 @@ StoreUnit 是存储指令执行单元 ，由多个协同工作的子模块组成
 SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
 <div>			
     <center>	
-    <img src="../vector.png"
-         alt="vse指令流水示意图"
-         style="zoom:100%"/>
-    <br>
-    图2：LoadQueueRAR结构示意图<br><br>
-    </center>
+<pre><code>&lt;img src=&quot;../../../../../../static/docs/98_ut/03_memblock/03_storeunit/vector.png&quot;
+
+     alt=&quot;vse指令流水示意图&quot;
+     style=&quot;zoom:100%&quot;/&gt;
+&lt;br&gt;
+图2：LoadQueueRAR结构示意图&lt;br&gt;&lt;br&gt;
+&lt;/center&gt;
+</code></pre>
 </div>
 <p>StoreUnit处理非对齐Store指令流程和标量类似，特别的:</p>
 <ul>
@@ -401,7 +405,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
 <p>原子指令、MMIO与NC地址空间均不支持非对齐访问，这些情况将触发AccessFault异常。</p>
 <div>			
     <center>	
-    <img src="../misalign.png"
+    <img src="../../../../../../static/docs/98_ut/03_memblock/03_storeunit/misalign.png"
          alt="非对齐sd指令流水示意图"
          style="zoom:100%"/>
     <br>
@@ -448,7 +452,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
 <p>Store指令地址流水线分为S0/S1/S2/S3四级,如图所示：</p>
 <div>			
     <center>	
-    <img src="../StoreUnit.png"
+    <img src="../../../../../../static/docs/98_ut/03_memblock/03_storeunit/StoreUnit.png"
          alt="StoreUnit整体框图"
          style="zoom:100%"/>
     <br>
@@ -3269,7 +3273,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
 <h3 id="接口时序实例">接口时序实例</h3>
 <div>			
     <center>	
-    <img src="../LSU-StoreUnit-Timing.svg"
+    <img src="../../../../../../static/docs/98_ut/03_memblock/03_storeunit/LSU-StoreUnit-Timing.svg"
          alt="StoreUnit接口时序"
          style="zoom:100%"/>
     <br>

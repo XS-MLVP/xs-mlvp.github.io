@@ -44,7 +44,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-19T14:08:07+08:00">
+    <meta property="article:modified_time" content="2025-09-19T14:28:31+08:00">
 
   <meta itemprop="name" content="F3PreDecoder">
   <meta itemprop="description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
@@ -57,7 +57,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 对于类型2，只有不为RVC指令且目的寄存器rd为link寄存器（x1或x5）时，才为Call。
 对于类型3，在RVI指令下，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。 在RVC指令下，对C.JALR指令，为call，对C.JR指令，当rs1为link时，为Ret
 序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret 测试点汇总 序号 功能 名称 描述 1.1 CFI指令类型判定 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 CFI指令类型判定 BR判定 对传入的BR指令，应该判定为类型1 1.3 CFI指令类型判定 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 CFI指令类型判定 JALR判定 对传入的JALR指令，应该判定为类型3 2.1 ret、call判定 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 ret、call判定 RVI.JAL判定call 对传入的RVC.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 ret、call判定 RVI.JAL例外 对传入的RVC.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 ret、call判定 RVC.JAL不判定 对传入的RVI.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 ret、call判定 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 ret、call判定 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 ret、call判定 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 ret、call判定 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 ret、call判定 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 ret、call判定 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret">
-  <meta itemprop="dateModified" content="2025-09-19T14:08:07+08:00">
+  <meta itemprop="dateModified" content="2025-09-19T14:28:31+08:00">
   <meta itemprop="wordCount" content="146">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="F3PreDecoder">
@@ -172,7 +172,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.7cd2e896209eb07ce94ce9fbb749ff0a.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.78b19efa46866ff16616df5b30f6d91e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -196,7 +196,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.7cd2e896209eb07ce94ce9fbb749ff0a.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.78b19efa46866ff16616df5b30f6d91e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -934,7 +934,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/b5dc2a3bfc876618d3ef8a7f7369e2cfe19f3aa5">StoreUnit docs update (b5dc2a3)</a>
+  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/1d18e71c0c8b63831fc0b1e2f3b4c0607781c9e6">update storeunit pics (1d18e71)</a>
 </div>
 
 </div>
