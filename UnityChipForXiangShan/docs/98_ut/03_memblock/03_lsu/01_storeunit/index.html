@@ -76,7 +76,7 @@ StoreQueue条目释放与状态清理
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-19T15:18:45+08:00">
+    <meta property="article:modified_time" content="2025-09-21T08:17:21+08:00">
 
   <meta itemprop="name" content="StoreUnit">
   <meta itemprop="description" content="本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
@@ -105,8 +105,8 @@ stage 3:
 标量store发起写回，通过stout发送给后端
 StoreQueue条目释放与状态清理
 存储数据流水线 从发射队列（issue queue）接收数据 将数据写回StoreQueue 标记发射队列接收的数据为就绪状态 向量存储指令执行 对于除 SEG指令外的向量内存访问指令，VSSplit 负责接收向量内存访问指令发射队列发送的微操作（uop），并将该微操作拆分为多个元素。随后VSSplit 将这些元素发送至StoreUnit 执行，执行流程与标量内存访问指令相同。执行完成后，元素会被写回至 VSMerge，其中 Merge 模块会将这些元素收集并组合成微操作，最终写回向量寄存器文件。 SEG 指令则由独立的 VSegmentUnit 模块处理。">
-  <meta itemprop="dateModified" content="2025-09-19T15:18:45+08:00">
-  <meta itemprop="wordCount" content="2333">
+  <meta itemprop="dateModified" content="2025-09-21T08:17:21+08:00">
+  <meta itemprop="wordCount" content="2323">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="StoreUnit">
   <meta name="twitter:description" content="本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
@@ -236,7 +236,7 @@ StoreQueue条目释放与状态清理
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d9463241ec04d4e6728523bf641946f5.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -260,7 +260,7 @@ StoreQueue条目释放与状态清理
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.d9463241ec04d4e6728523bf641946f5.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -711,16 +711,16 @@ StoreQueue条目释放与状态清理
     <li><a href="#整体框图及流水级">整体框图及流水级</a></li>
     <li><a href="#storeunit功能说明">StoreUnit功能说明</a>
       <ul>
-        <li><a href="#1-内存指令派发">1. 内存指令派发</a></li>
-        <li><a href="#2-地址流水线">2. 地址流水线</a></li>
-        <li><a href="#3-向量内存指令执行">3. 向量内存指令执行</a></li>
-        <li><a href="#4-重执行">4. 重执行​</a></li>
-        <li><a href="#5-raw处理">5. RAW处理</a></li>
-        <li><a href="#6-sbuffer优化">6. SBuffer优化</a></li>
-        <li><a href="#7-mmio处理">7. MMIO处理</a></li>
-        <li><a href="#8-uncache指令执行">8. Uncache指令执行</a></li>
-        <li><a href="#9-非对齐内存访问">9. 非对齐内存访问</a></li>
-        <li><a href="#10-原子指令执行">10. 原子指令执行</a></li>
+        <li><a href="#1内存指令派发">1.内存指令派发</a></li>
+        <li><a href="#2地址流水线">2.地址流水线</a></li>
+        <li><a href="#3向量内存指令执行">3.向量内存指令执行</a></li>
+        <li><a href="#4重执行">4.重执行​</a></li>
+        <li><a href="#5raw处理">5.RAW处理</a></li>
+        <li><a href="#6sbuffer优化">6.SBuffer优化</a></li>
+        <li><a href="#7mmio处理">7.MMIO处理</a></li>
+        <li><a href="#8uncache指令执行">8.Uncache指令执行</a></li>
+        <li><a href="#9非对齐内存访问">9.非对齐内存访问</a></li>
+        <li><a href="#10原子指令执行">10.原子指令执行</a></li>
       </ul>
     </li>
     <li><a href="#常量说明">常量说明</a></li>
@@ -986,7 +986,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
 <mrs-functions>
 <h2 id="storeunit功能说明">StoreUnit功能说明</h2>
 <p>StoreUnit是存储指令的逻辑，功能被解构并集成到了 ​Memory Dispatch Queue、STA、STD、Integer ALUs、StoreQueue、SBuffer、LoadQueueRAW/RAR以及 DTLB​ 等一系列子模块中。</p>
-<h3 id="1-内存指令派发">1. 内存指令派发</h3>
+<h3 id="1内存指令派发">1.内存指令派发</h3>
 <p>Store指令存在复杂的控制机制（如顺序、转发、违例等），因此需要队列来保存Store指令的先进先出顺序以进行相关控制，该队列即StoreQueue。Store指令在完成译码、重命名等操作后，需要派发至ROB与LSQ，分配对应的robIdx、lqIdx与sqIdx，随后进入各自发射队列。在所有源操作数就绪后发射至MemBlock中的流水线。在MemBlock中的执行生命周期内，Store指令会携带lqIdx与sqIdx，用于内存违例检测与数据转发时的顺序维护。</p>
 <p>对于标量内存访问指令，一条指令分配一个StoreQueue表项。</p>
 <p>对于向量内存访问指令，一条指令在译码阶段会被拆分为多个uop，每个uop包含若干元素，相当于一次内存访问操作。在派发时，一个uop会分配与其包含元素数量相等的多个LSQ表项。</p>
@@ -1014,7 +1014,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       </tr>
   </tbody>
 </table>
-<h3 id="2-地址流水线">2. 地址流水线</h3>
+<h3 id="2地址流水线">2.地址流水线</h3>
 <table>
   <thead>
       <tr>
@@ -1045,7 +1045,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       </tr>
   </tbody>
 </table>
-<h3 id="3-向量内存指令执行">3. 向量内存指令执行</h3>
+<h3 id="3向量内存指令执行">3.向量内存指令执行</h3>
 <table>
   <thead>
       <tr>
@@ -1070,9 +1070,9 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       </tr>
   </tbody>
 </table>
-<h3 id="4-重执行">4. 重执行​</h3>
+<h3 id="4重执行">4.重执行​</h3>
 <p>存储指令会被发射队列重新传输，在一个存储指令被发射队列发射后，队列不会立即清除该指令，直到StoreUnit返回信号。StoreUnit根据TLB是否命中发送相应反馈。如果TLB未命中，则由指令发射队列负责重新发送该指令。</p>
-<h3 id="5-raw处理">5. RAW处理</h3>
+<h3 id="5raw处理">5.RAW处理</h3>
 <p>RAW内存访问违例检测：LoadQueue中的LoadQueueRAW模块通过FreeList结构记录所有可能地址相同但尚未执行更早Store的Load指令。当Load指令在LoadUnit执行到s2阶段（此时地址转换与PMA/PMP检查已完成）时，会分配LoadQueueRAW表项。当StoreQueue中所有Store地址就绪后，LoadQueueRAW中的所有Load可释放；或当程序顺序早于它的所有Store地址就绪后，该Load可从LoadQueueRAW释放。若Store指令在查询LoadQueueRAW时发现存在地址相同的更晚Load，则发生RAW内存访问违例，需要回滚。</p>
 <p>RAW内存访问违例恢复：检测到RAW违例时，由LoadQueueRAW发起回滚，从造成违例的Store指令的下一条指令开始清空流水线。</p>
 <table>
@@ -1099,7 +1099,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       </tr>
   </tbody>
 </table>
-<h3 id="6-sbuffer优化">6. SBuffer优化</h3>
+<h3 id="6sbuffer优化">6.SBuffer优化</h3>
 <p>根据RVWMO模型，在多核场景下（无FENCE等栅栏语义指令时），一个核的Store指令可以比地址不同的更晚Load指令更晚对其他核可见。该内存模型规则主要优化Store指令性能。RVWMO等弱一致性模型允许处理器核包含SBuffer，暂时保存已提交的Store写操作，合并这些写操作后再写入DCache，从而减少Store指令对DCache SRAM端口的争用，提高Load指令执行带宽。</p>
 <p>SBuffer为16×512B的全相联结构。当多个Store地址落在同一缓存块时，SBuffer会合并这些Store。</p>
 <p>SBuffer每周期最多可写入2条Store指令，每条Store指令写数据位宽为16B（例外：cbo.zero指令按缓存块操作，一次操作一个缓存块）。</p>
@@ -1131,7 +1131,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       </tr>
   </tbody>
 </table>
-<h3 id="7-mmio处理">7. MMIO处理</h3>
+<h3 id="7mmio处理">7.MMIO处理</h3>
 <p>香山核仅允许标量内存访问指令访问MMIO地址空间。MMIO访问与任何其他内存操作强顺序。因此，MMIO指令必须等待成为ROB头（即所有前序指令均完成）时才能执行。对于MMIO Store指令，需完成虚地址到实地址转换，通过实地址检查，且写数据就绪。随后LSQ将内存请求发送至Uncache模块，通过总线访问外设。结果返回LSQ后写回至ROB。</p>
 <p>原子指令与向量指令不支持MMIO访问。若此类指令访问MMIO地址空间，将触发对应AccessFault异常。</p>
 <table>
@@ -1158,7 +1158,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       </tr>
   </tbody>
 </table>
-<h3 id="8-uncache指令执行">8. Uncache指令执行</h3>
+<h3 id="8uncache指令执行">8.Uncache指令执行</h3>
 <p>香山核除支持访问非幂等、强顺序的MMIO地址空间外，还支持访问幂等、弱一致性（RVWMO）的Non-cacheable地址空间，简称NC。软件通过页表PBMT字段配置为NC以覆盖原有PMA属性。与MMIO访问不同，NC访问允许乱序内存操作。</p>
 <p>在StoreUnit流水线中被识别为NC地址（PBMT = NC）的内存访问指令会在LSQ中标记。LSQ负责将NC访问发送至Uncache模块。Uncache支持同时处理多个NC请求，支持请求合并，并负责向正在LoadUnit执行的NC Load转发Stores。</p>
 <table>
@@ -1185,7 +1185,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       </tr>
   </tbody>
 </table>
-<h3 id="9-非对齐内存访问">9. 非对齐内存访问</h3>
+<h3 id="9非对齐内存访问">9.非对齐内存访问</h3>
 <table>
   <thead>
       <tr>
@@ -1216,7 +1216,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       </tr>
   </tbody>
 </table>
-<h3 id="10-原子指令执行">10. 原子指令执行</h3>
+<h3 id="10原子指令执行">10.原子指令执行</h3>
 <p>香山核支持RVA与Zacas指令集。香山当前设计中，原子指令需先将访问的缓存块缓存至DCache，再进行原子操作。</p>
 <p>内存访问单元监控Store发射队列发射的地址与数据，若为原子指令则进入AtomicsUnit。AtomicsUnit执行一系列操作，包括TLB地址转换、清空SBuffer、访问DCache等。</p>
 <table>
@@ -3938,7 +3938,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
 </mrs-testpoints>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 19, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/8d196d2eb24581ed28f7a29bee73fb5d09bed45a">Pics adjustment (#181) (8d196d2)</a>
+  最后修改 September 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/061bd5c3e6d4d85f5961802ffe26582ddbdb8d4b">update subtitle (#182) (061bd5c)</a>
 </div>
 
 </div>
