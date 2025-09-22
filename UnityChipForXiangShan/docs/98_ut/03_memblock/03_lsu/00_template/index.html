@@ -30,13 +30,13 @@
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-21T08:17:21+08:00">
+    <meta property="article:modified_time" content="2025-09-22T09:16:42+08:00">
 
   <meta itemprop="name" content="微报告模板">
   <meta itemprop="description" content="SCALAR_DISPATCH 测试点
 功能描述 本测试点验证标量Store指令（如sb、sh、sw、sd）从发射队列派发到StoreUnit时，是否正确分配一个StoreQueue（SQ）条目。测试确保指令派发机制正常工作，包括SQ索引分配、状态标记和信号交互。这是StoreUnit最基本的功能，涉及指令派发流水线的初始阶段。
 输入参数 虚拟地址（vaddr）​​：0x1000 存储数据（data）​​：0x12345678 存储大小（size）​​：1、2、4、8字节 首次派发标志（is_first_issue）​​：true或false 指令类型​：通过fuOpType设置 输出验证 派发成功信号​：io_stin_ready和io_stin_valid同时为高，表示指令被接收。 SQ条目分配​：io_lsq_valid为高，且io_lsq_bits_updateAddrValid为高，表示SQ地址更新有效。 SQ索引范围​：io_lsq_bits_uop_sqIdx_value在0到SQ_SIZE-1之间（如0-63）。 状态标记​：SQ条目中的valid位被设置为1，robIdx正确记录。 后续准备​：io_stin_ready保持为高，表示可接收新指令。 边界条件分析 不同存储大小​：测试了1字节（sb）、2字节（sh）、4字节（sw）和8字节（sd）指令，确保所有大小都能正确分配SQ条目。 地址对齐​：测试对齐地址（如0x1000）和不对齐地址（如0x1001），验证地址计算不影响派发。 首次派发与重发​：设置is_first_issue为true和false，模拟首次派发和重发场景，确保重发机制不干扰SQ分配。 ​SQ容量边界​：通过多次派发指令，测试SQ接近满时的行为，确保索引不溢出。 信号时序​：验证在时钟上升沿信号稳定，避免时序问题导致派发失败。 结果总结 测试通过，所有验证点均符合预期。标量Store指令派发功能正常，SQ条目分配正确，边界条件处理稳健。覆盖了标量存储的所有大小类型和常见地址场景，为后续流水线阶段提供了可靠基础。无异常或错误发生，测试完整性高。">
-  <meta itemprop="dateModified" content="2025-09-21T08:17:21+08:00">
+  <meta itemprop="dateModified" content="2025-09-22T09:16:42+08:00">
   <meta itemprop="wordCount" content="24">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="微报告模板">
@@ -144,7 +144,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -168,7 +168,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -459,6 +459,21 @@
   
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">LSU</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check" checked/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="td-sidebar-nav-active-item">微报告模板</span></a></label>
+  
+</li>
+  </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"/>
   <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/" title="Shield-XS:基于Bitmap的安全隔离机制" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap"><span class="">香山bitmap 隔离模块</span></a></label>
@@ -550,21 +565,6 @@
   </ul>
 </li>
   </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check" checked/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" title="LSU" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">香山LSU模块</span></a></label>
-  
-  <ul class="ul-4 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check" checked/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  active td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="td-sidebar-nav-active-item">微报告模板</span></a></label>
-  
-</li>
-  </ul>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut04_misc-li">
@@ -649,7 +649,7 @@
   <li class="breadcrumb-item">
     <a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/">Mem Block</a></li>
   <li class="breadcrumb-item">
-    <a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/">香山LSU模块</a></li>
+    <a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/">LSU</a></li>
   <li class="breadcrumb-item active" aria-current="page">
     微报告模板</li>
   </ol>
@@ -692,7 +692,7 @@
 <p>测试通过，所有验证点均符合预期。标量Store指令派发功能正常，SQ条目分配正确，边界条件处理稳健。覆盖了标量存储的所有大小类型和常见地址场景，为后续流水线阶段提供了可靠基础。无异常或错误发生，测试完整性高。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/061bd5c3e6d4d85f5961802ffe26582ddbdb8d4b">update subtitle (#182) (061bd5c)</a>
+  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/75bc6e2b07689a479e45f94ae9ef3e391ba699e0">Update (#183) (75bc6e2)</a>
 </div>
 
 </div>

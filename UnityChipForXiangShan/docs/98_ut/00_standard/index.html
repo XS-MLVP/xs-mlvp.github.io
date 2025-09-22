@@ -69,7 +69,7 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
 st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
 考虑以下伪代码示例：
 ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
-  <meta itemprop="dateModified" content="2025-09-21T08:17:21+08:00">
+  <meta itemprop="dateModified" content="2025-09-22T09:16:42+08:00">
   <meta itemprop="wordCount" content="420">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="验证文档规范">
@@ -188,7 +188,7 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -212,7 +212,7 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -503,6 +503,21 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
   
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">LSU</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
+  
+</li>
+  </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"/>
   <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/" title="Shield-XS:基于Bitmap的安全隔离机制" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap"><span class="">香山bitmap 隔离模块</span></a></label>
@@ -592,21 +607,6 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
   
 </li>
   </ul>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" title="LSU" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">香山LSU模块</span></a></label>
-  
-  <ul class="ul-4 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
-  
 </li>
   </ul>
 </li>
@@ -1104,7 +1104,7 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 September 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/061bd5c3e6d4d85f5961802ffe26582ddbdb8d4b">update subtitle (#182) (061bd5c)</a>
+  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/75bc6e2b07689a479e45f94ae9ef3e391ba699e0">Update (#183) (75bc6e2)</a>
 </div>
 </div>
 

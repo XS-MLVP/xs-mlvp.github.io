@@ -46,7 +46,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-21T08:17:21+08:00">
+    <meta property="article:modified_time" content="2025-09-22T09:16:42+08:00">
 
   <meta itemprop="name" content="FTQ子队列">
   <meta itemprop="description" content="文档概述 请注意：从本篇开始，就涉及待验证的功能点和测试点了
@@ -60,7 +60,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
 1.1 ftq_redirect_mem读操作 读操作： 输入： 需要使能ren，这是一个向量，可指定任意读端口可读 对应接口：ren 从任意读端口中输入要读取的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：raddr 输出： 从发起输入的读端口对应的读出端口中读出Ftq_Redirect_SRAMEntry。 对应接口：rdata 1.2 ftq_redirect_mem写操作 写操作 输入： 需要使能wen，可指定写端口可写 对应接口：wen 向写端口中输入要写入的元素在ftq_redirect_mem中的地址，这是一个从0到ftqsize-1的索引 对应接口：waddr 向wdata中写入Ftq_Redirect_SRAMEntry 对应接口：wdata 多端口读：可以从多个读端口读取结果 每个子队列的读写基本都是类似的，后面不再赘述
 Ftq_Redirect_SRAMEntry ftq_redirect_mem存储的表项。继承自SpeculativeInfo，存储RAS预测器相关重定向信息，根据这些信息回溯到之前的状态
 sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口类型：Some(Vec(numBr, Bool())) 说明：Option 类型，表明这个值可能不存在，在非FPGA平台才有，否则为none 信号列表： SpeculativeInfo：推测信息，帮助BPU在发生重定向的时候回归正常的状态 接口列表: histPtr：重定向请求需要恢复的全局历史指针，可参见BPU顶层文档了解详情 接口类型：CGHPtr 说明：以下都属于RAS重定向信息,可参见BPU文档了解如何利用这些信息进行重定向 ssp：重定向请求指令对应的 RAS 推测栈栈顶在提交栈位置的指针 接口类型：UInt(log2Up(RasSize).W) sctr：重定向请求指令对应的 RAS 推测栈栈顶递归计数 Counter 接口类型：RasCtrSize.W TOSW：重定向请求指令对应的 RAS 推测栈（队列）写指针 接口类型：RASPtr TOSR：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr NOS：重定向请求指令对应的 RAS 推测栈（队列）读指针 接口类型：RASPtr topAddr： 接口类型：UInt(VAddrBits.W) 序号 功能名称 测试点名称 描述 1.1 FTQ_REDIRECT_MEM WRITE 向单端口输入wen，waddr决定是否写入以及写入地址，写入wdata 1.2 FTQ_REDIRECT_MEM READ 向多端口中输入ren，raddr决定是否读以及读取地址，从rdata读取 2. ftq_pd_mem存储预译码信息 由64（FtqSize）个表项（Ftq_pd_Entry）构成。支持同步读写操作。有2个读端口和1个写端口。具有读写使能信号。">
-  <meta itemprop="dateModified" content="2025-09-21T08:17:21+08:00">
+  <meta itemprop="dateModified" content="2025-09-22T09:16:42+08:00">
   <meta itemprop="wordCount" content="399">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="FTQ子队列">
@@ -176,7 +176,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -200,7 +200,7 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -491,6 +491,21 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
   
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">LSU</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
+  
+</li>
+  </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"/>
   <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/" title="Shield-XS:基于Bitmap的安全隔离机制" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap"><span class="">香山bitmap 隔离模块</span></a></label>
@@ -580,21 +595,6 @@ sc_disagree：统计分支指令在sc预测器中预测是否发生错误 接口
   
 </li>
   </ul>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" title="LSU" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">香山LSU模块</span></a></label>
-  
-  <ul class="ul-4 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
-  
 </li>
   </ul>
 </li>
@@ -1367,7 +1367,7 @@ Ftq_1R_SRAMEntry接口列表</p>
 <p>newest_entry_ptr，newest_entry_target这几个内部信号，它们不是队列，但是它们很重要，表明我们当前应该关注的最新的FTQ项及对应的跳转目标。BPU新的写入，重定向等等都会对最新FTQ项进行新的安排，在涉及到修改该信号的相应的文档中，对其生成方式做具体的描述。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/061bd5c3e6d4d85f5961802ffe26582ddbdb8d4b">update subtitle (#182) (061bd5c)</a>
+  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/75bc6e2b07689a479e45f94ae9ef3e391ba699e0">Update (#183) (75bc6e2)</a>
 </div>
 
 </div>

@@ -42,7 +42,7 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
 MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映射，在进程的视角看来它独享一段确定的（通常是连续的）地址，避免了其它进程的干扰；同时提供了虚实地址转换功能，这使得进程不必关心实际的物理地址在哪里，只需要对自己的地址空间进行操作。同时，对于一个进程来说，每次访问内存时并不是访问整个虚拟内存空间，因此进程实际需要占用的物理内存大小可以小于其虚拟地址空间的大小，由操作系统来决定要把哪一部分留在内存中，将剩余部分保存在磁盘中，在需要时再加载进入内存，极大的扩展了可用内存空间。
 程序局部性原理，是计算机科学术语，指程序在执行时呈现出局部性规律，即在一段时间内，整个程序的执行仅限于程序中的某一部分。相应地，执行所访问的存储空间也局限于某个内存区域。局部性原理又表现为：时间局部性和空间局部性。
 时间局部性是指如果程序中的某条指令一旦执行，则不久之后该指令可能再次被执行；如果某数据被访问，则不久之后该数据可能再次被访问。 空间局部性是指一旦程序访问了某个存储单元，则不久之后，其附近的存储单元也将被访问。 这样的由 MMU 创建的并负责维护的由虚拟地址指向物理地址的映射也将成为一项存储在一个物理页帧中，MMU 为了访问这样的物理页帧也需要一个根页表，根页表中存储着指向这些物理页帧的页表项（PTE），称为叶子 PTE。一个 PTE 的长度一般为 64 Bit（8 Bytes），而每一个一般物理页帧的大小为 4KB，这也就意味着一个物理页帧最多可以存储 4KB/8B = 2^9 个 PTE，因此根页表可以索引的范围即为 2^9 × 4KB = 2MB。2MB 的页表并不能满足内存日益增大的需要，在香山中实现的 SV48 即采用了四级页表的形式，通过四级的查询最终得到物理地址，每一级页表都能够索引 2^9 个下一级页表，最终找到需要的映射。四级页表下能够索引的地址范围达到了 2^9 × 2^9 × 2^9 × 2MB = 256TB。而页表本身也会比较大，如果存满的话大小会达到 4KB &#43; 2^9 × 4KB &#43; 2^9 × 2^9 × 4KB &#43; 2^9 × 2^9 × 2^9 × 4KB = 537921540KB ≈ 513GB。当然，不是说每一级页表都要填满，页表的四级结构可以理解为一个多叉树形结构，只有需要用到的才会实际使用，很多的分支都不需要使用，因此页表的大小是可变的。">
-  <meta itemprop="dateModified" content="2025-09-21T08:17:21+08:00">
+  <meta itemprop="dateModified" content="2025-09-22T09:16:42+08:00">
   <meta itemprop="wordCount" content="727">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="ITLB">
@@ -152,7 +152,7 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -176,7 +176,7 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -467,6 +467,21 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
   
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">LSU</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
+  
+</li>
+  </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"/>
   <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/" title="Shield-XS:基于Bitmap的安全隔离机制" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap"><span class="">香山bitmap 隔离模块</span></a></label>
@@ -556,21 +571,6 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
   
 </li>
   </ul>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" title="LSU" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">香山LSU模块</span></a></label>
-  
-  <ul class="ul-4 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
-  
 </li>
   </ul>
 </li>
@@ -1253,7 +1253,7 @@ MMU 为每个进程创建自己的虚拟地址空间，存储虚实地址的映�
             </div>
         </div>
 <div class="td-page-meta__lastmod">
-  最后修改 September 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/061bd5c3e6d4d85f5961802ffe26582ddbdb8d4b">update subtitle (#182) (061bd5c)</a>
+  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/75bc6e2b07689a479e45f94ae9ef3e391ba699e0">Update (#183) (75bc6e2)</a>
 </div>
 </div>
 

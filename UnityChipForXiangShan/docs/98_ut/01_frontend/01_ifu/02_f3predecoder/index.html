@@ -44,7 +44,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-21T08:17:21+08:00">
+    <meta property="article:modified_time" content="2025-09-22T09:16:42+08:00">
 
   <meta itemprop="name" content="F3PreDecoder">
   <meta itemprop="description" content="子模块：F3PreDecoder模块简介 这个模块是从PreDecoder中时序优化出来的，负责判定CFI指令的类型
@@ -57,7 +57,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 对于类型2，只有不为RVC指令且目的寄存器rd为link寄存器（x1或x5）时，才为Call。
 对于类型3，在RVI指令下，当rd为link寄存器时，必为Call。当rs为link寄存器且rd不为时，必为Ret。 在RVC指令下，对C.JALR指令，为call，对C.JR指令，当rs1为link时，为Ret
 序号 名称 描述 2.1 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 RVI.JAL判定call 对传入的RVI.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 RVI.JAL例外 对传入的RVI.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 RVC.JAL不判定 对传入的RVC.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret 测试点汇总 序号 功能 名称 描述 1.1 CFI指令类型判定 非CFI判定 对传入的非CFI指令（包括RVC.EBREAK），应该判定为类型0 1.2 CFI指令类型判定 BR判定 对传入的BR指令，应该判定为类型1 1.3 CFI指令类型判定 JAL判定 对传入的JAL指令，应该判定为类型2 1.4 CFI指令类型判定 JALR判定 对传入的JALR指令，应该判定为类型3 2.1 ret、call判定 非CFI和BR不判定 对传入的非CFI和BR指令，都不应判定为call或者ret 2.2.1.1 ret、call判定 RVI.JAL判定call 对传入的RVC.JAL指令，当rd设置为1或5，应当判定该指令为call 2.2.1.2 ret、call判定 RVI.JAL例外 对传入的RVC.JAL指令，当rd设置为1和5之外的值，不应当判定该指令为call或ret 2.2.2 ret、call判定 RVC.JAL不判定 对传入的RVI.JAL指令，无论什么情况都不能判定为call或ret 2.3.1.1 ret、call判定 RVI.JALR和rd为link 传入RVI.JALR指令，并且rd为1或5，无论其他取值，都应判定为call 2.3.1.2 ret、call判定 RVI.JALR且仅rs为link 传入RVI.JALR指令，rd不为1和5，rs为1或5，应判定为ret 2.3.1.3 ret、call判定 RVI.JALR无link 对传入的JALR指令，若rd和rs均不为link，则不应判定为ret和cal 2.3.2.1 ret、call判定 RVC.JALR为Ret 传入RVC.JALR指令，必定为call 2.3.2.2.1 ret、call判定 RVC.JR且rs为link 传入RVC.JR指令，rs为1或5，应判定为ret 2.3.2.2.2 ret、call判定 RVC.JR且rs不为link 传入RVC.JR指令，rs不为1或5，不应判定为ret">
-  <meta itemprop="dateModified" content="2025-09-21T08:17:21+08:00">
+  <meta itemprop="dateModified" content="2025-09-22T09:16:42+08:00">
   <meta itemprop="wordCount" content="146">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="F3PreDecoder">
@@ -172,7 +172,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -196,7 +196,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -487,6 +487,21 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
   
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">LSU</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
+  
+</li>
+  </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"/>
   <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/" title="Shield-XS:基于Bitmap的安全隔离机制" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap"><span class="">香山bitmap 隔离模块</span></a></label>
@@ -576,21 +591,6 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
   
 </li>
   </ul>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" title="LSU" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">香山LSU模块</span></a></label>
-  
-  <ul class="ul-4 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
-  
 </li>
   </ul>
 </li>
@@ -934,7 +934,7 @@ F3PreDecoder子模块测试点和功能点 功能点1 CFI指令类型判定 要�
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 September 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/061bd5c3e6d4d85f5961802ffe26582ddbdb8d4b">update subtitle (#182) (061bd5c)</a>
+  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/75bc6e2b07689a479e45f94ae9ef3e391ba699e0">Update (#183) (75bc6e2)</a>
 </div>
 
 </div>

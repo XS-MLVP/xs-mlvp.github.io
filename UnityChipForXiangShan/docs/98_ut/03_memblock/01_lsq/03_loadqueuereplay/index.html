@@ -38,7 +38,7 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-21T08:17:21+08:00">
+    <meta property="article:modified_time" content="2025-09-22T09:16:42+08:00">
 
   <meta itemprop="name" content="LoadQueueReplay">
   <meta itemprop="description" content="本文档参考香山LSQ设计文档写成
@@ -48,7 +48,7 @@ LoadQueueReplay 简介 LoadQueueReplay 模块是现代处理器架构中用于�
 整体框图 图1：LoadQueueReplay结构示意图
 LoadQueueReplay 最多存放72条指令，涉及多个状态和存储的信息。其关键组成部分如下：
 Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该项的有效性。 Scheduled： 指示某个 Load 重发队列项是否已被调度，意味着该项已经被选出，并将被发送至 Load Unit 进行重发。 Uop： 该队列项对应的 Load 指令执行信息，包括微操作（uop）。 Cause：指示该 Load 指令重发的原因，主要包括以下几种情况： C_MA：存储-加载（st-ld）违反重新执行。 C_TM：TLB（翻译后备页表）缺失。 C_FF：存储-加载转发。 C_DR：数据缓存（dcache）需要重发。 C_DM：数据缓存缺失。 C_WF：路径预测失败。 C_BC：数据缓存路径冲突。 C_RAR：读取-读取（RAR）队列无法接收。 C_RAW：读取-写入（RAW）队列无法接收。 C_NK：存储-加载违反。 Blocking：指示该 Load 指令因等待条件而被阻塞，不能被调度重发。阻塞的原因和解除阻塞的条件包括： C_MA：存储指令的地址就绪。 C_TM：TLB 回填完毕，并发送 Hint 信号。 C_FF：存储指令的数据就绪。 C_DM：数据缓存回填完毕。 C_RAR：RAR 队列未满，且 Load 指令比 Load Queue 的写回项更老。 C_RAW：RAW 队列未满，且 Load 指令比 Store Queue 中所有地址准备好的项都更老。 LoadReplayQueue 通过 FreeList 管理队列的空闲状态。FreeList 的大小等于 LoadReplayQueue 的项数，分配宽度为3（Load Unit 的数量），释放宽度为 4。同时，Free List 可以反馈 Load Replay Queue 的空余项数量以及是否已满的信息。除了FreeList，LoadQueueReplay还包含两个子模块：AgeDetector 和 LqVAddrModule，其中 AgeDetector 用于寻找一系列load replay queue项中最早入队的一项。">
-  <meta itemprop="dateModified" content="2025-09-21T08:17:21+08:00">
+  <meta itemprop="dateModified" content="2025-09-22T09:16:42+08:00">
   <meta itemprop="wordCount" content="423">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="LoadQueueReplay">
@@ -160,7 +160,7 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -184,7 +184,7 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.ae2046ee403c4c5fc80ddbade1d79f32.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -475,6 +475,21 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
   
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">LSU</span></a></label>
+  
+  <ul class="ul-4 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
+  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
+  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
+  
+</li>
+  </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-li">
   <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"/>
   <label for="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/02_bitmap/" title="Shield-XS:基于Bitmap的安全隔离机制" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock02_bitmap"><span class="">香山bitmap 隔离模块</span></a></label>
@@ -564,21 +579,6 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
   
 </li>
   </ul>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/" title="LSU" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu"><span class="">香山LSU模块</span></a></label>
-  
-  <ul class="ul-4 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/01_storeunit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu01_storeunit"><span class="">StoreUnit</span></a></label>
-  
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-li">
-  <input type="checkbox" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"/>
-  <label for="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template-check"><a href="/UnityChipForXiangShan/docs/98_ut/03_memblock/03_lsu/00_template/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-unitychipforxiangshandocs98_ut03_memblock03_lsu00_template"><span class="">微报告模板</span></a></label>
-  
 </li>
   </ul>
 </li>
@@ -1011,7 +1011,7 @@ Allocated： 表示某个 Load 重发队列项是否已经被分配，反映该�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 21, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/061bd5c3e6d4d85f5961802ffe26582ddbdb8d4b">update subtitle (#182) (061bd5c)</a>
+  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/75bc6e2b07689a479e45f94ae9ef3e391ba699e0">Update (#183) (75bc6e2)</a>
 </div>
 
 </div>
