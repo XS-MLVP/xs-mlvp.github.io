@@ -42,7 +42,7 @@ ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; �
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-22T09:16:42+08:00">
+    <meta property="article:modified_time" content="2025-09-22T15:26:47+08:00">
 
   <meta itemprop="name" content="LoadQueueRAW">
   <meta itemprop="description" content="本文档参考香山LSQ设计文档写成
@@ -54,7 +54,7 @@ LoadQueueRAW 简介 LoadQueueRAW是用于处理store-load违例的。由于load�
 st-ld违例 在现代处理器中，Load 和 Store 指令通常采用乱序执行的方式进行处理。这种执行策略旨在提高处理器的并行性和整体性能。然而，由于 Load 和 Store 指令在流水线中的乱序执行，常常会出现 Load 指令越过更早的相同地址的 Store 指令的情况。这意味着，Load 指令本应通过前递（forwarding）机制从 Store 指令获取数据，但由于 Store 指令的地址或数据尚未准备好，导致 Load 指令未能成功前递到 Store 的数据，而 Store 指令已被提交。由此，后续依赖于该 Load 指令结果的指令可能会出现错误，这就是 st-ld 违例。
 考虑以下伪代码示例：
 ST R1, 0(R2) ; 将 R1 的值存储到 R2 指向的内存地址 LD R3, 0(R2) ; 从 R2 指向的内存地址加载值到 R3 ADD R4, R3, R5 ; 使用 R3 的值进行计算 假设在这个过程中，Store 指令由于某种原因（如缓存未命中）未能及时完成，而 Load 指令已经执行并读取了旧的数据（例如，从内存中读取到的值为 0）。此时，Load 指令并未获得 Store 指令更新后的值，导致后续计算的数据错误。">
-  <meta itemprop="dateModified" content="2025-09-22T09:16:42+08:00">
+  <meta itemprop="dateModified" content="2025-09-22T15:26:47+08:00">
   <meta itemprop="wordCount" content="356">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="LoadQueueRAW">
@@ -925,7 +925,7 @@ ADD R4, R3, R5 ; 使用 R3 的值进行计算
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/75bc6e2b07689a479e45f94ae9ef3e391ba699e0">Update (#183) (75bc6e2)</a>
+  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/755f40dca57edadc59621babf0888e405d42cb8f">Rename 01_storeunit.md to 01_StoreUnit.md (#185) (755f40d)</a>
 </div>
 
 </div>
