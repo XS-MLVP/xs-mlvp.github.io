@@ -76,7 +76,7 @@ StoreQueue条目释放与状态清理
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-22T09:16:42+08:00">
+    <meta property="article:modified_time" content="2025-09-22T15:26:47+08:00">
 
   <meta itemprop="name" content="StoreUnit">
   <meta itemprop="description" content="本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
@@ -105,7 +105,7 @@ stage 3:
 标量store发起写回，通过stout发送给后端
 StoreQueue条目释放与状态清理
 存储数据流水线 从发射队列（issue queue）接收数据 将数据写回StoreQueue 标记发射队列接收的数据为就绪状态 向量存储指令执行 对于除 SEG指令外的向量内存访问指令，VSSplit 负责接收向量内存访问指令发射队列发送的微操作（uop），并将该微操作拆分为多个元素。随后VSSplit 将这些元素发送至StoreUnit 执行，执行流程与标量内存访问指令相同。执行完成后，元素会被写回至 VSMerge，其中 Merge 模块会将这些元素收集并组合成微操作，最终写回向量寄存器文件。 SEG 指令则由独立的 VSegmentUnit 模块处理。">
-  <meta itemprop="dateModified" content="2025-09-22T09:16:42+08:00">
+  <meta itemprop="dateModified" content="2025-09-22T15:26:47+08:00">
   <meta itemprop="wordCount" content="2323">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="StoreUnit">
@@ -679,8 +679,8 @@ StoreQueue条目释放与状态清理
           </aside>
           <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
             <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_ut/03_memblock/03_lsu/01_storeunit.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
-  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_ut/03_memblock/03_lsu/01_storeunit.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+<a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/tree/main/content/zh-cn/docs/98_ut/03_memblock/03_lsu/01_StoreUnit.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/edit/main/content/zh-cn/docs/98_ut/03_memblock/03_lsu/01_StoreUnit.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
   <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/new/main/content/zh-cn/docs/98_ut/03_memblock/03_lsu?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
   <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/issues/new?title=StoreUnit" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
   <a href="https://github.com/XS-MLVP/UnityChipForXiangShan//issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
@@ -3938,7 +3938,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
 </mrs-testpoints>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/75bc6e2b07689a479e45f94ae9ef3e391ba699e0">Update (#183) (75bc6e2)</a>
+  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/755f40dca57edadc59621babf0888e405d42cb8f">Rename 01_storeunit.md to 01_StoreUnit.md (#185) (755f40d)</a>
 </div>
 
 </div>
