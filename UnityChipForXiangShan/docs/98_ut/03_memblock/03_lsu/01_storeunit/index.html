@@ -76,7 +76,7 @@ StoreQueue条目释放与状态清理
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-22T15:26:47+08:00">
+    <meta property="article:modified_time" content="2025-09-23T14:39:19+08:00">
 
   <meta itemprop="name" content="StoreUnit">
   <meta itemprop="description" content="本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
@@ -105,8 +105,8 @@ stage 3:
 标量store发起写回，通过stout发送给后端
 StoreQueue条目释放与状态清理
 存储数据流水线 从发射队列（issue queue）接收数据 将数据写回StoreQueue 标记发射队列接收的数据为就绪状态 向量存储指令执行 对于除 SEG指令外的向量内存访问指令，VSSplit 负责接收向量内存访问指令发射队列发送的微操作（uop），并将该微操作拆分为多个元素。随后VSSplit 将这些元素发送至StoreUnit 执行，执行流程与标量内存访问指令相同。执行完成后，元素会被写回至 VSMerge，其中 Merge 模块会将这些元素收集并组合成微操作，最终写回向量寄存器文件。 SEG 指令则由独立的 VSegmentUnit 模块处理。">
-  <meta itemprop="dateModified" content="2025-09-22T15:26:47+08:00">
-  <meta itemprop="wordCount" content="2323">
+  <meta itemprop="dateModified" content="2025-09-23T14:39:19+08:00">
+  <meta itemprop="wordCount" content="2292">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="StoreUnit">
   <meta name="twitter:description" content="本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
@@ -236,7 +236,7 @@ StoreQueue条目释放与状态清理
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.e14160d3868266acc52ef829cc0ae502.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -260,7 +260,7 @@ StoreQueue条目释放与状态清理
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.70b91e43a4f67e624b2f2e817b8fa993.json"
+    data-offline-search-index-json-src="/UnityChipForXiangShan/offline-search-index.e14160d3868266acc52ef829cc0ae502.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -720,7 +720,6 @@ StoreQueue条目释放与状态清理
         <li><a href="#mmio处理">MMIO处理</a></li>
         <li><a href="#uncache指令执行">Uncache指令执行</a></li>
         <li><a href="#非对齐内存访问">非对齐内存访问</a></li>
-        <li><a href="#原子指令执行">原子指令执行</a></li>
       </ul>
     </li>
     <li><a href="#常量说明">常量说明</a></li>
@@ -1205,41 +1204,8 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       <tr>
           <td>9.2</td>
           <td>SU_MISALIGN</td>
-          <td>SEG_HANDLE</td>
-          <td>验证向量Segment指令的非对齐处理（独立路径）。</td>
-      </tr>
-      <tr>
-          <td>9.3</td>
-          <td>SU_MISALIGN</td>
           <td>EXCEPTION</td>
           <td>验证原子指令、MMIO、NC空间非对齐访问触发异常。</td>
-      </tr>
-  </tbody>
-</table>
-<h3 id="原子指令执行">原子指令执行</h3>
-<p>香山核支持RVA与Zacas指令集。香山当前设计中，原子指令需先将访问的缓存块缓存至DCache，再进行原子操作。</p>
-<p>内存访问单元监控Store发射队列发射的地址与数据，若为原子指令则进入AtomicsUnit。AtomicsUnit执行一系列操作，包括TLB地址转换、清空SBuffer、访问DCache等。</p>
-<table>
-  <thead>
-      <tr>
-          <th>序号</th>
-          <th>功能名称</th>
-          <th>测试点名称</th>
-          <th>描述</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>10.1</td>
-          <td>SU_ATOMIC</td>
-          <td>PRELOAD</td>
-          <td>验证原子指令先将缓存块读入DCache。</td>
-      </tr>
-      <tr>
-          <td>10.2</td>
-          <td>SU_ATOMIC</td>
-          <td>OPS</td>
-          <td>验证原子操作（如AMO）执行正确性。</td>
       </tr>
   </tbody>
 </table>
@@ -3912,33 +3878,15 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
       <tr>
           <td>9.2</td>
           <td>SU_MISALIGN</td>
-          <td>SEG_HANDLE</td>
-          <td>验证向量Segment指令的非对齐处理（独立路径）。</td>
-      </tr>
-      <tr>
-          <td>9.3</td>
-          <td>SU_MISALIGN</td>
           <td>EXCEPTION</td>
           <td>验证原子指令、MMIO、NC空间非对齐访问触发异常。</td>
-      </tr>
-      <tr>
-          <td>10.1</td>
-          <td>SU_ATOMIC</td>
-          <td>PRELOAD</td>
-          <td>验证原子指令先将缓存块读入DCache。</td>
-      </tr>
-      <tr>
-          <td>10.2</td>
-          <td>SU_ATOMIC</td>
-          <td>OPS</td>
-          <td>验证原子操作（如AMO）执行正确性。</td>
       </tr>
   </tbody>
 </table>
 </mrs-testpoints>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 22, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/755f40dca57edadc59621babf0888e405d42cb8f">Rename 01_storeunit.md to 01_StoreUnit.md (#185) (755f40d)</a>
+  最后修改 September 23, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/fe37344753d77b00d14e264026ac9da16fad6605">Update func (#186) (fe37344)</a>
 </div>
 
 </div>
