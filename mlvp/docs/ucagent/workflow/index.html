@@ -1,0 +1,1285 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-cn" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/mlvp/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/mlvp/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/mlvp/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/mlvp/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/mlvp/favicons/android-192x192.png" sizes="192x192">
+
+<title>工作流 | 开放验证平台学习资源</title>
+<meta name="description" content="整体的工作流说明。">
+<meta property="og:url" content="https://open-verify.cc/mlvp/docs/ucagent/workflow/">
+  <meta property="og:site_name" content="开放验证平台学习资源">
+  <meta property="og:title" content="工作流">
+  <meta property="og:description" content="整体的工作流说明。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-09-30T16:15:28+08:00">
+    <meta property="article:tag" content="Docs">
+
+  <meta itemprop="name" content="工作流">
+  <meta itemprop="description" content="整体的工作流说明。">
+  <meta itemprop="dateModified" content="2025-09-30T16:15:28+08:00">
+  <meta itemprop="wordCount" content="1571">
+  <meta itemprop="keywords" content="Docs">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="工作流">
+  <meta name="twitter:description" content="整体的工作流说明。">
+<link rel="preload" href="/mlvp/scss/main.min.3bb6570761fbbb25e6691001febc67f331f0953db4e4e1cfb79172c2e6a5819e.css" as="style" integrity="sha256-O7ZXB2H7uyXmaRAB/rxn8zHwlT205OHPt5FywualgZ4=" crossorigin="anonymous">
+<link href="/mlvp/scss/main.min.3bb6570761fbbb25e6691001febc67f331f0953db4e4e1cfb79172c2e6a5819e.css" rel="stylesheet" integrity="sha256-O7ZXB2H7uyXmaRAB/rxn8zHwlT205OHPt5FywualgZ4=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/mlvp/css/prism.css"/>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?6aacb1c7ca0a3ef4e3aa84c1eaa237dd";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4Z2ZY6ZE84"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-4Z2ZY6ZE84');
+    </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+<script>
+    $(document).ready(function() {
+        $('a[name="multi-lang-toggle"]').on('click', function(event) {
+            var language = $(this).attr('lang');
+            var codeDiv = $(this).closest('.highlight');
+            var preNodes = codeDiv.find('pre');
+            preNodes.each(function(index, preNode) {
+                if ($(preNode).attr("name").toLowerCase().indexOf(language.toLowerCase()) !== -1) {
+                    preNode.style.display = 'block';
+                } else {
+                    preNode.style.display = 'none';
+                }
+            });
+            var alist = codeDiv.find('a[name="multi-lang-toggle"]');
+            alist.each(function(index, aNode) {
+                if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                    aNode.style.fontWeight = 'bold';
+                } else {
+                    aNode.style.fontWeight = 'normal';
+                }
+            });
+        })
+        $(this).find('pre[name^="group-lang-code-"]').each(function(index, preNode) {
+            if (preNode.style.display !== 'none') {
+                var language = $(preNode).attr("name").replace('group-lang-code-', '');
+                var alist = $(this).closest('.highlight').find('a[name="multi-lang-toggle"]');
+                alist.each(function(index, aNode) {
+                    if ($(aNode).attr('lang').toLowerCase() === language.toLowerCase()) {
+                        aNode.style.fontWeight = 'bold';
+                    } else {
+                        aNode.style.fontWeight = 'normal';
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/mlvp/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">开放验证平台学习资源</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7bcf4f3a036797892f2ebf70d73715da.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="站内搜索…"
+    aria-label="站内搜索…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/mlvp/offline-search-index.7bcf4f3a036797892f2ebf70d73715da.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse" id="td-section-nav">
+    <div class="td-sidebar-nav__section nav-item dropdown d-block d-lg-none">
+      <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">中文</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/mlvp/en/">English</a></li>
+    </ul>
+</div>
+    </div>
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocs-li">
+  <a href="/mlvp/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-mlvpdocs"><span class="">学习资源</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsquick-start-li">
+  <a href="/mlvp/docs/quick-start/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsquick-start"><span class="">快速开始</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-startinstaller-li">
+  <a href="/mlvp/docs/quick-start/installer/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-startinstaller"><span class="">搭建验证环境</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-adder-li">
+  <a href="/mlvp/docs/quick-start/eg-adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-adder"><span class="">案例一：简单加法器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-rmg-li">
+  <a href="/mlvp/docs/quick-start/eg-rmg/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-rmg"><span class="">案例二：随机数生成器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-callback-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-callback/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-callback"><span class="">案例三：双端口栈（回调）</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsquick-starteg-stack-async-li">
+  <a href="/mlvp/docs/quick-start/eg-stack-async/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsquick-starteg-stack-async"><span class="">案例四：双端口栈（协程）</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usage-li">
+  <a href="/mlvp/docs/env_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usage"><span class="">基础工具</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagepicker_usage-li">
+  <a href="/mlvp/docs/env_usage/picker_usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagepicker_usage"><span class="">工具介绍</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagewave-li">
+  <a href="/mlvp/docs/env_usage/wave/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagewave"><span class="">波形生成</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemultifile-li">
+  <a href="/mlvp/docs/env_usage/multifile/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemultifile"><span class="">多文件输入</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagecoverage-li">
+  <a href="/mlvp/docs/env_usage/coverage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagecoverage"><span class="">覆盖率统计</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemulticlock-li">
+  <a href="/mlvp/docs/env_usage/multiclock/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemulticlock"><span class="">多时钟</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usagemultiinstance-li">
+  <a href="/mlvp/docs/env_usage/multiinstance/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usagemultiinstance"><span class="">多实例</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usageinternalsignal-li">
+  <a href="/mlvp/docs/env_usage/internalsignal/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usageinternalsignal"><span class="">内部信号</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsenv_usageframeworks-li">
+  <a href="/mlvp/docs/env_usage/frameworks/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsenv_usageframeworks"><span class="">集成测试框架</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usageframeworkspytest-li">
+  <a href="/mlvp/docs/env_usage/frameworks/pytest/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usageframeworkspytest"><span class="">PyTest</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsenv_usageframeworkshypothesis-li">
+  <a href="/mlvp/docs/env_usage/frameworks/hypothesis/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsenv_usageframeworkshypothesis"><span class="">Hypothesis</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsbasic-li">
+  <a href="/mlvp/docs/basic/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsbasic"><span class="">验证基础</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasicic_verify-li">
+  <a href="/mlvp/docs/basic/ic_verify/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicic_verify"><span class="">芯片验证</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasicic_base-li">
+  <a href="/mlvp/docs/basic/ic_base/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicic_base"><span class="">数字电路</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasiccreate_dut-li">
+  <a href="/mlvp/docs/basic/create_dut/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasiccreate_dut"><span class="">创建DUT</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasictest_dut-li">
+  <a href="/mlvp/docs/basic/test_dut/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasictest_dut"><span class="">DUT验证</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsbasicreport-li">
+  <a href="/mlvp/docs/basic/report/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsbasicreport"><span class="">验证报告</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsadvance_case-li">
+  <a href="/mlvp/docs/advance_case/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsadvance_case"><span class="">高级案例</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_casenutshellcache-li">
+  <a href="/mlvp/docs/advance_case/nutshellcache/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_casenutshellcache"><span class="">完整果壳 Cache 验证</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsadvance_casetilelink-li">
+  <a href="/mlvp/docs/advance_case/tilelink/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsadvance_casetilelink"><span class="">TileLink 协议</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmlvp-li">
+  <a href="/mlvp/docs/mlvp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmlvp"><span class="">验证框架</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-mlvpdocsucagent-li">
+  <a href="/mlvp/docs/ucagent/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsucagent"><span class="">验证代理</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsucagentintroduce-li">
+  <a href="/mlvp/docs/ucagent/introduce/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagentintroduce"><span class="">工具介绍</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsucagentusage-li">
+  <a href="/mlvp/docs/ucagent/usage/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsucagentusage"><span class="">使用</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsucagentusagemcp-li">
+  <a href="/mlvp/docs/ucagent/usage/mcp/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagentusagemcp"><span class="">MCP集成模式（推荐）</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsucagentusagedirect-li">
+  <a href="/mlvp/docs/ucagent/usage/direct/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagentusagedirect"><span class="">直接使用模式</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsucagentusageassit-li">
+  <a href="/mlvp/docs/ucagent/usage/assit/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagentusageassit"><span class="">人机协同验证</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsucagentusageoption-li">
+  <a href="/mlvp/docs/ucagent/usage/option/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagentusageoption"><span class="">参数说明</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsucagentusagetui-li">
+  <a href="/mlvp/docs/ucagent/usage/tui/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagentusagetui"><span class="">TUI</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsucagentusagefaq-li">
+  <a href="/mlvp/docs/ucagent/usage/faq/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagentusagefaq"><span class="">FAQ</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-mlvpdocsucagentworkflow-li">
+  <a href="/mlvp/docs/ucagent/workflow/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagentworkflow"><span class="td-sidebar-nav-active-item">工作流</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsucagentcustomize-li">
+  <a href="/mlvp/docs/ucagent/customize/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagentcustomize"><span class="">定制功能</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsucagenttool_list-li">
+  <a href="/mlvp/docs/ucagent/tool_list/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsucagenttool_list"><span class="">工具列表</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmulti-lang-li">
+  <a href="/mlvp/docs/multi-lang/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmulti-lang"><span class="">多语言支持</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmulti-langinterface-li">
+  <a href="/mlvp/docs/multi-lang/interface/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmulti-langinterface"><span class="">验证接口</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-mlvpdocsmulti-langexamples-li">
+  <a href="/mlvp/docs/multi-lang/examples/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-mlvpdocsmulti-langexamples"><span class="">验证案例</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmulti-langexamplesadder-li">
+  <a href="/mlvp/docs/multi-lang/examples/adder/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmulti-langexamplesadder"><span class="">加法器</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-mlvpdocsmulti-langexamplescoupledl2-li">
+  <a href="/mlvp/docs/multi-lang/examples/coupledl2/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-mlvpdocsmulti-langexamplescoupledl2"><span class="">CoupledL2</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/XS-MLVP/course/tree/main/content/zh-cn/docs/ucagent/workflow.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> 查看页面源码</a>
+  <a href="https://github.com/XS-MLVP/course/edit/main/content/zh-cn/docs/ucagent/workflow.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 编辑此页</a>
+  <a href="https://github.com/XS-MLVP/course/new/main/content/zh-cn/docs/ucagent?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> 添加子页面</a>
+  <a href="https://github.com/XS-MLVP/course/issues/new?title=%e5%b7%a5%e4%bd%9c%e6%b5%81" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交文档问题</a>
+  <a href="https://github.com/XS-MLVP/course/mlvp-portal/issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> 提交项目问题</a>
+  <a id="print" href="/mlvp/docs/ucagent/_print/"><i class="fa-solid fa-print fa-fw"></i> 整节打印</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#整体流程概览11-个阶段">整体流程概览（11 个阶段）</a></li>
+    <li><a href="#定制工作流增删阶段子阶段">定制工作流（增删阶段/子阶段）</a>
+      <ul>
+        <li><a href="#原理说明">原理说明</a></li>
+        <li><a href="#增加阶段">增加阶段</a></li>
+        <li><a href="#减少子阶段">减少子阶段</a></li>
+      </ul>
+    </li>
+    <li><a href="#定制校验器checker">定制校验器（checker）</a>
+      <ul>
+        <li><a href="#增加-checker">增加 checker</a></li>
+        <li><a href="#删除-checker">删除 checker</a></li>
+        <li><a href="#修改-checker">修改 checker</a></li>
+        <li><a href="#常用-checker-参数结构化">常用 checker 参数（结构化）</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tag Cloud</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://open-verify.cc/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/mlvp/tags/examples/" data-taxonomy-term="examples"><span class="taxonomy-label">Examples</span><span class="taxonomy-count">25</span></a></li>
+        </ul>
+    </div>
+  <div class="taxonomy taxonomy-terms-cloud taxo-categories">
+      <h5 class="taxonomy-title">Categories</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://open-verify.cc/mlvp/categories/%E5%8F%82%E8%80%83/" data-taxonomy-term="%E5%8F%82%E8%80%83"><span class="taxonomy-label">参考</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/mlvp/categories/%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99/" data-taxonomy-term="%E5%AD%A6%E4%B9%A0%E6%9D%90%E6%96%99"><span class="taxonomy-label">学习材料</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span><span class="taxonomy-count">38</span></a></li>
+        <li><a class="taxonomy-term" href="https://open-verify.cc/mlvp/categories/%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE/" data-taxonomy-term="%E7%A4%BA%E4%BE%8B%E9%A1%B9%E7%9B%AE"><span class="taxonomy-label">示例项目</span><span class="taxonomy-count">25</span></a></li>
+        </ul>
+    </div>
+  
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/mlvp/docs/">学习资源</a></li>
+  <li class="breadcrumb-item">
+    <a href="/mlvp/docs/ucagent/">验证代理</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    工作流</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>工作流</h1>
+	<div class="lead">整体的工作流说明。</div>
+	<header class="article-meta">
+		<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://open-verify.cc/mlvp/tags/docs/" data-taxonomy-term="docs"><span class="taxonomy-label">Docs</span></a></li>
+    </ul>
+</div>
+<div class="taxonomy taxonomy-terms-article taxo-categories">
+  <h5 class="taxonomy-title">Categories:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://open-verify.cc/mlvp/categories/%E6%95%99%E7%A8%8B/" data-taxonomy-term="%E6%95%99%E7%A8%8B"><span class="taxonomy-label">教程</span></a></li>
+    </ul>
+</div>
+
+  </header>
+	<p>整体采用“按阶段渐进推进”的方式，每个阶段都有明确目标、产出与通过标准；完成后用工具 Check 验证并用 Complete 进入下一阶段。若阶段包含子阶段，需按顺序 逐一完成子阶段并各自通过 Check。</p>
+<ul>
+<li>顶层阶段总数：11（见 <code>vagent/lang/zh/config/default.yaml</code>）</li>
+<li>推进原则：未通过的阶段不可跳转；可用工具 CurrentTips 获取当前阶段详细指导；需要回补时可用 GotoStage 回到指定阶段；命令行也可用 &ndash;skip/--unskip 控制阶段索引。</li>
+</ul>
+<h2 id="整体流程概览11-个阶段">整体流程概览（11 个阶段）</h2>
+<p>目前的流程包含：</p>
+<ol>
+<li>需求分析与验证规划 → 2) {DUT} 功能理解 → 3) 功能规格分析与测试点定义 → 4) 测试平台基础架构设计 → 5) 功能覆盖率模型实现 → 6) 基础 API 实现 → 7) 基础 API 功能测试 → 8) 测试框架脚手架 → 9) 全面验证执行与缺陷分析 → 10) 代码行覆盖率分析与提升（默认跳过，可启用）→ 11) 验证审查与总结</li>
+</ol>
+<p>以实际的工作流为准，下图仅供参考。
+<img src="workflow.png" alt="工作流图"></p>
+<p>说明：以下路径中的 <OUT> 默认为工作目录下的输出目录名（默认 unity_test）。例如文档输出到 <code>&lt;workspace&gt;/unity_test/</code>。</p>
+<hr>
+<p>阶段 1：需求分析与验证规划</p>
+<ul>
+<li>目标：理解任务、明确验证范围与策略。</li>
+<li>怎么做：
+<ul>
+<li>阅读 <code>{DUT}/README.md</code>，梳理“需要测哪些功能/输入输出/边界与风险”。</li>
+<li>形成可执行的验证计划与目标清单。</li>
+</ul>
+</li>
+<li>产出：<code>&lt;OUT&gt;/{DUT}_verification_needs_and_plan.md</code>（中文撰写）。</li>
+<li>通过标准：文档存在、结构规范（自动检查 markdown_file_check）。</li>
+<li>检查器：
+<ul>
+<li>UnityChipCheckerMarkdownFileFormat
+<ul>
+<li>作用：校验 Markdown 文件存在与格式，禁止把换行写成字面量“\n”。</li>
+<li>参数：
+<ul>
+<li>markdown_file_list (str | List[str]): 待检查的 MD 文件路径或路径列表。示例：<code>{OUT}/{DUT}_verification_needs_and_plan.md</code></li>
+<li>no_line_break (bool): 是否禁止把换行写成字面量 &ldquo;\n&rdquo;；true 表示禁止。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>阶段 2：{DUT} 功能理解</p>
+<ul>
+<li>目标：掌握 DUT 的接口与基本信息，明确是组合/时序电路。</li>
+<li>怎么做：
+<ul>
+<li>阅读 <code>{DUT}/README.md</code> 与 <code>{DUT}/__init__.py</code>。</li>
+<li>分析 IO 端口、时钟/复位需求与功能范围。</li>
+</ul>
+</li>
+<li>产出：<code>&lt;OUT&gt;/{DUT}_basic_info.md</code>。</li>
+<li>通过标准：文档存在、格式规范（markdown_file_check）。</li>
+<li>检查器：
+<ul>
+<li>UnityChipCheckerMarkdownFileFormat
+<ul>
+<li>作用：校验 Markdown 文件存在与格式，禁止把换行写成字面量“\n”。</li>
+<li>参数：
+<ul>
+<li>markdown_file_list (str | List[str]): 待检查的 MD 文件路径或路径列表。示例：<code>{OUT}/{DUT}_basic_info.md</code></li>
+<li>no_line_break (bool): 是否禁止把换行写成字面量 &ldquo;\n&rdquo;；true 表示禁止。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>阶段 3：功能规格分析与测试点定义（含子阶段 FG/FC/CK）</p>
+<ul>
+<li>目标：把功能分组（FG）、功能点（FC）和检测点（CK）结构化，作为后续自动化的依据。</li>
+<li>怎么做：
+<ul>
+<li>阅读 <code>{DUT}/*.md</code> 与已产出文档，建立 <code>{DUT}_functions_and_checks.md</code> 的 FG/FC/CK 结构。</li>
+<li>规范标签：&lt;FG-组名&gt;、&lt;FC-功能名&gt;、&lt;CK-检测名&gt;，每个功能点至少 1 个检测点。</li>
+</ul>
+</li>
+<li>子阶段：
+<ul>
+<li>3.1 功能分组与层次（FG）：检查器 UnityChipCheckerLabelStructure(FG)</li>
+<li>3.2 功能点定义（FC）：检查器 UnityChipCheckerLabelStructure(FC)</li>
+<li>3.3 检测点设计（CK）：检查器 UnityChipCheckerLabelStructure(CK)</li>
+</ul>
+</li>
+<li>产出：<code>&lt;OUT&gt;/{DUT}_functions_and_checks.md</code>。</li>
+<li>通过标准：三类标签结构均通过对应检查。</li>
+<li>对应检查器（默认配置）：
+<ul>
+<li>3.1 UnityChipCheckerLabelStructure
+<ul>
+<li>作用：解析 <code>{DUT}_functions_and_checks.md</code> 中的标签结构并校验层级与数量（FG）。</li>
+<li>参数：
+<ul>
+<li>doc_file (str): 功能/检查点文档路径。示例：<code>{OUT}/{DUT}_functions_and_checks.md</code></li>
+<li>leaf_node (&ldquo;FG&rdquo; | &ldquo;FC&rdquo; | &ldquo;CK&rdquo;): 需要校验的叶子类型。示例：<code>&quot;FG&quot;</code></li>
+<li>min_count (int, 默认 1): 该叶子类型的最小数量阈值。</li>
+<li>must_have_prefix (str, 默认 &ldquo;FG-API&rdquo;): FG 名称要求的前缀，用于规范化分组命名。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>3.2 UnityChipCheckerLabelStructure
+<ul>
+<li>作用：解析文档并校验功能点定义（FC）。</li>
+<li>参数：
+<ul>
+<li>doc_file (str): 功能/检查点文档路径。示例：<code>{OUT}/{DUT}_functions_and_checks.md</code></li>
+<li>leaf_node (&ldquo;FG&rdquo; | &ldquo;FC&rdquo; | &ldquo;CK&rdquo;): 需要校验的叶子类型。示例：<code>&quot;FC&quot;</code></li>
+<li>min_count (int, 默认 1): 该叶子类型的最小数量阈值。</li>
+<li>must_have_prefix (str, 默认 &ldquo;FG-API&rdquo;): 所属 FG 的前缀规范，用于一致性检查。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>3.3 UnityChipCheckerLabelStructure
+<ul>
+<li>作用：解析文档并校验检测点设计（CK），并缓存 CK 列表用于后续分批实现。</li>
+<li>参数：
+<ul>
+<li>doc_file (str): 功能/检查点文档路径。示例：<code>{OUT}/{DUT}_functions_and_checks.md</code></li>
+<li>leaf_node (&ldquo;FG&rdquo; | &ldquo;FC&rdquo; | &ldquo;CK&rdquo;): 需要校验的叶子类型。示例：<code>&quot;CK&quot;</code></li>
+<li>data_key (str): 共享数据键名，用于缓存 CK 列表（供后续分批实现使用）。示例：<code>&quot;COVER_GROUP_DOC_CK_LIST&quot;</code></li>
+<li>min_count (int, 默认 1): 该叶子类型的最小数量阈值。</li>
+<li>must_have_prefix (str, 默认 &ldquo;FG-API&rdquo;): 所属 FG 的前缀规范，用于一致性检查。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>阶段 4：测试平台基础架构设计（fixture/API 框架）</p>
+<ul>
+<li>目标：提供统一的 DUT 创建与测试生命周期管理能力。</li>
+<li>怎么做：
+<ul>
+<li>在 <code>&lt;OUT&gt;/tests/{DUT}_api.py</code> 实现 create_dut()；时序电路配置时钟（InitClock），组合电路无需时钟。</li>
+<li>实现 pytest fixture <code>dut</code>，负责初始化/清理与可选的波形/行覆盖率开关。</li>
+</ul>
+</li>
+<li>产出：<code>&lt;OUT&gt;/tests/{DUT}_api.py</code>（含注释与文档字符串）。</li>
+<li>通过标准：DUT 创建与 fixture 检查通过（UnityChipCheckerDutCreation / UnityChipCheckerDutFixture）。</li>
+<li>子阶段检查器：
+<ul>
+<li>DUT 创建：UnityChipCheckerDutCreation
+<ul>
+<li>作用：校验 <code>{DUT}_api.py</code> 中的 create_dut(request) 是否实现规范（签名、时钟/复位、覆盖率路径等约定）。</li>
+<li>参数：
+<ul>
+<li>target_file (str): DUT API 与 fixture 所在文件路径。示例：<code>{OUT}/tests/{DUT}_api.py</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>dut fixture：UnityChipCheckerDutFixture
+<ul>
+<li>作用：校验 pytest fixture <code>dut</code> 的生命周期管理、yield/清理，以及覆盖率收集调用是否到位。</li>
+<li>参数：
+<ul>
+<li>target_file (str): 包含 <code>dut</code> fixture 的文件路径。示例：<code>{OUT}/tests/{DUT}_api.py</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>env fixture：UnityChipCheckerEnvFixture
+<ul>
+<li>作用：校验 <code>env*</code> 系列 fixture 的存在、数量与 Bundle 封装是否符合要求。</li>
+<li>参数：
+<ul>
+<li>target_file (str): 包含 <code>env*</code> 系列 fixture 的文件路径。示例：<code>{OUT}/tests/{DUT}_api.py</code></li>
+<li>min_env (int, 默认 1): 至少需要存在的 <code>env*</code> fixture 数量。示例：<code>1</code></li>
+<li>force_bundle (bool, 当前未使用): 是否强制要求 Bundle 封装。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>覆盖率路径规范（重要）：</p>
+<ul>
+<li>在 create_dut(request) 中，必须通过 <code>get_coverage_data_path(request, new_path=True)</code> 获取新的行覆盖率文件路径，并传入 <code>dut.SetCoverage(...)</code>。</li>
+<li>在 <code>dut</code> fixture 的清理阶段，必须通过 <code>get_coverage_data_path(request, new_path=False)</code> 获取已有路径，并调用 <code>set_line_coverage(request, &lt;path&gt;, ignore=...)</code> 写入统计。</li>
+<li>若缺失上述调用，检查器会直接报错，并给出修复提示（含 <code>tips_of_get_coverage_data_path</code> 示例）。</li>
+</ul>
+<p>阶段 5：功能覆盖率模型实现</p>
+<ul>
+<li>目标：将 FG/FC/CK 转为可统计的覆盖结构，支撑进度度量与回归。</li>
+<li>怎么做：
+<ul>
+<li>在 <code>&lt;OUT&gt;/tests/{DUT}_function_coverage_def.py</code> 实现 <code>get_coverage_groups(dut)</code>。</li>
+<li>为每个 FG 建立 CovGroup；为 FC/CK 建 watch_point 与检查函数（优先用 lambda，必要时普通函数）。</li>
+</ul>
+</li>
+<li>子阶段：
+<ul>
+<li>5.1 覆盖组创建（FG）</li>
+<li>5.2 覆盖点与检查实现（FC/CK），支持“分批实现”提示（COMPLETED_POINTS/TOTAL_POINTS）。</li>
+</ul>
+</li>
+<li>产出：<code>&lt;OUT&gt;/tests/{DUT}_function_coverage_def.py</code>。</li>
+<li>通过标准：CoverageGroup 检查（FG/FC/CK）与批量实现检查通过。</li>
+<li>子阶段检查器：
+<ul>
+<li>5.1 UnityChipCheckerCoverageGroup
+<ul>
+<li>作用：比对覆盖组定义与文档 FG 一致性。</li>
+<li>参数：
+<ul>
+<li>test_dir (str): 测试目录根路径。示例：<code>{OUT}/tests</code></li>
+<li>cov_file (str): 覆盖率模型定义文件路径。示例：<code>{OUT}/tests/{DUT}_function_coverage_def.py</code></li>
+<li>doc_file (str): 功能/检查点文档路径。示例：<code>{OUT}/{DUT}_functions_and_checks.md</code></li>
+<li>check_types (str | List[str]): 检查的类型集合。示例：<code>&quot;FG&quot;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>5.2 UnityChipCheckerCoverageGroup
+<ul>
+<li>作用：比对覆盖点/检查点实现与文档 FC/CK 一致性。</li>
+<li>参数：
+<ul>
+<li>test_dir (str): 测试目录根路径。示例同上</li>
+<li>cov_file (str): 覆盖率模型定义文件路径。示例同上</li>
+<li>doc_file (str): 功能/检查点文档路径。示例同上</li>
+<li>check_types (List[str]): 检查类型集合。示例：<code>[&quot;FC&quot;, &quot;CK&quot;]</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>5.2（分批）UnityChipCheckerCoverageGroupBatchImplementation
+<ul>
+<li>作用：按 CK 分批推进实现与对齐检查，维护进度（TOTAL/COMPLETED）。</li>
+<li>参数：
+<ul>
+<li>test_dir (str): 测试目录根路径。</li>
+<li>cov_file (str): 覆盖率模型定义文件路径。</li>
+<li>doc_file (str): 功能/检查点文档路径。</li>
+<li>batch_size (int, 默认 20): 每批实现与校验的 CK 数量上限。示例：<code>20</code></li>
+<li>data_key (str): 共享数据键名，用于读取 CK 列表。示例：<code>&quot;COVER_GROUP_DOC_CK_LIST&quot;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>阶段 6：基础 API 实现</p>
+<ul>
+<li>目标：用 <code>api_{DUT}_*</code> 前缀提供可复用的操作封装，隐藏底层信号细节。</li>
+<li>怎么做：
+<ul>
+<li>在 <code>&lt;OUT&gt;/tests/{DUT}_api.py</code> 实现至少 1 个基础 API；建议区分“底层功能 API”与“任务功能 API”。</li>
+<li>补充详细 docstring：功能、参数、返回值、异常。</li>
+</ul>
+</li>
+<li>产出：<code>&lt;OUT&gt;/tests/{DUT}_api.py</code>。</li>
+<li>通过标准：UnityChipCheckerDutApi 通过（前缀必须为 <code>api_{DUT}_</code>）。</li>
+<li>检查器：
+<ul>
+<li>UnityChipCheckerDutApi
+<ul>
+<li>作用：扫描/校验 <code>api_{DUT}_*</code> 函数的数量、命名、签名与 docstring 完整度。</li>
+<li>参数：
+<ul>
+<li>api*prefix (str): API 前缀匹配表达式。建议：<code>&quot;api*{DUT}\_&quot;</code></li>
+<li>target_file (str): API 定义所在文件。示例：<code>{OUT}/tests/{DUT}_api.py</code></li>
+<li>min_apis (int, 默认 1): 至少需要的 API 数量。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>阶段 7：基础 API 功能正确性测试</p>
+<ul>
+<li>目标：为每个已实现 API 编写至少 1 个基础功能用例，并标注覆盖率。</li>
+<li>怎么做：
+<ul>
+<li>在 <code>&lt;OUT&gt;/tests/test_{DUT}_api_*.py</code> 新建测试；导入 <code>from {DUT}_api import *</code>。</li>
+<li>每个测试函数的第一行：<code>dut.fc_cover['FG-API'].mark_function('FC-API-NAME', test_func, ['CK-XXX'])</code>。</li>
+<li>设计典型/边界/异常数据，断言预期输出。</li>
+<li>用工具 RunTestCases 执行与回归。</li>
+</ul>
+</li>
+<li>产出：<code>&lt;OUT&gt;/tests/test_{DUT}_api_*.py</code> 与缺陷记录（若发现 bug）。</li>
+<li>通过标准：UnityChipCheckerDutApiTest 通过（覆盖、用例质量、文档记录齐备）。</li>
+<li>检查器：
+<ul>
+<li>UnityChipCheckerDutApiTest
+<ul>
+<li>作用：运行 pytest 并检查每个 API 至少 1 个基础功能用例且正确覆盖标记；核对缺陷记录与文档一致。</li>
+<li>参数：
+<ul>
+<li>api*prefix (str): API 前缀匹配表达式。建议：<code>&quot;api*{DUT}\_&quot;</code></li>
+<li>target_file_api (str): API 文件路径。示例：<code>{OUT}/tests/{DUT}_api.py</code></li>
+<li>target*file_tests (str): 测试文件 Glob。示例：<code>{OUT}/tests/test*{DUT}\_api\*.py</code></li>
+<li>doc_func_check (str): 功能/检查点文档。示例：<code>{OUT}/{DUT}_functions_and_checks.md</code></li>
+<li>doc_bug_analysis (str): 缺陷分析文档。示例：<code>{OUT}/{DUT}_bug_analysis.md</code></li>
+<li>min_tests (int, 默认 1): 单 API 最少测试用例数。</li>
+<li>timeout (int, 默认 15): 单次测试运行超时（秒）。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>阶段 8：测试框架脚手架构建</p>
+<ul>
+<li>目标：为尚未实现的功能点批量生成“占位”测试模板，确保覆盖版图完整。</li>
+<li>怎么做：
+<ul>
+<li>依据 <code>{DUT}_functions_and_checks.md</code>，在 <code>&lt;OUT&gt;/tests/</code> 创建 <code>test_*.py</code>，文件与用例命名语义化。</li>
+<li>每个函数首行标注覆盖率 mark；补充 TODO 注释说明要测什么；末尾添加 <code>assert False, 'Not implemented'</code> 防误通过。</li>
+</ul>
+</li>
+<li>产出：批量测试模板；覆盖率进度指标（COVERED_CKS/TOTAL_CKS）。</li>
+<li>通过标准：UnityChipCheckerTestTemplate 通过（结构/标记/说明完整）。</li>
+<li>检查器：
+<ul>
+<li>UnityChipCheckerTestTemplate
+<ul>
+<li>作用：检查模板文件/用例结构、覆盖标记、TODO 注释与防误通过断言；统计覆盖进度。</li>
+<li>参数：
+<ul>
+<li>doc_func_check (str): 功能/检查点文档路径。示例：<code>{OUT}/{DUT}_functions_and_checks.md</code></li>
+<li>test_dir (str): 测试目录根路径。示例：<code>{OUT}/tests</code></li>
+<li>ignore*ck_prefix (str): 统计覆盖时忽略的 CK 前缀（通常为基础 API 的用例）。示例：<code>&quot;test_api*{DUT}\_&quot;</code></li>
+<li>data_key (str): 共享数据键名，用于生成/读取模板实现进度。示例：<code>&quot;TEST_TEMPLATE_IMP_REPORT&quot;</code></li>
+<li>batch_size (int, 默认 20): 每批模板检查数量。</li>
+<li>min_tests (int, 默认 1): 最少要求的模板测试数。</li>
+<li>timeout (int, 默认 15): 测试运行超时（秒）。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>阶段 9：全面验证执行与缺陷分析</p>
+<ul>
+<li>目标：将模板填充为真实测试，系统发现并分析 DUT bug。</li>
+<li>怎么做：
+<ul>
+<li>在 <code>test_*.py</code> 填充逻辑，优先通过 API 调用，不直接操纵底层信号。</li>
+<li>设计充分数据并断言；用 RunTestCases 运行；对 Fail 进行基于源码的缺陷定位与记录。</li>
+</ul>
+</li>
+<li>子阶段：
+<ul>
+<li>9.1 分批测试用例实现与对应缺陷分析（COMPLETED_CASES/TOTAL_CASES）。</li>
+</ul>
+</li>
+<li>产出：成体系的测试集与 <code>/{DUT}_bug_analysis.md</code>。</li>
+<li>通过标准：UnityChipCheckerTestCase（质量/覆盖/缺陷分析）通过。</li>
+<li>检查器：
+<ul>
+<li>父阶段：UnityChipCheckerTestCase
+<ul>
+<li>作用：运行整体测试并对照功能/缺陷文档检查质量、覆盖与记录一致性。</li>
+<li>参数：
+<ul>
+<li>doc_func_check (str): 功能/检查点文档路径。示例：<code>{OUT}/{DUT}_functions_and_checks.md</code></li>
+<li>doc_bug_analysis (str): 缺陷分析文档路径。示例：<code>{OUT}/{DUT}_bug_analysis.md</code></li>
+<li>test_dir (str): 测试目录根路径。示例：<code>{OUT}/tests</code></li>
+<li>min_tests (int, 默认 1): 最少要求的测试用例数量。</li>
+<li>timeout (int, 默认 15): 测试运行超时（秒）。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>子阶段（分批实现）：UnityChipCheckerBatchTestsImplementation
+<ul>
+<li>作用：分批将模板落地为真实用例并回归，维护实现进度与报告。</li>
+<li>参数：
+<ul>
+<li>doc_func_check (str): 功能/检查点文档路径。</li>
+<li>doc_bug_analysis (str): 缺陷分析文档路径。</li>
+<li>test_dir (str): 测试目录根路径。</li>
+<li>ignore*ck_prefix (str): 统计覆盖时忽略的 CK 前缀。示例：<code>&quot;test_api*{DUT}\_&quot;</code></li>
+<li>batch_size (int, 默认 10): 每批转化并执行的用例数量。</li>
+<li>data_key (str): 共享数据键名（必填），用于保存分批实现进度。示例：<code>&quot;TEST_TEMPLATE_IMP_REPORT&quot;</code></li>
+<li>pre_report_file (str): 历史进度报告路径。示例：<code>{OUT}/{DUT}/.TEST_TEMPLATE_IMP_REPORT.json</code></li>
+<li>timeout (int, 默认 15): 测试运行超时（秒）。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>TC bug 标注规范与一致性（与文档/报告强关联）：</p>
+<ul>
+<li>术语：统一使用 “TC bug”（不再使用 “CK bug”）。</li>
+<li>标注结构：<code>&lt;FG-*&gt;/&lt;FC-*&gt;/&lt;CK-*&gt;/&lt;BG-NAME-XX&gt;/&lt;TC-test_file.py::[ClassName]::test_case&gt;</code>；其中 BG 的置信度 XX 为 0–100 的整数。</li>
+<li>失败用例与文档关系：
+<ul>
+<li>文档中出现的 &lt;TC-*&gt; 必须能与测试报告中的失败用例一一对应（文件名/类名/用例名匹配）。</li>
+<li>失败的测试用例必须标注其关联检查点（CK），否则会被判定为“未标记”。</li>
+<li>若存在失败用例未在 bug 文档中记录，将被提示为“未文档化的失败用例”。</li>
+</ul>
+</li>
+</ul>
+<p>阶段 10：代码行覆盖率分析与提升（默认跳过，可启用）</p>
+<ul>
+<li>目标：回顾未覆盖代码行，定向补齐。</li>
+<li>怎么做：
+<ul>
+<li>运行 Check 获取行覆盖率；若未达标，围绕未覆盖行增补测试并回归；循环直至满足阈值。</li>
+</ul>
+</li>
+<li>产出：行覆盖率报告与补充测试。</li>
+<li>通过标准：UnityChipCheckerTestCaseWithLineCoverage 达标（默认阈值 0.9，可在配置中调整）。</li>
+<li>说明：该阶段在配置中标记 skip=true，可用 <code>--unskip</code> 指定索引启用。</li>
+<li>检查器：
+<ul>
+<li>UnityChipCheckerTestCaseWithLineCoverage
+<ul>
+<li>作用：在 TestCase 基础上统计行覆盖率并对比阈值。</li>
+<li>参数：
+<ul>
+<li>doc_func_check (str): 功能/检查点文档路径。示例：<code>{OUT}/{DUT}_functions_and_checks.md</code></li>
+<li>doc_bug_analysis (str): 缺陷分析文档路径。示例：<code>{OUT}/{DUT}_bug_analysis.md</code></li>
+<li>test_dir (str): 测试目录根路径。示例：<code>{OUT}/tests</code></li>
+<li>cfg (dict | Config): 必填，用于推导默认路径以及环境配置。</li>
+<li>min_line_coverage (float, 默认按配置，未配置则 0.8): 最低行覆盖率阈值。</li>
+<li>coverage_json (str, 可选): 行覆盖率 JSON 路径。默认：<code>uc_test_report/line_dat/code_coverage.json</code></li>
+<li>coverage_analysis (str, 可选): 行覆盖率分析 MD 输出。默认：<code>unity_test/{DUT}_line_coverage_analysis.md</code></li>
+<li>coverage_ignore (str, 可选): 忽略文件清单。默认：<code>unity_test/tests/{DUT}.ignore</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>阶段 11：验证审查与总结</p>
+<ul>
+<li>目标：沉淀成果、复盘流程、给出改进建议。</li>
+<li>怎么做：
+<ul>
+<li>完善 <code>/{DUT}_bug_analysis.md</code> 的缺陷条目（基于源码分析）。</li>
+<li>汇总并撰写 <code>/{DUT}_test_summary.md</code>，回看规划是否达成；必要时用 GotoStage 回补。</li>
+</ul>
+</li>
+<li>产出：<code>&lt;OUT&gt;/{DUT}_test_summary.md</code> 与最终结论。</li>
+<li>通过标准：UnityChipCheckerTestCase 复核通过。</li>
+<li>检查器：
+<ul>
+<li>UnityChipCheckerTestCase
+<ul>
+<li>作用：复核整体测试结果与文档一致性，形成最终结论。</li>
+<li>参数：doc_func_check: &ldquo;{OUT}/{DUT}_functions_and_checks.md&rdquo;；doc_bug_analysis: &ldquo;{OUT}/{DUT}_bug_analysis.md&rdquo;；test_dir: &ldquo;{OUT}/tests&rdquo;。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>提示与最佳实践</p>
+<ul>
+<li>随时用工具：Detail/Status 查看 Mission 进度与当前阶段；CurrentTips 获取步骤级指导；Check/Complete 推进阶段。</li>
+<li>TUI 左侧 Mission 会显示阶段序号、跳过状态与失败计数；可结合命令行 <code>--skip/--unskip/--force-stage-index</code> 控制推进。</li>
+</ul>
+<h2 id="定制工作流增删阶段子阶段">定制工作流（增删阶段/子阶段）</h2>
+<h3 id="原理说明">原理说明</h3>
+<ul>
+<li>工作流定义在语言配置 <code>vagent/lang/zh/config/default.yaml</code> 的顶层 <code>stage:</code> 列表。</li>
+<li>配置加载顺序：setting.yaml → ~/.ucagent/setting.yaml → 语言默认（含 stage）→ 项目根 <code>config.yaml</code> → CLI <code>--override</code>。</li>
+<li>注意：列表类型（如 stage 列表）在合并时是“整体覆盖”，不是元素级合并；因此要“增删改”阶段，建议把默认的 stage 列表复制到你的项目 <code>config.yaml</code>，在此基础上编辑。</li>
+<li>临时不执行某阶段：优先使用 CLI <code>--skip &lt;index&gt;</code> 或在运行中用工具 Skip/Goto；持久跳过可在你的 <code>config.yaml</code> 中把该阶段条目的 <code>skip: true</code> 写上（同样需要提供完整的 stage 列表）。</li>
+</ul>
+<h3 id="增加阶段">增加阶段</h3>
+<ul>
+<li>需求：在“全面验证执行”之后新增一个“静态检查与 Lint 报告”阶段，要求生成 <code>&lt;OUT&gt;/{DUT}_lint_report.md</code> 并做格式检查。</li>
+<li>做法：在项目根 <code>config.yaml</code> 中提供完整的 <code>stage:</code> 列表，并在合适位置插入如下条目（片段示例，仅展示新增项，实际需要放入你的完整 stage 列表里）。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">stage</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># ...前面的既有阶段...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">static_lint_and_style_check</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">desc</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;静态分析与代码风格检查报告&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">task</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#4e9a06">&#34;目标：完成 DUT 的静态检查/Lint，并输出报告&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#4e9a06">&#34;第1步：运行 lint 工具（按项目需要）&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#4e9a06">&#34;第2步：将结论整理为 &lt;OUT&gt;/{DUT}_lint_report.md（中文）&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#4e9a06">&#34;第3步：用 Check 校验报告是否存在且格式规范&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">checker</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">markdown_file_check</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">clss</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;UnityChipCheckerMarkdownFileFormat&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">          </span><span style="color:#204a87;font-weight:bold">markdown_file_list</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_lint_report.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># MD 文件路径或列表</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">          </span><span style="color:#204a87;font-weight:bold">no_line_break</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># 禁止字面量 &#34;\n&#34; 作为换行</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">reference_files</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">output_files</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#4e9a06">&#34;{OUT}/{DUT}_lint_report.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">skip</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">false</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># ...后续既有阶段...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h3 id="减少子阶段">减少子阶段</h3>
+<ul>
+<li>场景：在“功能规格分析与测试点定义”中，临时不执行“功能点定义（FC）”子阶段。</li>
+<li>推荐做法：运行时使用 CLI <code>--skip</code> 跳过该索引；若需长期配置，复制默认 <code>stage:</code> 列表到你的 <code>config.yaml</code>，在父阶段 <code>functional_specification_analysis</code> 的 <code>stage:</code> 子列表里移除对应子阶段条目，或为该子阶段加 <code>skip: true</code>。</li>
+</ul>
+<p>子阶段移除（片段示例，仅展示父阶段结构与其子阶段列表）：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">stage</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">functional_specification_analysis</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">desc</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;功能规格分析与测试点定义&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">task</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#4e9a06">&#34;目标：将芯片功能拆解成可测试的小块，为后续测试做准备&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#8f5902;font-style:italic"># ...省略父阶段任务...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">stage</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">functional_grouping</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># 保留 FG 子阶段</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#8f5902;font-style:italic"># ...原有配置...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#8f5902;font-style:italic"># - name: function_point_definition  # 原来的 FC 子阶段（此行及其内容整体删除，或在其中加 skip: true）</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">check_point_design</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># 保留 CK 子阶段</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#8f5902;font-style:italic"># ...原有配置...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># ...其他字段...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><p>小贴士</p>
+<ul>
+<li>仅需临时跳过：用 <code>--skip</code>/<code>--unskip</code> 最快，无需改配置文件。</li>
+<li>需要永久增删：复制默认 <code>stage:</code> 列表到项目 <code>config.yaml</code>，编辑后提交到仓库；注意列表是整体覆盖，别只贴新增/删减的片段。</li>
+<li>新增阶段的检查器可复用现有类（如 Markdown/Fixture/API/Coverage/TestCase 等），也可以扩展自定义检查器（放在 <code>vagent/checkers/</code> 并以可导入路径填写到 <code>clss</code>）。</li>
+</ul>
+<h2 id="定制校验器checker">定制校验器（checker）</h2>
+<p>原理说明</p>
+<ul>
+<li>每个（子）阶段下的 <code>checker:</code> 是一个列表；执行 <code>Check</code> 时会依次运行该列表里的所有检查器。</li>
+<li>配置字段：
+<ul>
+<li><code>name</code>: 该检查器在阶段内的标识（便于阅读/日志）</li>
+<li><code>clss</code>: 检查器类名；短名默认从 <code>vagent.checkers</code> 命名空间导入，也可写完整模块路径（如 <code>mypkg.mychk.MyChecker</code>）</li>
+<li><code>args</code>: 传给检查器构造函数的参数，支持模板变量（如 <code>{OUT}</code>、<code>{DUT}</code>）</li>
+<li><code>extra_args</code>: 可选，部分检查器支持自定义提示/策略（如 <code>fail_msg</code>、<code>batch_size</code>、<code>pre_report_file</code> 等）</li>
+</ul>
+</li>
+<li>解析与实例化：<code>vagent/stage/vstage.py</code> 会读取 <code>checker:</code>，按 <code>clss/args</code> 生成实例；运行期由 <code>ToolStdCheck/Check</code> 调用其 <code>do_check()</code>。</li>
+<li>合并语义：配置合并时列表是“整体替换”，要在项目 <code>config.yaml</code> 修改某个阶段的 <code>checker:</code>，建议复制该阶段条目并完整替换其 <code>checker:</code> 列表。</li>
+</ul>
+<h3 id="增加-checker">增加 checker</h3>
+<p>在“功能规格分析与测试点定义”父阶段，新增“文档格式检查”，确保 <code>{OUT}/{DUT}_functions_and_checks.md</code> 没有把换行写成字面量 <code>\n</code>。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 片段示例：需要放入你的完整 stage 列表对应阶段中</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">functional_specification_analysis</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">desc</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;功能规格分析与测试点定义&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># ...existing fields...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">output_files</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span>- <span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">checker</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">functions_and_checks_doc_format</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">clss</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;UnityChipCheckerMarkdownFileFormat&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">markdown_file_list</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># 功能/检查点文档</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">no_line_break</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># 禁止字面量 &#34;\n&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">stage</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#8f5902;font-style:italic"># ...子阶段 FG/FC/CK 原有配置...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><p>（可扩展）自定义检查器（最小实现，放在 <code>vagent/checkers/unity_test.py</code>）</p>
+<p>很多场景下“增加的 checker”并非复用已有检查器，而是需要自己实现一个新的检查器。最小实现步骤：</p>
+<ol>
+<li>新建类并继承基类 <code>vagent.checkers.base.Checker</code></li>
+<li>在 <code>__init__</code> 里声明你需要的参数（与 YAML args 对应）</li>
+<li>实现 <code>do_check(self, timeout=0, **kw) -&gt; tuple[bool, object]</code>，返回 (是否通过, 结构化消息)</li>
+<li>如需读/写工作区文件，使用 <code>self.get_path(rel)</code> 获取绝对路径；如需跨阶段共享数据，使用 <code>self.smanager_set_value/get_value</code></li>
+<li>若想用短名 <code>clss</code> 引用，请在 <code>vagent/checkers/__init__.py</code> 导出该类（或在 <code>clss</code> 写完整模块路径）</li>
+</ol>
+<p>最小代码骨架（示例）：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># 文件：vagent/checkers/unity_test.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">typing</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Tuple</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">os</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">from</span> <span style="color:#000">vagent.checkers.base</span> <span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">Checker</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">UnityChipCheckerMyCustomCheck</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Checker</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">__init__</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">target_file</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">str</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">threshold</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87">int</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#000">kw</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">target_file</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">target_file</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">threshold</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">threshold</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">def</span> <span style="color:#000">do_check</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">timeout</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">**</span><span style="color:#000">kw</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#000">Tuple</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87">bool</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87">object</span><span style="color:#000;font-weight:bold">]:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#34;&#34;&#34;检查 target_file 是否存在并做简单规则校验。&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">real</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">get_path</span><span style="color:#000;font-weight:bold">(</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">target_file</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#204a87;font-weight:bold">not</span> <span style="color:#000">os</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">path</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">exists</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">real</span><span style="color:#000;font-weight:bold">):</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">False</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#4e9a06">&#34;error&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">f</span><span style="color:#4e9a06">&#34;file &#39;</span><span style="color:#4e9a06">{</span><span style="color:#3465a4">self</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#000">target_file</span><span style="color:#4e9a06">}</span><span style="color:#4e9a06">&#39; not found&#34;</span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic"># TODO: 这里写你的具体校验逻辑，例如统计/解析/比对等</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">True</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#4e9a06">&#34;message&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;MyCustomCheck passed&#34;</span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>在阶段 YAML 中引用（与“增加一个 checker”一致）：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">checker</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">my_custom_check</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">clss</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;UnityChipCheckerMyCustomCheck&#34;</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># 若未在 __init__.py 导出，写完整路径 mypkg.mychk.UnityChipCheckerMyCustomCheck</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">target_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_something.py&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">threshold</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">extra_args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">fail_msg</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;未满足自定义阈值，请完善实现或调低阈值。&#34;</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># 可选：通过 extra_args 自定义默认失败提示</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><p>进阶提示（按需）：</p>
+<ul>
+<li>长时任务/外部进程：在运行子进程时调用 <code>self.set_check_process(p, timeout)</code>，即可用工具 <code>KillCheck/StdCheck</code> 管理与查看进程输出。</li>
+<li>模板渲染：实现 <code>get_template_data()</code> 可将进度/统计渲染到阶段标题与任务文案中。</li>
+<li>初始化钩子：实现 <code>on_init()</code> 以在阶段开始时加载缓存/准备批任务（与 Batch 系列 checker 一致）。</li>
+</ul>
+<h3 id="删除-checker">删除 checker</h3>
+<p>如临时不要“第 2 阶段 基本信息文档格式检查”，将该阶段的 <code>checker:</code> 置空或移除该项：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">dut_function_understanding</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">desc</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{DUT}功能理解&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># ...existing fields...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">checker</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[]</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># 删除原本的 markdown_file_check</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h3 id="修改-checker">修改 checker</h3>
+<p>把“行覆盖率检查”的阈值从 0.9 调整到 0.8，并自定义失败提示：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">line_coverage_analysis_and_improvement</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">desc</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;代码行覆盖率分析与提升{COVERAGE_COMPLETE}&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># ...existing fields...</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">checker</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">line_coverage_check</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">clss</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;UnityChipCheckerTestCaseWithLineCoverage&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">doc_func_check</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">doc_bug_analysis</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_bug_analysis.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">test_dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">min_line_coverage</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">0.8</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># 调低阈值</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">extra_args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">fail_msg</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;未达到 80% 的行覆盖率，请补充针对未覆盖行的测试。&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><p>可选：自定义检查器类</p>
+<ul>
+<li>在 <code>vagent/checkers/</code> 新增类，继承 <code>vagent.checkers.base.Checker</code> 并实现 <code>do_check()</code>；</li>
+<li>在 <code>vagent/checkers/__init__.py</code> 导出类后，可在 <code>clss</code> 用短名；或直接写完整模块路径；</li>
+<li><code>args</code> 中的字符串支持模板变量渲染；<code>extra_args</code> 可用于自定义提示文案（具体视检查器实现而定）。</li>
+</ul>
+<h3 id="常用-checker-参数结构化">常用 checker 参数（结构化）</h3>
+<p>以下参数均来自实际代码实现（<code>vagent/checkers/unity_test.py</code>），名称、默认值与类型与代码保持一致；示例片段可直接放入阶段 YAML 的 <code>checker[].args</code>。</p>
+<h4 id="unitychipcheckermarkdownfileformat">UnityChipCheckerMarkdownFileFormat</h4>
+<ul>
+<li>参数：
+<ul>
+<li>markdown_file_list (str | List[str]): 要检查的 Markdown 文件路径或路径列表。</li>
+<li>no_line_break (bool, 默认 false): 是否禁止把换行写成字面量 &ldquo;\n&rdquo;；true 表示禁止。</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">markdown_file_list</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_basic_info.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">no_line_break</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckerlabelstructure">UnityChipCheckerLabelStructure</h4>
+<ul>
+<li>参数：
+<ul>
+<li><code>doc_file</code> (str)</li>
+<li><code>leaf_node</code> (&ldquo;FG&rdquo;|&ldquo;FC&rdquo;|&ldquo;CK&rdquo;)</li>
+<li><code>min_count</code> (int, 默认 1)</li>
+<li><code>must_have_prefix</code> (str, 默认 &ldquo;FG-API&rdquo;)</li>
+<li><code>data_key</code> (str, 可选)</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">leaf_node</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;CK&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">data_key</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;COVER_GROUP_DOC_CK_LIST&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckerdutcreation">UnityChipCheckerDutCreation</h4>
+<ul>
+<li>参数：
+<ul>
+<li><code>target_file</code> (str)</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">target_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests/{DUT}_api.py&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckerdutfixture">UnityChipCheckerDutFixture</h4>
+<ul>
+<li>参数：
+<ul>
+<li><code>target_file</code> (str)</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">target_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests/{DUT}_api.py&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckerenvfixture">UnityChipCheckerEnvFixture</h4>
+<ul>
+<li>参数：
+<ul>
+<li><code>target_file</code> (str)</li>
+<li><code>min_env</code> (int, 默认 1)</li>
+<li><code>force_bundle</code> (bool, 当前未使用)</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">target_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests/{DUT}_api.py&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">min_env</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckerdutapi">UnityChipCheckerDutApi</h4>
+<ul>
+<li>参数：
+<ul>
+<li><code>api_prefix</code> (str)</li>
+<li><code>target_file</code> (str)</li>
+<li><code>min_apis</code> (int, 默认 1)</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">api_prefix</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;api_{DUT}_&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">target_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests/{DUT}_api.py&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">min_apis</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckercoveragegroup">UnityChipCheckerCoverageGroup</h4>
+<ul>
+<li>参数：
+<ul>
+<li><code>test_dir</code> (str)</li>
+<li><code>cov_file</code> (str)</li>
+<li><code>doc_file</code> (str)</li>
+<li><code>check_types</code> (str|List[str])</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">test_dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">cov_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests/{DUT}_function_coverage_def.py&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">check_types</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;FG&#34;</span><span style="color:#000;font-weight:bold">,</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;FC&#34;</span><span style="color:#000;font-weight:bold">,</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;CK&#34;</span><span style="color:#000;font-weight:bold">]</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckercoveragegroupbatchimplementation">UnityChipCheckerCoverageGroupBatchImplementation</h4>
+<ul>
+<li>参数：
+<ul>
+<li><code>test_dir</code> (str)</li>
+<li><code>cov_file</code> (str)</li>
+<li><code>doc_file</code> (str)</li>
+<li><code>batch_size</code> (int)</li>
+<li><code>data_key</code> (str)</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">test_dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">cov_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests/{DUT}_function_coverage_def.py&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">batch_size</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">20</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">data_key</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;COVER_GROUP_DOC_CK_LIST&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckertesttemplate">UnityChipCheckerTestTemplate</h4>
+<ul>
+<li>基类参数：<code>doc_func_check</code> (str), <code>test_dir</code> (str), <code>min_tests</code> (int, 默认 1), <code>timeout</code> (int, 默认 15)</li>
+<li>扩展参数（extra_args）：<code>batch_size</code> (默认 20), <code>ignore_ck_prefix</code> (str), <code>data_key</code> (str)</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_func_check</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">test_dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">ignore_ck_prefix</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;test_api_{DUT}_&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">data_key</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;TEST_TEMPLATE_IMP_REPORT&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">batch_size</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">20</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckerdutapitest">UnityChipCheckerDutApiTest</h4>
+<ul>
+<li>参数：
+<ul>
+<li><code>api_prefix</code> (str)</li>
+<li><code>target_file_api</code> (str)</li>
+<li><code>target_file_tests</code> (str)</li>
+<li><code>doc_func_check</code> (str)</li>
+<li><code>doc_bug_analysis</code> (str)</li>
+<li><code>min_tests</code> (int, 默认 1)</li>
+<li><code>timeout</code> (int, 默认 15)</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">api_prefix</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;api_{DUT}_&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">target_file_api</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests/{DUT}_api.py&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">target_file_tests</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests/test_{DUT}_api*.py&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_func_check</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_bug_analysis</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_bug_analysis.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckerbatchtestsimplementation">UnityChipCheckerBatchTestsImplementation</h4>
+<ul>
+<li>基类参数：<code>doc_func_check</code> (str), <code>test_dir</code> (str), <code>doc_bug_analysis</code> (str), <code>ignore_ck_prefix</code> (str), <code>timeout</code> (int, 默认 15)</li>
+<li>进度参数：<code>data_key</code> (str, 必填)</li>
+<li>扩展参数（extra_args）：<code>batch_size</code> (默认 5), <code>pre_report_file</code> (str)</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_func_check</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_bug_analysis</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_bug_analysis.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">test_dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">ignore_ck_prefix</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;test_api_{DUT}_&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">batch_size</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">10</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">data_key</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;TEST_TEMPLATE_IMP_REPORT&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">pre_report_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}/.TEST_TEMPLATE_IMP_REPORT.json&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckertestcase">UnityChipCheckerTestCase</h4>
+<ul>
+<li>参数：
+<ul>
+<li><code>doc_func_check</code> (str)</li>
+<li><code>doc_bug_analysis</code> (str)</li>
+<li><code>test_dir</code> (str)</li>
+<li><code>min_tests</code> (int, 默认 1)</li>
+<li><code>timeout</code> (int, 默认 15)</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_func_check</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_bug_analysis</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_bug_analysis.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">test_dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<h4 id="unitychipcheckertestcasewithlinecoverage">UnityChipCheckerTestCaseWithLineCoverage</h4>
+<ul>
+<li>基础参数同 <code>UnityChipCheckerTestCase</code></li>
+<li>额外必需：<code>cfg</code> (dict|Config)</li>
+<li>额外可选（extra_args）：
+<ul>
+<li><code>min_line_coverage</code> (float, 默认按配置，未配置则 0.8)</li>
+<li><code>coverage_json</code> (str, 默认 <code>uc_test_report/line_dat/code_coverage.json</code>)</li>
+<li><code>coverage_analysis</code> (str, 默认 <code>unity_test/{DUT}_line_coverage_analysis.md</code>)</li>
+<li><code>coverage_ignore</code> (str, 默认 <code>unity_test/tests/{DUT}.ignore</code>)</li>
+</ul>
+</li>
+<li>示例：
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">args</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_func_check</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_functions_and_checks.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">doc_bug_analysis</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/{DUT}_bug_analysis.md&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">test_dir</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;{OUT}/tests&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">cfg</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;&lt;CONFIG_OBJECT_OR_DICT&gt;&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">min_line_coverage</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">0.9</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ul>
+<p>提示：上面的 <code>示例</code> 仅展示 <code>args</code> 片段；实际需置于阶段条目下的 <code>checker[].args</code>。</p>
+
+	<div class="td-page-meta__lastmod">
+  最后修改 September 30, 2025: <a href="https://github.com/XS-MLVP/course/commit/e18bbd0489faaf103dc23fe935401f55328de5a8">add ucagent document and its pics (e18bbd0)</a>
+</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="User mailing list" aria-label="User mailing list">
+    <a target="_blank" rel="noopener" href="https://example.org/mail" aria-label="User mailing list">
+      <i class="fa fa-envelope"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/google/docsy" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2025
+    <span class="td-footer__authors">BOSC</span></span><span class="td-footer__all_rights_reserved">保留所有权利</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隐私政策</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/mlvp/js/main.min.8bdc707530d61dee3a6fd659f8a422c05d2e2319377a8710175451ca21fa83b0.js" integrity="sha256-i9xwdTDWHe46b9ZZ&#43;KQiwF0uIxk3eocQF1RRyiH6g7A=" crossorigin="anonymous"></script>
+<script src='/mlvp/js/prism.js'></script>
+<script src='/mlvp/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
