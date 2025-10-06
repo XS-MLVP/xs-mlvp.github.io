@@ -32,14 +32,14 @@ IPrefetchPipe结构示意图	接收预取请求（s0 阶段）： 从 FTQ 或后
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-23T14:39:19+08:00">
+    <meta property="article:modified_time" content="2025-10-06T17:19:28+08:00">
 
   <meta itemprop="name" content="IPrefetchPipe">
   <meta itemprop="description" content="IPrefetchPipe IPrefetchPipe 为预取的流水线，三级流水设计，负责预取请求的过滤。
 IPrefetchPipe结构示意图	接收预取请求（s0 阶段）： 从 FTQ 或后端接收预取请求。 发送读请求到 ITLB 和 MetaArray 缓存元数据模块。 地址转换和缓存检查（s1 阶段）： 接收 ITLB 的地址转换结果，处理可能的缺失和重发。 从缓存元数据中读取标签和有效位，检查是否命中。 进行 PMP 权限检查，合并异常信息。 根据情况决定是否发送请求到 WayLookup 模块。 未命中请求处理（s2 阶段）： 检查与 missUnit 的交互，更新命中状态。 对于无异常的未命中请求，向 missUnit 发送请求以获取数据。 控制流水线的推进和刷新，处理可能的阻塞和异常。 S0 流水级 在 S0 流水级，接收来自 FTQ 的预取请求，向 MetaArray 和 ITLB 发送请求。
 接收预取请求：从 FTQ 或后端接收预取请求，提取预取请求的虚拟地址、FTQ 索引、是否为软件预取、是否跨缓存行信、虚拟组索引（s0_req_vSetIdx）和后端的异常信息。 发送请求到 ITLB：将虚拟地址发送到 ITLB 进行地址转换。 发送请求到缓存元数据（Meta SRAM）：将请求发送到缓存的元数据存储器，以便在后续阶段读取缓存标签和有效位。 S1 流水级 软件预取 enqway 持续一拍…
 接收 ITLB 的响应：从 ITLB 接收地址转换的结果，包括物理地址 paddr、异常类型(af/pf)和特殊情况(pbmt.nc/pbmt.io)。 接收缓存元数据的响应并检查缓存命中：从缓存元数据存储器 MetaArray 读取缓存标签 tag 和有效位，检查预取地址是否在缓存中已存在，命中结果存入 waymask 中。 权限检查：使用 PMP 对物理地址进行权限检查，确保预取操作的合法性。 异常处理和合并：合并来自后端、ITLB、PMP 的异常信息，准备在后续阶段处理。 发送请求到 WayLookup 模块：当条件满足时，将元数据（命中信息 waymask、ITLB 信息 paddr/af/pf）发送到 WayLookup 模块，以便进行后续的缓存访问。 状态机转换：根据当前状态和条件，更新下一个状态。 状态机初始状态为 idle，当 S1 流水级进入新的请求时，首先判断 ITLB 是否缺失，如果缺失，就进入 itlbResend；如果 ITLB 命中但命中信息未入队 WayLookup，就进入 enqWay；如果 ITLB 命中且 WayLookup 入队但 S2 请求未处理完，就进入 enterS2。 在 itlbResend 状态，重发 ITLB 请求，此时占用 ITLB 端口，直至请求回填完成，在回填完成的当拍向 MetaArray 再次发送读请求，回填期间可能发生新的写入，如果 MetaArray 繁忙（正在被写入），就进入metaResend，否则进入 enqWay。 在 metaResend 状态，重发 MetaArray 读请求，发送成功后进入 enqWay。 在 enqWay 状态，尝试将元数据入队 WayLookup，如果 WayLookup 队列已满，就阻塞至 WayLookup 入队成功，另外在 MSHR 发生新的写入时禁止入队，主要是为了防止写入的信息与命中信息所冲突，需要对命中信息进行更新。当成功入队 WayLookup 或者是软件预取时，如果 S2 空闲，就直接进入 idle，否则进入 enterS2。 在 enterS2 状态，尝试将请求流入下一流水级，流入后进入 idle。 IPrefetchPipe S1状态机	S2 流水级 监控 missUnit 的请求：更新 MSHR 的匹配状态。综合该请求的命中结果、ITLB 异常、PMP 异常、meta 损坏，判断是否需要预取，只有不存在异常时才进行预取。 发送请求到 missUnit：因为同一个预测块可能对应两个 cacheline，所以通过 Arbiter 依次将请求发送至 MissUnit。 命中信息的更新 在 S1 流水级中得到命中信息后，距离命中信息真正在 MainPipe 中被使用要经过两个阶段，分别是在 IPrefetchPipe 中等待入队 WayLookup 阶段和在 WayLookup 中等待出队阶段，在等待期间可能会发生 MSHR 对 Meta/DataArray 的更新，因此需要对 MSHR 的响应进行监听，分为两种情况：">
-  <meta itemprop="dateModified" content="2025-09-23T14:39:19+08:00">
+  <meta itemprop="dateModified" content="2025-10-06T17:19:28+08:00">
   <meta itemprop="wordCount" content="982">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="IPrefetchPipe">
@@ -1302,7 +1302,7 @@ cacheline 也分为单 cacheline 和双 cacheline。</p>
 </ol>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 23, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/fe37344753d77b00d14e264026ac9da16fad6605">Update func (#186) (fe37344)</a>
+  最后修改 October 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/5c937d47cff4cad0a20002d73f932b9aaf1541c2">Fix bug of build script for ftq_top (5c937d4)</a>
 </div>
 
 </div>

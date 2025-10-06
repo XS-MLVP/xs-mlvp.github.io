@@ -40,7 +40,7 @@ rob_commits的valid字段有效，可以根据其中信息对指令进行提交�
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-09-23T14:39:19+08:00">
+    <meta property="article:modified_time" content="2025-10-06T17:19:28+08:00">
 
   <meta itemprop="name" content="冲刷指针和状态队列">
   <meta itemprop="description" content="文档概述 之前讲了，后端和IFU重定向写回会修改一些状态队列。此外，FtqPtr也是一种比较重要的维护信息。由后端或者IFU引起的重定向，需要恢复各种类型用来索引FTQ项的FtqPtr。而当重定向是由后端发起的时候，还要修改提交状态队列，说明指令已经被执行。
@@ -51,7 +51,7 @@ rob_commits的valid字段有效，可以根据其中信息对指令进行提交�
 2.1 flush转发到icacheFlush flush信号顶层IO转发（icacheFlush）： 确认后端和IFU的重定向信号可能冲刷指针时，拉高FTQ顶层IO接口中的icacheFlush信号，把重定向产生的flush信号转发给ICache 2.2 重定向信号转发到IFU 重定向信号顶层IO转发（toIFU）： redirect： bits：接收来自后端的重定向信号 valid：后端的重定向信号有效时有效，保持有效，直到下个周期依然有效 3 重排序缓冲区提交 其实，除了后端重定向会更新提交状态队列，最直接的更新提交状态队列的方式是通过FTQ顶层IO中frombackend里提供的提交信息，rob_commits告知我们哪些指令需要被提交。
 rob_commits的valid字段有效，可以根据其中信息对指令进行提交，修改状态队列。对于被执行的指令，是如何提交的，如何对应地修改提交状态队列，有两种情况：
 3.1 提交普通指令 对于普通指令，根据rob_commits的ftqIdx和ftqOffset索引提交状态队列中的某条指令，将对应的提交状态设置为c_commited 3.2 提交融合指令 对于融合指令，根据提交类型commitType对被索引的指令和另一与之融合的指令进行提交，将对应的提交状态设置为c_commited commitType = 4：同时把被索引指令的下一条指令设为c_commited commitType = 5：同时把被索引指令的之后的第二条指令设为c_commited commitType = 6：同时把被指令块的下一个指令块的第0条指令设为c_commited commitType = 7：同时把被指令块的下一个指令块的第1条指令设为c_commited 接口说明 顶层IO 作用 fromBackend 接收后端重定向和指令提交 fromIfu 接收IFU重定向 icacheFlush 将flush信号转发到icache toIFU 将后端重定向转发到IFU 测试点总表 序号 功能名称 测试点名称 描述 1.1 FLUSH_FTQPTR_AND_COMMITSTATE FLUSH_COND 后端写回接口fromBackend有效，或者IFU重定向有效时，进行冲刷 1.2 FLUSH_FTQPTR_AND_COMMITSTATE FLUSH_FTQ_PTR 优先采用后端重定向信息冲刷FTQ指针 1.3 FLUSH_FTQPTR_AND_COMMITSTATE FLUSH_COMMIT_STATE 发生后端重定向时，进一步修改提交状态队列 2.1 TRANSFER_TO_TOP FLUSH 后端和IFU的重定向信号可能冲刷指针，拉高FTQ顶层IO接口中的icacheFlush信号 2.2 TRANSFER_TO_TOP IFU 将重定向信号转发到IFU 3.1 COMMIT_BY_ROB NORMAL 对于普通指令，根据rob_commits的ftqIdx和ftqOffset索引提交状态队列中的某条指令，将对应的提交状态设置为c_commited 3.2 COMMIT_BY_ROB FUSION 对于融合指令，根据提交类型commitType对被索引的指令和另一与之融合的指令进行提交，将对应的提交状态设置为c_commited">
-  <meta itemprop="dateModified" content="2025-09-23T14:39:19+08:00">
+  <meta itemprop="dateModified" content="2025-10-06T17:19:28+08:00">
   <meta itemprop="wordCount" content="116">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="冲刷指针和状态队列">
@@ -865,7 +865,7 @@ rob_commits的valid字段有效，可以根据其中信息对指令进行提交�
 </table>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 September 23, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/fe37344753d77b00d14e264026ac9da16fad6605">Update func (#186) (fe37344)</a>
+  最后修改 October 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/5c937d47cff4cad0a20002d73f932b9aaf1541c2">Fix bug of build script for ftq_top (5c937d4)</a>
 </div>
 
 </div>
