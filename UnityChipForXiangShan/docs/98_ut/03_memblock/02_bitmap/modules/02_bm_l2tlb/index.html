@@ -34,7 +34,7 @@ Bitmap Wakeup接口: refill bitmap 功能描述：当接收到 wake up valid 信
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-10-06T17:19:28+08:00">
+    <meta property="article:modified_time" content="2025-10-29T14:29:18+08:00">
     <meta property="article:tag" content="香山">
     <meta property="article:tag" content="Bitmap">
     <meta property="article:tag" content="硬件">
@@ -45,7 +45,7 @@ Bitmap Wakeup接口: refill bitmap 功能描述：当接收到 wake up valid 信
 接收来自 bitmap 的重填信号（bitmap wakeup）：用于接收 bitmap 检测结果并更新缓存。
 Bitmap Wakeup接口: refill bitmap 功能描述：当接收到 wake up valid 信号时，将 check_success 结果写入对应的 sp 或 l0 的 cache bitmap reg 中。
 工作原理：cache bitmap reg 用于标识缓存项是否通过 bitmap 检测。值为 1 表示已通过检测；值为 0 表示检测未通过或尚未检测。如果发现 PtwCache 命中的表项未通过检测，则触发 Bitmap 检测流程，并通过 bitmap wakeup 更新缓存项。此外，在走表过程中所有bitmap返回的项都会回填page cache。">
-  <meta itemprop="dateModified" content="2025-10-06T17:19:28+08:00">
+  <meta itemprop="dateModified" content="2025-10-29T14:29:18+08:00">
   <meta itemprop="wordCount" content="173">
   <meta itemprop="keywords" content="香山,Bitmap,硬件">
   <meta name="twitter:card" content="summary">
@@ -714,7 +714,7 @@ Bitmap Wakeup接口: refill bitmap 功能描述：当接收到 wake up valid 信
 <p>bitmap 依赖软件辅助刷新，硬件刷新不完整。在刷新前，需依次sfence 和 hfence L1 和L2TLB内所有项目，然后才可以拉高 CSR_MBMC_BCLEAR 进行bitmap cache刷新。</p>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 October 6, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/5c937d47cff4cad0a20002d73f932b9aaf1541c2">Fix bug of build script for ftq_top (5c937d4)</a>
+  最后修改 October 29, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/432bdafe20fe80a95823a13a55ba58cd4ff7d7b7">Verify icache moudles (#167) (432bdaf)</a>
 </div>
 
 </div>
