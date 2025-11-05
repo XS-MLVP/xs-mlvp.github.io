@@ -39,7 +39,7 @@
 学习本材料前，假定您已经拥有linux、python等相关基础知识。
 相关学习材料：
 《Linux 101》在线讲义 Python官方教程 Javatpoint上的Git基础 若计划参与本平台上发布的“开源开放验证项目”，建议提前完本材料的学习。">
-  <meta itemprop="dateModified" content="2025-10-29T16:40:21+08:00">
+  <meta itemprop="dateModified" content="2025-11-05T15:39:45+08:00">
   <meta itemprop="wordCount" content="8">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="学习资源">
@@ -146,7 +146,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.2010838e0c676927aa8ef73707fe1e6b.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.1e19e82645e8483f19db23e8f6c1d36e.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -3905,11 +3905,11 @@ CacheMeta.sv
 <p>方式一：克隆仓库并安装依赖</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/XS-MLVP/UCAgent.git
 </span></span><span style="display:flex;"><span><span style="color:#204a87">cd</span> UCAgent
-</span></span><span style="display:flex;"><span>pip install .
+</span></span><span style="display:flex;"><span>pip3 install .
 </span></span></code></pre></div></li>
 <li>
 <p>方式二（pip 安装）</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pip install git+https://git@github.com/XS-MLVP/UCAgent@main
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pip3 install git+https://git@github.com/XS-MLVP/UCAgent@main
 </span></span><span style="display:flex;"><span>ucagent --help <span style="color:#8f5902;font-style:italic"># 确认安装成功</span>
 </span></span></code></pre></div></li>
 </ul>
@@ -3918,7 +3918,7 @@ CacheMeta.sv
 <ol>
 <li>
 <p>pip 安装 UCAgent</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pip install git+https://git@github.com/XS-MLVP/UCAgent@main
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pip3 install git+https://git@github.com/XS-MLVP/UCAgent@main
 </span></span></code></pre></div></li>
 <li>
 <p>准备 DUT（待测模块）</p>
@@ -5102,7 +5102,9 @@ CacheMeta.sv
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  --template-dir ./templates <span style="color:#4e9a06">\
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  --template-overwrite <span style="color:#4e9a06">\
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  --output unity_test <span style="color:#4e9a06">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  --override <span style="color:#4e9a06">&#39;conversation_summary.max_tokens=16384,...&#39;</span> <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  --override <span style="color:#4e9a06">&#39;conversation_summary.max_tokens=16384,conversation_summary.max_summary_tokens=2048,conversation_summary.use_uc_mode=True,lang=&#34;zh&#34;,openai.model_name=&#34;gpt-4o-mini&#34;&#39;</span> <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  --gen-instruct-file GEMINI.md <span style="color:#4e9a06">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  --guid-doc-path ./output/Guide_Doc <span style="color:#4e9a06">\
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  <span style="color:#4e9a06">\
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  --use-todo-tools <span style="color:#4e9a06">\
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>  <span style="color:#4e9a06">\
@@ -5134,7 +5136,8 @@ CacheMeta.sv
 <li>-hm：启动即人工可介入</li>
 <li>-im enhanced：交互模式为增强（含规划与记忆）</li>
 <li>--tui：启用 TUI</li>
-<li>--loop/&ndash;loop-msg：启动后立即进入循环并注入首条消息</li>
+<li>-l：启动后立即进入循环</li>
+<li>--loop/&ndash;loop-msg：进入循环注入首条消息</li>
 <li>--seed 12345：固定随机种子</li>
 <li>--sys-tips：自定义系统提示</li>
 </ul>
