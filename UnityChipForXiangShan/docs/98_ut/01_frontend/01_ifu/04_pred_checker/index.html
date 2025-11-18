@@ -80,7 +80,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-10-29T14:29:18+08:00">
+    <meta property="article:modified_time" content="2025-11-18T14:30:51+08:00">
 
   <meta itemprop="name" content="PredChecker">
   <meta itemprop="description" content="子模块：PredChecker简介 分支预测检查器PredChecker接收来自IFU的预测块信息（包括预测跳转指令在预测块的位置、预测的跳转目标、预译码得到的指令信息、指令PC以及预译码得到的跳转目标偏移等），在模块内部检查五种类型的分支预测错误。模块内部分为两个流水线stage，分别输出信息，第一个stage输出给IFU的f3阶段，用于修正预测块的指令范围和预测结果。第二个stage输出给wb阶段，用于在发现分支预测错误时产生前端重定向以及写回给FTQ（Fetch Target Queue）正确的预测信息。
@@ -111,7 +111,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 对于误检，我们设计如下的测试点:
 序号 名称 描述 1.1.1 误检测试1 预测块中没有JAL指令且BPU预测信息也没有取用任何跳转指令的输入，检查PredChecker是否会误报JAL预测错误。 1.1.2 误检测试2 预测块中有JAL指令且BPU预测信息取用的正是本条跳转指令的输入，检查PredChecker是否会误报JAL预测错误。 对于JAL预测错误的正确检验，我们设计如下的测试点：
 序号 名称 描述 1.2.1 存在JAL未预测 预测块中存在JAL指令，但是BPU预测信息未预测跳转，检查PredChecker是否能检测出JAL预测错误。 1.2.2 预测的JAL并非第一条 预测块中存在JAL指令，但是BPU预测信息取的跳转指令在第一条JAL指令之后，检查PredChecker是否能检测出JAL预测错误。 功能点2 BPU预测信息的RET预测错误检查 PredChecker会对传入的预测块进行RET预测错误预检查并修正指令有效范围向量和新的预测结果。">
-  <meta itemprop="dateModified" content="2025-10-29T14:29:18+08:00">
+  <meta itemprop="dateModified" content="2025-11-18T14:30:51+08:00">
   <meta itemprop="wordCount" content="308">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="PredChecker">
@@ -1283,7 +1283,7 @@ PredChecker测试点和功能点 功能点1 BPU预测信息的JAL预测错误检
 </table>
 </div>
 	<div class="td-page-meta__lastmod">
-  最后修改 October 29, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/432bdafe20fe80a95823a13a55ba58cd4ff7d7b7">Verify icache moudles (#167) (432bdaf)</a>
+  最后修改 November 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c062796ac5f1ba5fd6dcc04bbca42b917736dc61">fix some issues for missunit (#190) (c062796)</a>
 </div>
 
 </div>

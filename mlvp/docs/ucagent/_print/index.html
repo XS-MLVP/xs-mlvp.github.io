@@ -30,7 +30,7 @@
 
   <meta itemprop="name" content="(AI)验证智能体">
   <meta itemprop="description" content="基于大模型进行自动化UT验证智能体">
-  <meta itemprop="dateModified" content="2025-11-17T17:12:09+08:00">
+  <meta itemprop="dateModified" content="2025-11-18T15:46:20+08:00">
   <meta itemprop="wordCount" content="5">
   <meta itemprop="keywords" content="Examples,Docs">
   <meta name="twitter:card" content="summary">
@@ -135,7 +135,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.b98b733c2b7cacc53ceecf67f0bbd8c4.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.a77c6c6ad71d350e773360a33e47bab5.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -274,6 +274,14 @@
     
 	
 <li>5: <a href="#pg-41ee5298b8c6094ee5f1fde353978dbe">工具列表</a></li>
+
+
+    
+  
+    
+    
+	
+<li>6: <a href="#pg-3bea19b021e5bd84529c181b33e46a03">黑客马拉松</a></li>
 
 
     
@@ -3185,6 +3193,58 @@
 <li>工具调用超时默认 20s（具体工具可重写）；长任务请周期性输出进度避免超时。</li>
 <li>MCP 无文件工具模式下默认不暴露写类工具；如需写入，建议在本地 Agent 模式或按需限制可写目录。</li>
 </ul>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-3bea19b021e5bd84529c181b33e46a03">6 - 黑客马拉松</h1>
+    <div class="lead">黑客马拉松赛题</div>
+	<h2 id="yunsuan介绍">YunSuan介绍</h2>
+<pre><code>YunSuan模块是开源高性能RISC-V处理器项目XiangShan（香山）的核心组成部分，专门负责实现处理器的各种算术和逻辑运算功能，包括整数运算单元、浮点运算单元、向量处理单元等。YunSuan模块与XiangShan处理器的流水线紧密集成，为RISC-V指令集提供完整的运算支持。
+</code></pre>
+<h2 id="赛题简介">赛题简介</h2>
+<p>本次比赛分为两个排名赛道，找bug赛道和token效率赛道，本次赛题均选自该模块的向量处理单元。每个模块含有五道题，1、2题为简单难度；3题为中等难度；4、5题困难难度。</p>
+<h3 id="找bug">找bug</h3>
+<p>你需要将选题中的bug找出，确认后在网站上提交；
+发现注入bug记100-500分；
+若发现全新bug（即在未注入bug的版本中找到新bug，第一个提交队伍活动额外奖金）记 1000-2000分；
+最后将按积分进行排名，前3名发奖金</p>
+<h3 id="token效率">token效率</h3>
+<p>利用UCAgent工具的API模式寻找bug，计算token效率：E = bug数/消耗总token （发现人工注入bug必须 &gt; 80%）；
+结果按E进行队伍排序，前3名发奖金；</p>
+<p><strong>备注：token将由UCAgent统计；你需要修改UCAgent以达到更高的token效率</strong>
+<strong>UCAgent链接：https://github.com/XS-MLVP/UCAgent</strong></p>
+<p>本次给出每个模块第一道题目，剩余题目将于活动当天一并给出</p>
+<h2 id="赛题模块">赛题&amp;模块：</h2>
+<h3 id="vectorfloatfma">VectorFloatFMA</h3>
+<pre><code>VectorFloatFMA是XiangShan处理器中YunSuan模块的关键组件，专门执行RISC-V V扩展的向量浮点乘加指令，支持FP16、FP32和FP64格式的并行计算，包括乘法、乘加、乘减等操作，并处理舍入模式、异常标志及特殊情况如NaN和无穷大，以实现高性能向量浮点运算。
+</code></pre>
+<p><a href="VectorFloatFMA.v">无bug版本</a>
+<a href="VectorFloatFMA_BUG1.v">题目1（简单）</a>
+Spec：<a href="https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html#sec-vector-float">向量浮点指令</a></p>
+<h3 id="vectorfloatadder模块">VectorFloatAdder模块</h3>
+<pre><code>VectorFloatAdder是一个支持多种浮点运算的向量加法器模块，能够处理半精度（f16）、单精度（f32）和双精度（f64）浮点数，并支持扩展操作（如扩展输入和扩展结果）。它支持包括加法、减法、最小值、最大值、比较、符号注入、分类和归约操作在内的多种操作。该模块通过多个子模块并行处理不同精度的数据，并根据操作码和格式选择相应的结果和异常标志。
+</code></pre>
+<p><a href="VectorFloatAdder.v">无bug版本</a>
+<a href="VectorFloatAdder_BUG1.v">题目1（简单）</a>
+Spec：<a href="https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html#sec-vector-float">向量浮点指令</a></p>
+<h3 id="vectoridiv模块">VectorIdiv模块</h3>
+<pre><code>VectorIdiv 是一个支持多种数据位宽的向量整数除法器模块。它通过并行实例化多个不同位宽的除法子模块来处理128位向量数据，采用状态机控制除法流程，最终输出商、余数向量和除零标志。该设计实现了高效的向量化整数除法运算。
+</code></pre>
+<p><a href="VectorIdiv.v">无bug版本</a>
+<a href="VectorIdiv_BUG1.v">题目1（简单）</a>
+Spec：<a href="https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html#vector-integer-divide-instructions">向量整数除法指令</a></p>
 
 </div>
 

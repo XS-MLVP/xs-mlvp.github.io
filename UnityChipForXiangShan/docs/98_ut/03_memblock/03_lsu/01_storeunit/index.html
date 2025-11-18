@@ -76,7 +76,7 @@ StoreQueue条目释放与状态清理
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
-    <meta property="article:modified_time" content="2025-10-29T14:29:18+08:00">
+    <meta property="article:modified_time" content="2025-11-18T14:30:51+08:00">
 
   <meta itemprop="name" content="StoreUnit">
   <meta itemprop="description" content="本文档参考香山StoreUnit设计文档写成 请注意，本文档撰写的测试点仅供参考，如能补充更多测试点，最终获得的奖励可能更高！
@@ -105,7 +105,7 @@ stage 3:
 标量store发起写回，通过stout发送给后端
 StoreQueue条目释放与状态清理
 存储数据流水线 从发射队列（issue queue）接收数据 将数据写回StoreQueue 标记发射队列接收的数据为就绪状态 向量存储指令执行 对于除 SEG指令外的向量内存访问指令，VSSplit 负责接收向量内存访问指令发射队列发送的微操作（uop），并将该微操作拆分为多个元素。随后VSSplit 将这些元素发送至StoreUnit 执行，执行流程与标量内存访问指令相同。执行完成后，元素会被写回至 VSMerge，其中 Merge 模块会将这些元素收集并组合成微操作，最终写回向量寄存器文件。 SEG 指令则由独立的 VSegmentUnit 模块处理。">
-  <meta itemprop="dateModified" content="2025-10-29T14:29:18+08:00">
+  <meta itemprop="dateModified" content="2025-11-18T14:30:51+08:00">
   <meta itemprop="wordCount" content="2292">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="StoreUnit">
@@ -3886,7 +3886,7 @@ SEG 指令则由独立的 VSegmentUnit 模块处理。</p>
 </mrs-testpoints>
 
 	<div class="td-page-meta__lastmod">
-  最后修改 October 29, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/432bdafe20fe80a95823a13a55ba58cd4ff7d7b7">Verify icache moudles (#167) (432bdaf)</a>
+  最后修改 November 18, 2025: <a href="https://github.com/XS-MLVP/UnityChipForXiangShan/documents/commit/c062796ac5f1ba5fd6dcc04bbca42b917736dc61">fix some issues for missunit (#190) (c062796)</a>
 </div>
 
 </div>
