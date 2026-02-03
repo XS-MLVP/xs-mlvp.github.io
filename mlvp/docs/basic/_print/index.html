@@ -30,7 +30,7 @@
 
   <meta itemprop="name" content="验证基础">
   <meta itemprop="description" content="介绍开放验证平台工作所需要的基础知识。">
-  <meta itemprop="dateModified" content="2025-11-25T14:15:26+08:00">
+  <meta itemprop="dateModified" content="2026-02-03T11:31:06+08:00">
   <meta itemprop="wordCount" content="3">
   <meta itemprop="keywords" content="Examples,Docs">
   <meta name="twitter:card" content="summary">
@@ -135,7 +135,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.4e01a9ff22f62167a5aafb32d6267591.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.25c99fb50f79292a8e54b0f86ed5faa0.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -554,7 +554,7 @@
 <p>完成上述所有文件的创建后（build.sc，src/main/scala/nut_cache.scala），在cache-ut目录下执行如下命令：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mkdir build
 </span></span><span style="display:flex;"><span>mill --no-server -d ut.runMain ut_nutshell.CacheMain --target-dir build --output-file Cache
-</span></span></code></pre></div><p>注：mill环境的配置请参考 <a href="https://mill-build.com/mill/Intro_to_Mill.html">https://mill-build.com/mill/Intro_to_Mill.html</a></p>
+</span></span></code></pre></div><p>注：mill环境的配置请参考 <a href="https://mill-build.org/mill/cli/installation-ide.html">https://mill-build.org/mill/cli/installation-ide.html</a></p>
 <p>上述命令成功执行完成后，会在build目录下生成verilog文件：Cache.v。之后就可以通过picker工具进行Cache.v到 Python模块的转换。除去chisel外，其他HCL语言几乎都能生成对应的 RTL代码，因此上述基本流程也适用于其他HCL。</p>
 <h3 id="dut编译">DUT编译</h3>
 <p>一般情况下，如果需要DUT生成波形、覆盖率等会导致DUT的执行速度变慢，因此在通过picker工具生成python模块时会根据多种配置进行生成：（1）关闭所有debug信息；（2）开启波形；（3）开启代码行覆盖率。其中第一种配置的目标是快速构建环境，进行回归测试等；第二种配置用于分析具体错误，时序等；第三种用于提升覆盖率。</p>
@@ -608,7 +608,7 @@
 <strong>3. Ref Cache</strong>：一个简单的参考模型
 <strong>4. Memory/MMIO Ram</strong>：外围设备的模拟，用于模拟相应cache的请求
 <strong>5. Nutshell Cache Dut</strong>：由Picker生成的DUT</p></blockquote>
-<p>此外，您可能还需要对DUT的接口做进一步封装以实现更方便的读写请求操作，具体可以参考<a href="https://github.com/yzcccccccccc/XS-MLVP-NutShellCache/blob/master/UT_Cache/util/cachewrapper.py">Nutshll cachewrapper</a>。</p>
+<p>此外，您可能还需要对DUT的接口做进一步封装以实现更方便的读写请求操作，具体可以参考<a href="https://github.com/XS-MLVP/Example-NutShellCache/blob/b6be4986ac701a34aa3a3619ddddc763f6539530/UT_Cache/util/cachewrapper.py">Nutshll cachewrapper</a>。</p>
 <p><strong>3 功能点与测试点分解</strong>：
 果壳cache可以响应MMIO请求，进一步分解可以得到一下测试点：</p>
 <blockquote>
@@ -616,7 +616,7 @@
 <strong>测试点2</strong>：cache响应MMIO请求时，不会发出突发传输（Burst Transfer）的请求
 <strong>测试点3</strong>：cache响应MMIO请求时，会阻塞流水线</p></blockquote>
 <p><strong>4 构造测试用例</strong>：
-测试用例的构造是简单的，已知通过<a href="/zh-cn/docs/basic/create_dut">创建DUT</a>得到的Nutshell cache的MMIO地址范围是<code>0x30000000</code>~<code>0x7fffffff</code>，则我们只需访问这段内存区间，应当就能获得MMIO的预期结果。需要注意的是，为了触发阻塞流水线的测试点，您可能需要连续地发起请求。
+测试用例的构造是简单的，已知通过<a href="/mlvp/docs/basic/create_dut/">创建DUT</a>得到的Nutshell cache的MMIO地址范围是<code>0x30000000</code>~<code>0x7fffffff</code>，则我们只需访问这段内存区间，应当就能获得MMIO的预期结果。需要注意的是，为了触发阻塞流水线的测试点，您可能需要连续地发起请求。
 以下是一个简单的测试用例：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># import CacheWrapper here</span>
 </span></span><span style="display:flex;"><span>

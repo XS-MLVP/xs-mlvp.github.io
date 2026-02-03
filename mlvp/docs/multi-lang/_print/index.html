@@ -30,7 +30,7 @@
 
   <meta itemprop="name" content="多语言支持">
   <meta itemprop="description" content="开放验证平台支持多种语言">
-  <meta itemprop="dateModified" content="2025-11-25T14:15:26+08:00">
+  <meta itemprop="dateModified" content="2026-02-03T11:31:06+08:00">
   <meta itemprop="keywords" content="Examples,Docs">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="多语言支持">
@@ -134,7 +134,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.4e01a9ff22f62167a5aafb32d6267591.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.25c99fb50f79292a8e54b0f86ed5faa0.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -263,6 +263,38 @@
 </span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support  Scala <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/scala/xspcomm-scala.jar&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
 </span></span></code></pre></div><p>输出显示success表示支持，fail表示不支持。</p>
 <h3 id="c">C++</h3>
+<p>以下为如何使用Picker将RTL代码编译为C++ Class，并编译为动态库。</p>
+<ol>
+<li>
+<p>首先，Picker工具会解析RTL代码，根据指定的 Top Module ，创建一个新的 Module 封装该模块的<strong>输入输出端口</strong>，并导出<code>DPI/API</code>以操作输入端口、读取输出端口。</p>
+<blockquote>
+<p><em>工具通过指定Top Module所在的文件和 Module Name来确定需要封装的模块。此时可以将 Top 理解为软件编程中的main。</em></p></blockquote>
+</li>
+<li>
+<p>其次，Picker工具会使用指定的 <strong>仿真器</strong> 编译RTL代码，并生成一个<strong>DPI库文件</strong>。该库文件内包含模拟运行RTL代码所需要的逻辑（即为<strong>硬件模拟器</strong>）。</p>
+<blockquote>
+<p><em>对于VCS，该库文件为.so（动态库）文件，对于Verilator，该库文件为.a（静态库）文件。</em>
+<em>DPI的含义是 <a href="https://www.chipverify.com/systemverilog/systemverilog-dpi">Direct Programming Interface</a>，可以理解为一种API规范。</em></p></blockquote>
+</li>
+<li>
+<p>接下来，Picker工具会根据配置参数，渲染源代码中定义的基类，生成用于对接仿真器并<strong>隐藏仿真器细节</strong>的基类（wrapper）。然后链接基类与DPI库文件，生成一个 <strong>UT动态库文件</strong>。</p>
+<blockquote>
+<ul>
+<li><em>此时，该<strong>UT库文件</strong>使用了Picker工具模板中提供的统一API，相比于<strong>DPI库文件</strong>中与仿真器强相关的API，UT库文件为仿真器生成的硬件模拟器，提供了<strong>统一的API接口</strong>。</em></li>
+<li><em>截至这一步生成<strong>UT库文件</strong>在不同语言中是<strong>通用</strong>的！如果没有另行说明，其他高级语言均会通过<strong>调用UT动态库</strong>以实现对硬件模拟器的操作。</em></li>
+</ul></blockquote>
+</li>
+<li>
+<p>最后，Picker工具会根据配置参数和解析的RTL代码，生成一段 <strong>C++ Class</strong> 的源码。这段源码即是 RTL 硬件模块在软件中的<strong>定义 (.hpp)</strong> 及<strong>实现 (.cpp)</strong> 。实例化该类即相当于创建了一个硬件模块。</p>
+<blockquote>
+<p><em>该类继承自<strong>基类</strong>，并实现了基类中的纯虚函数，以用软件方式实例化硬件。</em>
+<em>不将<strong>类的实现</strong>这一步也封装进动态库的原因有两点：</em></p>
+<ol>
+<li><em>由于<strong>UT库文件</strong>需要在不同语言中<strong>通用</strong>，而不同语言实现类的方式不同。为了通用性，不将<code>类的实现</code>封装进动态库。</em></li>
+<li><em>为了<strong>便于调试</strong>，提升代码可读性，方便用户进行二次封装和修改。</em></li>
+</ol></blockquote>
+</li>
+</ol>
 <p>对于C++语言，picker生成的为so动态链接库，和对应的头文件。例如：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
 </span></span><span style="display:flex;"><span>├── UT_Adder.cpp       <span style="color:#8f5902;font-style:italic"># DUT 文件</span>

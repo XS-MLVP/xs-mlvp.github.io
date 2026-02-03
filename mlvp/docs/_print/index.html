@@ -39,7 +39,7 @@
 学习本材料前，假定您已经拥有linux、python等相关基础知识。
 相关学习材料：
 《Linux 101》在线讲义 Python官方教程 Javatpoint上的Git基础 若计划参与本平台上发布的“开源开放验证项目”，建议提前完本材料的学习。">
-  <meta itemprop="dateModified" content="2025-11-25T14:15:26+08:00">
+  <meta itemprop="dateModified" content="2026-02-03T11:31:06+08:00">
   <meta itemprop="wordCount" content="8">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="学习资源">
@@ -146,7 +146,7 @@
     aria-label="站内搜索…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/mlvp/offline-search-index.4e01a9ff22f62167a5aafb32d6267591.json"
+    data-offline-search-index-json-src="/mlvp/offline-search-index.25c99fb50f79292a8e54b0f86ed5faa0.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -1738,7 +1738,7 @@ Test Passed
 <blockquote>
 <p>Swig 是一个用于将 C/C++ 导出为其他高级语言的工具。该工具会解析 C++ 头文件，并生成对应的中间代码。
 如果希望详细了解生成过程，请参阅 <a href="http://www.swig.org/Doc4.2/SWIGDocumentation.html">Swig 官方文档</a>。
-如果希望知道 Picker 如何生成 C++ Class，请参阅 <a href="docs/quick-start/multi-lang/cpp">C++</a>。</p></blockquote>
+如果希望知道 Picker 如何生成 C++ Class，请参阅 <a href="/mlvp/docs/multi-lang/interface/#c">C++</a>。</p></blockquote>
 <ul>
 <li>该这个模块和标准的 Python 模块一样，可以被其他 Python 程序导入并调用，文件结构也与普通 Python 模块无异。</li>
 </ul>
@@ -2112,7 +2112,7 @@ CacheMeta.sv
 </li>
 </ol>
 <h4 id="genhtml">genhtml</h4>
-<p>由 <code>locv</code> 包提供的 <code>genhtml</code> 可以由上述的.info 文件导出可读性更好的 html 报告。命令格式为：<code>genhtml [OPTIONS] &lt;infofiles&gt;</code>。
+<p>由 <code>lcov</code> 包提供的 <code>genhtml</code> 可以由上述的.info 文件导出可读性更好的 html 报告。命令格式为：<code>genhtml [OPTIONS] &lt;infofiles&gt;</code>。
 建议使用<code>-o &lt;outputdir&gt;</code>选项将结果输出到指定目录。</p>
 <p>以<a href="/mlvp/docs/quick-start/eg-adder/">加法器</a>为例。</p>
 <p><img src="adder.jpg" alt="adder.jpg"></p>
@@ -3413,7 +3413,7 @@ CacheMeta.sv
 <p>完成上述所有文件的创建后（build.sc，src/main/scala/nut_cache.scala），在cache-ut目录下执行如下命令：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mkdir build
 </span></span><span style="display:flex;"><span>mill --no-server -d ut.runMain ut_nutshell.CacheMain --target-dir build --output-file Cache
-</span></span></code></pre></div><p>注：mill环境的配置请参考 <a href="https://mill-build.com/mill/Intro_to_Mill.html">https://mill-build.com/mill/Intro_to_Mill.html</a></p>
+</span></span></code></pre></div><p>注：mill环境的配置请参考 <a href="https://mill-build.org/mill/cli/installation-ide.html">https://mill-build.org/mill/cli/installation-ide.html</a></p>
 <p>上述命令成功执行完成后，会在build目录下生成verilog文件：Cache.v。之后就可以通过picker工具进行Cache.v到 Python模块的转换。除去chisel外，其他HCL语言几乎都能生成对应的 RTL代码，因此上述基本流程也适用于其他HCL。</p>
 <h3 id="dut编译">DUT编译</h3>
 <p>一般情况下，如果需要DUT生成波形、覆盖率等会导致DUT的执行速度变慢，因此在通过picker工具生成python模块时会根据多种配置进行生成：（1）关闭所有debug信息；（2）开启波形；（3）开启代码行覆盖率。其中第一种配置的目标是快速构建环境，进行回归测试等；第二种配置用于分析具体错误，时序等；第三种用于提升覆盖率。</p>
@@ -3467,7 +3467,7 @@ CacheMeta.sv
 <strong>3. Ref Cache</strong>：一个简单的参考模型
 <strong>4. Memory/MMIO Ram</strong>：外围设备的模拟，用于模拟相应cache的请求
 <strong>5. Nutshell Cache Dut</strong>：由Picker生成的DUT</p></blockquote>
-<p>此外，您可能还需要对DUT的接口做进一步封装以实现更方便的读写请求操作，具体可以参考<a href="https://github.com/yzcccccccccc/XS-MLVP-NutShellCache/blob/master/UT_Cache/util/cachewrapper.py">Nutshll cachewrapper</a>。</p>
+<p>此外，您可能还需要对DUT的接口做进一步封装以实现更方便的读写请求操作，具体可以参考<a href="https://github.com/XS-MLVP/Example-NutShellCache/blob/b6be4986ac701a34aa3a3619ddddc763f6539530/UT_Cache/util/cachewrapper.py">Nutshll cachewrapper</a>。</p>
 <p><strong>3 功能点与测试点分解</strong>：
 果壳cache可以响应MMIO请求，进一步分解可以得到一下测试点：</p>
 <blockquote>
@@ -3475,7 +3475,7 @@ CacheMeta.sv
 <strong>测试点2</strong>：cache响应MMIO请求时，不会发出突发传输（Burst Transfer）的请求
 <strong>测试点3</strong>：cache响应MMIO请求时，会阻塞流水线</p></blockquote>
 <p><strong>4 构造测试用例</strong>：
-测试用例的构造是简单的，已知通过<a href="/zh-cn/docs/basic/create_dut">创建DUT</a>得到的Nutshell cache的MMIO地址范围是<code>0x30000000</code>~<code>0x7fffffff</code>，则我们只需访问这段内存区间，应当就能获得MMIO的预期结果。需要注意的是，为了触发阻塞流水线的测试点，您可能需要连续地发起请求。
+测试用例的构造是简单的，已知通过<a href="/mlvp/docs/basic/create_dut/">创建DUT</a>得到的Nutshell cache的MMIO地址范围是<code>0x30000000</code>~<code>0x7fffffff</code>，则我们只需访问这段内存区间，应当就能获得MMIO的预期结果。需要注意的是，为了触发阻塞流水线的测试点，您可能需要连续地发起请求。
 以下是一个简单的测试用例：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># import CacheWrapper here</span>
 </span></span><span style="display:flex;"><span>
@@ -3808,6 +3808,38 @@ CacheMeta.sv
 </span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">[</span>OK <span style="color:#ce5c00;font-weight:bold">]</span> Support  Scala <span style="color:#ce5c00;font-weight:bold">(</span>find: <span style="color:#4e9a06">&#39;/usr/local/share/lib/python3.11/site-packages/picker/share/picker/scala/xspcomm-scala.jar&#39;</span> success<span style="color:#ce5c00;font-weight:bold">)</span>
 </span></span></code></pre></div><p>输出显示success表示支持，fail表示不支持。</p>
 <h3 id="c">C++</h3>
+<p>以下为如何使用Picker将RTL代码编译为C++ Class，并编译为动态库。</p>
+<ol>
+<li>
+<p>首先，Picker工具会解析RTL代码，根据指定的 Top Module ，创建一个新的 Module 封装该模块的<strong>输入输出端口</strong>，并导出<code>DPI/API</code>以操作输入端口、读取输出端口。</p>
+<blockquote>
+<p><em>工具通过指定Top Module所在的文件和 Module Name来确定需要封装的模块。此时可以将 Top 理解为软件编程中的main。</em></p></blockquote>
+</li>
+<li>
+<p>其次，Picker工具会使用指定的 <strong>仿真器</strong> 编译RTL代码，并生成一个<strong>DPI库文件</strong>。该库文件内包含模拟运行RTL代码所需要的逻辑（即为<strong>硬件模拟器</strong>）。</p>
+<blockquote>
+<p><em>对于VCS，该库文件为.so（动态库）文件，对于Verilator，该库文件为.a（静态库）文件。</em>
+<em>DPI的含义是 <a href="https://www.chipverify.com/systemverilog/systemverilog-dpi">Direct Programming Interface</a>，可以理解为一种API规范。</em></p></blockquote>
+</li>
+<li>
+<p>接下来，Picker工具会根据配置参数，渲染源代码中定义的基类，生成用于对接仿真器并<strong>隐藏仿真器细节</strong>的基类（wrapper）。然后链接基类与DPI库文件，生成一个 <strong>UT动态库文件</strong>。</p>
+<blockquote>
+<ul>
+<li><em>此时，该<strong>UT库文件</strong>使用了Picker工具模板中提供的统一API，相比于<strong>DPI库文件</strong>中与仿真器强相关的API，UT库文件为仿真器生成的硬件模拟器，提供了<strong>统一的API接口</strong>。</em></li>
+<li><em>截至这一步生成<strong>UT库文件</strong>在不同语言中是<strong>通用</strong>的！如果没有另行说明，其他高级语言均会通过<strong>调用UT动态库</strong>以实现对硬件模拟器的操作。</em></li>
+</ul></blockquote>
+</li>
+<li>
+<p>最后，Picker工具会根据配置参数和解析的RTL代码，生成一段 <strong>C++ Class</strong> 的源码。这段源码即是 RTL 硬件模块在软件中的<strong>定义 (.hpp)</strong> 及<strong>实现 (.cpp)</strong> 。实例化该类即相当于创建了一个硬件模块。</p>
+<blockquote>
+<p><em>该类继承自<strong>基类</strong>，并实现了基类中的纯虚函数，以用软件方式实例化硬件。</em>
+<em>不将<strong>类的实现</strong>这一步也封装进动态库的原因有两点：</em></p>
+<ol>
+<li><em>由于<strong>UT库文件</strong>需要在不同语言中<strong>通用</strong>，而不同语言实现类的方式不同。为了通用性，不将<code>类的实现</code>封装进动态库。</em></li>
+<li><em>为了<strong>便于调试</strong>，提升代码可读性，方便用户进行二次封装和修改。</em></li>
+</ol></blockquote>
+</li>
+</ol>
 <p>对于C++语言，picker生成的为so动态链接库，和对应的头文件。例如：</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>UT_Adder/
 </span></span><span style="display:flex;"><span>├── UT_Adder.cpp       <span style="color:#8f5902;font-style:italic"># DUT 文件</span>
